@@ -59,5 +59,320 @@ namespace WPFTheWeakestRival.Properties.Langs {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Select an image.
+        /// </summary>
+        internal static string btnChooseImage {
+            get {
+                return ResourceManager.GetString("btnChooseImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Choose an image.
+        /// </summary>
+        internal static string btnImageChooser {
+            get {
+                return ResourceManager.GetString("btnImageChooser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Login.
+        /// </summary>
+        internal static string btnLogin {
+            get {
+                return ResourceManager.GetString("btnLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Cancel.
+        /// </summary>
+        internal static string cancel {
+            get {
+                return ResourceManager.GetString("cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a #cb102c.
+        /// </summary>
+        internal static string colorLogin {
+            get {
+                return ResourceManager.GetString("colorLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a email@example.com.
+        /// </summary>
+        internal static string emailPlaceholder {
+            get {
+                return ResourceManager.GetString("emailPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a English.
+        /// </summary>
+        internal static string en {
+            get {
+                return ResourceManager.GetString("en", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The email is already registered.
+        /// </summary>
+        internal static string errorEmailExists {
+            get {
+                return ResourceManager.GetString("errorEmailExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Email or password incorrects.
+        /// </summary>
+        internal static string errorInvalidateCredentials {
+            get {
+                return ResourceManager.GetString("errorInvalidateCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The email does not have the necessary structure.
+        /// </summary>
+        internal static string errorInvalidEmail {
+            get {
+                return ResourceManager.GetString("errorInvalidEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The passwords don&apos;t match.
+        /// </summary>
+        internal static string errorMatchingPasswords {
+            get {
+                return ResourceManager.GetString("errorMatchingPasswords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Fields were missing to fill out.
+        /// </summary>
+        internal static string errorMisingFields {
+            get {
+                return ResourceManager.GetString("errorMisingFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The password must have at least 9 characters, one uppercase letter, and a symbol..
+        /// </summary>
+        internal static string errorPasswordStructure {
+            get {
+                return ResourceManager.GetString("errorPasswordStructure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The username already exists.
+        /// </summary>
+        internal static string errorUsernameExists {
+            get {
+                return ResourceManager.GetString("errorUsernameExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The username should not have spaces.
+        /// </summary>
+        internal static string errorUsernameWithoutSpaces {
+            get {
+                return ResourceManager.GetString("errorUsernameWithoutSpaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Spanish.
+        /// </summary>
+        internal static string es {
+            get {
+                return ResourceManager.GetString("es", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Forgot your password?.
+        /// </summary>
+        internal static string forgotPassword {
+            get {
+                return ResourceManager.GetString("forgotPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error on the registration.
+        /// </summary>
+        internal static string generalRegistError {
+            get {
+                return ResourceManager.GetString("generalRegistError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a /Properties/Images/logo_en.png.
+        /// </summary>
+        internal static string imageLogo {
+            get {
+                return ResourceManager.GetString("imageLogo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Confirm password.
+        /// </summary>
+        internal static string lblConfirmPassword {
+            get {
+                return ResourceManager.GetString("lblConfirmPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Email.
+        /// </summary>
+        internal static string lblEmail {
+            get {
+                return ResourceManager.GetString("lblEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Password.
+        /// </summary>
+        internal static string lblPassword {
+            get {
+                return ResourceManager.GetString("lblPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Welcome.
+        /// </summary>
+        internal static string lblWelcome {
+            get {
+                return ResourceManager.GetString("lblWelcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Login.
+        /// </summary>
+        internal static string loginTitle {
+            get {
+                return ResourceManager.GetString("loginTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You don&apos;t have account?.
+        /// </summary>
+        internal static string notAccount {
+            get {
+                return ResourceManager.GetString("notAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Enter your password.
+        /// </summary>
+        internal static string passwordPlaceHolder {
+            get {
+                return ResourceManager.GetString("passwordPlaceHolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Play as guest.
+        /// </summary>
+        internal static string playAsGuest {
+            get {
+                return ResourceManager.GetString("playAsGuest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Registration.
+        /// </summary>
+        internal static string regist {
+            get {
+                return ResourceManager.GetString("regist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Username.
+        /// </summary>
+        internal static string registerDisplayName {
+            get {
+                return ResourceManager.GetString("registerDisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Registratioon error.
+        /// </summary>
+        internal static string registerError {
+            get {
+                return ResourceManager.GetString("registerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Registration.
+        /// </summary>
+        internal static string registerTitle {
+            get {
+                return ResourceManager.GetString("registerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Registration.
+        /// </summary>
+        internal static string registHeader {
+            get {
+                return ResourceManager.GetString("registHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The registration has been success.
+        /// </summary>
+        internal static string registSucces {
+            get {
+                return ResourceManager.GetString("registSucces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Welcome to The weakest rival.
+        /// </summary>
+        internal static string succesLoginMessage {
+            get {
+                return ResourceManager.GetString("succesLoginMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Select your profile picture.
+        /// </summary>
+        internal static string tittleImageSelector {
+            get {
+                return ResourceManager.GetString("tittleImageSelector", resourceCulture);
+            }
+        }
     }
 }
