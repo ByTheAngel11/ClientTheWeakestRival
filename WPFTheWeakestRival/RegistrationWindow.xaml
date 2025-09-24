@@ -3,10 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WPFTheWeakestRival"
+        xmlns:language="clr-namespace:WPFTheWeakestRival.Properties.Langs"
         mc:Ignorable="d"
-        Title="RegistrationWindow" Height="450" Width="800">
+        Title="{x:Static language:Lang.registHeader}" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <Label Name="lblRegistration" Content="{x:Static language:Lang.registerTitle}" FontSize="35" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Margin="0,37,0,0" VerticalAlignment="Top" Width="200"/>
+        <Label Name="lblUsername" Content="{x:Static language:Lang.registerDisplayName}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="141,100,0,0" VerticalAlignment="Top" Width="164"/>
+        <TextBox Name="txtUsername"  HorizontalAlignment="Left" Margin="343,104,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="216"/>
+        <Label Name="lblEmail" Content="{x:Static language:Lang.lblEmail}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="144,144,0,0" VerticalAlignment="Top" Width="157"/>
+        <TextBox Name="txtEmail" HorizontalAlignment="Left" Margin="343,153,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="216"/>
+        <Label Name="lblPassword" Content="{x:Static language:Lang.lblPassword}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="171,198,0,0" VerticalAlignment="Top" Width="102"/>
+        <PasswordBox Name="pstPassword" HorizontalAlignment="Left" Margin="343,202,0,0" VerticalAlignment="Top" Width="216"/>
+        <Label Name="lblConfirmPassword" Content="{x:Static language:Lang.lblConfirmPassword}" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Margin="125,242,0,0" VerticalAlignment="Top" Width="195"/>
+        <PasswordBox Name="pstConfirmPassword" HorizontalAlignment="Left" Margin="343,251,0,0" VerticalAlignment="Top" Width="216"/>
+        <Image x:Name="imgPreview" Width="120" Height="120" Margin="94,300,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Stretch="UniformToFill">
+            <Image.Style>
+                <Style TargetType="Image">
+                    <Setter Property="Source" Value="{x:Null}"/>
+                </Style>
+            </Image.Style>
+        </Image>
+        <Button x:Name="btnChooseImage" Content="{x:Static language:Lang.btnChooseImage}" Width="140" Height="26" Margin="0,322,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Click="ChooseImageClick"/>
+        <TextBlock x:Name="txtImgName" Margin="0,353,0,0" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" Width="394"/>
+        <Button Name="btnRegister" Content="{x:Static language:Lang.regist}" HorizontalAlignment="Left" Background="Blue" Foreground="White" Margin="434,374,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="RegisterClick"/>
+        <Button Name="btnBack" Content="{x:Static language:Lang.cancel}" HorizontalAlignment="Left" Background="Red" Foreground="White" Margin="246,374,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="CancelClick"/>
     </Grid>
 </Window>
