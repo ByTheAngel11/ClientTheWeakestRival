@@ -6,14 +6,14 @@
         xmlns:local="clr-namespace:WPFTheWeakestRival"
         xmlns:language="clr-namespace:WPFTheWeakestRival.Properties.Langs"
         mc:Ignorable="d"
-        Title="LoginWindow" Height="450" Width="800">
+        Title="LoginWindow" Height="450" Width="850">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Margin="20">
-            <Image Height="100" Width="100"/>
+            <Image Name="logoImage" Height="393" Width="382" Source=""/>
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="40,0,40,0" VerticalAlignment="Center" Height="375">
             <Label x:Name="lblWelcome" Content="{x:Static language:Lang.lblWelcome}" HorizontalAlignment="Center" FontSize="28" FontWeight="Bold" Margin="0,0,0,20"/>
@@ -25,6 +25,6 @@
             <Button x:Name="btnRegist" Content="{x:Static language:Lang.regist}" Width="101" Margin="0,0,0,10" Background="Transparent"/>
             <Button x:Name="btnPlayAsGuest" Content="{x:Static language:Lang.playAsGuest}" Width="114" Margin="0,0,0,0" Background="Transparent"/>
         </StackPanel>
-        <ComboBox x:Name="cmblanguage" Grid.Column="1" HorizontalAlignment="Left" Margin="280,0,0,0" VerticalAlignment="Top" Width="120"/>
+        <ComboBox x:Name="cmblanguage" Grid.Column="1" HorizontalAlignment="Left" Margin="280,0,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="cmblanguage_SelectionChanged_1"/>
     </Grid>
 </Window>

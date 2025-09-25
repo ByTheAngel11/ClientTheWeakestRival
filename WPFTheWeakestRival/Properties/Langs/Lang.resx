@@ -228,4 +228,7 @@
   <data name="txtPassword" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="Logo" xml:space="preserve">
+    <value>/Properties/Images/logo_en.png</value>
+  </data>
 </root>
