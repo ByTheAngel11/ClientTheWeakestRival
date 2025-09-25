@@ -22,7 +22,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Lang {
+    public class Lang {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         ///   Devuelve la instancia de ResourceManager almacenada en caché utilizada por esta clase.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("WPFTheWeakestRival.Properties.Langs.Lang", typeof(Lang).Assembly);
@@ -51,7 +51,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         ///   búsquedas de recursos mediante esta clase de recurso fuertemente tipado.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Select an image.
         /// </summary>
-        internal static string btnChooseImage {
+        public static string btnChooseImage {
             get {
                 return ResourceManager.GetString("btnChooseImage", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Choose an image.
         /// </summary>
-        internal static string btnImageChooser {
+        public static string btnImageChooser {
             get {
                 return ResourceManager.GetString("btnImageChooser", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Login.
         /// </summary>
-        internal static string btnLogin {
+        public static string btnLogin {
             get {
                 return ResourceManager.GetString("btnLogin", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Cancel.
         /// </summary>
-        internal static string cancel {
+        public static string cancel {
             get {
                 return ResourceManager.GetString("cancel", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a #cb102c.
         /// </summary>
-        internal static string colorLogin {
+        public static string colorLogin {
             get {
                 return ResourceManager.GetString("colorLogin", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a email@example.com.
         /// </summary>
-        internal static string emailPlaceholder {
+        public static string emailPlaceholder {
             get {
                 return ResourceManager.GetString("emailPlaceholder", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a English.
         /// </summary>
-        internal static string en {
+        public static string en {
             get {
                 return ResourceManager.GetString("en", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The email is already registered.
         /// </summary>
-        internal static string errorEmailExists {
+        public static string errorEmailExists {
             get {
                 return ResourceManager.GetString("errorEmailExists", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Email or password incorrects.
         /// </summary>
-        internal static string errorInvalidateCredentials {
+        public static string errorInvalidateCredentials {
             get {
                 return ResourceManager.GetString("errorInvalidateCredentials", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The email does not have the necessary structure.
         /// </summary>
-        internal static string errorInvalidEmail {
+        public static string errorInvalidEmail {
             get {
                 return ResourceManager.GetString("errorInvalidEmail", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The passwords don&apos;t match.
         /// </summary>
-        internal static string errorMatchingPasswords {
+        public static string errorMatchingPasswords {
             get {
                 return ResourceManager.GetString("errorMatchingPasswords", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Fields were missing to fill out.
         /// </summary>
-        internal static string errorMisingFields {
+        public static string errorMisingFields {
             get {
                 return ResourceManager.GetString("errorMisingFields", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The password must have at least 9 characters, one uppercase letter, and a symbol..
         /// </summary>
-        internal static string errorPasswordStructure {
+        public static string errorPasswordStructure {
             get {
                 return ResourceManager.GetString("errorPasswordStructure", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The username already exists.
         /// </summary>
-        internal static string errorUsernameExists {
+        public static string errorUsernameExists {
             get {
                 return ResourceManager.GetString("errorUsernameExists", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The username should not have spaces.
         /// </summary>
-        internal static string errorUsernameWithoutSpaces {
+        public static string errorUsernameWithoutSpaces {
             get {
                 return ResourceManager.GetString("errorUsernameWithoutSpaces", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Spanish.
         /// </summary>
-        internal static string es {
+        public static string es {
             get {
                 return ResourceManager.GetString("es", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Forgot your password?.
         /// </summary>
-        internal static string forgotPassword {
+        public static string forgotPassword {
             get {
                 return ResourceManager.GetString("forgotPassword", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Error on the registration.
         /// </summary>
-        internal static string generalRegistError {
+        public static string generalRegistError {
             get {
                 return ResourceManager.GetString("generalRegistError", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a /Properties/Images/logo_en.png.
         /// </summary>
-        internal static string imageLogo {
+        public static string imageLogo {
             get {
                 return ResourceManager.GetString("imageLogo", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Confirm password.
         /// </summary>
-        internal static string lblConfirmPassword {
+        public static string lblConfirmPassword {
             get {
                 return ResourceManager.GetString("lblConfirmPassword", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Email.
         /// </summary>
-        internal static string lblEmail {
+        public static string lblEmail {
             get {
                 return ResourceManager.GetString("lblEmail", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Password.
         /// </summary>
-        internal static string lblPassword {
+        public static string lblPassword {
             get {
                 return ResourceManager.GetString("lblPassword", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Welcome.
         /// </summary>
-        internal static string lblWelcome {
+        public static string lblWelcome {
             get {
                 return ResourceManager.GetString("lblWelcome", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Login.
         /// </summary>
-        internal static string loginTitle {
+        public static string loginTitle {
             get {
                 return ResourceManager.GetString("loginTitle", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a You don&apos;t have account?.
         /// </summary>
-        internal static string notAccount {
+        public static string notAccount {
             get {
                 return ResourceManager.GetString("notAccount", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Enter your password.
         /// </summary>
-        internal static string passwordPlaceHolder {
+        public static string passwordPlaceHolder {
             get {
                 return ResourceManager.GetString("passwordPlaceHolder", resourceCulture);
             }
@@ -297,7 +297,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Play as guest.
         /// </summary>
-        internal static string playAsGuest {
+        public static string playAsGuest {
             get {
                 return ResourceManager.GetString("playAsGuest", resourceCulture);
             }
@@ -306,7 +306,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Registration.
         /// </summary>
-        internal static string regist {
+        public static string regist {
             get {
                 return ResourceManager.GetString("regist", resourceCulture);
             }
@@ -315,7 +315,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Username.
         /// </summary>
-        internal static string registerDisplayName {
+        public static string registerDisplayName {
             get {
                 return ResourceManager.GetString("registerDisplayName", resourceCulture);
             }
@@ -324,7 +324,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Registratioon error.
         /// </summary>
-        internal static string registerError {
+        public static string registerError {
             get {
                 return ResourceManager.GetString("registerError", resourceCulture);
             }
@@ -333,7 +333,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Registration.
         /// </summary>
-        internal static string registerTitle {
+        public static string registerTitle {
             get {
                 return ResourceManager.GetString("registerTitle", resourceCulture);
             }
@@ -342,7 +342,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Registration.
         /// </summary>
-        internal static string registHeader {
+        public static string registHeader {
             get {
                 return ResourceManager.GetString("registHeader", resourceCulture);
             }
@@ -351,7 +351,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a The registration has been success.
         /// </summary>
-        internal static string registSucces {
+        public static string registSucces {
             get {
                 return ResourceManager.GetString("registSucces", resourceCulture);
             }
@@ -360,7 +360,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Welcome to The weakest rival.
         /// </summary>
-        internal static string succesLoginMessage {
+        public static string succesLoginMessage {
             get {
                 return ResourceManager.GetString("succesLoginMessage", resourceCulture);
             }
@@ -369,7 +369,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Select your profile picture.
         /// </summary>
-        internal static string tittleImageSelector {
+        public static string tittleImageSelector {
             get {
                 return ResourceManager.GetString("tittleImageSelector", resourceCulture);
             }
