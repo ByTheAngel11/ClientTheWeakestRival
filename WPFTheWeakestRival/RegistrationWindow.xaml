@@ -28,5 +28,6 @@
         <TextBlock x:Name="txtImgName" Margin="0,353,0,0" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top" TextTrimming="CharacterEllipsis" Width="394"/>
         <Button Name="btnRegister" Content="{x:Static language:Lang.regist}" HorizontalAlignment="Left" Background="Blue" Foreground="White" Margin="434,374,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="RegisterClick"/>
         <Button Name="btnBack" Content="{x:Static language:Lang.cancel}" HorizontalAlignment="Left" Background="Red" Foreground="White" Margin="246,374,0,0" VerticalAlignment="Top" Width="120" Height="22" Click="CancelClick"/>
+        <ComboBox Name="cmbLanguage" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
