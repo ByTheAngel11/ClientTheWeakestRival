@@ -14,10 +14,9 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            // Agrega los valores al ComboBox
             cmblanguage.Items.Add("Español");
             cmblanguage.Items.Add("English");
-            cmblanguage.SelectedIndex = 0; // Español por defecto
+            cmblanguage.SelectedIndex = 0; 
 
             cmblanguage.SelectionChanged += Cmblanguage_SelectionChanged;
         }
