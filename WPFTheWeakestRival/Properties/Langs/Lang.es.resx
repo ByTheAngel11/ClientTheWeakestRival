@@ -222,4 +222,10 @@
   <data name="forgotPassword" xml:space="preserve">
     <value>¿Olvidaste tu contraseña?</value>
   </data>
+  <data name="txtEmail" xml:space="preserve">
+    <value>Correo Electronico</value>
+  </data>
+  <data name="txtPassword" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
 </root>

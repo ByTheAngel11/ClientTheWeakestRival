@@ -374,5 +374,23 @@ namespace WPFTheWeakestRival.Properties.Langs {
                 return ResourceManager.GetString("tittleImageSelector", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Email.
+        /// </summary>
+        public static string txtEmail {
+            get {
+                return ResourceManager.GetString("txtEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Password.
+        /// </summary>
+        public static string txtPassword {
+            get {
+                return ResourceManager.GetString("txtPassword", resourceCulture);
+            }
+        }
     }
 }
