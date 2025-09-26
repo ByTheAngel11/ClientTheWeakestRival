@@ -17,9 +17,7 @@ namespace WPFTheWeakestRival
 {
     public partial class RegistrationWindow : Window
     {
-        private string pickedImagePath;
-        private string savedImagePath;
-
+        
         public RegistrationWindow()
         {
             InitializeComponent();
@@ -52,7 +50,6 @@ namespace WPFTheWeakestRival
             btnChooseImage.Content = Properties.Langs.Lang.btnChooseImage;
             btnRegister.Content = Properties.Langs.Lang.regist;
             btnBack.Content = Properties.Langs.Lang.cancel;
-            // Si tienes más controles con texto, agrégalos aquí
         }
 
         private void UpdateLabelColors()

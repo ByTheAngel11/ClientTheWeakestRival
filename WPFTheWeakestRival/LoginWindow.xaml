@@ -13,7 +13,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Margin="20">
-            <Image Name="logoImage" Height="393" Width="382" Source=""/>
+            <Image Name="logoImage" Height="393" Width="382"></Image>
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="40,0,40,0" VerticalAlignment="Center" Height="375">
             <Label x:Name="lblWelcome" Content="{x:Static language:Lang.lblWelcome}" HorizontalAlignment="Center" FontSize="28" FontWeight="Bold" Margin="0,0,0,20"/>
