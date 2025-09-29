@@ -22,7 +22,7 @@
             <Button x:Name="btnLogin" Content="{x:Static language:Lang.btnLogin}" Width="101" Margin="0,0,0,10" Background="Transparent"/>
             <Button x:Name="btnForgotPassword" Content="{x:Static language:Lang.forgotPassword}" Width="164" Background="Transparent" Margin="0,0,0,10" BorderThickness="0"/>
             <Button x:Name="btnNotAccount" Content="{x:Static language:Lang.notAccount}" Width="164" Background="Transparent" Margin="0,0,0,10" BorderThickness="0"/>
-            <Button x:Name="btnRegist" Content="{x:Static language:Lang.regist}" Width="101" Margin="0,0,0,10" Background="Transparent"/>
+            <Button x:Name="btnRegist" Content="{x:Static language:Lang.regist}" Width="101" Margin="0,0,0,10" Background="Transparent" Click="RegistrationClick" />
             <Button x:Name="btnPlayAsGuest" Content="{x:Static language:Lang.playAsGuest}" Width="114" Margin="0,0,0,0" Background="Transparent"/>
         </StackPanel>
         <ComboBox x:Name="cmblanguage" Grid.Column="1" HorizontalAlignment="Left" Margin="280,0,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="cmblanguage_SelectionChanged_1"/>

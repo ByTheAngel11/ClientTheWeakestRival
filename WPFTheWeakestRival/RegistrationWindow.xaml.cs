@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using WPFTheWeakestRival.Properties.Langs;
 using System;
 using System.Globalization;
 using System.IO;
@@ -9,8 +8,10 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WPFTheWeakestRival.Properties.Langs;
 
 
 namespace WPFTheWeakestRival
@@ -22,8 +23,8 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            cmbLanguage.Items.Add("Español");
-            cmbLanguage.Items.Add("English");
+            cmbLanguage.Items.Add(Lang.es);
+            cmbLanguage.Items.Add(Lang.en);
             cmbLanguage.SelectedIndex = 0;
 
             cmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;

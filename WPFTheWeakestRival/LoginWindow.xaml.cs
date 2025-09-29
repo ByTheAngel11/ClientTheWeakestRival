@@ -82,5 +82,12 @@ namespace WPFTheWeakestRival
         {
 
         }
+
+        private void RegistrationClick(object sender, RoutedEventArgs e)
+        {
+            RegistrationWindow regWindow = new RegistrationWindow();
+            regWindow.Show();
+            this.Close();
+        }
     }
 }

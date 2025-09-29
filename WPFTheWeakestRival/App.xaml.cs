@@ -13,16 +13,6 @@ namespace WPFTheWeakestRival
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
-
-            var login = new LoginWindow();
-            this.MainWindow = login;
-            login.Show();
-            
-            // Si quieres que sea modal y detenga la aplicación hasta cerrarse:
-            // login.ShowDialog();
-        }
+        
     }
 }
