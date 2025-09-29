@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WPFTheWeakestRival"
         xmlns:language="clr-namespace:WPFTheWeakestRival.Properties.Langs"
         mc:Ignorable="d"
-        Title="LoginWindow" Height="450" Width="850">
+        Title="LoginWindow" Height="450" Width="850"
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />

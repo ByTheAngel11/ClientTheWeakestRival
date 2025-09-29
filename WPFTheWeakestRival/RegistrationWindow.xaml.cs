@@ -100,7 +100,8 @@ namespace WPFTheWeakestRival
 
         private void CancelClick(object sender, RoutedEventArgs e)
         {
-            // Esqueleto: implementación eliminada
+            new LoginWindow().Show();
+            this.Close();
         }
 
     }
