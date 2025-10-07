@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="4c00b9d5-da44-4dc4-8a43-8de6906b99a2" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8082/matchmaking/" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="061e9365-4546-47d4-b851-2fa2b72e6fe5" SourceId="1" SourceUrl="http://localhost:8082/matchmaking/?xsd=xsd0" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="484ef697-50b5-41a9-bdee-bdddc6a64200" SourceId="1" SourceUrl="http://localhost:8082/matchmaking/?xsd=xsd1" />
+    <MetadataFile FileName="MatchmakingService.wsdl" MetadataType="Wsdl" ID="10da060d-43f2-42fe-a214-bb82c4a3fff9" SourceId="1" SourceUrl="http://localhost:8082/matchmaking/?wsdl" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="96027f5a-594b-4e61-a53c-7129e3ae9d30" SourceId="1" SourceUrl="http://localhost:8082/matchmaking/?disco" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="033e6660-1a27-4c92-98e2-d93ec7a5b26e" SourceId="1" SourceUrl="http://localhost:8082/matchmaking/?xsd=xsd2" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

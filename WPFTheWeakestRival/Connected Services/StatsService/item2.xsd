@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8082/stats/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="GetLeaderboardRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Top" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetLeaderboardRequest" nillable="true" type="tns:GetLeaderboardRequest" />
+  <xs:complexType name="GetLeaderboardResponse">
+    <xs:sequence>
+      <xs:element name="Entries" nillable="true" type="tns:ArrayOfLeaderboardEntry" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetLeaderboardResponse" nillable="true" type="tns:GetLeaderboardResponse" />
+  <xs:complexType name="ArrayOfLeaderboardEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="LeaderboardEntry" nillable="true" type="tns:LeaderboardEntry" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfLeaderboardEntry" nillable="true" type="tns:ArrayOfLeaderboardEntry" />
+  <xs:complexType name="LeaderboardEntry">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
+      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Wins" type="xs:int" />
+      <xs:element minOccurs="0" name="BestBank" type="xs:decimal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LeaderboardEntry" nillable="true" type="tns:LeaderboardEntry" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="GetPlayerStatsRequest">
+    <xs:sequence>
+      <xs:element name="PlayerName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetPlayerStatsRequest" nillable="true" type="tns:GetPlayerStatsRequest" />
+  <xs:complexType name="GetPlayerStatsResponse">
+    <xs:sequence>
+      <xs:element name="Stats" nillable="true" type="tns:LeaderboardEntry" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetPlayerStatsResponse" nillable="true" type="tns:GetPlayerStatsResponse" />
+</xs:schema>

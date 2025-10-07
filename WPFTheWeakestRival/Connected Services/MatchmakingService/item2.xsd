@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8082/matchmaking/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="CreateMatchRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MaxPlayers" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CreateMatchRequest" nillable="true" type="tns:CreateMatchRequest" />
+  <xs:complexType name="CreateMatchResponse">
+    <xs:sequence>
+      <xs:element name="Match" nillable="true" type="tns:MatchInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CreateMatchResponse" nillable="true" type="tns:CreateMatchResponse" />
+  <xs:complexType name="MatchInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="ser:guid" />
+      <xs:element minOccurs="0" name="MatchCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfPlayerSummary" />
+      <xs:element minOccurs="0" name="State" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MatchInfo" nillable="true" type="tns:MatchInfo" />
+  <xs:complexType name="ArrayOfPlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlayerSummary" nillable="true" type="tns:ArrayOfPlayerSummary" />
+  <xs:complexType name="PlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
+      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="JoinMatchRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchCode" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JoinMatchRequest" nillable="true" type="tns:JoinMatchRequest" />
+  <xs:complexType name="JoinMatchResponse">
+    <xs:sequence>
+      <xs:element name="Match" nillable="true" type="tns:MatchInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JoinMatchResponse" nillable="true" type="tns:JoinMatchResponse" />
+  <xs:complexType name="LeaveMatchRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LeaveMatchRequest" nillable="true" type="tns:LeaveMatchRequest" />
+  <xs:complexType name="StartMatchRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="StartMatchRequest" nillable="true" type="tns:StartMatchRequest" />
+  <xs:complexType name="StartMatchResponse">
+    <xs:sequence>
+      <xs:element name="Match" nillable="true" type="tns:MatchInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="StartMatchResponse" nillable="true" type="tns:StartMatchResponse" />
+  <xs:complexType name="ListOpenMatchesRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Top" nillable="true" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListOpenMatchesRequest" nillable="true" type="tns:ListOpenMatchesRequest" />
+  <xs:complexType name="ListOpenMatchesResponse">
+    <xs:sequence>
+      <xs:element name="Matches" nillable="true" type="tns:ArrayOfMatchInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListOpenMatchesResponse" nillable="true" type="tns:ListOpenMatchesResponse" />
+  <xs:complexType name="ArrayOfMatchInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="MatchInfo" nillable="true" type="tns:MatchInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfMatchInfo" nillable="true" type="tns:ArrayOfMatchInfo" />
+</xs:schema>

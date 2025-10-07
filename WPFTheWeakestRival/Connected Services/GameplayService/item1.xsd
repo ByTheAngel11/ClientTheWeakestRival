@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="SubmitAnswerRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+      <xs:element name="QuestionId" type="ser:guid" />
+      <xs:element name="AnswerText" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ResponseTime" type="ser:duration" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SubmitAnswerRequest" nillable="true" type="tns:SubmitAnswerRequest" />
+  <xs:complexType name="SubmitAnswerResponse">
+    <xs:sequence>
+      <xs:element name="Result" nillable="true" type="tns:AnswerResult" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SubmitAnswerResponse" nillable="true" type="tns:SubmitAnswerResponse" />
+  <xs:complexType name="AnswerResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="QuestionId" type="ser:guid" />
+      <xs:element minOccurs="0" name="IsCorrect" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ChainIncrement" type="xs:decimal" />
+      <xs:element minOccurs="0" name="CurrentChain" type="xs:decimal" />
+      <xs:element minOccurs="0" name="BankedPoints" type="xs:decimal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AnswerResult" nillable="true" type="tns:AnswerResult" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="BankRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BankRequest" nillable="true" type="tns:BankRequest" />
+  <xs:complexType name="BankResponse">
+    <xs:sequence>
+      <xs:element name="Bank" nillable="true" type="tns:BankState" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BankResponse" nillable="true" type="tns:BankResponse" />
+  <xs:complexType name="BankState">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="ser:guid" />
+      <xs:element minOccurs="0" name="CurrentChain" type="xs:decimal" />
+      <xs:element minOccurs="0" name="BankedPoints" type="xs:decimal" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BankState" nillable="true" type="tns:BankState" />
+  <xs:complexType name="UseLifelineRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+      <xs:element name="Lifeline" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="TargetPlayerId" nillable="true" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UseLifelineRequest" nillable="true" type="tns:UseLifelineRequest" />
+  <xs:complexType name="UseLifelineResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Outcome" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UseLifelineResponse" nillable="true" type="tns:UseLifelineResponse" />
+  <xs:complexType name="CastVoteRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+      <xs:element name="ToPlayerId" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CastVoteRequest" nillable="true" type="tns:CastVoteRequest" />
+  <xs:complexType name="CastVoteResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Accepted" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CastVoteResponse" nillable="true" type="tns:CastVoteResponse" />
+  <xs:complexType name="AckEventSeenRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="MatchId" type="ser:guid" />
+      <xs:element name="EventName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AckEventSeenRequest" nillable="true" type="tns:AckEventSeenRequest" />
+  <xs:complexType name="AckEventSeenResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Acknowledged" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AckEventSeenResponse" nillable="true" type="tns:AckEventSeenResponse" />
+  <xs:complexType name="PlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
+      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+  <xs:complexType name="Question">
+    <xs:sequence>
+      <xs:element name="QuestionId" type="ser:guid" />
+      <xs:element name="Text" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Difficulty" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Question" nillable="true" type="tns:Question" />
+</xs:schema>

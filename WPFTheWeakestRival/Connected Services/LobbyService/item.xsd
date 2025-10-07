@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="JoinLobbyRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="LobbyName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JoinLobbyRequest" nillable="true" type="tns:JoinLobbyRequest" />
+  <xs:complexType name="JoinLobbyResponse">
+    <xs:sequence>
+      <xs:element name="Lobby" nillable="true" type="tns:LobbyInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JoinLobbyResponse" nillable="true" type="tns:JoinLobbyResponse" />
+  <xs:complexType name="LobbyInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="LobbyId" type="ser:guid" />
+      <xs:element minOccurs="0" name="LobbyName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MaxPlayers" type="xs:int" />
+      <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfPlayerSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LobbyInfo" nillable="true" type="tns:LobbyInfo" />
+  <xs:complexType name="ArrayOfPlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlayerSummary" nillable="true" type="tns:ArrayOfPlayerSummary" />
+  <xs:complexType name="PlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
+      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="LeaveLobbyRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="LobbyId" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LeaveLobbyRequest" nillable="true" type="tns:LeaveLobbyRequest" />
+  <xs:complexType name="ListLobbiesRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Top" nillable="true" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListLobbiesRequest" nillable="true" type="tns:ListLobbiesRequest" />
+  <xs:complexType name="ListLobbiesResponse">
+    <xs:sequence>
+      <xs:element name="Lobbies" nillable="true" type="tns:ArrayOfLobbyInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListLobbiesResponse" nillable="true" type="tns:ListLobbiesResponse" />
+  <xs:complexType name="ArrayOfLobbyInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="LobbyInfo" nillable="true" type="tns:LobbyInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfLobbyInfo" nillable="true" type="tns:ArrayOfLobbyInfo" />
+  <xs:complexType name="SendLobbyMessageRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="LobbyId" type="ser:guid" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SendLobbyMessageRequest" nillable="true" type="tns:SendLobbyMessageRequest" />
+  <xs:complexType name="ChatMessage">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="FromPlayerId" type="ser:guid" />
+      <xs:element minOccurs="0" name="FromPlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SentAtUtc" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ChatMessage" nillable="true" type="tns:ChatMessage" />
+</xs:schema>
