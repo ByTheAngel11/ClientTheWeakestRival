@@ -154,7 +154,7 @@ namespace WPFTheWeakestRival
                 AppSession.CurrentToken = token;
 
                 // Navega a tu siguiente ventana (cámbiala por la que uses)
-                var home = new MainWindow();
+                var home = new LobbyWindow();
                 home.Show();
                 this.Close();
             }
