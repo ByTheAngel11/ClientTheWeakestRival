@@ -19,8 +19,8 @@
         <StackPanel Grid.Column="1" Margin="40,0,40,0" VerticalAlignment="Center" Height="375">
             <Label x:Name="lblWelcome" Content="{x:Static language:Lang.lblWelcome}" HorizontalAlignment="Center" FontSize="28" FontWeight="Bold" Margin="0,0,0,20"/>
             <TextBox x:Name="txtEmail" TextWrapping="Wrap" Width="210" BorderBrush="DarkBlue" BorderThickness="1.5" Text="{x:Static language:Lang.txtEmail}" Background="White" Margin="0,0,0,10"/>
-            <TextBox x:Name="txtPassword" TextWrapping="Wrap" Width="210" BorderBrush="DarkBlue" BorderThickness="1.5" Text="{x:Static language:Lang.txtPassword}" Background="White" Margin="0,0,0,20"/>
-            <Button x:Name="btnLogin" Content="{x:Static language:Lang.btnLogin}" Width="101" Margin="0,0,0,10" Background="Transparent"/>
+            <PasswordBox x:Name="pwdPassword" Width="210" BorderBrush="DarkBlue" BorderThickness="1.5" Background="White" Margin="0,0,0,20"/>
+            <Button x:Name="btnLogin" Content="{x:Static language:Lang.btnLogin}" Width="101" Margin="0,0,0,10" Background="Transparent" Click="btnLogin_Click"/>
             <Button x:Name="btnForgotPassword" Content="{x:Static language:Lang.forgotPassword}" Width="164" Background="Transparent" Margin="0,0,0,10" BorderThickness="0"/>
             <Button x:Name="btnNotAccount" Content="{x:Static language:Lang.notAccount}" Width="164" Background="Transparent" Margin="0,0,0,10" BorderThickness="0"/>
             <Button x:Name="btnRegist" Content="{x:Static language:Lang.regist}" Width="101" Margin="0,0,0,10" Background="Transparent" Click="RegistrationClick" />
