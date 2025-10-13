@@ -84,6 +84,25 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SendLobbyMessageRequest" nillable="true" type="tns:SendLobbyMessageRequest" />
+  <xs:complexType name="UpdateAccountResponse">
+    <xs:sequence>
+      <xs:element name="UserId" type="xs:int" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
+      <xs:element name="CreatedAtUtc" type="xs:dateTime" />
+      <xs:element name="Email" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UpdateAccountResponse" nillable="true" type="tns:UpdateAccountResponse" />
+  <xs:complexType name="UpdateAccountRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UpdateAccountRequest" nillable="true" type="tns:UpdateAccountRequest" />
   <xs:complexType name="ChatMessage">
     <xs:sequence>
       <xs:element minOccurs="0" name="FromPlayerId" type="ser:guid" />

@@ -1,0 +1,94 @@
+﻿<Page x:Class="WPFTheWeakestRival.ModifyProfilePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Modificar Perfil">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <TextBlock Text="Modificar Perfil"
+               FontSize="22" FontWeight="Bold"
+               Margin="0,0,0,14"/>
+
+        <!-- Contenido -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Vista previa (encaja sin recortar) -->
+            <Border Grid.Column="0"
+              BorderBrush="#DDD" BorderThickness="1"
+              CornerRadius="8" Padding="12">
+                <StackPanel>
+                    <Image x:Name="imgPreview"
+                 MaxWidth="256" MaxHeight="256"
+                 Stretch="Uniform"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Campos -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Email:" VerticalAlignment="Center"/>
+                <TextBox x:Name="txtEmail"
+                 Grid.Column="1" Margin="8,0,0,12"
+                 MaxLength="320"/>
+
+                <TextBlock Grid.Row="1" Text="Nombre para mostrar:" VerticalAlignment="Center"/>
+                <TextBox x:Name="txtDisplayName"
+                 Grid.Row="1" Grid.Column="1"
+                 Margin="8,0,0,12" MaxLength="80"/>
+
+                <TextBlock Grid.Row="2" Text="URL de Avatar:" VerticalAlignment="Center"/>
+
+                <!-- Caja + Examinar + Quitar -->
+                <Grid Grid.Row="2" Grid.Column="1" Margin="8,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="txtAvatarUrl"
+                   Grid.Column="0" IsReadOnly="True"
+                   MaxLength="500" Margin="0,0,8,0"/>
+                    <Button Grid.Column="1" x:Name="btnBrowse"
+                  Content="Examinar…" Width="110" Margin="0,0,8,0"
+                  Click="BtnBrowse_Click"/>
+                    <Button Grid.Column="2" Content="Quitar" Width="80"
+                  Click="BtnClearImage_Click"/>
+                </Grid>
+
+            </Grid>
+        </Grid>
+
+        <!-- Acciones -->
+        <StackPanel Grid.Row="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Margin="0,16,0,0">
+            <Button Content="Cancelar" Width="110" Margin="0,0,10,0"
+              Click="BtnCancel_Click"/>
+            <Button Content="Guardar" Width="130"
+              Click="BtnSave_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

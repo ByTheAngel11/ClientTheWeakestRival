@@ -585,6 +585,204 @@ namespace WPFTheWeakestRival.LobbyService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="UpdateAccountResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class UpdateAccountResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int UserIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DisplayNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageUrlField;
+        
+        private System.DateTime CreatedAtUtcField;
+        
+        private string EmailField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int UserId {
+            get {
+                return this.UserIdField;
+            }
+            set {
+                if ((this.UserIdField.Equals(value) != true)) {
+                    this.UserIdField = value;
+                    this.RaisePropertyChanged("UserId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public string DisplayName {
+            get {
+                return this.DisplayNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public string ProfileImageUrl {
+            get {
+                return this.ProfileImageUrlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
+                    this.ProfileImageUrlField = value;
+                    this.RaisePropertyChanged("ProfileImageUrl");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public System.DateTime CreatedAtUtc {
+            get {
+                return this.CreatedAtUtcField;
+            }
+            set {
+                if ((this.CreatedAtUtcField.Equals(value) != true)) {
+                    this.CreatedAtUtcField = value;
+                    this.RaisePropertyChanged("CreatedAtUtc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=4)]
+        public string Email {
+            get {
+                return this.EmailField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="UpdateAccountRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class UpdateAccountRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DisplayNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageUrlField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string EmailField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public string DisplayName {
+            get {
+                return this.DisplayNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public string ProfileImageUrl {
+            get {
+                return this.ProfileImageUrlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
+                    this.ProfileImageUrlField = value;
+                    this.RaisePropertyChanged("ProfileImageUrl");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public string Email {
+            get {
+                return this.EmailField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ChatMessage", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class ChatMessage : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -705,6 +903,20 @@ namespace WPFTheWeakestRival.LobbyService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILobbyService/SendChatMessage")]
         System.Threading.Tasks.Task SendChatMessageAsync(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/GetMyProfile", ReplyAction="http://tempuri.org/ILobbyService/GetMyProfileResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/GetMyProfileServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.LobbyService.UpdateAccountResponse GetMyProfile(string token);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/GetMyProfile", ReplyAction="http://tempuri.org/ILobbyService/GetMyProfileResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.UpdateAccountResponse> GetMyProfileAsync(string token);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/UpdateAccount", ReplyAction="http://tempuri.org/ILobbyService/UpdateAccountResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/UpdateAccountServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.LobbyService.UpdateAccountResponse UpdateAccount(WPFTheWeakestRival.LobbyService.UpdateAccountRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/UpdateAccount", ReplyAction="http://tempuri.org/ILobbyService/UpdateAccountResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.UpdateAccountResponse> UpdateAccountAsync(WPFTheWeakestRival.LobbyService.UpdateAccountRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -781,6 +993,22 @@ namespace WPFTheWeakestRival.LobbyService {
         
         public System.Threading.Tasks.Task SendChatMessageAsync(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request) {
             return base.Channel.SendChatMessageAsync(request);
+        }
+        
+        public WPFTheWeakestRival.LobbyService.UpdateAccountResponse GetMyProfile(string token) {
+            return base.Channel.GetMyProfile(token);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.UpdateAccountResponse> GetMyProfileAsync(string token) {
+            return base.Channel.GetMyProfileAsync(token);
+        }
+        
+        public WPFTheWeakestRival.LobbyService.UpdateAccountResponse UpdateAccount(WPFTheWeakestRival.LobbyService.UpdateAccountRequest request) {
+            return base.Channel.UpdateAccount(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.UpdateAccountResponse> UpdateAccountAsync(WPFTheWeakestRival.LobbyService.UpdateAccountRequest request) {
+            return base.Channel.UpdateAccountAsync(request);
         }
     }
 }

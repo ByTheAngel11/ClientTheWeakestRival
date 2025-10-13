@@ -1,48 +1,78 @@
 ﻿<Window x:Class="WPFTheWeakestRival.LobbyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LobbyWindow" Height="450" Width="800">
+        Title="Lobby" Height="480" Width="900"
+        WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown">
     <Grid Margin="8">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
 
-        </Grid.RowDefinitions>
+        <!-- ===== Zona principal que se difumina ===== -->
+        <Grid x:Name="MainArea">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button Content="Configuración" Width="130" Height="32" Margin="0,0,12,0"/>
-                <Button Content="Personalización" Width="130" Height="32" Margin="0,0,12,0"/>
-                <Button Content="Marcadores" Width="110" Height="32"/>
-            </StackPanel>
-            <Button Content="Amigos" Width="100" Height="32" HorizontalAlignment="Right"/>
-        </Grid>
-
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="220"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" Margin="8">
-                <Image Width="180" Height="220"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
-                <Button Content="JUGAR"
-                        Width="140" Height="40"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom"
-                        Margin="8"/>
+            <!-- Barra superior -->
+            <Grid Grid.Row="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="Configuración" Width="130" Height="32" Margin="0,0,12,0"/>
+                    <Button Content="Personalización" Width="130" Height="32" Margin="0,0,12,0"/>
+                    <Button Content="Marcadores" Width="110" Height="32" Margin="0,0,12,0"/>
+                    <Button x:Name="btnModifyProfile" Content="Modificar Perfil" Width="130" Height="32"
+                  Click="btnModifyProfile_Click"/>
+                </StackPanel>
+                <Button Content="Amigos" Width="100" Height="32" HorizontalAlignment="Right"/>
             </Grid>
 
-            <Grid Grid.Column="1" Margin="8">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="32"/>
-                </Grid.RowDefinitions>
-                <ListBox Grid.Row="0"/>
-                <TextBox Grid.Row="1" Text="Chat"/>
+            <!-- Contenido principal -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="260"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="8">
+                    <Image Width="180" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button Content="JUGAR" Width="160" Height="44"
+                  HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"/>
+                </Grid>
+
+                <Grid Grid.Column="1" Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0"/>
+                    <TextBox Grid.Row="1" Text="Chat"/>
+                </Grid>
             </Grid>
         </Grid>
+
+        <Grid x:Name="OverlayHost" Visibility="Collapsed" Opacity="0">
+            <Rectangle Fill="#99000000"/>
+            <Border Width="700" Height="420" Background="#FAFFFFFF" CornerRadius="14" Padding="16"
+              HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="16" ShadowDepth="0" Opacity="0.45"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <DockPanel LastChildFill="False" Margin="0,0,0,12">
+                        <TextBlock Text="{Binding ElementName=OverlayFrame, Path=Content.Title, FallbackValue=Página}"
+                       FontSize="22" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <Button Content="✕" Width="32" Height="32" DockPanel.Dock="Right"
+                    Background="Transparent" BorderThickness="0" FontSize="16"
+                    Click="CloseOverlay_Click"/>
+                    </DockPanel>
+                    <Frame x:Name="OverlayFrame" Grid.Row="1"
+                 NavigationUIVisibility="Hidden" Background="Transparent"/>
+                </Grid>
+            </Border>
+        </Grid>
+
     </Grid>
 </Window>
