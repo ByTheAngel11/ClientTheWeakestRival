@@ -1,103 +1,181 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using WPFTheWeakestRival.LobbyService;
-using static WPFTheWeakestRival.LoginWindow;
 
 namespace WPFTheWeakestRival
 {
+    /// <summary>
+    /// Main lobby window. Hosts overlay pages and handles lobby callbacks.
+    /// </summary>
     public partial class LobbyWindow : Window, ILobbyServiceCallback
     {
-        private LobbyServiceClient _lobbyClient;
-        private readonly BlurEffect _blur = new BlurEffect { Radius = 0 };
+        // ===================== Constants (no magic numbers) =====================
+        private const double OverlayBlurMaxRadius = 6.0;
+        private const int OverlayFadeInDurationMs = 180;
+        private const int OverlayFadeOutDurationMs = 160;
+
+        // ===================== State / Dependencies =====================
+        private readonly LobbyServiceClient lobbyServiceClient;
+        private readonly BlurEffect overlayBlurEffect = new BlurEffect { Radius = 0 };
 
         public LobbyWindow()
         {
             InitializeComponent();
-            var ctx = new InstanceContext(this);
-            _lobbyClient = new LobbyServiceClient(ctx, "WSDualHttpBinding_ILobbyService");
+
+            var serviceContext = new InstanceContext(this);
+            lobbyServiceClient = new LobbyServiceClient(serviceContext, "WSDualHttpBinding_ILobbyService");
+
+            Unloaded += OnWindowUnloaded;
         }
 
-        private void btnModifyProfile_Click(object sender, RoutedEventArgs e)
+        // ========== Wrappers para mantener los nombres de handlers del XAML ==========
+        private void btnModifyProfile_Click(object sender, RoutedEventArgs e) => OnModifyProfileClick(sender, e);
+        private void CloseOverlay_Click(object sender, RoutedEventArgs e) => OnCloseOverlayClick(sender, e);
+        private void Window_KeyDown(object sender, KeyEventArgs e) => OnWindowKeyDown(sender, e);
+
+        // ===================== Handlers con buen naming =====================
+
+        private void OnModifyProfileClick(object sender, RoutedEventArgs e)
         {
-            var token = AppSession.CurrentToken?.Token;
+            // AppSession/CurrentToken estático: sin null-conditional en AppSession
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
             if (string.IsNullOrWhiteSpace(token))
             {
                 MessageBox.Show("Sesión no válida.");
                 return;
             }
-            var page = new ModifyProfilePage(_lobbyClient, token) { Title = "Modificar Perfil" };
-            ShowOverlay(page);
+
+            var modifyProfilePage = new ModifyProfilePage(lobbyServiceClient, token)
+            {
+                Title = "Modificar Perfil" // idealmente desde recursos
+            };
+
+            ShowOverlayPage(modifyProfilePage);
         }
 
-        private void ShowOverlay(System.Windows.Controls.Page page)
+        private void OnCloseOverlayClick(object sender, RoutedEventArgs e)
         {
-            OverlayFrame.Content = page;
-            MainArea.Effect = _blur;
-            OverlayHost.Visibility = Visibility.Visible;
-
-            var fadeIn = new DoubleAnimation
-            {
-                From = 0,
-                To = 1,
-                Duration = new Duration(TimeSpan.FromMilliseconds(180)),
-                EasingFunction = new QuadraticEase()
-            };
-            OverlayHost.BeginAnimation(OpacityProperty, fadeIn);
-
-            var blurAnim = new DoubleAnimation
-            {
-                From = 0,
-                To = 6,
-                Duration = new Duration(TimeSpan.FromMilliseconds(180)),
-                EasingFunction = new QuadraticEase()
-            };
-            _blur.BeginAnimation(BlurEffect.RadiusProperty, blurAnim);
+            HideOverlayPanel();
         }
 
-        private void HideOverlay()
+        private void OnWindowKeyDown(object sender, KeyEventArgs e)
         {
-            var fadeOut = new DoubleAnimation
+            if (e.Key == Key.Escape && pnlOverlayHost.Visibility == Visibility.Visible)
             {
-                From = OverlayHost.Opacity,
-                To = 0,
-                Duration = new Duration(TimeSpan.FromMilliseconds(160)),
-                EasingFunction = new QuadraticEase()
-            };
-            fadeOut.Completed += (_, __) =>
-            {
-                OverlayHost.Visibility = Visibility.Collapsed;
-                OverlayFrame.Content = null;
-                MainArea.Effect = null;
-            };
-            OverlayHost.BeginAnimation(OpacityProperty, fadeOut);
-
-            if (MainArea.Effect is BlurEffect be)
-            {
-                var blurAnim = new DoubleAnimation
-                {
-                    From = be.Radius,
-                    To = 0,
-                    Duration = new Duration(TimeSpan.FromMilliseconds(160)),
-                    EasingFunction = new QuadraticEase()
-                };
-                be.BeginAnimation(BlurEffect.RadiusProperty, blurAnim);
+                HideOverlayPanel();
             }
         }
 
-        private void CloseOverlay_Click(object sender, RoutedEventArgs e) => HideOverlay();
+        // ===================== Overlay helpers =====================
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void ShowOverlayPage(Page page)
         {
-            if (e.Key == System.Windows.Input.Key.Escape && OverlayHost.Visibility == Visibility.Visible)
-                HideOverlay();
+            frmOverlayFrame.Content = page;
+            grdMainArea.Effect = overlayBlurEffect;
+            pnlOverlayHost.Visibility = Visibility.Visible;
+
+            var overlayFadeInAnimation = new DoubleAnimation
+            {
+                From = 0,
+                To = 1,
+                Duration = TimeSpan.FromMilliseconds(OverlayFadeInDurationMs),
+                EasingFunction = new QuadraticEase()
+            };
+            pnlOverlayHost.BeginAnimation(OpacityProperty, overlayFadeInAnimation);
+
+            var overlayBlurInAnimation = new DoubleAnimation
+            {
+                From = 0,
+                To = OverlayBlurMaxRadius,
+                Duration = TimeSpan.FromMilliseconds(OverlayFadeInDurationMs),
+                EasingFunction = new QuadraticEase()
+            };
+            overlayBlurEffect.BeginAnimation(BlurEffect.RadiusProperty, overlayBlurInAnimation);
         }
 
-        public void OnLobbyUpdated(LobbyInfo lobby) { }
-        public void OnPlayerJoined(PlayerSummary player) { }
-        public void OnPlayerLeft(Guid playerId) { }
-        public void OnChatMessageReceived(ChatMessage message) { }
+        private void HideOverlayPanel()
+        {
+            var overlayFadeOutAnimation = new DoubleAnimation
+            {
+                From = pnlOverlayHost.Opacity,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs),
+                EasingFunction = new QuadraticEase()
+            };
+
+            overlayFadeOutAnimation.Completed += (_, __) =>
+            {
+                pnlOverlayHost.Visibility = Visibility.Collapsed;
+                frmOverlayFrame.Content = null;
+                grdMainArea.Effect = null;
+            };
+
+            pnlOverlayHost.BeginAnimation(OpacityProperty, overlayFadeOutAnimation);
+
+            if (grdMainArea.Effect is BlurEffect currentBlurEffect)
+            {
+                var overlayBlurOutAnimation = new DoubleAnimation
+                {
+                    From = currentBlurEffect.Radius,
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs),
+                    EasingFunction = new QuadraticEase()
+                };
+                currentBlurEffect.BeginAnimation(BlurEffect.RadiusProperty, overlayBlurOutAnimation);
+            }
+        }
+
+        // ===================== Lobby callbacks (WCF) =====================
+
+        /// <summary>Raised when lobby state changes.</summary>
+        public void OnLobbyUpdated(LobbyInfo lobbyInfo)
+        {
+            // TODO: refresh UI if needed
+        }
+
+        /// <summary>Raised when a player joins.</summary>
+        public void OnPlayerJoined(PlayerSummary playerSummary)
+        {
+            // TODO: update players list
+        }
+
+        /// <summary>Raised when a player leaves.</summary>
+        public void OnPlayerLeft(Guid playerId)
+        {
+            // TODO: update players list
+        }
+
+        /// <summary>Raised when a chat message arrives.</summary>
+        public void OnChatMessageReceived(ChatMessage chatMessage)
+        {
+            // TODO: append message to chat
+        }
+
+        // ===================== Cleanup =====================
+
+        /// <summary>Closes the WCF client to release resources.</summary>
+        private void OnWindowUnloaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (lobbyServiceClient.State == CommunicationState.Faulted)
+                {
+                    lobbyServiceClient.Abort();
+                }
+                else
+                {
+                    lobbyServiceClient.Close();
+                }
+            }
+            catch
+            {
+                lobbyServiceClient.Abort();
+            }
+        }
     }
 }
