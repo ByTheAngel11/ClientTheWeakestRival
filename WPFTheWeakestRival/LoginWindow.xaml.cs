@@ -21,7 +21,7 @@ namespace WPFTheWeakestRival
 
             cmblanguage.Items.Add(Lang.es);
             cmblanguage.Items.Add(Lang.en);
-            cmblanguage.SelectedIndex = 0; 
+            cmblanguage.SelectedIndex = 0;
 
             cmblanguage.SelectionChanged += Cmblanguage_SelectionChanged;
         }
@@ -91,16 +91,59 @@ namespace WPFTheWeakestRival
             this.Close();
         }
 
+        private bool isPasswordVisible = false;
+
+        private void btnTogglePassword_Click(object sender, RoutedEventArgs e)
+        {
+            isPasswordVisible = !isPasswordVisible;
+            if (isPasswordVisible)
+            {
+                txtPasswordVisible.Text = pwdPassword.Password;
+                txtPasswordVisible.Visibility = Visibility.Visible;
+                pwdPassword.Visibility = Visibility.Collapsed;
+                btnTogglePassword.Content = new TextBlock { Text = "🙈", FontSize = 14 };
+            }
+            else
+            {
+                pwdPassword.Password = txtPasswordVisible.Text;
+                txtPasswordVisible.Visibility = Visibility.Collapsed;
+                pwdPassword.Visibility = Visibility.Visible;
+                btnTogglePassword.Content = new TextBlock { Text = "👁", FontSize = 14 };
+            }
+        }
+
+        private void pwdPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            placeholderPassword.Visibility = string.IsNullOrEmpty(pwdPassword.Password)
+                ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void pwdPassword_GotFocus(object sender, RoutedEventArgs e)
+        {
+            placeholderPassword.Visibility = Visibility.Collapsed;
+        }
+
+        private void pwdPassword_LostFocus(object sender, RoutedEventArgs e)
+        {
+            placeholderPassword.Visibility = string.IsNullOrEmpty(pwdPassword.Password)
+                ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void txtPasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            placeholderPassword.Visibility = string.IsNullOrEmpty(txtPasswordVisible.Text)
+                ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         private async void btnLogin_Click(object sender, RoutedEventArgs e)
         {
             btnLogin.IsEnabled = false;
 
             try
             {
-                var email = txtEmail.Text?.Trim();           // usa el mismo control que en registro
+                var email = txtEmail.Text?.Trim();
                 var password = pwdPassword.Password ?? "";
 
-                // Validaciones mínimas del lado cliente (lo fino puede quedar igual que en Register)
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     MessageBox.Show(Lang.errorInvalidEmail, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -142,18 +185,14 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                // Éxito: tienes el token emitido por el servidor
-                var token = resp.Token; // contiene UserId, Token (string), ExpiresAtUtc
+                var token = resp.Token;
 
-                // Reemplaza Lang.loginSuccess por Lang.succesLoginMessage en la línea correspondiente
                 MessageBox.Show(
                     $"{Lang.succesLoginMessage}\nUserId: {token.UserId}\nToken: {token.Token}\nExp: {token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
                     "Auth", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // TODO: guarda el token donde te convenga (ejemplo simple):
                 AppSession.CurrentToken = token;
 
-                // Navega a tu siguiente ventana (cámbiala por la que uses)
                 var home = new LobbyWindow();
                 home.Show();
                 this.Close();
@@ -164,7 +203,6 @@ namespace WPFTheWeakestRival
             }
         }
 
-        // Session sencilla para tener el token disponible en la app
         public static class AppSession
         {
             public static AuthToken CurrentToken { get; set; }
