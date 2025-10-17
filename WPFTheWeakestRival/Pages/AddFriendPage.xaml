@@ -1,0 +1,81 @@
+﻿<Page x:Class="WPFTheWeakestRival.Pages.AddFriendPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Agregar amigo"
+      SnapsToDevicePixels="True"
+      TextOptions.TextRenderingMode="Aliased">
+
+    <Page.Resources>
+        <!-- Converter para mostrar/ocultar el botón Aceptar -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="MinWidth" Value="86"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Título -->
+        <TextBlock Text="Agregar amigo" FontSize="22" FontWeight="Bold" />
+
+        <!-- Buscador -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBox x:Name="txtQuery"
+                     Width="360" Height="28" Margin="0,0,8,0"
+                     VerticalContentAlignment="Center"
+                     TextChanged="txtQuery_TextChanged"
+                     ToolTip="Escribe nombre o correo"/>
+            <Button x:Name="btnSearch" Content="Buscar" Click="btnSearch_Click"/>
+            <TextBlock x:Name="txtStatus" Margin="12,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Resultados -->
+        <Border Grid.Row="4" BorderBrush="#40000000" BorderThickness="1" CornerRadius="6" Padding="8">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="lstResults">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,4" Padding="8" CornerRadius="6" Background="#0A000000">
+                                <DockPanel LastChildFill="False">
+                                    <!-- Avatar -->
+                                    <Image Width="36" Height="36" Stretch="UniformToFill" Margin="0,0,8,0"
+                                           Source="{Binding Avatar}" ClipToBounds="True"/>
+                                    <!-- Datos -->
+                                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" DockPanel.Dock="Left" Width="320">
+                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Email}" Opacity="0.7" FontSize="12"/>
+                                        <TextBlock Text="{Binding StateText}" FontSize="12" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <!-- Acciones -->
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="Aceptar"
+                                                Visibility="{Binding ShowAccept, Converter={StaticResource BoolToVis}}"
+                                                Click="btnAccept_Click"/>
+                                        <Button Content="{Binding AddButtonText}"
+                                                IsEnabled="{Binding CanAdd}"
+                                                Click="btnAdd_Click"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Cerrar -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button Content="Cerrar" Click="btnClose_Click"/>
+        </StackPanel>
+    </Grid>
+</Page>

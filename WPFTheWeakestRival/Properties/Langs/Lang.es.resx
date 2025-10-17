@@ -231,4 +231,28 @@
   <data name="Logo" xml:space="preserve">
     <value>/Properties/Images/logo_es.png"</value>
   </data>
+  <data name="lblNoFriends" xml:space="preserve">
+    <value>Aún no tienes amigos</value>
+  </data>
+  <data name="lblSendInvitations" xml:space="preserve">
+    <value>Usa “Enviar solicitud” para agregar nuevos</value>
+  </data>
+  <data name="btnPersonalization" xml:space="preserve">
+    <value>Personalización</value>
+  </data>
+  <data name="btnScoreboard" xml:space="preserve">
+    <value>Marcadores</value>
+  </data>
+  <data name="btnFriends" xml:space="preserve">
+    <value>Amigos</value>
+  </data>
+  <data name="btnPlay" xml:space="preserve">
+    <value>JUGAR</value>
+  </data>
+  <data name="btnSendRequests" xml:space="preserve">
+    <value>Enviar solicitud</value>
+  </data>
+  <data name="btnRequests" xml:space="preserve">
+    <value>Ver solicitudes</value>
+  </data>
 </root>

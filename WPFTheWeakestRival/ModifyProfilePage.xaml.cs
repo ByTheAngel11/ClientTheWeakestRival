@@ -5,6 +5,7 @@ using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.LobbyService;
 
 namespace WPFTheWeakestRival
@@ -103,34 +104,15 @@ namespace WPFTheWeakestRival
             imgPreview.Source = null;
         }
 
+
         private void CargarPreviewDesdeArchivo(string path)
         {
-            try
-            {
-                if (!File.Exists(path)) { imgPreview.Source = null; return; }
-                var bi = new BitmapImage();
-                bi.BeginInit();
-                bi.CacheOption = BitmapCacheOption.OnLoad; // evita lock del archivo
-                bi.UriSource = new Uri(path, UriKind.Absolute);
-                bi.EndInit();
-                imgPreview.Source = bi;
-            }
-            catch { imgPreview.Source = null; }
+            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(path, decodePixelWidth: 128);
         }
 
         private void CargarPreviewDesdeUrl(string url)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(url)) { imgPreview.Source = null; return; }
-                var bi = new BitmapImage();
-                bi.BeginInit();
-                bi.CacheOption = BitmapCacheOption.OnLoad;
-                bi.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
-                bi.EndInit();
-                imgPreview.Source = bi;
-            }
-            catch { imgPreview.Source = null; }
+            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(url, decodePixelWidth: 128);
         }
     }
 }

@@ -70,6 +70,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Friends.
+        /// </summary>
+        public static string btnFriends {
+            get {
+                return ResourceManager.GetString("btnFriends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Choose an image.
         /// </summary>
         public static string btnImageChooser {
@@ -84,6 +93,51 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string btnLogin {
             get {
                 return ResourceManager.GetString("btnLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Personalization.
+        /// </summary>
+        public static string btnPersonalization {
+            get {
+                return ResourceManager.GetString("btnPersonalization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a PLAY.
+        /// </summary>
+        public static string btnPlay {
+            get {
+                return ResourceManager.GetString("btnPlay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Requests.
+        /// </summary>
+        public static string btnRequests {
+            get {
+                return ResourceManager.GetString("btnRequests", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Scoreboard.
+        /// </summary>
+        public static string btnScoreboard {
+            get {
+                return ResourceManager.GetString("btnScoreboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Send Request.
+        /// </summary>
+        public static string btnSendRequests {
+            get {
+                return ResourceManager.GetString("btnSendRequests", resourceCulture);
             }
         }
         
@@ -250,11 +304,29 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a You don&apos;t have friends yet.
+        /// </summary>
+        public static string lblNoFriends {
+            get {
+                return ResourceManager.GetString("lblNoFriends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Password.
         /// </summary>
         public static string lblPassword {
             get {
                 return ResourceManager.GetString("lblPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Use “Send Request” to add new ones.
+        /// </summary>
+        public static string lblSendInvitations {
+            get {
+                return ResourceManager.GetString("lblSendInvitations", resourceCulture);
             }
         }
         

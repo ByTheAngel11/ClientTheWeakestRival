@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8082/friends/?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="SendFriendRequestRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="TargetAccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SendFriendRequestRequest" nillable="true" type="tns:SendFriendRequestRequest" />
+  <xs:complexType name="SendFriendRequestResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="FriendRequestId" type="xs:int" />
+      <xs:element minOccurs="0" name="Status" type="tns:FriendRequestStatus" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SendFriendRequestResponse" nillable="true" type="tns:SendFriendRequestResponse" />
+  <xs:simpleType name="FriendRequestStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Pending" />
+      <xs:enumeration value="Accepted" />
+      <xs:enumeration value="Rejected" />
+      <xs:enumeration value="Cancelled" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="FriendRequestStatus" nillable="true" type="tns:FriendRequestStatus" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="AcceptFriendRequestRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="FriendRequestId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AcceptFriendRequestRequest" nillable="true" type="tns:AcceptFriendRequestRequest" />
+  <xs:complexType name="AcceptFriendRequestResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="NewFriend" nillable="true" type="tns:FriendSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AcceptFriendRequestResponse" nillable="true" type="tns:AcceptFriendRequestResponse" />
+  <xs:complexType name="FriendSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="Username" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SinceUtc" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FriendSummary" nillable="true" type="tns:FriendSummary" />
+  <xs:complexType name="RejectFriendRequestRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="FriendRequestId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RejectFriendRequestRequest" nillable="true" type="tns:RejectFriendRequestRequest" />
+  <xs:complexType name="RejectFriendRequestResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Status" type="tns:FriendRequestStatus" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RejectFriendRequestResponse" nillable="true" type="tns:RejectFriendRequestResponse" />
+  <xs:complexType name="RemoveFriendRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="FriendAccountId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RemoveFriendRequest" nillable="true" type="tns:RemoveFriendRequest" />
+  <xs:complexType name="RemoveFriendResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Removed" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RemoveFriendResponse" nillable="true" type="tns:RemoveFriendResponse" />
+  <xs:complexType name="ListFriendsRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IncludePendingIncoming" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IncludePendingOutgoing" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListFriendsRequest" nillable="true" type="tns:ListFriendsRequest" />
+  <xs:complexType name="ListFriendsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Friends" nillable="true" type="tns:ArrayOfFriendSummary" />
+      <xs:element minOccurs="0" name="PendingIncoming" nillable="true" type="tns:ArrayOfFriendRequestSummary" />
+      <xs:element minOccurs="0" name="PendingOutgoing" nillable="true" type="tns:ArrayOfFriendRequestSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListFriendsResponse" nillable="true" type="tns:ListFriendsResponse" />
+  <xs:complexType name="ArrayOfFriendSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FriendSummary" nillable="true" type="tns:FriendSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFriendSummary" nillable="true" type="tns:ArrayOfFriendSummary" />
+  <xs:complexType name="ArrayOfFriendRequestSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FriendRequestSummary" nillable="true" type="tns:FriendRequestSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFriendRequestSummary" nillable="true" type="tns:ArrayOfFriendRequestSummary" />
+  <xs:complexType name="FriendRequestSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="FriendRequestId" type="xs:int" />
+      <xs:element minOccurs="0" name="FromAccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="ToAccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Status" type="tns:FriendRequestStatus" />
+      <xs:element minOccurs="0" name="CreatedUtc" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ResolvedUtc" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FriendRequestSummary" nillable="true" type="tns:FriendRequestSummary" />
+  <xs:complexType name="SearchAccountsRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Query" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MaxResults" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SearchAccountsRequest" nillable="true" type="tns:SearchAccountsRequest" />
+  <xs:complexType name="SearchAccountsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Results" nillable="true" type="tns:ArrayOfSearchAccountItem" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SearchAccountsResponse" nillable="true" type="tns:SearchAccountsResponse" />
+  <xs:complexType name="ArrayOfSearchAccountItem">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="SearchAccountItem" nillable="true" type="tns:SearchAccountItem" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfSearchAccountItem" nillable="true" type="tns:ArrayOfSearchAccountItem" />
+  <xs:complexType name="SearchAccountItem">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsFriend" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasPendingOutgoing" type="xs:boolean" />
+      <xs:element minOccurs="0" name="HasPendingIncoming" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PendingIncomingRequestId" nillable="true" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SearchAccountItem" nillable="true" type="tns:SearchAccountItem" />
+  <xs:complexType name="GetAccountsByIdsRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AccountIds" nillable="true" type="q1:ArrayOfint" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetAccountsByIdsRequest" nillable="true" type="tns:GetAccountsByIdsRequest" />
+  <xs:complexType name="GetAccountsByIdsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Accounts" nillable="true" type="tns:ArrayOfAccountMini" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetAccountsByIdsResponse" nillable="true" type="tns:GetAccountsByIdsResponse" />
+  <xs:complexType name="ArrayOfAccountMini">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AccountMini" nillable="true" type="tns:AccountMini" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAccountMini" nillable="true" type="tns:ArrayOfAccountMini" />
+  <xs:complexType name="AccountMini">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AccountMini" nillable="true" type="tns:AccountMini" />
+</xs:schema>

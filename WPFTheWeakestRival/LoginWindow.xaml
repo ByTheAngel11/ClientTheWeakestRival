@@ -74,7 +74,8 @@
                          Background="White"
                          Padding="8,6,30,6"
                          Visibility="Collapsed"
-                         TextChanged="txtPasswordVisible_TextChanged"/>
+                         TextChanged="txtPasswordVisible_TextChanged"
+                         HorizontalContentAlignment="Center"/>
 
                 <TextBlock x:Name="placeholderPassword"
                            Text="{x:Static language:Lang.passwordPlaceHolder}"
