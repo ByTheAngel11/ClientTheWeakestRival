@@ -87,6 +87,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+
+    <!-- AGREGADO -->
+    <Compile Include="EmailVerificationWindow.xaml.cs">
+      <DependentUpon>EmailVerificationWindow.xaml</DependentUpon>
+    </Compile>
+    <!-- /AGREGADO -->
+
     <Compile Include="Helpers\UiImageHelper.cs" />
     <Compile Include="LobbyCallback.cs" />
     <Compile Include="LobbyWindow.xaml.cs">
@@ -112,6 +119,14 @@
     <Compile Include="RegistrationWindow.xaml.cs">
       <DependentUpon>RegistrationWindow.xaml</DependentUpon>
     </Compile>
+
+    <!-- AGREGADO -->
+    <Page Include="EmailVerificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <!-- /AGREGADO -->
+
     <Page Include="LobbyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -182,6 +197,13 @@
     <None Include="Connected Services\AuthService\item2.xsd">
       <SubType>Designer</SubType>
     </None>
+
+    <!-- AGREGADO -->
+    <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.BeginRegisterResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <!-- /AGREGADO -->
+
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.LoginResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

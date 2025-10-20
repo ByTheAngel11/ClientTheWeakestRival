@@ -59,9 +59,6 @@ namespace WPFTheWeakestRival
         private void UpdateUILanguage()
         {
             lblWelcome.Content = Properties.Langs.Lang.lblWelcome;
-
-            // NO sobrescribimos txtEmail.Text para no borrar la entrada del usuario.
-            // Actualizamos el Text de los placeholders para cambiar idioma sin tocar el TextBox.
             if (placeholderEmail != null)
                 placeholderEmail.Text = Properties.Langs.Lang.emailPlaceholder;
 

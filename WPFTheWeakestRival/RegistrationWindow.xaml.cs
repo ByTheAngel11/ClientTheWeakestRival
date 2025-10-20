@@ -129,7 +129,6 @@ namespace WPFTheWeakestRival
         private async void RegisterClick(object sender, RoutedEventArgs e)
         {
             btnRegister.IsEnabled = false;
-
             try
             {
                 var displayName = txtUsername.Text?.Trim();
@@ -165,46 +164,34 @@ namespace WPFTheWeakestRival
                     copiedImagePath = profilePath;
                 }
 
-                var req = new RegisterRequest
-                {
-                    Email = email,
-                    Password = password,
-                    DisplayName = displayName,
-                    ProfileImageUrl = profilePath
-                };
-
+                // === NUEVO: Paso 1 — pedir código por correo ===
                 var client = new AuthServiceClient();
-
-                RegisterResponse resp;
-
+                BeginRegisterResponse beginResp;
                 try
                 {
-                    resp = await client.RegisterAsync(req);
-                    if (client.State != CommunicationState.Faulted) client.Close();
-                    else client.Abort();
+                    beginResp = await client.BeginRegisterAsync(new BeginRegisterRequest { Email = email });
+                    if (client.State != CommunicationState.Faulted) client.Close(); else client.Abort();
                 }
                 catch (FaultException<ServiceFault> fx)
                 {
                     client.Abort();
-                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 catch (Exception ex)
                 {
                     client.Abort();
-                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                var token = resp.Token;
-                MessageBox.Show(
-                    $"{Lang.registSucces}\nUserId: {resp.UserId}\nExp: {token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
-                    "Auth", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                new LoginWindow().Show();
-                this.Close();
+                // Abre la ventana de verificación con cooldown que devolvió el server
+                var verify = new EmailVerificationWindow(email, displayName, password, profilePath, beginResp.ResendAfterSeconds)
+                {
+                    Owner = this
+                };
+                verify.Show();
+                this.Hide();
             }
             finally
             {

@@ -13,15 +13,43 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PingResponse" nillable="true" type="tns:PingResponse" />
-  <xs:complexType name="RegisterRequest">
+  <xs:complexType name="BeginRegisterRequest">
     <xs:sequence>
       <xs:element name="Email" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BeginRegisterRequest" nillable="true" type="tns:BeginRegisterRequest" />
+  <xs:complexType name="BeginRegisterResponse">
+    <xs:sequence>
+      <xs:element name="ExpiresAtUtc" type="xs:dateTime" />
+      <xs:element name="ResendAfterSeconds" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BeginRegisterResponse" nillable="true" type="tns:BeginRegisterResponse" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="CompleteRegisterRequest">
+    <xs:sequence>
+      <xs:element name="Email" nillable="true" type="xs:string" />
+      <xs:element name="Code" nillable="true" type="xs:string" />
       <xs:element name="Password" nillable="true" type="xs:string" />
       <xs:element name="DisplayName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="RegisterRequest" nillable="true" type="tns:RegisterRequest" />
+  <xs:element name="CompleteRegisterRequest" nillable="true" type="tns:CompleteRegisterRequest" />
   <xs:complexType name="RegisterResponse">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="tns:AuthToken" />
@@ -37,20 +65,15 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="AuthToken" nillable="true" type="tns:AuthToken" />
-  <xs:complexType name="ServiceFault">
+  <xs:complexType name="RegisterRequest">
     <xs:sequence>
-      <xs:element name="Code" nillable="true" type="xs:string" />
-      <xs:element name="Message" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
-        <xs:annotation>
-          <xs:appinfo>
-            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:element>
+      <xs:element name="Email" nillable="true" type="xs:string" />
+      <xs:element name="Password" nillable="true" type="xs:string" />
+      <xs:element name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:element name="RegisterRequest" nillable="true" type="tns:RegisterRequest" />
   <xs:complexType name="LoginRequest">
     <xs:sequence>
       <xs:element name="Email" nillable="true" type="xs:string" />

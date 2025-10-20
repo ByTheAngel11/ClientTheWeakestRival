@@ -119,14 +119,194 @@ namespace WPFTheWeakestRival.AuthService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="RegisterRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BeginRegisterRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
-    public partial class RegisterRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class BeginRegisterRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         private string EmailField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Email {
+            get {
+                return this.EmailField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BeginRegisterResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class BeginRegisterResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private System.DateTime ExpiresAtUtcField;
+        
+        private int ResendAfterSecondsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public System.DateTime ExpiresAtUtc {
+            get {
+                return this.ExpiresAtUtcField;
+            }
+            set {
+                if ((this.ExpiresAtUtcField.Equals(value) != true)) {
+                    this.ExpiresAtUtcField = value;
+                    this.RaisePropertyChanged("ExpiresAtUtc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int ResendAfterSeconds {
+            get {
+                return this.ResendAfterSecondsField;
+            }
+            set {
+                if ((this.ResendAfterSecondsField.Equals(value) != true)) {
+                    this.ResendAfterSecondsField = value;
+                    this.RaisePropertyChanged("ResendAfterSeconds");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class ServiceFault : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string CodeField;
+        
+        private string MessageField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DetailsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Code {
+            get {
+                return this.CodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CodeField, value) != true)) {
+                    this.CodeField = value;
+                    this.RaisePropertyChanged("Code");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Message {
+            get {
+                return this.MessageField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MessageField, value) != true)) {
+                    this.MessageField = value;
+                    this.RaisePropertyChanged("Message");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public string Details {
+            get {
+                return this.DetailsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DetailsField, value) != true)) {
+                    this.DetailsField = value;
+                    this.RaisePropertyChanged("Details");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CompleteRegisterRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class CompleteRegisterRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string EmailField;
+        
+        private string CodeField;
         
         private string PasswordField;
         
@@ -158,7 +338,20 @@ namespace WPFTheWeakestRival.AuthService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public string Code {
+            get {
+                return this.CodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CodeField, value) != true)) {
+                    this.CodeField = value;
+                    this.RaisePropertyChanged("Code");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
         public string Password {
             get {
                 return this.PasswordField;
@@ -171,7 +364,7 @@ namespace WPFTheWeakestRival.AuthService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -184,7 +377,7 @@ namespace WPFTheWeakestRival.AuthService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
         public string ProfileImageUrl {
             get {
                 return this.ProfileImageUrlField;
@@ -342,19 +535,21 @@ namespace WPFTheWeakestRival.AuthService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="RegisterRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
-    public partial class ServiceFault : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class RegisterRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        private string CodeField;
+        private string EmailField;
         
-        private string MessageField;
+        private string PasswordField;
+        
+        private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string DetailsField;
+        private string ProfileImageUrlField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -367,40 +562,53 @@ namespace WPFTheWeakestRival.AuthService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string Code {
+        public string Email {
             get {
-                return this.CodeField;
+                return this.EmailField;
             }
             set {
-                if ((object.ReferenceEquals(this.CodeField, value) != true)) {
-                    this.CodeField = value;
-                    this.RaisePropertyChanged("Code");
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string Message {
+        public string Password {
             get {
-                return this.MessageField;
+                return this.PasswordField;
             }
             set {
-                if ((object.ReferenceEquals(this.MessageField, value) != true)) {
-                    this.MessageField = value;
-                    this.RaisePropertyChanged("Message");
+                if ((object.ReferenceEquals(this.PasswordField, value) != true)) {
+                    this.PasswordField = value;
+                    this.RaisePropertyChanged("Password");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
-        public string Details {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public string DisplayName {
             get {
-                return this.DetailsField;
+                return this.DisplayNameField;
             }
             set {
-                if ((object.ReferenceEquals(this.DetailsField, value) != true)) {
-                    this.DetailsField = value;
-                    this.RaisePropertyChanged("Details");
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public string ProfileImageUrl {
+            get {
+                return this.ProfileImageUrlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
+                    this.ProfileImageUrlField = value;
+                    this.RaisePropertyChanged("ProfileImageUrl");
                 }
             }
         }
@@ -572,6 +780,20 @@ namespace WPFTheWeakestRival.AuthService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/Ping", ReplyAction="http://tempuri.org/IAuthService/PingResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.PingResponse> PingAsync(WPFTheWeakestRival.AuthService.PingRequest request);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/BeginRegister", ReplyAction="http://tempuri.org/IAuthService/BeginRegisterResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.AuthService.ServiceFault), Action="http://tempuri.org/IAuthService/BeginRegisterServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.AuthService.BeginRegisterResponse BeginRegister(WPFTheWeakestRival.AuthService.BeginRegisterRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/BeginRegister", ReplyAction="http://tempuri.org/IAuthService/BeginRegisterResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.BeginRegisterResponse> BeginRegisterAsync(WPFTheWeakestRival.AuthService.BeginRegisterRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/CompleteRegister", ReplyAction="http://tempuri.org/IAuthService/CompleteRegisterResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.AuthService.ServiceFault), Action="http://tempuri.org/IAuthService/CompleteRegisterServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.AuthService.RegisterResponse CompleteRegister(WPFTheWeakestRival.AuthService.CompleteRegisterRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/CompleteRegister", ReplyAction="http://tempuri.org/IAuthService/CompleteRegisterResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.RegisterResponse> CompleteRegisterAsync(WPFTheWeakestRival.AuthService.CompleteRegisterRequest request);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/Register", ReplyAction="http://tempuri.org/IAuthService/RegisterResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.AuthService.ServiceFault), Action="http://tempuri.org/IAuthService/RegisterServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
         WPFTheWeakestRival.AuthService.RegisterResponse Register(WPFTheWeakestRival.AuthService.RegisterRequest request);
@@ -626,6 +848,22 @@ namespace WPFTheWeakestRival.AuthService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.PingResponse> PingAsync(WPFTheWeakestRival.AuthService.PingRequest request) {
             return base.Channel.PingAsync(request);
+        }
+        
+        public WPFTheWeakestRival.AuthService.BeginRegisterResponse BeginRegister(WPFTheWeakestRival.AuthService.BeginRegisterRequest request) {
+            return base.Channel.BeginRegister(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.BeginRegisterResponse> BeginRegisterAsync(WPFTheWeakestRival.AuthService.BeginRegisterRequest request) {
+            return base.Channel.BeginRegisterAsync(request);
+        }
+        
+        public WPFTheWeakestRival.AuthService.RegisterResponse CompleteRegister(WPFTheWeakestRival.AuthService.CompleteRegisterRequest request) {
+            return base.Channel.CompleteRegister(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.RegisterResponse> CompleteRegisterAsync(WPFTheWeakestRival.AuthService.CompleteRegisterRequest request) {
+            return base.Channel.CompleteRegisterAsync(request);
         }
         
         public WPFTheWeakestRival.AuthService.RegisterResponse Register(WPFTheWeakestRival.AuthService.RegisterRequest request) {
