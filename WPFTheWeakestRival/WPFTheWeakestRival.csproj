@@ -100,7 +100,7 @@
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ModifyProfilePage.xaml.cs">
+    <Compile Include="Pages\ModifyProfilePage.xaml.cs">
       <DependentUpon>ModifyProfilePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\AddFriendPage.xaml.cs">
@@ -143,7 +143,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ModifyProfilePage.xaml">
+    <Page Include="Pages\ModifyProfilePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -224,6 +224,12 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.GetFriendsPresenceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.HeartbeatResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.ListFriendsResponse.datasource">

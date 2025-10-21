@@ -85,17 +85,45 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="PresenceHeartbeat">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q13:HeartbeatRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PresenceHeartbeatResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="PresenceHeartbeatResult" nillable="true" type="q14:HeartbeatResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFriendsPresence">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q15:GetFriendsPresenceRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetFriendsPresenceResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetFriendsPresenceResult" nillable="true" type="q16:GetFriendsPresenceResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetAccountsByIds">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q13:GetAccountsByIdsRequest" />
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q17:GetAccountsByIdsRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetAccountsByIdsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetAccountsByIdsResult" nillable="true" type="q14:GetAccountsByIdsResponse" />
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetAccountsByIdsResult" nillable="true" type="q18:GetAccountsByIdsResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

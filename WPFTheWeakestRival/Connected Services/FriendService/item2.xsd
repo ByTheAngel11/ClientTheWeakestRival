@@ -162,6 +162,45 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SearchAccountItem" nillable="true" type="tns:SearchAccountItem" />
+  <xs:complexType name="HeartbeatRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Device" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="HeartbeatRequest" nillable="true" type="tns:HeartbeatRequest" />
+  <xs:complexType name="HeartbeatResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Utc" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="HeartbeatResponse" nillable="true" type="tns:HeartbeatResponse" />
+  <xs:complexType name="GetFriendsPresenceRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetFriendsPresenceRequest" nillable="true" type="tns:GetFriendsPresenceRequest" />
+  <xs:complexType name="GetFriendsPresenceResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Friends" nillable="true" type="tns:ArrayOfFriendPresence" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetFriendsPresenceResponse" nillable="true" type="tns:GetFriendsPresenceResponse" />
+  <xs:complexType name="ArrayOfFriendPresence">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="FriendPresence" nillable="true" type="tns:FriendPresence" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfFriendPresence" nillable="true" type="tns:ArrayOfFriendPresence" />
+  <xs:complexType name="FriendPresence">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+      <xs:element minOccurs="0" name="LastSeenUtc" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="FriendPresence" nillable="true" type="tns:FriendPresence" />
   <xs:complexType name="GetAccountsByIdsRequest">
     <xs:sequence>
       <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
