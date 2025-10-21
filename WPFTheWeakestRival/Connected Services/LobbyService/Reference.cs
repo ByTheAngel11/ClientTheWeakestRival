@@ -137,6 +137,9 @@ namespace WPFTheWeakestRival.LobbyService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.LobbyService.PlayerSummary[] PlayersField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AccessCodeField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -195,6 +198,19 @@ namespace WPFTheWeakestRival.LobbyService {
                 if ((object.ReferenceEquals(this.PlayersField, value) != true)) {
                     this.PlayersField = value;
                     this.RaisePropertyChanged("Players");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public string AccessCode {
+            get {
+                return this.AccessCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AccessCodeField, value) != true)) {
+                    this.AccessCodeField = value;
+                    this.RaisePropertyChanged("AccessCode");
                 }
             }
         }
@@ -783,6 +799,229 @@ namespace WPFTheWeakestRival.LobbyService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CreateLobbyRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class CreateLobbyRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string LobbyNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<byte> MaxPlayersField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public string LobbyName {
+            get {
+                return this.LobbyNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LobbyNameField, value) != true)) {
+                    this.LobbyNameField = value;
+                    this.RaisePropertyChanged("LobbyName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public System.Nullable<byte> MaxPlayers {
+            get {
+                return this.MaxPlayersField;
+            }
+            set {
+                if ((this.MaxPlayersField.Equals(value) != true)) {
+                    this.MaxPlayersField = value;
+                    this.RaisePropertyChanged("MaxPlayers");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CreateLobbyResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class CreateLobbyResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private WPFTheWeakestRival.LobbyService.LobbyInfo LobbyField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public WPFTheWeakestRival.LobbyService.LobbyInfo Lobby {
+            get {
+                return this.LobbyField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LobbyField, value) != true)) {
+                    this.LobbyField = value;
+                    this.RaisePropertyChanged("Lobby");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="JoinByCodeRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class JoinByCodeRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        private string AccessCodeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public string AccessCode {
+            get {
+                return this.AccessCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AccessCodeField, value) != true)) {
+                    this.AccessCodeField = value;
+                    this.RaisePropertyChanged("AccessCode");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="JoinByCodeResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class JoinByCodeResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private WPFTheWeakestRival.LobbyService.LobbyInfo LobbyField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public WPFTheWeakestRival.LobbyService.LobbyInfo Lobby {
+            get {
+                return this.LobbyField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LobbyField, value) != true)) {
+                    this.LobbyField = value;
+                    this.RaisePropertyChanged("Lobby");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ChatMessage", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class ChatMessage : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -917,6 +1156,20 @@ namespace WPFTheWeakestRival.LobbyService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/UpdateAccount", ReplyAction="http://tempuri.org/ILobbyService/UpdateAccountResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.UpdateAccountResponse> UpdateAccountAsync(WPFTheWeakestRival.LobbyService.UpdateAccountRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/CreateLobby", ReplyAction="http://tempuri.org/ILobbyService/CreateLobbyResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/CreateLobbyServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.LobbyService.CreateLobbyResponse CreateLobby(WPFTheWeakestRival.LobbyService.CreateLobbyRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/CreateLobby", ReplyAction="http://tempuri.org/ILobbyService/CreateLobbyResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.CreateLobbyResponse> CreateLobbyAsync(WPFTheWeakestRival.LobbyService.CreateLobbyRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/JoinByCode", ReplyAction="http://tempuri.org/ILobbyService/JoinByCodeResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/JoinByCodeServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.LobbyService.JoinByCodeResponse JoinByCode(WPFTheWeakestRival.LobbyService.JoinByCodeRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/JoinByCode", ReplyAction="http://tempuri.org/ILobbyService/JoinByCodeResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.JoinByCodeResponse> JoinByCodeAsync(WPFTheWeakestRival.LobbyService.JoinByCodeRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1009,6 +1262,22 @@ namespace WPFTheWeakestRival.LobbyService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.UpdateAccountResponse> UpdateAccountAsync(WPFTheWeakestRival.LobbyService.UpdateAccountRequest request) {
             return base.Channel.UpdateAccountAsync(request);
+        }
+        
+        public WPFTheWeakestRival.LobbyService.CreateLobbyResponse CreateLobby(WPFTheWeakestRival.LobbyService.CreateLobbyRequest request) {
+            return base.Channel.CreateLobby(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.CreateLobbyResponse> CreateLobbyAsync(WPFTheWeakestRival.LobbyService.CreateLobbyRequest request) {
+            return base.Channel.CreateLobbyAsync(request);
+        }
+        
+        public WPFTheWeakestRival.LobbyService.JoinByCodeResponse JoinByCode(WPFTheWeakestRival.LobbyService.JoinByCodeRequest request) {
+            return base.Channel.JoinByCode(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.JoinByCodeResponse> JoinByCodeAsync(WPFTheWeakestRival.LobbyService.JoinByCodeRequest request) {
+            return base.Channel.JoinByCodeAsync(request);
         }
     }
 }

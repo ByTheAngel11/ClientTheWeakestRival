@@ -20,6 +20,7 @@
       <xs:element minOccurs="0" name="LobbyName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="MaxPlayers" type="xs:int" />
       <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfPlayerSummary" />
+      <xs:element minOccurs="0" name="AccessCode" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LobbyInfo" nillable="true" type="tns:LobbyInfo" />
@@ -103,6 +104,33 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="UpdateAccountRequest" nillable="true" type="tns:UpdateAccountRequest" />
+  <xs:complexType name="CreateLobbyRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LobbyName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MaxPlayers" nillable="true" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CreateLobbyRequest" nillable="true" type="tns:CreateLobbyRequest" />
+  <xs:complexType name="CreateLobbyResponse">
+    <xs:sequence>
+      <xs:element name="Lobby" nillable="true" type="tns:LobbyInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CreateLobbyResponse" nillable="true" type="tns:CreateLobbyResponse" />
+  <xs:complexType name="JoinByCodeRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="AccessCode" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JoinByCodeRequest" nillable="true" type="tns:JoinByCodeRequest" />
+  <xs:complexType name="JoinByCodeResponse">
+    <xs:sequence>
+      <xs:element name="Lobby" nillable="true" type="tns:LobbyInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="JoinByCodeResponse" nillable="true" type="tns:JoinByCodeResponse" />
   <xs:complexType name="ChatMessage">
     <xs:sequence>
       <xs:element minOccurs="0" name="FromPlayerId" type="ser:guid" />

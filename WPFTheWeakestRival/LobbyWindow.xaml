@@ -3,7 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:language="clr-namespace:WPFTheWeakestRival.Properties.Langs"
-        Title="Lobby" Height="480" Width="900"
+        Title="Lobby"
+        Height="540" Width="1100"
+        MinWidth="1024" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
@@ -148,7 +150,7 @@
         </Storyboard>
     </Window.Resources>
 
-    <Grid Margin="8">
+    <Grid Margin="12">
 
         <!-- ====== Contenido principal ====== -->
         <Grid x:Name="grdMainArea">
@@ -158,35 +160,37 @@
             </Grid.RowDefinitions>
 
             <!-- Top bar -->
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="0" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <Button x:Name="btnSettings"
                             Style="{StaticResource TopBarIconButtonStyle}"
+                            Margin="0,0,12,0"
                             Click="btnSettings_Click"/>
                     <Button Style="{StaticResource TopBarButtonStyle}" Content="{x:Static language:Lang.btnPersonalization}"/>
-                    <Button Style="{StaticResource TopBarButtonStyle}" Width="110" Content="{x:Static language:Lang.btnScoreboard}"/>
+                    <Button Style="{StaticResource TopBarButtonStyle}" Width="130" Content="{x:Static language:Lang.btnScoreboard}"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
-                            HorizontalAlignment="Right">
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
                     <Button x:Name="btnFriends"
                             Content="{x:Static language:Lang.btnFriends}"
                             Style="{StaticResource TopBarButtonStyle}"
-                            Width="100"
+                            Width="120"
                             Click="btnFriends_Click"/>
 
                     <Button x:Name="btnProfile"
                             Style="{StaticResource AvatarButtonStyle}"
                             Margin="12,0,0,0"
-                            Click="btnModifyProfile_Click" Height="48" Width="45">
+                            Click="btnModifyProfile_Click" Height="48" Width="48">
                         <Image x:Name="imgAvatar"
-                               Width="45"
+                               Width="48"
                                Height="48"
                                Stretch="UniformToFill"
                                SnapsToDevicePixels="True"
@@ -199,30 +203,144 @@
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="260"/>
+                    <ColumnDefinition Width="380"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Panel visual izquierdo (placeholder) -->
                 <Grid Grid.Column="0" Margin="8">
-                    <Image Width="180" Height="220"
+                    <Image Width="200" Height="240"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Content="{x:Static language:Lang.btnPlay}" Width="160" Height="44"
+                    <Button Content="{x:Static language:Lang.btnPlay}" Width="180" Height="46"
                             HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"/>
                 </Grid>
 
-                <Grid Grid.Column="1" Margin="8">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="32"/>
-                    </Grid.RowDefinitions>
+                <!-- ===================== -->
+                <!--   LOBBY + CHAT (sidebar) -->
+                <!-- ===================== -->
+                <Border Grid.Column="1" Margin="8"
+                        Background="#FFFFFFFF"
+                        BorderBrush="#DDDDDD" BorderThickness="1"
+                        CornerRadius="8">
+                    <Grid Margin="10" MinWidth="360">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <!-- header + acciones -->
+                            <RowDefinition Height="Auto"/>
+                            <!-- ids/código -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                            <!-- mensajes -->
+                            <RowDefinition Height="40"/>
+                            <!-- input -->
+                        </Grid.RowDefinitions>
 
-                    <ListBox Grid.Row="0"
-                             x:Name="lstChatMessages"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"
-                             VirtualizingPanel.IsVirtualizing="True"
-                             VirtualizingPanel.ScrollUnit="Pixel"/>
+                        <!-- Header + acciones -->
+                        <Grid Grid.Row="0" Margin="0,0,0,6">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                    <TextBox Grid.Row="1" x:Name="txtChatInput" Text="Chat"/>
-                </Grid>
+                            <TextBlock Grid.Row="0"
+                                       x:Name="txtLobbyHeader"
+                                       Text="Sin lobby"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,6"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="150"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="btnCreateLobby"
+                                        Grid.Column="0"
+                                        Content="Crear lobby"
+                                        Height="30"
+                                        Click="btnCreateLobby_Click"/>
+
+                                <TextBox x:Name="txtJoinCode"
+                                         Grid.Column="2"
+                                         Height="30"
+                                         MaxLength="12"
+                                         VerticalContentAlignment="Center"
+                                         ToolTip="Código de acceso (8–12 chars)"/>
+
+                                <Button x:Name="btnJoinByCode"
+                                        Grid.Column="4"
+                                        Content="Unirse por código"
+                                        Height="30"
+                                        Click="btnJoinByCode_Click"/>
+                            </Grid>
+                        </Grid>
+
+                        <!-- IDs / Código -->
+                        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,2,0,0">
+                            <TextBlock x:Name="txtLobbyId"
+                                       FontSize="11"
+                                       Opacity="0.75"/>
+                            <TextBlock x:Name="txtAccessCode"
+                                       FontSize="11"
+                                       Opacity="0.75"/>
+                        </StackPanel>
+
+                        <!-- Lista de mensajes -->
+                        <ListBox Grid.Row="3"
+                                 x:Name="lstChatMessages"
+                                 Margin="0,4,0,0"
+                                 BorderBrush="#DDDDDD" BorderThickness="1"
+                                 Padding="6"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 VirtualizingPanel.IsVirtualizing="True"
+                                 VirtualizingPanel.ScrollUnit="Pixel">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,3">
+                                        <TextBlock>
+                                            <Run Text="{Binding Author}" FontWeight="SemiBold"/>
+                                            <Run Text=" · "/>
+                                            <Run Text="{Binding Time}"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Input con watermark -->
+                        <Grid Grid.Row="4" Margin="0,6,0,0">
+                            <Border Background="#FFFFFFFF" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4"/>
+                            <TextBox x:Name="txtChatInput"
+                                     Margin="4"
+                                     BorderThickness="0"
+                                     VerticalContentAlignment="Center"
+                                     KeyDown="txtChatInput_KeyDown"/>
+                            <TextBlock Text="Escribe y presiona Enter..."
+                                       Margin="10,0,0,0"
+                                       Foreground="#99000000"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, ElementName=txtChatInput}" Value="">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=txtChatInput}" Value="True">
+                                                <Setter Property="Foreground" Value="#55000000"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+                </Border>
             </Grid>
         </Grid>
 

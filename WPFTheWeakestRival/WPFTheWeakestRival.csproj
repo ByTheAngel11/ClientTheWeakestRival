@@ -282,6 +282,12 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\LobbyService\LobbyService.wsdl" />
+    <None Include="Connected Services\LobbyService\WPFTheWeakestRival.LobbyService.CreateLobbyResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\LobbyService\WPFTheWeakestRival.LobbyService.JoinByCodeResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Connected Services\LobbyService\WPFTheWeakestRival.LobbyService.JoinLobbyResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
