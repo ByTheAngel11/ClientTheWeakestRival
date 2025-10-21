@@ -1,0 +1,41 @@
+* [33m6bc3390[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Se añadio el servicio actualizado para llevar a cabo el chat en el Lobby
+[31m|[m *   [33mb4d46a5[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Actualización del estado de los amigos
+[31m|[m [32m|[m[31m\[m  
+[31m|[m [32m|[m[31m/[m  
+[31m|[m[31m/[m[32m|[m   
+* [32m|[m [33m4076464[m Se agregaron los elementos y llamadas a los servicios para crear y unirse a un Lobby
+[33m|[m * [33mfdaf7d5[m Actualización del FriendService y ya aparecen Online los amigos
+[33m|[m[33m/[m  
+* [33m6d9e51a[m Arreglado mis errores, ya debe de estar todo bien
+* [33m6ae4e5b[m Creacion de lista de amigos, agregar amigos y solicitudes funcionales
+* [33m06772dc[m Modificaciones por nombramiento
+* [33md36154d[m Se realizo el placeholder para la ventana de Login
+* [33m0e9452a[m Se realizo la ventana para Modificar Perfil
+* [33m4c6c24c[m Al iniciar sesion ya te manda al lobby
+* [33mcfd3a9c[m Se realizo la logica para el inicio de sesion con un metodo externo
+* [33m5f9f671[m Ya registra, falta manejo de excepciones
+* [33m3bb260b[m Función de cancelar registro
+* [33m47934e7[m Pequeñas correcciones de internacionalización
+* [33m0577757[m cambios en internacionalización
+*   [33m7919ae9[m Merge branch 'main' of https://github.com/ByTheAngel11/ClientTheWeakestRival
+[34m|[m[35m\[m  
+[34m|[m * [33m4f64757[m Se realizo la internacionalizacion de RegistrationWindow
+[34m|[m * [33m5cb760e[m Solucion actualizada
+[34m|[m * [33m6229b6c[m Se agregaron los elementos y se acomodaron de buena manera para LobbyWindow
+* [35m|[m [33m3659478[m Integración de imagenes como recursos, ademas de cambios minimos en partes de internacionalización
+[35m|[m[35m/[m  
+* [33m4d4e719[m Se realizo el esqueleto para LobbyWindow
+* [33m397dafd[m Se realizo la internacionalizacion de LoginWindow
+* [33ma3d1655[m Error al hacer el commit
+* [33mb3d8f6f[m Se realizo el esqueleto de la ventana LoginWindow
+* [33m05f48bf[m Se soluciono un problema con el archivo Lang
+* [33m9b38380[m[33m ([m[1;31morigin/windows[m[33m)[m Inicio de contruccion de RegistrationWindow
+* [33mb733549[m Llenado de Lang para español e ingles
+*   [33m3a57431[m Se resolvio una merge
+[36m|[m[1;31m\[m  
+[36m|[m * [33m954f0b9[m Creacion de RegistrationWindow
+[36m|[m * [33mbee1c56[m Commit de prueba
+* [1;31m|[m [33mf5b04b0[m Se creo la carpeta de Langs
+[1;31m|[m[1;31m/[m  
+* [33m1acbc9f[m Agregar archivos de proyecto.
+* [33md95df5f[m Agregar .gitattributes y .gitignore.
