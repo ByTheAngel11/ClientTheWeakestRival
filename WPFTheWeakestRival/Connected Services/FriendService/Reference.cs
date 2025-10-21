@@ -1262,6 +1262,279 @@ namespace WPFTheWeakestRival.FriendService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="HeartbeatRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class HeartbeatRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TokenField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DeviceField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public string Device {
+            get {
+                return this.DeviceField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DeviceField, value) != true)) {
+                    this.DeviceField = value;
+                    this.RaisePropertyChanged("Device");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="HeartbeatResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class HeartbeatResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime UtcField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime Utc {
+            get {
+                return this.UtcField;
+            }
+            set {
+                if ((this.UtcField.Equals(value) != true)) {
+                    this.UtcField = value;
+                    this.RaisePropertyChanged("Utc");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GetFriendsPresenceRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GetFriendsPresenceRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TokenField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GetFriendsPresenceResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GetFriendsPresenceResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.FriendService.FriendPresence[] FriendsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public WPFTheWeakestRival.FriendService.FriendPresence[] Friends {
+            get {
+                return this.FriendsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.FriendsField, value) != true)) {
+                    this.FriendsField = value;
+                    this.RaisePropertyChanged("Friends");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="FriendPresence", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class FriendPresence : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int AccountIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsOnlineField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<System.DateTime> LastSeenUtcField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int AccountId {
+            get {
+                return this.AccountIdField;
+            }
+            set {
+                if ((this.AccountIdField.Equals(value) != true)) {
+                    this.AccountIdField = value;
+                    this.RaisePropertyChanged("AccountId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsOnline {
+            get {
+                return this.IsOnlineField;
+            }
+            set {
+                if ((this.IsOnlineField.Equals(value) != true)) {
+                    this.IsOnlineField = value;
+                    this.RaisePropertyChanged("IsOnline");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<System.DateTime> LastSeenUtc {
+            get {
+                return this.LastSeenUtcField;
+            }
+            set {
+                if ((this.LastSeenUtcField.Equals(value) != true)) {
+                    this.LastSeenUtcField = value;
+                    this.RaisePropertyChanged("LastSeenUtc");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="GetAccountsByIdsRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class GetAccountsByIdsRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1505,6 +1778,20 @@ namespace WPFTheWeakestRival.FriendService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/SearchAccounts", ReplyAction="http://tempuri.org/IFriendService/SearchAccountsResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.SearchAccountsResponse> SearchAccountsAsync(WPFTheWeakestRival.FriendService.SearchAccountsRequest request);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/PresenceHeartbeat", ReplyAction="http://tempuri.org/IFriendService/PresenceHeartbeatResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.FriendService.ServiceFault), Action="http://tempuri.org/IFriendService/PresenceHeartbeatServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.FriendService.HeartbeatResponse PresenceHeartbeat(WPFTheWeakestRival.FriendService.HeartbeatRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/PresenceHeartbeat", ReplyAction="http://tempuri.org/IFriendService/PresenceHeartbeatResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.HeartbeatResponse> PresenceHeartbeatAsync(WPFTheWeakestRival.FriendService.HeartbeatRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetFriendsPresence", ReplyAction="http://tempuri.org/IFriendService/GetFriendsPresenceResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.FriendService.ServiceFault), Action="http://tempuri.org/IFriendService/GetFriendsPresenceServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.FriendService.GetFriendsPresenceResponse GetFriendsPresence(WPFTheWeakestRival.FriendService.GetFriendsPresenceRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetFriendsPresence", ReplyAction="http://tempuri.org/IFriendService/GetFriendsPresenceResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetFriendsPresenceResponse> GetFriendsPresenceAsync(WPFTheWeakestRival.FriendService.GetFriendsPresenceRequest request);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetAccountsByIds", ReplyAction="http://tempuri.org/IFriendService/GetAccountsByIdsResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.FriendService.ServiceFault), Action="http://tempuri.org/IFriendService/GetAccountsByIdsServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
         WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse GetAccountsByIds(WPFTheWeakestRival.FriendService.GetAccountsByIdsRequest request);
@@ -1586,6 +1873,22 @@ namespace WPFTheWeakestRival.FriendService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.SearchAccountsResponse> SearchAccountsAsync(WPFTheWeakestRival.FriendService.SearchAccountsRequest request) {
             return base.Channel.SearchAccountsAsync(request);
+        }
+        
+        public WPFTheWeakestRival.FriendService.HeartbeatResponse PresenceHeartbeat(WPFTheWeakestRival.FriendService.HeartbeatRequest request) {
+            return base.Channel.PresenceHeartbeat(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.HeartbeatResponse> PresenceHeartbeatAsync(WPFTheWeakestRival.FriendService.HeartbeatRequest request) {
+            return base.Channel.PresenceHeartbeatAsync(request);
+        }
+        
+        public WPFTheWeakestRival.FriendService.GetFriendsPresenceResponse GetFriendsPresence(WPFTheWeakestRival.FriendService.GetFriendsPresenceRequest request) {
+            return base.Channel.GetFriendsPresence(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetFriendsPresenceResponse> GetFriendsPresenceAsync(WPFTheWeakestRival.FriendService.GetFriendsPresenceRequest request) {
+            return base.Channel.GetFriendsPresenceAsync(request);
         }
         
         public WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse GetAccountsByIds(WPFTheWeakestRival.FriendService.GetAccountsByIdsRequest request) {

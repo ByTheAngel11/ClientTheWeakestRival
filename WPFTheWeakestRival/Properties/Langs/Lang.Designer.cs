@@ -367,6 +367,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No valid session.
+        /// </summary>
+        public static string noValidSessionCode {
+            get {
+                return ResourceManager.GetString("noValidSessionCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Enter your password.
         /// </summary>
         public static string passwordPlaceHolder {

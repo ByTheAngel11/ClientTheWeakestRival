@@ -255,4 +255,7 @@
   <data name="btnRequests" xml:space="preserve">
     <value>Ver solicitudes</value>
   </data>
+  <data name="noValidSessionCode" xml:space="preserve">
+    <value>Sesión no válida</value>
+  </data>
 </root>
