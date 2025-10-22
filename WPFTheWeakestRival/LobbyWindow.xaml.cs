@@ -13,107 +13,109 @@ using System.Windows.Media.Effects;
 using System.Windows.Threading;
 
 using WPFTheWeakestRival.Helpers;
-using WPFTheWeakestRival.LobbyService;
-using WPFTheWeakestRival.FriendService;
+using WPFTheWeakestRival.LobbyService;    // Lobby (duplex)
+using WPFTheWeakestRival.FriendService;  // Friends (no duplex)
 using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
     /// <summary>
-    /// Ventana principal del lobby. Hospeda overlays y maneja callbacks del lobby.
+    /// Ventana principal del lobby. Hospeda overlays, drawer de amigos y callbacks de lobby/chat.
     /// </summary>
     public partial class LobbyWindow : Window, ILobbyServiceCallback
     {
+        // ===== Animaciones / UI =====
         private const double OverlayBlurMaxRadius = 6.0;
         private const int OverlayFadeInDurationMs = 180;
         private const int OverlayFadeOutDurationMs = 160;
-
         private const int DrawerAnimInMs = 180;
         private const int DrawerAnimOutMs = 160;
 
-        // Presencia
+        // ===== Presencia / refrescos =====
         private const int HeartbeatIntervalSeconds = 30;
         private const int FriendsRefreshIntervalSeconds = 45;
-        private DispatcherTimer presenceTimer;
-        private DispatcherTimer friendsRefreshTimer;
 
-        private readonly LobbyServiceClient lobbyServiceClient;
-        private readonly FriendServiceClient friendsClient;
-        private readonly BlurEffect overlayBlurEffect = new BlurEffect { Radius = 0 };
+        private readonly LobbyServiceClient _lobby;     // duplex
+        private readonly FriendServiceClient _friends;   // no duplex
+        private readonly BlurEffect _overlayBlur = new BlurEffect { Radius = 0 };
 
-        private readonly ObservableCollection<FriendItem> friends = new ObservableCollection<FriendItem>();
-        private int pendingRequestsCount = 0;
+        private readonly DispatcherTimer _presenceTimer;
+        private readonly DispatcherTimer _friendsTimer;
 
-        // ====== LOBBY + CHAT ======
-        private Guid? currentLobbyId = null;
-        private string currentAccessCode = null;
+        // ===== Amigos (drawer) =====
+        private readonly ObservableCollection<FriendItem> _friendsItems = new ObservableCollection<FriendItem>();
+        private int _pendingRequestsCount = 0;
 
-        private readonly ObservableCollection<ChatLine> chatLines = new ObservableCollection<ChatLine>();
+        // ===== Lobby + Chat =====
+        private Guid? _currentLobbyId = null;
+        private string _currentAccessCode = null;
+
+        private readonly ObservableCollection<ChatLine> _chatLines = new ObservableCollection<ChatLine>();
         private sealed class ChatLine
         {
-            public string Author { get; set; }
-            public string Text { get; set; }
-            public string Time { get; set; }
-            public ChatLine() { Author = ""; Text = ""; Time = ""; }
+            public string Author { get; set; } = string.Empty;
+            public string Text { get; set; } = string.Empty;
+            public string Time { get; set; } = string.Empty;
         }
 
         public LobbyWindow()
         {
             InitializeComponent();
 
-            // WCF: lobby (dúplex) y amigos
-            var serviceContext = new InstanceContext(this);
-            lobbyServiceClient = new LobbyServiceClient(serviceContext, "WSDualHttpBinding_ILobbyService");
-            friendsClient = new FriendServiceClient("WSHttpBinding_IFriendService");
+            // WCF
+            var ctx = new InstanceContext(this);
+            _lobby = new LobbyServiceClient(ctx, "WSDualHttpBinding_ILobbyService");
+            _friends = new FriendServiceClient("WSHttpBinding_IFriendService");
 
-            // Chat binding
-            lstChatMessages.ItemsSource = chatLines;
+            // Chat
+            lstChatMessages.ItemsSource = _chatLines;
             txtChatInput.Text = string.Empty;
 
-            RefreshProfileButtonAvatar();
+            // Amigos
+            lstFriends.ItemsSource = _friendsItems;
             UpdateFriendDrawerUI();
 
-            // Timers de presencia / refresco
-            presenceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(HeartbeatIntervalSeconds) };
-            presenceTimer.Tick += async (_, __) => await SendHeartbeatAsync();
-            presenceTimer.Start();
+            // Avatar
+            RefreshProfileButtonAvatar();
+
+            // Timers
+            _presenceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(HeartbeatIntervalSeconds) };
+            _presenceTimer.Tick += async (_, __) => await SendHeartbeatAsync();
+            _presenceTimer.Start();
             _ = SendHeartbeatAsync(); // primer latido
 
-            friendsRefreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(FriendsRefreshIntervalSeconds) };
-            friendsRefreshTimer.Tick += async (_, __) =>
+            _friendsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(FriendsRefreshIntervalSeconds) };
+            _friendsTimer.Tick += async (_, __) =>
             {
                 if (friendsDrawerHost.Visibility == Visibility.Visible)
                     await RefreshFriendsAsync();
             };
-            friendsRefreshTimer.Start();
+            _friendsTimer.Start();
 
             Unloaded += OnWindowUnloaded;
         }
 
-        // ========================= Top bar: Perfil =========================
-        private void btnModifyProfile_Click(object sender, RoutedEventArgs e) => OnProfileClick(sender, e);
-        private void CloseOverlay_Click(object sender, RoutedEventArgs e) => OnCloseOverlayClick(sender, e);
-        private void Window_KeyDown(object sender, KeyEventArgs e) => OnWindowKeyDown(sender, e);
-        private void btnSettings_Click(object sender, RoutedEventArgs e) { /* TODO */ }
-
-        private void OnProfileClick(object sender, RoutedEventArgs e)
+        // ========================= Top bar / Perfil =========================
+        private void btnModifyProfile_Click(object sender, RoutedEventArgs e)
         {
-            var token = LoginWindow.AppSession.CurrentToken != null ? LoginWindow.AppSession.CurrentToken.Token : null;
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show("Sesión no válida.");
+                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
-            var profilePage = new ModifyProfilePage(lobbyServiceClient, token) { Title = "Perfil" };
-            profilePage.Closed += delegate { RefreshProfileButtonAvatar(); };
-            ShowOverlayPage(profilePage);
+            var page = new ModifyProfilePage(_lobby, token) { Title = "Perfil" };
+            page.Closed += (_, __) => RefreshProfileButtonAvatar();
+            ShowOverlayPage(page);
         }
 
-        // ======== Overlay central ========
-        private void OnCloseOverlayClick(object sender, RoutedEventArgs e) => HideOverlayPanel();
+        private void btnSettings_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Settings
+        }
 
-        private void OnWindowKeyDown(object sender, KeyEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Escape) return;
 
@@ -127,27 +129,64 @@ namespace WPFTheWeakestRival
                 HideOverlayPanel();
         }
 
+        // ========================= Overlay central =========================
+        private void CloseOverlay_Click(object sender, RoutedEventArgs e) => HideOverlayPanel();
+
+        private void ShowOverlayPage(Page page)
+        {
+            frmOverlayFrame.Content = page;
+            grdMainArea.Effect = _overlayBlur;
+            pnlOverlayHost.Visibility = Visibility.Visible;
+
+            pnlOverlayHost.BeginAnimation(OpacityProperty,
+                new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(OverlayFadeInDurationMs))
+                { EasingFunction = new QuadraticEase() });
+
+            _overlayBlur.BeginAnimation(BlurEffect.RadiusProperty,
+                new DoubleAnimation(0, OverlayBlurMaxRadius, TimeSpan.FromMilliseconds(OverlayFadeInDurationMs))
+                { EasingFunction = new QuadraticEase() });
+        }
+
+        private void HideOverlayPanel()
+        {
+            var fadeOut = new DoubleAnimation(pnlOverlayHost.Opacity, 0, TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs))
+            {
+                EasingFunction = new QuadraticEase()
+            };
+            fadeOut.Completed += (_, __) =>
+            {
+                pnlOverlayHost.Visibility = Visibility.Collapsed;
+                frmOverlayFrame.Content = null;
+                if (friendsDrawerHost.Visibility != Visibility.Visible)
+                    grdMainArea.Effect = null;
+            };
+            pnlOverlayHost.BeginAnimation(OpacityProperty, fadeOut);
+
+            if (grdMainArea.Effect is BlurEffect currentBlur)
+            {
+                currentBlur.BeginAnimation(BlurEffect.RadiusProperty,
+                    new DoubleAnimation(currentBlur.Radius, 0, TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs))
+                    { EasingFunction = new QuadraticEase() });
+            }
+        }
+
         private void RefreshProfileButtonAvatar()
         {
             try
             {
-                var token = LoginWindow.AppSession.CurrentToken != null ? LoginWindow.AppSession.CurrentToken.Token : null;
+                var token = LoginWindow.AppSession.CurrentToken?.Token;
                 if (string.IsNullOrWhiteSpace(token)) return;
 
-                var me = lobbyServiceClient.GetMyProfile(token);
+                var me = _lobby.GetMyProfile(token);
 
                 int px = 28;
                 try { px = (int)(double)FindResource("AvatarSize"); } catch { }
 
-                ImageSource src =
-                    UiImageHelper.TryCreateFromUrlOrPath(me.ProfileImageUrl, decodePixelWidth: px)
-                    ?? UiImageHelper.DefaultAvatar(px);
+                var src = UiImageHelper.TryCreateFromUrlOrPath(me.ProfileImageUrl, decodePixelWidth: px)
+                          ?? UiImageHelper.DefaultAvatar(px);
 
-                var brushObj = FindName("brushAvatar") as ImageBrush;
-                if (brushObj != null) brushObj.ImageSource = src;
-
-                var imgObj = FindName("imgAvatar") as Image;
-                if (imgObj != null) imgObj.Source = src;
+                if (FindName("brushAvatar") is ImageBrush brush) brush.ImageSource = src;
+                if (FindName("imgAvatar") is Image img) img.Source = src;
             }
             catch
             {
@@ -155,62 +194,12 @@ namespace WPFTheWeakestRival
                 try { px = (int)(double)FindResource("AvatarSize"); } catch { }
                 var fallback = UiImageHelper.DefaultAvatar(px);
 
-                var brushObj = FindName("brushAvatar") as ImageBrush;
-                if (brushObj != null) brushObj.ImageSource = fallback;
-
-                var legacyImg = FindName("imgProfile") as Image;
-                if (legacyImg != null) legacyImg.Source = fallback;
+                if (FindName("brushAvatar") is ImageBrush brush) brush.ImageSource = fallback;
+                if (FindName("imgProfile") is Image legacyImg) legacyImg.Source = fallback;
             }
         }
 
-        // ========================= Overlay central =========================
-        private void CloseOverlay_Click(object sender, RoutedEventArgs e) => OnCloseOverlayClick(sender, e);
-
-        private void OnCloseOverlayClick(object sender, RoutedEventArgs e)
-        {
-            HideOverlayPanel();
-        }
-
-        private void ShowOverlayPage(Page page)
-        {
-            frmOverlayFrame.Content = page;
-            grdMainArea.Effect = overlayBlurEffect;
-            pnlOverlayHost.Visibility = Visibility.Visible;
-
-            var fadeIn = new DoubleAnimation { From = 0, To = 1, Duration = TimeSpan.FromMilliseconds(OverlayFadeInDurationMs), EasingFunction = new QuadraticEase() };
-            pnlOverlayHost.BeginAnimation(OpacityProperty, fadeIn);
-
-            var blurIn = new DoubleAnimation { From = 0, To = OverlayBlurMaxRadius, Duration = TimeSpan.FromMilliseconds(OverlayFadeInDurationMs), EasingFunction = new QuadraticEase() };
-            overlayBlurEffect.BeginAnimation(BlurEffect.RadiusProperty, blurIn);
-        }
-
-        private void HideOverlayPanel()
-        {
-            var fadeOut = new DoubleAnimation { From = pnlOverlayHost.Opacity, To = 0, Duration = TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs), EasingFunction = new QuadraticEase() };
-            fadeOut.Completed += delegate
-            {
-                pnlOverlayHost.Visibility = Visibility.Collapsed;
-                frmOverlayFrame.Content = null;
-                if (friendsDrawerHost.Visibility != Visibility.Visible)
-                    grdMainArea.Effect = null;
-            };
-
-            pnlOverlayHost.BeginAnimation(OpacityProperty, overlayFadeOutAnimation);
-
-            if (grdMainArea.Effect is BlurEffect currentBlurEffect)
-            {
-                var overlayBlurOutAnimation = new DoubleAnimation
-                {
-                    From = currentBlurEffect.Radius,
-                    To = 0,
-                    Duration = TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs),
-                    EasingFunction = new QuadraticEase()
-                };
-                currentBlurEffect.BeginAnimation(BlurEffect.RadiusProperty, overlayBlurOutAnimation);
-            }
-        }
-
-        // ======== Drawer de Amigos ========
+        // ========================= Drawer de Amigos =========================
         private void btnFriends_Click(object sender, RoutedEventArgs e) => OpenFriendsDrawer();
         private void btnCloseFriends_Click(object sender, RoutedEventArgs e) => CloseFriendsDrawer();
         private void friendsDimmer_MouseDown(object sender, MouseButtonEventArgs e) => CloseFriendsDrawer();
@@ -219,9 +208,10 @@ namespace WPFTheWeakestRival
         {
             if (friendsDrawerHost.Visibility == Visibility.Visible) return;
 
-            grdMainArea.Effect = overlayBlurEffect;
-            overlayBlurEffect.BeginAnimation(BlurEffect.RadiusProperty,
-                new DoubleAnimation(overlayBlurEffect.Radius, 3.0, TimeSpan.FromMilliseconds(DrawerAnimInMs)) { EasingFunction = new QuadraticEase() });
+            grdMainArea.Effect = _overlayBlur;
+            _overlayBlur.BeginAnimation(BlurEffect.RadiusProperty,
+                new DoubleAnimation(_overlayBlur.Radius, 3.0, TimeSpan.FromMilliseconds(DrawerAnimInMs))
+                { EasingFunction = new QuadraticEase() });
 
             await RefreshFriendsAsync();
 
@@ -229,18 +219,16 @@ namespace WPFTheWeakestRival
             friendsDrawerHost.Opacity = 0;
             friendsDrawerHost.Visibility = Visibility.Visible;
 
-            var sb = FindResource("sbOpenFriendsDrawer") as Storyboard;
-            if (sb != null) sb.Begin(this, true);
+            if (FindResource("sbOpenFriendsDrawer") is Storyboard sb) sb.Begin(this, true);
         }
 
         private void CloseFriendsDrawer()
         {
             if (friendsDrawerHost.Visibility != Visibility.Visible) return;
 
-            var sb = FindResource("sbCloseFriendsDrawer") as Storyboard;
-            if (sb != null)
+            if (FindResource("sbCloseFriendsDrawer") is Storyboard sb)
             {
-                sb.Completed += delegate
+                sb.Completed += (_, __) =>
                 {
                     friendsDrawerHost.Visibility = Visibility.Collapsed;
                     if (pnlOverlayHost.Visibility != Visibility.Visible)
@@ -249,62 +237,34 @@ namespace WPFTheWeakestRival
                 sb.Begin(this, true);
             }
 
-            overlayBlurEffect.BeginAnimation(BlurEffect.RadiusProperty,
-                new DoubleAnimation(overlayBlurEffect.Radius, 0.0, TimeSpan.FromMilliseconds(DrawerAnimOutMs)) { EasingFunction = new QuadraticEase() });
-        }
-
-        private void btnSendFriendRequest_Click(object sender, RoutedEventArgs e)
-        {
-            var token = LoginWindow.AppSession.CurrentToken != null ? LoginWindow.AppSession.CurrentToken.Token : null;
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                MessageBox.Show(Lang.noValidSessionCode);
-                return;
-            }
-
-            var page = new WPFTheWeakestRival.Pages.AddFriendPage(friendsClient, token);
-            page.FriendsUpdated += async delegate { await RefreshFriendsAsync(); };
-            ShowOverlayPage(page);
-        }
-
-        private void btnViewRequests_Click(object sender, RoutedEventArgs e)
-        {
-            var token = LoginWindow.AppSession.CurrentToken != null ? LoginWindow.AppSession.CurrentToken.Token : null;
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                MessageBox.Show("Sesión no válida.");
-                return;
-            }
-
-            var page = new WPFTheWeakestRival.Pages.FriendRequestsPage(friendsClient, token);
-            page.FriendsChanged += async delegate { await RefreshFriendsAsync(); };
-            ShowOverlayPage(page);
+            _overlayBlur.BeginAnimation(BlurEffect.RadiusProperty,
+                new DoubleAnimation(_overlayBlur.Radius, 0.0, TimeSpan.FromMilliseconds(DrawerAnimOutMs))
+                { EasingFunction = new QuadraticEase() });
         }
 
         public void SetFriends(IEnumerable<FriendItem> list, int pendingRequestCount)
         {
-            friends.Clear();
-            if (list != null) foreach (var f in list) friends.Add(f);
-            pendingRequestsCount = Math.Max(0, pendingRequestCount);
+            _friendsItems.Clear();
+            if (list != null)
+                foreach (var f in list) _friendsItems.Add(f);
+
+            _pendingRequestsCount = Math.Max(0, pendingRequestCount);
             UpdateFriendDrawerUI();
         }
 
         private void UpdateFriendDrawerUI()
         {
-            lstFriends.ItemsSource = friends;
-            friendsEmptyPanel.Visibility = friends.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-            lstFriends.Visibility = friends.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-
-            // Badge
-            txtRequestsCount.Text = pendingRequestsCount.ToString();
+            friendsEmptyPanel.Visibility = _friendsItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            lstFriends.Visibility = _friendsItems.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+            txtRequestsCount.Text = _pendingRequestsCount.ToString();
         }
 
         private async Task RefreshFriendsAsync()
         {
-            var token = LoginWindow.AppSession.CurrentToken != null ? LoginWindow.AppSession.CurrentToken.Token : null;
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show("Sesión no válida.");
+                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
@@ -312,45 +272,128 @@ namespace WPFTheWeakestRival
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                var response = await friendsClient.ListFriendsAsync(new ListFriendsRequest
+                var response = await Task.Run(() =>
                 {
-                    Token = token,
-                    IncludePendingIncoming = true,
-                    IncludePendingOutgoing = false
+                    var req = new ListFriendsRequest
+                    {
+                        Token = token,
+                        IncludePendingIncoming = true,
+                        IncludePendingOutgoing = false
+                    };
+                    return _friends.ListFriends(req);
                 });
 
-                friends.Clear();
+                _friendsItems.Clear();
 
-                var items = (response.Friends ?? Array.Empty<FriendSummary>())
-                    .Select(f =>
+                foreach (var f in (response.Friends ?? Array.Empty<FriendSummary>()))
+                {
+                    var name = string.IsNullOrWhiteSpace(f.DisplayName) ? f.Username : f.DisplayName;
+                    var img = UiImageHelper.TryCreateFromUrlOrPath(f.AvatarUrl, decodePixelWidth: 36)
+                              ?? UiImageHelper.DefaultAvatar(36);
+
+                    _friendsItems.Add(new FriendItem
                     {
-                        var name = string.IsNullOrWhiteSpace(f.DisplayName) ? f.Username : f.DisplayName;
-                        var img = UiImageHelper.TryCreateFromUrlOrPath(f.AvatarUrl, decodePixelWidth: 36)
-                                  ?? UiImageHelper.DefaultAvatar(36);
-
-                        return new FriendItem
-                        {
-                            DisplayName = name ?? string.Empty,
-                            StatusText = f.IsOnline ? "Disponible" : "Desconectado",
-                            Presence = f.IsOnline ? "Online" : "Offline",
-                            Avatar = img
-                        };
+                        DisplayName = name ?? string.Empty,
+                        StatusText = f.IsOnline ? "Disponible" : "Desconectado",
+                        Presence = f.IsOnline ? "Online" : "Offline",
+                        Avatar = img,
+                        IsOnline = f.IsOnline
                     });
+                }
 
-                if (resp == null || resp.Lobby == null)
+                _pendingRequestsCount = Math.Max(0, response.PendingIncoming?.Length ?? 0);
+                UpdateFriendDrawerUI();
+            }
+            catch (FaultException<FriendService.ServiceFault> fx)
+            {
+                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Amigos",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (CommunicationException cx)
+            {
+                MessageBox.Show("No se pudo conectar con FriendService.\n" + cx.Message, "Amigos",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al cargar amigos: " + ex.Message, "Amigos",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
+        }
+
+        // === Handlers del drawer (restaurados para XAML) ===
+        private void btnSendFriendRequest_Click(object sender, RoutedEventArgs e)
+        {
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            var page = new WPFTheWeakestRival.Pages.AddFriendPage(_friends, token);
+            page.FriendsUpdated += async (_, __) => await RefreshFriendsAsync();
+            ShowOverlayPage(page);
+        }
+
+        private void btnViewRequests_Click(object sender, RoutedEventArgs e)
+        {
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            var page = new WPFTheWeakestRival.Pages.FriendRequestsPage(_friends, token);
+            page.FriendsChanged += async (_, __) => await RefreshFriendsAsync();
+            ShowOverlayPage(page);
+        }
+
+        // ========================= Lobby + Chat =========================
+        private async void btnCreateLobby_Click(object sender, RoutedEventArgs e)
+        {
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+
+                var resp = await Task.Run(() =>
+                {
+                    var req = new CreateLobbyRequest
+                    {
+                        Token = token,
+                        LobbyName = "Lobby",
+                        MaxPlayers = 8
+                    };
+                    return _lobby.CreateLobby(req);
+                });
+
+                if (resp?.Lobby == null)
                 {
                     MessageBox.Show("No se pudo crear el lobby.");
                     return;
                 }
 
-                pendingRequestsCount = Math.Max(0, (response.PendingIncoming?.Length ?? 0));
+                _currentLobbyId = resp.Lobby.LobbyId;
+                _currentAccessCode = resp.Lobby.AccessCode;
 
-                UpdateLobbyHeader(resp.Lobby.LobbyName, currentLobbyId, currentAccessCode);
+                UpdateLobbyHeader(resp.Lobby.LobbyName, _currentLobbyId, _currentAccessCode);
                 AppendSystemLine("Lobby creado.");
             }
             catch (FaultException<LobbyService.ServiceFault> fx)
             {
-                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Amigos",
+                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Lobby",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (CommunicationException cx)
@@ -362,13 +405,60 @@ namespace WPFTheWeakestRival
             {
                 MessageBox.Show("Error al crear lobby: " + ex.Message, "Lobby",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+            }
+        }
 
-                try
+        private async void btnJoinByCode_Click(object sender, RoutedEventArgs e)
+        {
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            var code = (txtJoinCode.Text ?? string.Empty).Trim().ToUpperInvariant();
+            if (code.Length == 0)
+            {
+                MessageBox.Show("Ingresa un código de acceso.");
+                return;
+            }
+
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+
+                var resp = await Task.Run(() =>
                 {
-                    if (friendsClient.State == CommunicationState.Faulted)
-                        friendsClient.Abort();
+                    var req = new JoinByCodeRequest { Token = token, AccessCode = code };
+                    return _lobby.JoinByCode(req);
+                });
+
+                if (resp?.Lobby == null)
+                {
+                    MessageBox.Show("No se pudo unir al lobby.");
+                    return;
                 }
-                catch { /* ignore */ }
+
+                _currentLobbyId = resp.Lobby.LobbyId;
+                _currentAccessCode = string.IsNullOrWhiteSpace(resp.Lobby.AccessCode) ? code : resp.Lobby.AccessCode;
+
+                UpdateLobbyHeader(resp.Lobby.LobbyName, _currentLobbyId, _currentAccessCode);
+                AppendSystemLine("Te uniste al lobby.");
+            }
+            catch (FaultException<LobbyService.ServiceFault> fx)
+            {
+                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Lobby",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (CommunicationException cx)
+            {
+                MessageBox.Show("No se pudo conectar con LobbyService.\n" + cx.Message, "Lobby",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
@@ -384,8 +474,8 @@ namespace WPFTheWeakestRival
         private void UpdateLobbyHeader(string lobbyName, Guid? lobbyId, string accessCode)
         {
             txtLobbyHeader.Text = string.IsNullOrWhiteSpace(lobbyName) ? "Lobby" : lobbyName;
-            txtLobbyId.Text = lobbyId.HasValue ? "LobbyId: " + lobbyId.Value.ToString() : "";
-            txtAccessCode.Text = string.IsNullOrWhiteSpace(accessCode) ? "" : "Código: " + accessCode;
+            txtLobbyId.Text = lobbyId.HasValue ? "LobbyId: " + lobbyId.Value : string.Empty;
+            txtAccessCode.Text = string.IsNullOrWhiteSpace(accessCode) ? string.Empty : "Código: " + accessCode;
         }
 
         private async void txtChatInput_KeyDown(object sender, KeyEventArgs e)
@@ -395,22 +485,22 @@ namespace WPFTheWeakestRival
             var text = (txtChatInput.Text ?? string.Empty).Trim();
             if (text.Length == 0) return;
 
-            if (!currentLobbyId.HasValue)
+            if (!_currentLobbyId.HasValue)
             {
                 MessageBox.Show("Primero crea o únete a un lobby.");
                 return;
             }
 
-            var token = LoginWindow.AppSession.CurrentToken != null ? LoginWindow.AppSession.CurrentToken.Token : null;
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show("Sesión no válida.");
+                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
             try
             {
-                var lobbyId = currentLobbyId.Value;
+                var lobbyId = _currentLobbyId.Value;
 
                 await Task.Run(() =>
                 {
@@ -420,7 +510,7 @@ namespace WPFTheWeakestRival
                         LobbyId = lobbyId,
                         Message = text
                     };
-                    lobbyServiceClient.SendChatMessage(req);
+                    _lobby.SendChatMessage(req);
                 });
                 txtChatInput.Text = string.Empty;
             }
@@ -438,11 +528,11 @@ namespace WPFTheWeakestRival
 
         private void AppendLine(string author, string text)
         {
-            chatLines.Add(new ChatLine
+            _chatLines.Add(new ChatLine
             {
                 Author = string.IsNullOrWhiteSpace(author) ? "?" : author,
                 Text = text ?? string.Empty,
-                Time = DateTime.Now.ToShortTimeString()
+                Time = DateTime.Now.ToString("HH:mm")
             });
 
             if (lstChatMessages.Items.Count > 0)
@@ -451,83 +541,104 @@ namespace WPFTheWeakestRival
 
         private void AppendSystemLine(string text) => AppendLine("Sistema", text);
 
-        // ====== Callbacks (duplex) ======
+        // ========================= Callbacks (duplex) =========================
         public void OnLobbyUpdated(LobbyInfo lobbyInfo)
         {
             if (lobbyInfo == null) return;
-            if (currentLobbyId.HasValue && lobbyInfo.LobbyId != currentLobbyId.Value) return;
+            if (_currentLobbyId.HasValue && lobbyInfo.LobbyId != _currentLobbyId.Value) return;
 
-            Dispatcher.Invoke(delegate
+            Dispatcher.Invoke(() =>
             {
-                // Si el server envía el AccessCode en el update, úsalo
                 if (!string.IsNullOrWhiteSpace(lobbyInfo.AccessCode))
-                    currentAccessCode = lobbyInfo.AccessCode;
+                    _currentAccessCode = lobbyInfo.AccessCode;
 
-                UpdateLobbyHeader(lobbyInfo.LobbyName, lobbyInfo.LobbyId, currentAccessCode);
+                UpdateLobbyHeader(lobbyInfo.LobbyName, lobbyInfo.LobbyId, _currentAccessCode);
             });
         }
 
+        // PlayerSummary no expone DisplayName/Username en tus contratos actuales
         public void OnPlayerJoined(PlayerSummary playerSummary)
         {
-            Dispatcher.Invoke(delegate { AppendSystemLine("Un jugador se unió al lobby."); });
+            Dispatcher.Invoke(() => AppendSystemLine("Un jugador se unió al lobby."));
         }
 
         public void OnPlayerLeft(Guid playerId)
         {
-            Dispatcher.Invoke(delegate { AppendSystemLine("Un jugador salió del lobby."); });
+            Dispatcher.Invoke(() => AppendSystemLine("Un jugador salió del lobby."));
         }
 
-        public void OnLobbyUpdated(LobbyInfo lobbyInfo) { }
-        public void OnPlayerJoined(PlayerSummary playerSummary) { }
-        public void OnPlayerLeft(Guid playerId) { }
-        public void OnChatMessageReceived(ChatMessage chatMessage) { }
+        public void OnChatMessageReceived(ChatMessage chatMessage)
+        {
+            if (chatMessage == null) return;
+            Dispatcher.Invoke(() =>
+            {
+                var who = string.IsNullOrWhiteSpace(chatMessage.FromPlayerName) ? "Jugador" : chatMessage.FromPlayerName;
+                AppendLine(who, chatMessage.Message ?? string.Empty);
+            });
+        }
+
+        // ========================= Presencia =========================
+        private async Task SendHeartbeatAsync()
+        {
+            try
+            {
+                var token = LoginWindow.AppSession.CurrentToken?.Token;
+                if (string.IsNullOrWhiteSpace(token)) return;
+
+                await _friends.PresenceHeartbeatAsync(new HeartbeatRequest
+                {
+                    Token = token,
+                    Device = "WPF"
+                });
+            }
+            catch
+            {
+                // best-effort; se reintenta en el siguiente tick
+            }
+        }
 
         // ========================= Cleanup =========================
         private void OnWindowUnloaded(object sender, RoutedEventArgs e)
-            try { presenceTimer?.Stop(); } catch { }
-            try { friendsRefreshTimer?.Stop(); } catch { }
-
         {
-            // Salir del lobby en server para limpiar callback
+            try { _presenceTimer?.Stop(); } catch { }
+            try { _friendsTimer?.Stop(); } catch { }
+
+            // Intentar abandonar lobby (limpia callback del lado server)
             try
             {
-                if (lobbyServiceClient.State == CommunicationState.Faulted)
-                    lobbyServiceClient.Abort();
-                else
-                    lobbyServiceClient.Close();
+                var token = LoginWindow.AppSession.CurrentToken?.Token;
+                if (!string.IsNullOrWhiteSpace(token) && _currentLobbyId.HasValue)
+                {
+                    try { _lobby.LeaveLobby(new LeaveLobbyRequest { Token = token, LobbyId = _currentLobbyId.Value }); }
+                    catch { /* ignore */ }
+                }
             }
-            catch
+            catch { /* ignore */ }
+
+            // Cerrar clientes WCF
+            try
             {
-                if (lobbyServiceClient.State == CommunicationState.Faulted) lobbyServiceClient.Abort();
-                else lobbyServiceClient.Close();
+                if (_lobby.State == CommunicationState.Faulted) _lobby.Abort();
+                else _lobby.Close();
             }
-            catch { lobbyServiceClient.Abort(); }
+            catch { try { _lobby.Abort(); } catch { } }
 
             try
             {
-                if (friendsClient.State == CommunicationState.Faulted) friendsClient.Abort();
-                else friendsClient.Close();
+                if (_friends.State == CommunicationState.Faulted) _friends.Abort();
+                else _friends.Close();
             }
-            catch
-            {
-                try { friendsClient.Abort(); } catch { }
-            }
+            catch { try { _friends.Abort(); } catch { } }
         }
     }
 
-    // ========================= ViewModel simple del drawer =========================
+    // ========================= ViewModel para el drawer =========================
     public class FriendItem
     {
-        public string DisplayName { get; set; }
-        public string StatusText { get; set; }
-        public string Presence { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string StatusText { get; set; } = string.Empty;
+        public string Presence { get; set; } = "Offline";
         public ImageSource Avatar { get; set; }
-
-        public FriendItem()
-        {
-            DisplayName = "";
-            StatusText = "";
-            Presence = "Online";
-        }
+        public bool IsOnline { get; set; } = false;
     }
 }
