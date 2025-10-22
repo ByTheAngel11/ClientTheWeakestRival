@@ -79,7 +79,6 @@ namespace WPFTheWeakestRival
             }
         }
 
-        // === Imagen ===
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
@@ -91,10 +90,8 @@ namespace WPFTheWeakestRival
 
             if (dlg.ShowDialog() == true)
             {
-                // Vista previa (archivo local)
                 CargarPreviewDesdeArchivo(dlg.FileName);
-                // Guarda como URL file:/// para enviar al server
-                txtAvatarUrl.Text = new Uri(dlg.FileName, UriKind.Absolute).AbsoluteUri; // file:///C:/...
+                txtAvatarUrl.Text = new Uri(dlg.FileName, UriKind.Absolute).AbsoluteUri;
             }
         }
 

@@ -91,6 +91,7 @@
     <Compile Include="EmailVerificationWindow.xaml.cs">
       <DependentUpon>EmailVerificationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\UiChat.cs" />
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
     <Compile Include="LobbyCallback.cs" />

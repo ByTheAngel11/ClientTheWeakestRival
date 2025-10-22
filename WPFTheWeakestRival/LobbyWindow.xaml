@@ -17,6 +17,15 @@
         <sys:Double x:Key="TopBarButtonWidth">130</sys:Double>
         <sys:Double x:Key="TopBarButtonHeight">32</sys:Double>
         <Thickness x:Key="TopBarButtonMargin">0,0,12,0</Thickness>
+        <!-- Presencia: colores -->
+        <SolidColorBrush x:Key="PresenceOnlineBg" Color="#E9FFEF"/>
+        <!-- verde suave -->
+        <SolidColorBrush x:Key="PresenceOnlineFg" Color="#2FA35A"/>
+        <!-- verde texto -->
+        <SolidColorBrush x:Key="PresenceOfflineBg" Color="#E9F2FF"/>
+        <!-- azul suave (tu actual) -->
+        <SolidColorBrush x:Key="PresenceOfflineFg" Color="#2F5AA3"/>
+        <!-- azul texto (tu actual) -->
 
         <sys:Double x:Key="AvatarSize">28</sys:Double>
 
@@ -116,7 +125,7 @@
 
                 <Border Width="40" Height="40" CornerRadius="10" Background="#FFEFEFEF">
                     <Image Source="{Binding Avatar}" Stretch="UniformToFill" SnapsToDevicePixels="True"
-                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Border>
 
                 <StackPanel Grid.Column="1" Margin="8,0,8,0">
@@ -124,11 +133,29 @@
                     <TextBlock Text="{Binding StatusText}" Opacity="0.7" FontSize="12"/>
                 </StackPanel>
 
-                <Border Grid.Column="2" Background="#FFE9F2FF" CornerRadius="8" Padding="8,3" Margin="0,0,4,0">
-                    <TextBlock Text="{Binding Presence}" FontSize="12" Foreground="#FF2F5AA3"/>
+                <!-- Badge de presencia: default AZUL (offline) -->
+                <Border x:Name="PresencePill"
+                Grid.Column="2"
+                Background="{StaticResource PresenceOfflineBg}"
+                CornerRadius="8"
+                Padding="8,3"
+                Margin="0,0,4,0">
+                    <TextBlock x:Name="PresenceText"
+                       Text="{Binding Presence}"
+                       FontSize="12"
+                       Foreground="{StaticResource PresenceOfflineFg}"/>
                 </Border>
             </Grid>
+
+            <!-- Cambiar a VERDE cuando IsOnline = true -->
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                    <Setter TargetName="PresencePill" Property="Background" Value="{StaticResource PresenceOnlineBg}"/>
+                    <Setter TargetName="PresenceText" Property="Foreground" Value="{StaticResource PresenceOnlineFg}"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
+
 
         <!-- ====== Animaciones del Drawer de Amigos ====== -->
         <Storyboard x:Key="sbOpenFriendsDrawer">
