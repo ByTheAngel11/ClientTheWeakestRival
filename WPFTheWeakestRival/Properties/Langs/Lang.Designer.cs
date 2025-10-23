@@ -61,11 +61,56 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Accept.
+        /// </summary>
+        public static string addFriendAccept {
+            get {
+                return ResourceManager.GetString("addFriendAccept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Search friends.
+        /// </summary>
+        public static string addFriendSearchTooltip {
+            get {
+                return ResourceManager.GetString("addFriendSearchTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a We had an error on the FriendService try again later.
+        /// </summary>
+        public static string addFriendServiceError {
+            get {
+                return ResourceManager.GetString("addFriendServiceError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Add Friends.
+        /// </summary>
+        public static string addFriendTitle {
+            get {
+                return ResourceManager.GetString("addFriendTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Select an image.
         /// </summary>
         public static string btnChooseImage {
             get {
                 return ResourceManager.GetString("btnChooseImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Create lobby.
+        /// </summary>
+        public static string btnCreateLobby {
+            get {
+                return ResourceManager.GetString("btnCreateLobby", resourceCulture);
             }
         }
         
@@ -88,11 +133,29 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Join by a code.
+        /// </summary>
+        public static string btnJoinByCode {
+            get {
+                return ResourceManager.GetString("btnJoinByCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Login.
         /// </summary>
         public static string btnLogin {
             get {
                 return ResourceManager.GetString("btnLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Logout.
+        /// </summary>
+        public static string btnLogout {
+            get {
+                return ResourceManager.GetString("btnLogout", resourceCulture);
             }
         }
         
@@ -151,11 +214,65 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a First create or join a lobby.
+        /// </summary>
+        public static string chatCreateOrJoinFirst {
+            get {
+                return ResourceManager.GetString("chatCreateOrJoinFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The message could not be sent.
+        /// </summary>
+        public static string chatSendFailed {
+            get {
+                return ResourceManager.GetString("chatSendFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Chat.
+        /// </summary>
+        public static string chatTitle {
+            get {
+                return ResourceManager.GetString("chatTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a #cb102c.
         /// </summary>
         public static string colorLogin {
             get {
                 return ResourceManager.GetString("colorLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Close.
+        /// </summary>
+        public static string commonClose {
+            get {
+                return ResourceManager.GetString("commonClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Search.
+        /// </summary>
+        public static string commonSearch {
+            get {
+                return ResourceManager.GetString("commonSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Succes.
+        /// </summary>
+        public static string commonSucces {
+            get {
+                return ResourceManager.GetString("commonSucces", resourceCulture);
             }
         }
         
@@ -201,6 +318,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string errorInvalidEmail {
             get {
                 return ResourceManager.GetString("errorInvalidEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Error loading friends:.
+        /// </summary>
+        public static string errorLoadFriends {
+            get {
+                return ResourceManager.GetString("errorLoadFriends", resourceCulture);
             }
         }
         
@@ -331,11 +457,110 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Settings.
+        /// </summary>
+        public static string lblSettings {
+            get {
+                return ResourceManager.GetString("lblSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Welcome.
         /// </summary>
         public static string lblWelcome {
             get {
                 return ResourceManager.GetString("lblWelcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Code:.
+        /// </summary>
+        public static string lobbyCodePrefix {
+            get {
+                return ResourceManager.GetString("lobbyCodePrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The lobby was successfully created.
+        /// </summary>
+        public static string lobbyCreated {
+            get {
+                return ResourceManager.GetString("lobbyCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The lobby could not be created.
+        /// </summary>
+        public static string lobbyCreateFailed {
+            get {
+                return ResourceManager.GetString("lobbyCreateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Enter an access code.
+        /// </summary>
+        public static string lobbyEnterAccessCode {
+            get {
+                return ResourceManager.GetString("lobbyEnterAccessCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a LobbyId.
+        /// </summary>
+        public static string lobbyIdPrefix {
+            get {
+                return ResourceManager.GetString("lobbyIdPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You joined the lobby.
+        /// </summary>
+        public static string lobbyJoined {
+            get {
+                return ResourceManager.GetString("lobbyJoined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not join the lobby.
+        /// </summary>
+        public static string lobbyJoinFailed {
+            get {
+                return ResourceManager.GetString("lobbyJoinFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a A player joined the lobby.
+        /// </summary>
+        public static string lobbyPlayerJoined {
+            get {
+                return ResourceManager.GetString("lobbyPlayerJoined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a A player left the lobby.
+        /// </summary>
+        public static string lobbyPlayerLeft {
+            get {
+                return ResourceManager.GetString("lobbyPlayerLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Lobby.
+        /// </summary>
+        public static string lobbyTitle {
+            get {
+                return ResourceManager.GetString("lobbyTitle", resourceCulture);
             }
         }
         
@@ -358,6 +583,51 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Session closed successfully..
+        /// </summary>
+        public static string logoutConfirmMessage {
+            get {
+                return ResourceManager.GetString("logoutConfirmMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Logout.
+        /// </summary>
+        public static string logoutTitle {
+            get {
+                return ResourceManager.GetString("logoutTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Modify Profile.
+        /// </summary>
+        public static string modifyProfileTitle {
+            get {
+                return ResourceManager.GetString("modifyProfileTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a There is no connection.
+        /// </summary>
+        public static string noConnection {
+            get {
+                return ResourceManager.GetString("noConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No found results.
+        /// </summary>
+        public static string noResults {
+            get {
+                return ResourceManager.GetString("noResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a You don&apos;t have account?.
         /// </summary>
         public static string notAccount {
@@ -376,6 +646,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Now are friends.
+        /// </summary>
+        public static string nowFriends {
+            get {
+                return ResourceManager.GetString("nowFriends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Enter your password.
         /// </summary>
         public static string passwordPlaceHolder {
@@ -390,6 +669,51 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string playAsGuest {
             get {
                 return ResourceManager.GetString("playAsGuest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Player.
+        /// </summary>
+        public static string player {
+            get {
+                return ResourceManager.GetString("player", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Filtr image.
+        /// </summary>
+        public static string profileImageFilter {
+            get {
+                return ResourceManager.GetString("profileImageFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Select your profile picture.
+        /// </summary>
+        public static string profileSelectAvatarTitle {
+            get {
+                return ResourceManager.GetString("profileSelectAvatarTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Profile.
+        /// </summary>
+        public static string profileTitle {
+            get {
+                return ResourceManager.GetString("profileTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Profile Updated.
+        /// </summary>
+        public static string profileUpdated {
+            get {
+                return ResourceManager.GetString("profileUpdated", resourceCulture);
             }
         }
         
@@ -448,11 +772,74 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Results.
         /// </summary>
-        public static string String1 {
+        public static string results {
             get {
-                return ResourceManager.GetString("String1", resourceCulture);
+                return ResourceManager.GetString("results", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Searching....
+        /// </summary>
+        public static string searching {
+            get {
+                return ResourceManager.GetString("searching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You are already friends.
+        /// </summary>
+        public static string stateAlreadyFriends {
+            get {
+                return ResourceManager.GetString("stateAlreadyFriends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Suggested.
+        /// </summary>
+        public static string stateSuggested {
+            get {
+                return ResourceManager.GetString("stateSuggested", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Available.
+        /// </summary>
+        public static string statusAvailable {
+            get {
+                return ResourceManager.GetString("statusAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Offline.
+        /// </summary>
+        public static string statusOffline {
+            get {
+                return ResourceManager.GetString("statusOffline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Request recieved.
+        /// </summary>
+        public static string statusPendingIn {
+            get {
+                return ResourceManager.GetString("statusPendingIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Request sent.
+        /// </summary>
+        public static string statusPendingOut {
+            get {
+                return ResourceManager.GetString("statusPendingOut", resourceCulture);
             }
         }
         
@@ -466,11 +853,11 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Select your profile picture.
+        ///   Busca una cadena traducida similar a System.
         /// </summary>
-        public static string tittleImageSelector {
+        public static string system {
             get {
-                return ResourceManager.GetString("tittleImageSelector", resourceCulture);
+                return ResourceManager.GetString("system", resourceCulture);
             }
         }
         

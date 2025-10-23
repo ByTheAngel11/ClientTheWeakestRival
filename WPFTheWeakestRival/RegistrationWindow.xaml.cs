@@ -4,13 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using System.Security.Cryptography;
 using System.ServiceModel;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Markup;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Properties.Langs;
@@ -29,72 +25,74 @@ namespace WPFTheWeakestRival
             cmbLanguage.Items.Add(Lang.es);
             cmbLanguage.Items.Add(Lang.en);
             cmbLanguage.SelectedIndex = 0;
-
-            cmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
+            cmbLanguage.SelectionChanged += CmbLanguageSelectionChanged;
         }
 
-        private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CmbLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string selectedLang = cmbLanguage.SelectedItem as string;
-            if (selectedLang == "Español")
-                Properties.Langs.Lang.Culture = new CultureInfo("es");
-            else
-                Properties.Langs.Lang.Culture = new CultureInfo("en");
+            var selected = cmbLanguage.SelectedItem as string;
+            Lang.Culture = string.Equals(selected, Lang.es, StringComparison.Ordinal)
+                ? new CultureInfo("es")
+                : new CultureInfo("en");
 
-            UpdateUILanguage();
+            UpdateUiLanguage();
         }
 
-        private void UpdateUILanguage()
+        private void UpdateUiLanguage()
         {
-            lblRegistration.Content = Properties.Langs.Lang.registerTitle;
-            lblUsername.Content = Properties.Langs.Lang.registerDisplayName;
-            lblEmail.Content = Properties.Langs.Lang.lblEmail;
-            lblPassword.Content = Properties.Langs.Lang.lblPassword;
-            lblConfirmPassword.Content = Properties.Langs.Lang.lblConfirmPassword;
-            btnChooseImage.Content = Properties.Langs.Lang.btnChooseImage;
-            btnRegister.Content = Properties.Langs.Lang.regist;
-            btnBack.Content = Properties.Langs.Lang.cancel;
+            lblRegistration.Content = Lang.registerTitle;
+            lblUsername.Content = Lang.registerDisplayName;
+            lblEmail.Content = Lang.lblEmail;
+            lblPassword.Content = Lang.lblPassword;
+            lblConfirmPassword.Content = Lang.lblConfirmPassword;
+            btnChooseImage.Content = Lang.btnChooseImage;
+            btnRegister.Content = Lang.regist;
+            btnBack.Content = Lang.cancel;
         }
 
         private void ChooseImageClick(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog
+            var dialog = new OpenFileDialog
             {
                 Title = Lang.btnChooseImage,
                 Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp;*.gif",
                 Multiselect = false,
                 CheckFileExists = true
             };
-            if (dlg.ShowDialog() == true)
+
+            if (dialog.ShowDialog() == true)
             {
-                selectedImagePath = dlg.FileName;
-                var bmp = new BitmapImage();
-                bmp.BeginInit();
-                bmp.CacheOption = BitmapCacheOption.OnLoad;
-                bmp.UriSource = new Uri(selectedImagePath);
-                bmp.EndInit();
-                imgPreview.Source = bmp;
+                selectedImagePath = dialog.FileName;
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(selectedImagePath, UriKind.Absolute);
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                imgPreview.Source = bitmap;
+                txtImgName.Text = System.IO.Path.GetFileName(selectedImagePath);
             }
         }
 
-
-        private static string SaveProfileImageCopy(string originalPath)
+        private static string SaveProfileImageCopy(string sourcePath)
         {
-            if (string.IsNullOrWhiteSpace(originalPath) || !File.Exists(originalPath))
-                return null;
+            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath)) return null;
 
-            var destDir = Path.Combine(
+            var destinationDirectory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "TheWeakestRival", "ProfileImages");
+                "TheWeakestRival",
+                "ProfileImages");
 
-            Directory.CreateDirectory(destDir);
+            Directory.CreateDirectory(destinationDirectory);
 
-            var ext = Path.GetExtension(originalPath);
-            var fileName = Guid.NewGuid().ToString("N") + ext;
-            var destPath = Path.Combine(destDir, fileName);
+            var extension = Path.GetExtension(sourcePath);
+            var fileName = Guid.NewGuid().ToString("N") + extension;
+            var destinationPath = Path.Combine(destinationDirectory, fileName);
 
-            File.Copy(originalPath, destPath, overwrite: false);
-            return destPath;
+            File.Copy(sourcePath, destinationPath, overwrite: false);
+            return destinationPath;
         }
 
         private static bool IsValidEmail(string email)
@@ -103,9 +101,12 @@ namespace WPFTheWeakestRival
             try
             {
                 var addr = new MailAddress(email.Trim());
-                return addr.Address == email.Trim();
+                return string.Equals(addr.Address, email.Trim(), StringComparison.OrdinalIgnoreCase);
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
         }
 
         private static bool PasswordMeetsRequirements(string password)
@@ -113,9 +114,9 @@ namespace WPFTheWeakestRival
             if (string.IsNullOrEmpty(password)) return false;
             if (password.Length < 8) return false;
 
-            bool hasUpper = password.Any(char.IsUpper);
-            bool hasLower = password.Any(char.IsLower);
-            bool hasDigit = password.Any(char.IsDigit);
+            var hasUpper = password.Any(char.IsUpper);
+            var hasLower = password.Any(char.IsLower);
+            var hasDigit = password.Any(char.IsDigit);
 
             return hasUpper && hasLower && hasDigit;
         }
@@ -129,29 +130,33 @@ namespace WPFTheWeakestRival
         private async void RegisterClick(object sender, RoutedEventArgs e)
         {
             btnRegister.IsEnabled = false;
+
             try
             {
                 var displayName = txtUsername.Text?.Trim();
                 var email = txtEmail.Text?.Trim();
-                var password = pstPassword.Password ?? "";
-                var confirm = pstConfirmPassword.Password ?? "";
+                var password = pstPassword.Password ?? string.Empty;
+                var confirmPassword = pstConfirmPassword.Password ?? string.Empty;
 
                 if (!UsernameHasNoSpaces(displayName))
                 {
                     MessageBox.Show(Lang.errorUsernameWithoutSpaces, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+
                 if (!IsValidEmail(email))
                 {
                     MessageBox.Show(Lang.errorInvalidEmail, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+
                 if (!PasswordMeetsRequirements(password))
                 {
                     MessageBox.Show(Lang.errorPasswordStructure, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                if (!string.Equals(password, confirm, StringComparison.Ordinal))
+
+                if (!string.Equals(password, confirmPassword, StringComparison.Ordinal))
                 {
                     MessageBox.Show(Lang.errorMatchingPasswords, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
@@ -164,34 +169,39 @@ namespace WPFTheWeakestRival
                     copiedImagePath = profilePath;
                 }
 
-                // === NUEVO: Paso 1 — pedir código por correo ===
-                var client = new AuthServiceClient();
-                BeginRegisterResponse beginResp;
+                var authClient = new AuthServiceClient();
                 try
                 {
-                    beginResp = await client.BeginRegisterAsync(new BeginRegisterRequest { Email = email });
-                    if (client.State != CommunicationState.Faulted) client.Close(); else client.Abort();
+                    var beginResponse = await authClient.BeginRegisterAsync(new BeginRegisterRequest
+                    {
+                        Email = email
+                    });
+
+                    if (authClient.State != CommunicationState.Faulted) authClient.Close(); else authClient.Abort();
+
+                    var verificationWindow = new EmailVerificationWindow(
+                        email: email,
+                        displayName: displayName,
+                        password: password,
+                        profileImagePath: profilePath,
+                        resendCooldownSeconds: beginResponse.ResendAfterSeconds)
+                    {
+                        Owner = this
+                    };
+
+                    verificationWindow.Show();
+                    Hide();
                 }
                 catch (FaultException<ServiceFault> fx)
                 {
-                    client.Abort();
+                    authClient.Abort();
                     MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
                 }
                 catch (Exception ex)
                 {
-                    client.Abort();
+                    authClient.Abort();
                     MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
                 }
-
-                // Abre la ventana de verificación con cooldown que devolvió el server
-                var verify = new EmailVerificationWindow(email, displayName, password, profilePath, beginResp.ResendAfterSeconds)
-                {
-                    Owner = this
-                };
-                verify.Show();
-                this.Hide();
             }
             finally
             {
@@ -202,8 +212,7 @@ namespace WPFTheWeakestRival
         private void CancelClick(object sender, RoutedEventArgs e)
         {
             new LoginWindow().Show();
-            this.Close();
+            Close();
         }
-
     }
 }

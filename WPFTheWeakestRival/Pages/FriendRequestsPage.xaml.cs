@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
 
@@ -16,22 +15,22 @@ namespace WPFTheWeakestRival.Pages
 {
     public partial class FriendRequestsPage : Page
     {
-        private readonly FriendServiceClient _client;
-        private readonly string _token;
+        private readonly FriendServiceClient friendServiceClient;
+        private readonly string authToken;
 
-        private readonly ObservableCollection<RequestVm> _incoming = new ObservableCollection<RequestVm>();
-        private readonly ObservableCollection<RequestVm> _outgoing = new ObservableCollection<RequestVm>();
+        private readonly ObservableCollection<RequestViewModel> incomingRequests = new ObservableCollection<RequestViewModel>();
+        private readonly ObservableCollection<RequestViewModel> outgoingRequests = new ObservableCollection<RequestViewModel>();
 
-        public event EventHandler FriendsChanged; // para que el Lobby refresque el drawer
+        public event EventHandler FriendsChanged;
 
         public FriendRequestsPage(FriendServiceClient client, string token)
         {
             InitializeComponent();
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _token = token ?? string.Empty;
+            friendServiceClient = client ?? throw new ArgumentNullException(nameof(client));
+            authToken = token ?? string.Empty;
 
-            lstIncoming.ItemsSource = _incoming;
-            lstOutgoing.ItemsSource = _outgoing;
+            lstIncoming.ItemsSource = incomingRequests;
+            lstOutgoing.ItemsSource = outgoingRequests;
 
             Loaded += async (_, __) => await RefreshAsync();
         }
@@ -42,90 +41,92 @@ namespace WPFTheWeakestRival.Pages
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                var resp = await _client.ListFriendsAsync(new ListFriendsRequest
+                var response = await friendServiceClient.ListFriendsAsync(new ListFriendsRequest
                 {
-                    Token = _token,
+                    Token = authToken,
                     IncludePendingIncoming = true,
                     IncludePendingOutgoing = true
                 });
 
-                _incoming.Clear();
-                _outgoing.Clear();
+                incomingRequests.Clear();
+                outgoingRequests.Clear();
 
-                var inc = resp.PendingIncoming ?? new FriendRequestSummary[0];
-                var outg = resp.PendingOutgoing ?? new FriendRequestSummary[0];
+                var incoming = response.PendingIncoming ?? Array.Empty<FriendRequestSummary>();
+                var outgoing = response.PendingOutgoing ?? Array.Empty<FriendRequestSummary>();
 
-                // 1) recolectar IDs a enriquecer
-                var ids = new System.Collections.Generic.HashSet<int>();
-                for (int i = 0; i < inc.Length; i++) ids.Add(inc[i].FromAccountId);
-                for (int i = 0; i < outg.Length; i++) ids.Add(outg[i].ToAccountId);
+                var accountIds = new System.Collections.Generic.HashSet<int>();
+                for (var i = 0; i < incoming.Length; i++) accountIds.Add(incoming[i].FromAccountId);
+                for (var i = 0; i < outgoing.Length; i++) accountIds.Add(outgoing[i].ToAccountId);
 
-                // 2) pedir nombres/avatars
-                var map = new System.Collections.Generic.Dictionary<int, AccountMini>();
-                if (ids.Count > 0)
+                var accountsById = new System.Collections.Generic.Dictionary<int, AccountMini>();
+                if (accountIds.Count > 0)
                 {
-                    var req = new GetAccountsByIdsRequest { Token = _token, AccountIds = new int[ids.Count] };
-                    ids.CopyTo(req.AccountIds, 0);
+                    var getReq = new GetAccountsByIdsRequest { Token = authToken, AccountIds = new int[accountIds.Count] };
+                    accountIds.CopyTo(getReq.AccountIds, 0);
 
-                    var info = await _client.GetAccountsByIdsAsync(req);
-                    var arr = info.Accounts ?? new AccountMini[0];
-                    for (int i = 0; i < arr.Length; i++)
-                        map[arr[i].AccountId] = arr[i];
+                    var info = await friendServiceClient.GetAccountsByIdsAsync(getReq);
+                    var minis = info.Accounts ?? Array.Empty<AccountMini>();
+                    for (var i = 0; i < minis.Length; i++)
+                    {
+                        accountsById[minis[i].AccountId] = minis[i];
+                    }
                 }
 
-                // 3) poblar Incoming
-                for (int i = 0; i < inc.Length; i++)
+                for (var i = 0; i < incoming.Length; i++)
                 {
-                    var r = inc[i];
-                    AccountMini a;
-                    map.TryGetValue(r.FromAccountId, out a);
+                    var summary = incoming[i];
+                    AccountMini mini;
+                    accountsById.TryGetValue(summary.FromAccountId, out mini);
 
-                    var name = (a != null && !string.IsNullOrWhiteSpace(a.DisplayName)) ? a.DisplayName : ("Cuenta #" + r.FromAccountId);
-                    var img = UiImageHelper.TryCreateFromUrlOrPath(a != null ? a.AvatarUrl : null, 36)
-                              ?? UiImageHelper.DefaultAvatar(36);
+                    var displayName = mini != null && !string.IsNullOrWhiteSpace(mini.DisplayName)
+                        ? mini.DisplayName
+                        : "Cuenta #" + summary.FromAccountId;
 
-                    _incoming.Add(new RequestVm
+                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(mini != null ? mini.AvatarUrl : null, 36)
+                                 ?? UiImageHelper.DefaultAvatar(36);
+
+                    incomingRequests.Add(new RequestViewModel
                     {
-                        FriendRequestId = r.FriendRequestId,
-                        OtherAccountId = r.FromAccountId,
-                        DisplayName = name,
+                        FriendRequestId = summary.FriendRequestId,
+                        OtherAccountId = summary.FromAccountId,
+                        DisplayName = displayName,
                         Subtitle = "Te ha enviado una solicitud",
-                        Avatar = img,
+                        Avatar = avatar,
                         IsIncoming = true
                     });
                 }
 
-                // 4) poblar Outgoing
-                for (int i = 0; i < outg.Length; i++)
+                for (var i = 0; i < outgoing.Length; i++)
                 {
-                    var r = outg[i];
-                    AccountMini a;
-                    map.TryGetValue(r.ToAccountId, out a);
+                    var summary = outgoing[i];
+                    AccountMini mini;
+                    accountsById.TryGetValue(summary.ToAccountId, out mini);
 
-                    var name = (a != null && !string.IsNullOrWhiteSpace(a.DisplayName)) ? a.DisplayName : ("Cuenta #" + r.ToAccountId);
-                    var img = UiImageHelper.TryCreateFromUrlOrPath(a != null ? a.AvatarUrl : null, 36)
-                              ?? UiImageHelper.DefaultAvatar(36);
+                    var displayName = mini != null && !string.IsNullOrWhiteSpace(mini.DisplayName)
+                        ? mini.DisplayName
+                        : "Cuenta #" + summary.ToAccountId;
 
-                    _outgoing.Add(new RequestVm
+                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(mini != null ? mini.AvatarUrl : null, 36)
+                                 ?? UiImageHelper.DefaultAvatar(36);
+
+                    outgoingRequests.Add(new RequestViewModel
                     {
-                        FriendRequestId = r.FriendRequestId,
-                        OtherAccountId = r.ToAccountId,
-                        DisplayName = name,
+                        FriendRequestId = summary.FriendRequestId,
+                        OtherAccountId = summary.ToAccountId,
+                        DisplayName = displayName,
                         Subtitle = "Solicitud enviada",
-                        Avatar = img,
+                        Avatar = avatar,
                         IsIncoming = false
                     });
                 }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Solicitudes",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Solicitudes", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Solicitudes",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Solicitudes", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -133,34 +134,39 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-
-        private async void btnAccept_Click(object sender, RoutedEventArgs e)
+        private async void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            var vm = (sender as Button)?.DataContext as RequestVm;
-            if (vm == null) return;
+            var viewModel = (sender as Button)?.DataContext as RequestViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
 
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                await _client.AcceptFriendRequestAsync(new AcceptFriendRequestRequest
+                await friendServiceClient.AcceptFriendRequestAsync(new AcceptFriendRequestRequest
                 {
-                    Token = _token,
-                    FriendRequestId = vm.FriendRequestId
+                    Token = authToken,
+                    FriendRequestId = viewModel.FriendRequestId
                 });
 
-                _incoming.Remove(vm);
-                var ev = FriendsChanged; if (ev != null) ev(this, EventArgs.Empty); // actualiza drawer
+                incomingRequests.Remove(viewModel);
+
+                var handler = FriendsChanged;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Aceptar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Aceptar solicitud", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Aceptar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Aceptar solicitud", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -168,33 +174,39 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        private async void btnReject_Click(object sender, RoutedEventArgs e)
+        private async void BtnRejectClick(object sender, RoutedEventArgs e)
         {
-            var vm = (sender as Button)?.DataContext as RequestVm;
-            if (vm == null) return;
+            var viewModel = (sender as Button)?.DataContext as RequestViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
 
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                var resp = await _client.RejectFriendRequestAsync(new RejectFriendRequestRequest
+                await friendServiceClient.RejectFriendRequestAsync(new RejectFriendRequestRequest
                 {
-                    Token = _token,
-                    FriendRequestId = vm.FriendRequestId
+                    Token = authToken,
+                    FriendRequestId = viewModel.FriendRequestId
                 });
 
-                _incoming.Remove(vm); // rechazadas desaparecen de "recibidas"
-                var ev = FriendsChanged; if (ev != null) ev(this, EventArgs.Empty);
+                incomingRequests.Remove(viewModel);
+
+                var handler = FriendsChanged;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Rechazar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Rechazar solicitud", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Rechazar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Rechazar solicitud", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -202,34 +214,39 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        private async void btnCancel_Click(object sender, RoutedEventArgs e)
+        private async void BtnCancelClick(object sender, RoutedEventArgs e)
         {
-            var vm = (sender as Button)?.DataContext as RequestVm;
-            if (vm == null) return;
+            var viewModel = (sender as Button)?.DataContext as RequestViewModel;
+            if (viewModel == null)
+            {
+                return;
+            }
 
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                // Cancelar usa el mismo endpoint RejectFriendRequest (si el caller es el "from" ⇒ cancelado)
-                var resp = await _client.RejectFriendRequestAsync(new RejectFriendRequestRequest
+                await friendServiceClient.RejectFriendRequestAsync(new RejectFriendRequestRequest
                 {
-                    Token = _token,
-                    FriendRequestId = vm.FriendRequestId
+                    Token = authToken,
+                    FriendRequestId = viewModel.FriendRequestId
                 });
 
-                _outgoing.Remove(vm);
-                var ev = FriendsChanged; if (ev != null) ev(this, EventArgs.Empty);
+                outgoingRequests.Remove(viewModel);
+
+                var handler = FriendsChanged;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Cancelar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Cancelar solicitud", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Cancelar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Cancelar solicitud", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -237,19 +254,23 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
-            var win = Window.GetWindow(this) as LobbyWindow;
-            if (win != null)
+            var window = Window.GetWindow(this) as LobbyWindow;
+            if (window != null)
             {
-                var mi = win.GetType().GetMethod("OnCloseOverlayClick",
+                var method = window.GetType().GetMethod(
+                    "OnCloseOverlayClick",
                     System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (mi != null) mi.Invoke(win, new object[] { this, new RoutedEventArgs() });
+
+                if (method != null)
+                {
+                    method.Invoke(window, new object[] { this, new RoutedEventArgs() });
+                }
             }
         }
 
-        // ===== VM =====
-        private class RequestVm : INotifyPropertyChanged
+        private class RequestViewModel : INotifyPropertyChanged
         {
             public int FriendRequestId { get; set; }
             public int OtherAccountId { get; set; }
@@ -259,9 +280,14 @@ namespace WPFTheWeakestRival.Pages
             public bool IsIncoming { get; set; }
 
             public event PropertyChangedEventHandler PropertyChanged;
-            private void OnPropertyChanged(string name)
+
+            private void OnPropertyChanged(string propertyName)
             {
-                var ev = PropertyChanged; if (ev != null) ev(this, new PropertyChangedEventArgs(name));
+                var handler = PropertyChanged;
+                if (handler != null)
+                {
+                    handler(this, new PropertyChangedEventArgs(propertyName));
+                }
             }
         }
     }

@@ -9,110 +9,111 @@ namespace WPFTheWeakestRival
 {
     public partial class EmailVerificationWindow : Window
     {
-        private readonly string _displayName;
-        private readonly string _password;
-        private readonly string _profileImagePath;
-        private int _resendCooldown;
-        private DispatcherTimer _timer;
-        private int _secondsLeft;
+        private readonly string displayName;
+        private readonly string password;
+        private readonly string profileImagePath;
+
+        private int resendCooldownSeconds;
+        private DispatcherTimer cooldownTimer;
+        private int secondsRemaining;
 
         public EmailVerificationWindow(string email, string displayName, string password, string profileImagePath, int resendCooldownSeconds)
         {
             InitializeComponent();
-            txtEmail.Text = email;
-            _displayName = displayName;
-            _password = password;
-            _profileImagePath = profileImagePath;
-            _resendCooldown = (resendCooldownSeconds > 0) ? resendCooldownSeconds : 60;
+            txtEmail.Text = email ?? string.Empty;
+
+            this.displayName = displayName ?? string.Empty;
+            this.password = password ?? string.Empty;
+            this.profileImagePath = profileImagePath ?? string.Empty;
+            this.resendCooldownSeconds = resendCooldownSeconds > 0 ? resendCooldownSeconds : 60;
 
             txtCode.Focus();
-            StartCooldown(_resendCooldown);
+            StartResendCooldown(this.resendCooldownSeconds);
         }
 
-        private void StartCooldown(int seconds)
+        private void StartResendCooldown(int seconds)
         {
-            _secondsLeft = seconds;
+            secondsRemaining = seconds;
             btnResend.IsEnabled = false;
-            lblCooldown.Text = $"Puedes reenviar en {_secondsLeft}s";
+            lblCooldown.Text = $"Puedes reenviar en {secondsRemaining}s";
 
-            if (_timer != null)
+            if (cooldownTimer != null)
             {
-                _timer.Stop();
-                _timer.Tick -= Timer_Tick;
+                cooldownTimer.Stop();
+                cooldownTimer.Tick -= OnCooldownTick;
             }
 
-            _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _timer.Tick += Timer_Tick;
-            _timer.Start();
+            cooldownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            cooldownTimer.Tick += OnCooldownTick;
+            cooldownTimer.Start();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void OnCooldownTick(object sender, EventArgs e)
         {
-            _secondsLeft--;
-            if (_secondsLeft <= 0)
+            secondsRemaining--;
+
+            if (secondsRemaining <= 0)
             {
-                _timer.Stop();
-                lblCooldown.Text = "";
+                cooldownTimer.Stop();
+                lblCooldown.Text = string.Empty;
                 btnResend.IsEnabled = true;
             }
             else
             {
-                lblCooldown.Text = $"Puedes reenviar en {_secondsLeft}s";
+                lblCooldown.Text = $"Puedes reenviar en {secondsRemaining}s";
             }
         }
 
         private async void ResendClick(object sender, RoutedEventArgs e)
         {
             btnResend.IsEnabled = false;
+
+            var authClient = new AuthServiceClient();
             try
             {
-                var client = new AuthServiceClient();
-                BeginRegisterResponse resp;
-                try
+                BeginRegisterResponse response = await authClient.BeginRegisterAsync(new BeginRegisterRequest
                 {
-                    resp = await client.BeginRegisterAsync(new BeginRegisterRequest { Email = txtEmail.Text?.Trim() });
-                    if (client.State != CommunicationState.Faulted) client.Close(); else client.Abort();
-                }
-                catch (FaultException<ServiceFault> fx)
-                {
-                    client.Abort();
-                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Email = (txtEmail.Text ?? string.Empty).Trim()
+                });
 
-                    // Si el server dijo TOO_SOON, vuelve a iniciar el cooldown
-                    if (string.Equals(fx.Detail.Code, "TOO_SOON", StringComparison.OrdinalIgnoreCase))
-                        StartCooldown(_resendCooldown);
-                    return;
-                }
-                catch (Exception ex)
+                if (authClient.State != CommunicationState.Faulted) authClient.Close(); else authClient.Abort();
+
+                if (response != null && response.ResendAfterSeconds > 0)
                 {
-                    client.Abort();
-                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    resendCooldownSeconds = response.ResendAfterSeconds;
                 }
 
-                // Usa el cooldown que devolvió el server si viene distinto
-                if (resp != null && resp.ResendAfterSeconds > 0)
-                    _resendCooldown = resp.ResendAfterSeconds;
-
-                StartCooldown(_resendCooldown);
+                StartResendCooldown(resendCooldownSeconds);
                 txtCode.Clear();
                 txtCode.Focus();
 
                 MessageBox.Show("Se envió un nuevo código a tu correo.", "Auth", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            finally
+            catch (FaultException<ServiceFault> fx)
             {
-                // se re-habilita cuando termine el cooldown
+                authClient.Abort();
+                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                if (string.Equals(fx.Detail.Code, "TOO_SOON", StringComparison.OrdinalIgnoreCase))
+                {
+                    StartResendCooldown(resendCooldownSeconds);
+                }
+            }
+            catch (Exception ex)
+            {
+                authClient.Abort();
+                MessageBox.Show($"Error de red/servicio: {ex.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private async void ConfirmClick(object sender, RoutedEventArgs e)
         {
             btnConfirm.IsEnabled = false;
+
             try
             {
-                string email = txtEmail.Text?.Trim();
-                string code = txtCode.Text?.Trim();
+                string email = (txtEmail.Text ?? string.Empty).Trim();
+                string code = (txtCode.Text ?? string.Empty).Trim();
 
                 if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(code))
                 {
@@ -120,25 +121,33 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                var req = new CompleteRegisterRequest
+                var request = new CompleteRegisterRequest
                 {
                     Email = email,
                     Code = code,
-                    Password = _password,
-                    DisplayName = _displayName,
-                    ProfileImageUrl = _profileImagePath
+                    Password = password,
+                    DisplayName = displayName,
+                    ProfileImageUrl = profileImagePath
                 };
 
-                var client = new AuthServiceClient();
-                RegisterResponse resp;
+                var authClient = new AuthServiceClient();
                 try
                 {
-                    resp = await client.CompleteRegisterAsync(req);
-                    if (client.State != CommunicationState.Faulted) client.Close(); else client.Abort();
+                    RegisterResponse response = await authClient.CompleteRegisterAsync(request);
+                    if (authClient.State != CommunicationState.Faulted) authClient.Close(); else authClient.Abort();
+
+                    MessageBox.Show($"{Lang.registSucces}\nUserId: {response.UserId}\nExp: {response.Token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
+                        "Auth", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    var loginWindow = new LoginWindow();
+                    loginWindow.Show();
+
+                    if (Owner != null) Owner.Close();
+                    Close();
                 }
                 catch (FaultException<ServiceFault> fx)
                 {
-                    client.Abort();
+                    authClient.Abort();
                     MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
 
                     if (string.Equals(fx.Detail.Code, "CODE_INVALID", StringComparison.OrdinalIgnoreCase))
@@ -146,31 +155,17 @@ namespace WPFTheWeakestRival
                         txtCode.SelectAll();
                         txtCode.Focus();
                     }
-                    if (string.Equals(fx.Detail.Code, "CODE_EXPIRED", StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(fx.Detail.Code, "CODE_EXPIRED", StringComparison.OrdinalIgnoreCase))
                     {
-                        // guía al usuario a reenviar
                         txtCode.Clear();
                         btnResend.Focus();
                     }
-                    return;
                 }
                 catch (Exception ex)
                 {
-                    client.Abort();
-                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    authClient.Abort();
+                    MessageBox.Show($"Error de red/servicio: {ex.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
-                MessageBox.Show($"{Lang.registSucces}\nUserId: {resp.UserId}\nExp: {resp.Token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
-                    "Auth", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // Volver a login (mismo comportamiento que tenías)
-                var login = new LoginWindow();
-                login.Show();
-
-                // cierra RegistrationWindow (owner) y esta ventana
-                if (Owner != null) Owner.Close();
-                Close();
             }
             finally
             {
@@ -184,6 +179,7 @@ namespace WPFTheWeakestRival
             {
                 Owner.Show();
             }
+
             Close();
         }
     }

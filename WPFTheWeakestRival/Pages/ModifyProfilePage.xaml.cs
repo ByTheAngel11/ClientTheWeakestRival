@@ -4,112 +4,181 @@ using System.IO;
 using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.AuthService;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
     public partial class ModifyProfilePage : Page
     {
-        private readonly LobbyServiceClient _svc;
-        private readonly string _token;
+        private readonly LobbyServiceClient lobbyClient;
+        private readonly AuthServiceClient authClient;
+        private readonly string authToken;
+
+        public LobbyServiceClient Lobby { get; }
+        public string Token { get; }
 
         public event EventHandler Closed;
+        public event EventHandler LoggedOut;
 
-        public ModifyProfilePage(LobbyServiceClient svc, string token)
+        public ModifyProfilePage(LobbyServiceClient lobbyClient, AuthServiceClient authClient, string authToken)
         {
             InitializeComponent();
-            _svc = svc ?? throw new ArgumentNullException(nameof(svc));
-            _token = token ?? throw new ArgumentNullException(nameof(token));
-            CargarPerfil();
+            this.lobbyClient = lobbyClient ?? throw new ArgumentNullException(nameof(lobbyClient));
+            this.authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
+            this.authToken = authToken ?? throw new ArgumentNullException(nameof(authToken));
+            LoadProfile();
         }
 
-        private void CargarPerfil()
+        public ModifyProfilePage(LobbyServiceClient lobby, string token)
+        {
+            Lobby = lobby;
+            Token = token;
+        }
+
+        private void LoadProfile()
         {
             try
             {
-                var profile = _svc.GetMyProfile(_token);
+                var profile = lobbyClient.GetMyProfile(authToken);
                 txtEmail.Text = profile.Email ?? string.Empty;
                 txtDisplayName.Text = profile.DisplayName ?? string.Empty;
                 txtAvatarUrl.Text = profile.ProfileImageUrl ?? string.Empty;
                 CargarPreviewDesdeUrl(txtAvatarUrl.Text);
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<AuthService.ServiceFault> ex)
             {
-                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Perfil",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"{ex.Detail.Code}: {ex.Detail.Message}", Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                MessageBox.Show(ex.Message, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Perfil",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void BtnCancel_Click(object sender, RoutedEventArgs e)
-            => Closed?.Invoke(this, EventArgs.Empty);
+        private void BtnCancelClick(object sender, RoutedEventArgs e)
+        {
+            var handler = Closed;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
+        }
 
-        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        private void BtnSaveClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                var req = new UpdateAccountRequest
+                var request = new UpdateAccountRequest
                 {
-                    Token = _token,
+                    Token = authToken,
                     Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text,
                     DisplayName = string.IsNullOrWhiteSpace(txtDisplayName.Text) ? null : txtDisplayName.Text,
                     ProfileImageUrl = string.IsNullOrWhiteSpace(txtAvatarUrl.Text) ? null : txtAvatarUrl.Text
                 };
 
-                _svc.UpdateAccount(req);
-                MessageBox.Show("Perfil actualizado.", "OK",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-                Closed?.Invoke(this, EventArgs.Empty);
+                lobbyClient.UpdateAccount(request);
+
+                MessageBox.Show(Lang.profileUpdated, Lang.commonSucces, MessageBoxButton.OK, MessageBoxImage.Information);
+
+                var handler = Closed;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<AuthService.ServiceFault> ex)
             {
-                MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Modificar Perfil",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"{ex.Detail.Code}: {ex.Detail.Message}", Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                MessageBox.Show(ex.Message, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Modificar Perfil",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void BtnBrowse_Click(object sender, RoutedEventArgs e)
+        private void BtnBrowseClick(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog
+            var dialog = new OpenFileDialog
             {
-                Title = "Elegir imagen de avatar",
-                Filter = "Imágenes|*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp",
+                Title = Lang.profileSelectAvatarTitle,
+                Filter = Lang.profileImageFilter,
                 Multiselect = false
             };
 
-            if (dlg.ShowDialog() == true)
+            var result = dialog.ShowDialog();
+            if (result == true)
             {
-                CargarPreviewDesdeArchivo(dlg.FileName);
-                txtAvatarUrl.Text = new Uri(dlg.FileName, UriKind.Absolute).AbsoluteUri;
+                CargarPreviewDesdeArchivo(dialog.FileName);
+                txtAvatarUrl.Text = new Uri(dialog.FileName, UriKind.Absolute).AbsoluteUri;
             }
         }
 
-        private void BtnClearImage_Click(object sender, RoutedEventArgs e)
+        private void BtnClearImageClick(object sender, RoutedEventArgs e)
         {
             txtAvatarUrl.Text = string.Empty;
             imgPreview.Source = null;
         }
 
-
-        private void CargarPreviewDesdeArchivo(string path)
+        private void CargarPreviewDesdeArchivo(string filePath)
         {
-            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(path, decodePixelWidth: 128);
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+            {
+                imgPreview.Source = null;
+                return;
+            }
+
+            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(filePath, 128);
         }
 
-        private void CargarPreviewDesdeUrl(string url)
+        private void CargarPreviewDesdeUrl(string source)
         {
-            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(url, decodePixelWidth: 128);
+            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(source, 128);
+        }
+
+        private void LogoutClick(object sender, RoutedEventArgs e)
+        {
+            var confirm = MessageBox.Show(Lang.logoutConfirmMessage, Lang.logoutTitle, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirm != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                authClient.Logout(new LogoutRequest { Token = authToken });
+            }
+            catch (FaultException<AuthService.ServiceFault> ex)
+            {
+                MessageBox.Show($"{ex.Detail.Code}: {ex.Detail.Message}", Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                MessageBox.Show(ex.Message, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                try { LoginWindow.AppSession.CurrentToken = null; } catch { }
+                var handler = LoggedOut;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
+            }
         }
     }
 }

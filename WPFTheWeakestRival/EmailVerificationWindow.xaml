@@ -1,8 +1,13 @@
 ﻿<Window x:Class="WPFTheWeakestRival.EmailVerificationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Verificación de correo" Height="240" Width="440"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="Verificación de correo"
+        Height="240" Width="440"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        TextOptions.TextRenderingMode="Aliased">
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -14,15 +19,29 @@
 
         <StackPanel Grid.Row="0">
             <TextBlock Text="Correo electrónico" Margin="0,0,0,4"/>
-            <TextBox x:Name="txtEmail" IsReadOnly="True"/>
+            <TextBox x:Name="txtEmail"
+                     IsReadOnly="True"
+                     VerticalContentAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2">
             <TextBlock Text="Código de verificación" Margin="0,0,0,4"/>
-            <TextBox x:Name="txtCode" MaxLength="6" HorizontalAlignment="Left" Width="140"/>
+            <TextBox x:Name="txtCode"
+                     Width="140"
+                     MaxLength="6"
+                     HorizontalAlignment="Left"
+                     VerticalContentAlignment="Center">
+                <TextBox.InputScope>
+                    <InputScope>
+                        <InputScope.Names>
+                            <InputScopeName NameValue="Number"/>
+                        </InputScope.Names>
+                    </InputScope>
+                </TextBox.InputScope>
+            </TextBox>
         </StackPanel>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" >
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock x:Name="lblCooldown" Margin="0,0,12,0" VerticalAlignment="Center"/>
             <Button x:Name="btnResend" Content="Reenviar código" Width="120" Margin="0,0,8,0" Click="ResendClick"/>
             <Button x:Name="btnConfirm" Content="Confirmar" Width="100" Margin="0,0,8,0" Click="ConfirmClick"/>

@@ -9,11 +9,10 @@ using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
-    /// <summary>
-    /// Lógica de interacción para LoginWindow.xaml
-    /// </summary>
     public partial class LoginWindow : Window
     {
+        private bool isPasswordVisible = false;
+
         public LoginWindow()
         {
             InitializeComponent();
@@ -23,7 +22,7 @@ namespace WPFTheWeakestRival
             cmblanguage.Items.Add(Lang.en);
             cmblanguage.SelectedIndex = 0;
 
-            cmblanguage.SelectionChanged += Cmblanguage_SelectionChanged;
+            cmblanguage.SelectionChanged += CmbLanguageSelectionChanged;
         }
 
         private void UpdateMainImage()
@@ -44,63 +43,52 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void Cmblanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CmbLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string selectedLang = cmblanguage.SelectedItem as string;
-            if (selectedLang == Lang.es)
-                Properties.Langs.Lang.Culture = new CultureInfo("es");
-            else
-                Properties.Langs.Lang.Culture = new CultureInfo("en");
+            var selected = cmblanguage.SelectedItem as string;
+            Lang.Culture = string.Equals(selected, Lang.es, StringComparison.Ordinal)
+                ? new CultureInfo("es")
+                : new CultureInfo("en");
 
-            UpdateUILanguage();
+            UpdateUiLanguage();
             UpdateMainImage();
         }
 
-        private void UpdateUILanguage()
+        private void UpdateUiLanguage()
         {
-            lblWelcome.Content = Properties.Langs.Lang.lblWelcome;
+            lblWelcome.Content = Lang.lblWelcome;
+
             if (placeholderEmail != null)
-                placeholderEmail.Text = Properties.Langs.Lang.emailPlaceholder;
+                placeholderEmail.Text = Lang.emailPlaceholder;
 
             if (placeholderPassword != null)
-                placeholderPassword.Text = Properties.Langs.Lang.passwordPlaceHolder;
+                placeholderPassword.Text = Lang.passwordPlaceHolder;
 
-            btnLogin.Content = Properties.Langs.Lang.btnLogin;
-            btnForgotPassword.Content = Properties.Langs.Lang.forgotPassword;
-            btnNotAccount.Content = Properties.Langs.Lang.notAccount;
-            btnRegist.Content = Properties.Langs.Lang.regist;
-            btnPlayAsGuest.Content = Properties.Langs.Lang.playAsGuest;
+            btnLogin.Content = Lang.btnLogin;
+            btnForgotPassword.Content = Lang.forgotPassword;
+            btnNotAccount.Content = Lang.notAccount;
+            btnRegist.Content = Lang.regist;
+            btnPlayAsGuest.Content = Lang.playAsGuest;
 
-            string prevSelected = cmblanguage.SelectedItem as string;
-            cmblanguage.SelectionChanged -= Cmblanguage_SelectionChanged;
+            cmblanguage.SelectionChanged -= CmbLanguageSelectionChanged;
             cmblanguage.Items.Clear();
             cmblanguage.Items.Add(Lang.es);
             cmblanguage.Items.Add(Lang.en);
-
-            if (Properties.Langs.Lang.Culture.TwoLetterISOLanguageName == "es")
-                cmblanguage.SelectedIndex = 0;
-            else
-                cmblanguage.SelectedIndex = 1;
-            cmblanguage.SelectionChanged += Cmblanguage_SelectionChanged;
-        }
-
-        private void cmblanguage_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
-        {
-
+            cmblanguage.SelectedIndex = Lang.Culture.TwoLetterISOLanguageName == "es" ? 0 : 1;
+            cmblanguage.SelectionChanged += CmbLanguageSelectionChanged;
         }
 
         private void RegistrationClick(object sender, RoutedEventArgs e)
         {
-            RegistrationWindow regWindow = new RegistrationWindow();
-            regWindow.Show();
-            this.Close();
+            var registration = new RegistrationWindow();
+            registration.Show();
+            Close();
         }
 
-        private bool isPasswordVisible = false;
-
-        private void btnTogglePassword_Click(object sender, RoutedEventArgs e)
+        private void BtnTogglePasswordClick(object sender, RoutedEventArgs e)
         {
             isPasswordVisible = !isPasswordVisible;
+
             if (isPasswordVisible)
             {
                 txtPasswordVisible.Text = pwdPassword.Password;
@@ -117,80 +105,77 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void pwdPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        private void PwdPasswordChanged(object sender, RoutedEventArgs e)
         {
             placeholderPassword.Visibility = string.IsNullOrEmpty(pwdPassword.Password)
-                ? Visibility.Visible : Visibility.Collapsed;
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
-        private void pwdPassword_GotFocus(object sender, RoutedEventArgs e)
+        private void PwdPasswordGotFocus(object sender, RoutedEventArgs e)
         {
             placeholderPassword.Visibility = Visibility.Collapsed;
         }
 
-        private void pwdPassword_LostFocus(object sender, RoutedEventArgs e)
+        private void PwdPasswordLostFocus(object sender, RoutedEventArgs e)
         {
             placeholderPassword.Visibility = string.IsNullOrEmpty(pwdPassword.Password)
-                ? Visibility.Visible : Visibility.Collapsed;
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
-        private void txtPasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        private void TxtPasswordVisibleTextChanged(object sender, TextChangedEventArgs e)
         {
             placeholderPassword.Visibility = string.IsNullOrEmpty(txtPasswordVisible.Text)
-                ? Visibility.Visible : Visibility.Collapsed;
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
-        private async void btnLogin_Click(object sender, RoutedEventArgs e)
+        private async void BtnLoginClick(object sender, RoutedEventArgs e)
         {
             btnLogin.IsEnabled = false;
 
             try
             {
                 var email = txtEmail.Text?.Trim();
-                var password = pwdPassword.Password ?? "";
+                var password = pwdPassword.Password ?? string.Empty;
 
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     MessageBox.Show(Lang.errorInvalidEmail, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+
                 if (string.IsNullOrEmpty(password))
                 {
-                    MessageBox.Show(Lang.errorMisingFields, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Warning); return;
+                    MessageBox.Show(Lang.errorMisingFields, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
 
-                var req = new LoginRequest
-                {
-                    Email = email,
-                    Password = password
-                };
+                var request = new LoginRequest { Email = email, Password = password };
 
                 var client = new AuthServiceClient();
-                LoginResponse resp;
+                LoginResponse response;
 
                 try
                 {
-                    resp = await client.LoginAsync(req);
-
-                    if (client.State != CommunicationState.Faulted) client.Close();
-                    else client.Abort();
+                    response = await client.LoginAsync(request);
+                    if (client.State != CommunicationState.Faulted) client.Close(); else client.Abort();
                 }
                 catch (FaultException<ServiceFault> fx)
                 {
                     client.Abort();
-                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 catch (Exception ex)
                 {
                     client.Abort();
-                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                var token = resp.Token;
+                var token = response.Token;
 
                 MessageBox.Show(
                     $"{Lang.succesLoginMessage}\nUserId: {token.UserId}\nToken: {token.Token}\nExp: {token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
@@ -198,9 +183,9 @@ namespace WPFTheWeakestRival
 
                 AppSession.CurrentToken = token;
 
-                var home = new LobbyWindow();
-                home.Show();
-                this.Close();
+                var lobby = new LobbyWindow();
+                lobby.Show();
+                Close();
             }
             finally
             {

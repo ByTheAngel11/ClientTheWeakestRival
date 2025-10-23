@@ -8,21 +8,22 @@
         mc:Ignorable="d"
         Title="LoginWindow"
         Height="450" Width="850"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        TextOptions.TextRenderingMode="Aliased">
 
     <Grid Margin="0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Margin="20" VerticalAlignment="Center">
             <Image x:Name="logoImage" Height="300" Stretch="Uniform"/>
         </StackPanel>
 
-        <!-- Lado Derecho: Formulario -->
         <StackPanel Grid.Column="1" Margin="40,0,40,0" VerticalAlignment="Center" Height="375">
-
             <Label x:Name="lblWelcome"
                    Content="{x:Static language:Lang.lblWelcome}"
                    HorizontalAlignment="Center"
@@ -63,9 +64,9 @@
                              BorderThickness="1.5"
                              Background="White"
                              Padding="8,6,30,6"
-                             PasswordChanged="pwdPassword_PasswordChanged"
-                             GotFocus="pwdPassword_GotFocus"
-                             LostFocus="pwdPassword_LostFocus"
+                             PasswordChanged="PwdPasswordChanged"
+                             GotFocus="PwdPasswordGotFocus"
+                             LostFocus="PwdPasswordLostFocus"
                              HorizontalContentAlignment="Center"/>
 
                 <TextBox x:Name="txtPasswordVisible"
@@ -74,7 +75,7 @@
                          Background="White"
                          Padding="8,6,30,6"
                          Visibility="Collapsed"
-                         TextChanged="txtPasswordVisible_TextChanged"
+                         TextChanged="TxtPasswordVisibleTextChanged"
                          HorizontalContentAlignment="Center"/>
 
                 <TextBlock x:Name="placeholderPassword"
@@ -93,7 +94,7 @@
                         Margin="0,0,5,0"
                         BorderThickness="0"
                         Background="Transparent"
-                        Click="btnTogglePassword_Click">
+                        Click="BtnTogglePasswordClick">
                     <TextBlock Text="👁" FontSize="14"/>
                 </Button>
             </Grid>
@@ -103,7 +104,7 @@
                     Width="120"
                     Margin="0,0,0,10"
                     Background="Transparent"
-                    Click="btnLogin_Click"/>
+                    Click="BtnLoginClick"/>
 
             <Button x:Name="btnForgotPassword"
                     Content="{x:Static language:Lang.forgotPassword}"
@@ -138,6 +139,6 @@
                   Margin="280,10,0,0"
                   VerticalAlignment="Top"
                   Width="120"
-                  SelectionChanged="cmblanguage_SelectionChanged_1"/>
+                  SelectionChanged="CmbLanguageSelectionChanged"/>
     </Grid>
 </Window>

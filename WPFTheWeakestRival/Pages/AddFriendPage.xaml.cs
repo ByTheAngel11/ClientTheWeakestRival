@@ -8,109 +8,118 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Pages
 {
     public partial class AddFriendPage : Page
     {
-        private readonly FriendServiceClient _client;
-        private readonly string _token;
+        private const int SearchDebounceMilliseconds = 300;
+        private const int MaxSearchResults = 20;
 
-        private readonly ObservableCollection<SearchVm> _items = new ObservableCollection<SearchVm>();
-        private CancellationTokenSource _cts;
+        private readonly FriendServiceClient friendServiceClient;
+        private readonly string authToken;
+
+        private readonly ObservableCollection<FriendSearchResultVm> results = new ObservableCollection<FriendSearchResultVm>();
+        private CancellationTokenSource debounceCancellation;
 
         public event EventHandler FriendsUpdated;
 
         public AddFriendPage(FriendServiceClient client, string token)
         {
             InitializeComponent();
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _token = token ?? string.Empty;
-            lstResults.ItemsSource = _items;
+            friendServiceClient = client ?? throw new ArgumentNullException(nameof(client));
+            authToken = token ?? string.Empty;
+            lstResults.ItemsSource = results;
         }
 
-        // ===== Buscar (click) =====
-        private async void btnSearch_Click(object sender, RoutedEventArgs e)
+        private async void BtnSearchClick(object sender, RoutedEventArgs e)
         {
-            await DoSearchAsync(txtQuery.Text);
+            await SearchAsync(txtSearchQuery.Text);
         }
 
-        // ===== Buscar (debounce al teclear) =====
-        private async void txtQuery_TextChanged(object sender, TextChangedEventArgs e)
+        private async void TxtSearchQueryTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_cts != null) _cts.Cancel();
-            _cts = new CancellationTokenSource();
-            var tk = _cts.Token;
+            if (debounceCancellation != null)
+            {
+                debounceCancellation.Cancel();
+            }
+
+            debounceCancellation = new CancellationTokenSource();
+            var ct = debounceCancellation.Token;
 
             try
             {
-                await Task.Delay(300, tk);
-                if (!tk.IsCancellationRequested)
-                    await DoSearchAsync(((TextBox)sender).Text);
+                await Task.Delay(SearchDebounceMilliseconds, ct);
+                if (!ct.IsCancellationRequested)
+                {
+                    var textBox = (TextBox)sender;
+                    await SearchAsync(textBox.Text);
+                }
             }
-            catch (TaskCanceledException) { }
+            catch (TaskCanceledException)
+            {
+            }
         }
 
-        private async Task DoSearchAsync(string query)
+        private async Task SearchAsync(string query)
         {
-            var q = (query ?? "").Trim();
-            if (string.IsNullOrWhiteSpace(q))
+            var trimmedQuery = (query ?? string.Empty).Trim();
+
+            if (string.IsNullOrWhiteSpace(trimmedQuery))
             {
-                _items.Clear();
-                txtStatus.Text = "";
+                results.Clear();
+                lblStatus.Text = string.Empty;
                 return;
             }
 
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
-                txtStatus.Text = "Buscando…";
+                lblStatus.Text = Lang.searching;
 
-                var resp = await _client.SearchAccountsAsync(new SearchAccountsRequest
+                var response = await friendServiceClient.SearchAccountsAsync(new SearchAccountsRequest
                 {
-                    Token = _token,
-                    Query = q,
-                    MaxResults = 20
+                    Token = authToken,
+                    Query = trimmedQuery,
+                    MaxResults = MaxSearchResults
                 });
 
+                results.Clear();
+                var serviceResults = response.Results ?? new SearchAccountItem[0];
 
-                _items.Clear();
-                var results = resp.Results ?? new SearchAccountItem[0];
-
-                foreach (var r in results)
+                foreach (var item in serviceResults)
                 {
-                    var img = UiImageHelper.TryCreateFromUrlOrPath(r.AvatarUrl, 36)
-                              ?? UiImageHelper.DefaultAvatar(36);
+                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(item.AvatarUrl, 36) ?? UiImageHelper.DefaultAvatar(36);
 
-                    _items.Add(new SearchVm
+                    results.Add(new FriendSearchResultVm
                     {
-                        AccountId = r.AccountId,
-                        DisplayName = string.IsNullOrWhiteSpace(r.DisplayName) ? r.Email : r.DisplayName,
-                        Email = r.Email,
-                        Avatar = img,
-                        IsFriend = r.IsFriend,
-                        HasPendingOutgoing = r.HasPendingOutgoing,
-                        HasPendingIncoming = r.HasPendingIncoming,
-                        PendingIncomingRequestId = r.PendingIncomingRequestId
+                        AccountId = item.AccountId,
+                        DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Email : item.DisplayName,
+                        Email = item.Email,
+                        Avatar = avatar,
+                        IsFriend = item.IsFriend,
+                        HasPendingOutgoing = item.HasPendingOutgoing,
+                        HasPendingIncoming = item.HasPendingIncoming,
+                        PendingIncomingRequestId = item.PendingIncomingRequestId
                     });
                 }
 
-                txtStatus.Text = _items.Count == 0 ? "Sin resultados" : _items.Count + " resultado(s)";
+                lblStatus.Text = results.Count == 0
+                    ? Lang.noResults
+                    : string.Format(Lang.results, results.Count);
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Buscar amigos",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtStatus.Text = "Error del servicio";
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, Lang.addFriendSearchTooltip, MessageBoxButton.OK, MessageBoxImage.Warning);
+                lblStatus.Text = Lang.addFriendServiceError;
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Buscar amigos",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                txtStatus.Text = "Sin conexión";
+                MessageBox.Show(Lang.noConnection + Environment.NewLine + ex.Message, Lang.addFriendSearchTooltip, MessageBoxButton.OK, MessageBoxImage.Error);
+                lblStatus.Text = Lang.noConnection;
             }
             finally
             {
@@ -118,53 +127,59 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        // ===== Enviar solicitud =====
-        private async void btnAdd_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddClick(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            if (btn == null) return;
+            var button = sender as Button;
+            if (button == null)
+            {
+                return;
+            }
 
-            var vm = btn.DataContext as SearchVm;
-            if (vm == null || !vm.CanAdd) return;
+            var viewModel = button.DataContext as FriendSearchResultVm;
+            if (viewModel == null || !viewModel.CanAdd)
+            {
+                return;
+            }
 
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                var resp = await _client.SendFriendRequestAsync(new SendFriendRequestRequest
+                var response = await friendServiceClient.SendFriendRequestAsync(new SendFriendRequestRequest
                 {
-                    Token = _token,
-                    TargetAccountId = vm.AccountId
+                    Token = authToken,
+                    TargetAccountId = viewModel.AccountId
                 });
 
-
-                if (resp.Status == FriendRequestStatus.Accepted)
+                if (response.Status == FriendRequestStatus.Accepted)
                 {
-                    vm.IsFriend = true;
-                    vm.HasPendingOutgoing = false;
-                    vm.HasPendingIncoming = false;
-                    vm.PendingIncomingRequestId = null;
-                    vm.NotifyStateChanged();
+                    viewModel.IsFriend = true;
+                    viewModel.HasPendingOutgoing = false;
+                    viewModel.HasPendingIncoming = false;
+                    viewModel.PendingIncomingRequestId = null;
+                    viewModel.NotifyStateChanged();
 
-                    var ev = FriendsUpdated; if (ev != null) ev(this, EventArgs.Empty);
-                    MessageBox.Show("Ahora eres amigo de " + vm.DisplayName + ".", "Amigos",
-                        MessageBoxButton.OK, MessageBoxImage.Information);
+                    var handler = FriendsUpdated;
+                    if (handler != null)
+                    {
+                        handler(this, EventArgs.Empty);
+                    }
+
+                    MessageBox.Show(string.Format(Lang.nowFriends, viewModel.DisplayName), Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    vm.HasPendingOutgoing = true;
-                    vm.NotifyStateChanged();
+                    viewModel.HasPendingOutgoing = true;
+                    viewModel.NotifyStateChanged();
                 }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Agregar amigo",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Agregar amigo",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Lang.noConnection + Environment.NewLine + ex.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -172,46 +187,56 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        // ===== Aceptar solicitud entrante =====
-        private async void btnAccept_Click(object sender, RoutedEventArgs e)
+        private async void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            if (btn == null) return;
+            var button = sender as Button;
+            if (button == null)
+            {
+                return;
+            }
 
-            var vm = btn.DataContext as SearchVm;
-            if (vm == null) return;
+            var viewModel = button.DataContext as FriendSearchResultVm;
+            if (viewModel == null)
+            {
+                return;
+            }
 
-            if (!vm.HasPendingIncoming || !vm.PendingIncomingRequestId.HasValue) return;
-            int frId = vm.PendingIncomingRequestId.Value;
+            if (!viewModel.HasPendingIncoming || !viewModel.PendingIncomingRequestId.HasValue)
+            {
+                return;
+            }
+
+            var friendRequestId = viewModel.PendingIncomingRequestId.Value;
 
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
-                await _client.AcceptFriendRequestAsync(new AcceptFriendRequestRequest
+                await friendServiceClient.AcceptFriendRequestAsync(new AcceptFriendRequestRequest
                 {
-                    Token = _token,
-                    FriendRequestId = frId
+                    Token = authToken,
+                    FriendRequestId = friendRequestId
                 });
 
+                viewModel.IsFriend = true;
+                viewModel.HasPendingIncoming = false;
+                viewModel.PendingIncomingRequestId = null;
+                viewModel.HasPendingOutgoing = false;
+                viewModel.NotifyStateChanged();
 
-                vm.IsFriend = true;
-                vm.HasPendingIncoming = false;
-                vm.PendingIncomingRequestId = null;
-                vm.HasPendingOutgoing = false;
-                vm.NotifyStateChanged();
-
-                var ev = FriendsUpdated; if (ev != null) ev(this, EventArgs.Empty);
+                var handler = FriendsUpdated;
+                if (handler != null)
+                {
+                    handler(this, EventArgs.Empty);
+                }
             }
-            catch (FaultException<ServiceFault> fx)
+            catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(fx.Detail.Code + ": " + fx.Detail.Message, "Aceptar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            catch (CommunicationException cx)
+            catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + cx.Message, "Aceptar solicitud",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(Lang.noConnection + Environment.NewLine + ex.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -219,23 +244,24 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
-            var win = Window.GetWindow(this) as LobbyWindow;
-            if (win != null)
+            var window = Window.GetWindow(this) as LobbyWindow;
+            if (window != null)
             {
-                var mi = win.GetType().GetMethod("OnCloseOverlayClick",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-                if (mi != null) mi.Invoke(win, new object[] { this, new RoutedEventArgs() });
+                var method = window.GetType().GetMethod("OnCloseOverlayClick", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                if (method != null)
+                {
+                    method.Invoke(window, new object[] { this, new RoutedEventArgs() });
+                }
             }
         }
 
-        // ===== VM interna =====
-        private class SearchVm : INotifyPropertyChanged
+        private class FriendSearchResultVm : INotifyPropertyChanged
         {
             public int AccountId { get; set; }
-            public string DisplayName { get; set; } = "";
-            public string Email { get; set; } = "";
+            public string DisplayName { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
             public ImageSource Avatar { get; set; }
 
             public bool IsFriend { get; set; }
@@ -243,27 +269,35 @@ namespace WPFTheWeakestRival.Pages
             public bool HasPendingIncoming { get; set; }
             public int? PendingIncomingRequestId { get; set; }
 
-            // Derivados para UI (sin switch expr)
-            public bool CanAdd { get { return !IsFriend && !HasPendingOutgoing && !HasPendingIncoming; } }
-            public bool ShowAccept { get { return HasPendingIncoming; } }
+            public bool CanAdd
+            {
+                get { return !IsFriend && !HasPendingOutgoing && !HasPendingIncoming; }
+            }
+
+            public bool ShowAccept
+            {
+                get { return HasPendingIncoming; }
+            }
+
             public string AddButtonText
             {
                 get
                 {
-                    if (IsFriend) return "Amigos";
-                    if (HasPendingOutgoing) return "Pendiente";
-                    if (HasPendingIncoming) return "—";
-                    return "Agregar";
+                    if (IsFriend) return Lang.btnFriends;
+                    if (HasPendingOutgoing) return Lang.statusPendingOut;
+                    if (HasPendingIncoming) return Lang.statusPendingIn;
+                    return Lang.addFriendAccept;
                 }
             }
+
             public string StateText
             {
                 get
                 {
-                    if (IsFriend) return "Ya son amigos";
-                    if (HasPendingOutgoing) return "Solicitud enviada";
-                    if (HasPendingIncoming) return "Solicitud recibida";
-                    return "Sugerido";
+                    if (IsFriend) return Lang.stateAlreadyFriends;
+                    if (HasPendingOutgoing) return Lang.statusPendingOut;
+                    if (HasPendingIncoming) return Lang.statusPendingIn;
+                    return Lang.stateSuggested;
                 }
             }
 
@@ -276,9 +310,14 @@ namespace WPFTheWeakestRival.Pages
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
-            private void OnPropertyChanged(string name)
+
+            private void OnPropertyChanged(string propertyName)
             {
-                var ev = PropertyChanged; if (ev != null) ev(this, new PropertyChangedEventArgs(name));
+                var handler = PropertyChanged;
+                if (handler != null)
+                {
+                    handler(this, new PropertyChangedEventArgs(propertyName));
+                }
             }
         }
     }

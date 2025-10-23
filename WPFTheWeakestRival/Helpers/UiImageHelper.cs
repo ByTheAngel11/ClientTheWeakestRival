@@ -7,81 +7,155 @@ namespace WPFTheWeakestRival.Helpers
 {
     public static class UiImageHelper
     {
-        public static ImageSource TryCreateFromUrlOrPath(string urlOrPath, int decodePixelWidth = 24)
+        public static ImageSource TryCreateFromUrlOrPath(string sourcePathOrUri, int decodeWidth = 24)
         {
-            if (string.IsNullOrWhiteSpace(urlOrPath)) return null;
+            if (string.IsNullOrWhiteSpace(sourcePathOrUri))
+            {
+                return null;
+            }
 
             try
             {
-                // Acepta http/https/file/pack y rutas absolutas
-                if (Uri.TryCreate(urlOrPath, UriKind.RelativeOrAbsolute, out var uri))
+                Uri candidateUri;
+                if (!Uri.TryCreate(sourcePathOrUri, UriKind.RelativeOrAbsolute, out candidateUri))
                 {
-                    if (!uri.IsAbsoluteUri)
+                    return null;
+                }
+
+                Uri resolvedUri;
+
+                if (!candidateUri.IsAbsoluteUri)
+                {
+                    string applicationBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    string absoluteFilePath = Path.Combine(applicationBaseDirectory, sourcePathOrUri);
+
+                    if (!File.Exists(absoluteFilePath))
                     {
-                        // Si vino como ruta relativa, resuélvela contra el bin
-                        var full = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, urlOrPath);
-                        if (!File.Exists(full)) return null;
-                        uri = new Uri(full, UriKind.Absolute);
+                        return null;
                     }
 
-                    var bi = new BitmapImage();
-                    bi.BeginInit();
-                    bi.CacheOption = BitmapCacheOption.OnLoad;   // no bloquear archivo
-                    if (decodePixelWidth > 0) bi.DecodePixelWidth = decodePixelWidth;
-                    bi.UriSource = uri;
-                    bi.EndInit();
-                    bi.Freeze();
-                    return bi;
+                    resolvedUri = new Uri(absoluteFilePath, UriKind.Absolute);
                 }
-            }
-            catch
-            {
-                // swallow
-            }
-
-            return null;
-        }
-
-        public static ImageSource TryCreateFromBytes(byte[] bytes, int decodePixelWidth = 24)
-        {
-            if (bytes == null || bytes.Length == 0) return null;
-
-            try
-            {
-                using (var ms = new MemoryStream(bytes))
+                else
                 {
-                    var bi = new BitmapImage();
-                    bi.BeginInit();
-                    bi.CacheOption = BitmapCacheOption.OnLoad;
-                    if (decodePixelWidth > 0) bi.DecodePixelWidth = decodePixelWidth;
-                    bi.StreamSource = ms;
-                    bi.EndInit();
-                    bi.Freeze();
-                    return bi;
+                    string uriScheme = candidateUri.Scheme.ToLowerInvariant();
+                    bool isAllowedScheme =
+                        uriScheme == Uri.UriSchemeHttp ||
+                        uriScheme == Uri.UriSchemeHttps ||
+                        uriScheme == Uri.UriSchemeFile ||
+                        uriScheme == "pack";
+
+                    if (!isAllowedScheme)
+                    {
+                        return null;
+                    }
+
+                    resolvedUri = candidateUri;
                 }
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                if (decodeWidth > 0)
+                {
+                    bitmap.DecodePixelWidth = decodeWidth;
+                }
+                bitmap.UriSource = resolvedUri;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
             }
-            catch
+            catch (FileNotFoundException ex)
             {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+            catch (NotSupportedException ex)
+            {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+            catch (IOException ex)
+            {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+            catch (UriFormatException ex)
+            {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
                 return null;
             }
         }
 
-        public static ImageSource DefaultAvatar(int decodePixelWidth = 24)
+        public static ImageSource TryCreateFromBytes(byte[] imageBytes, int decodeWidth = 24)
+        {
+            if (imageBytes == null || imageBytes.Length == 0)
+            {
+                return null;
+            }
+
+            try
+            {
+                using (var memoryStream = new MemoryStream(imageBytes))
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                    if (decodeWidth > 0)
+                    {
+                        bitmap.DecodePixelWidth = decodeWidth;
+                    }
+                    bitmap.StreamSource = memoryStream;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                    return bitmap;
+                }
+            }
+            catch (NotSupportedException ex)
+            {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+            catch (IOException ex)
+            {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex);
+                return null;
+            }
+        }
+
+        public static ImageSource DefaultAvatar(int decodeWidth = 24)
         {
             try
             {
-                var uri = new Uri("pack://application:,,,/Assets/Images/Avatars/default.png", UriKind.Absolute);
-                var bi = new BitmapImage();
-                bi.BeginInit();
-                bi.CacheOption = BitmapCacheOption.OnLoad;
-                if (decodePixelWidth > 0) bi.DecodePixelWidth = decodePixelWidth;
-                bi.UriSource = uri;
-                bi.EndInit();
-                bi.Freeze();
-                return bi;
+                var avatarPackUri = new Uri("pack://application:,,,/Assets/Images/Avatars/default.png", UriKind.Absolute);
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                if (decodeWidth > 0)
+                {
+                    bitmap.DecodePixelWidth = decodeWidth;
+                }
+                bitmap.UriSource = avatarPackUri;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.Error.WriteLine(ex);
                 return null;
             }
         }

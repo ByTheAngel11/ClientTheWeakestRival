@@ -189,9 +189,6 @@
   <data name="errorMatchingPasswords" xml:space="preserve">
     <value>The passwords don't match</value>
   </data>
-  <data name="tittleImageSelector" xml:space="preserve">
-    <value>Select your profile picture</value>
-  </data>
   <data name="btnChooseImage" xml:space="preserve">
     <value>Select an image</value>
   </data>
@@ -257,5 +254,140 @@
   </data>
   <data name="noValidSessionCode" xml:space="preserve">
     <value>No valid session</value>
+  </data>
+  <data name="btnLogout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="lblSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="addFriendTitle" xml:space="preserve">
+    <value>Add Friends</value>
+  </data>
+  <data name="commonClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="commonSearch" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="commonSucces" xml:space="preserve">
+    <value>Succes</value>
+  </data>
+  <data name="profileUpdated" xml:space="preserve">
+    <value>Profile Updated</value>
+  </data>
+  <data name="addFriendAccept" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="modifyProfileTitle" xml:space="preserve">
+    <value>Modify Profile</value>
+  </data>
+  <data name="profileTitle" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="profileSelectAvatarTitle" xml:space="preserve">
+    <value>Select your profile picture</value>
+  </data>
+  <data name="profileImageFilter" xml:space="preserve">
+    <value>Filtr image</value>
+  </data>
+  <data name="logoutConfirmMessage" xml:space="preserve">
+    <value>Session closed successfully.</value>
+  </data>
+  <data name="logoutTitle" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="searching" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
+  <data name="noResults" xml:space="preserve">
+    <value>No found results</value>
+  </data>
+  <data name="results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="addFriendServiceError" xml:space="preserve">
+    <value>We had an error on the FriendService try again later</value>
+  </data>
+  <data name="noConnection" xml:space="preserve">
+    <value>There is no connection</value>
+  </data>
+  <data name="nowFriends" xml:space="preserve">
+    <value>Now are friends</value>
+  </data>
+  <data name="statusPendingOut" xml:space="preserve">
+    <value>Request sent</value>
+  </data>
+  <data name="statusPendingIn" xml:space="preserve">
+    <value>Request recieved</value>
+  </data>
+  <data name="stateSuggested" xml:space="preserve">
+    <value>Suggested</value>
+  </data>
+  <data name="stateAlreadyFriends" xml:space="preserve">
+    <value>You are already friends</value>
+  </data>
+  <data name="statusAvailable" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="statusOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="errorLoadFriends" xml:space="preserve">
+    <value>Error loading friends:</value>
+  </data>
+  <data name="lobbyTitle" xml:space="preserve">
+    <value>Lobby</value>
+  </data>
+  <data name="lobbyCreateFailed" xml:space="preserve">
+    <value>The lobby could not be created</value>
+  </data>
+  <data name="lobbyCreated" xml:space="preserve">
+    <value>The lobby was successfully created</value>
+  </data>
+  <data name="lobbyEnterAccessCode" xml:space="preserve">
+    <value>Enter an access code</value>
+  </data>
+  <data name="lobbyJoinFailed" xml:space="preserve">
+    <value>Could not join the lobby</value>
+  </data>
+  <data name="lobbyJoined" xml:space="preserve">
+    <value>You joined the lobby</value>
+  </data>
+  <data name="lobbyIdPrefix" xml:space="preserve">
+    <value>LobbyId</value>
+  </data>
+  <data name="lobbyCodePrefix" xml:space="preserve">
+    <value>Code:</value>
+  </data>
+  <data name="chatCreateOrJoinFirst" xml:space="preserve">
+    <value>First create or join a lobby</value>
+  </data>
+  <data name="chatSendFailed" xml:space="preserve">
+    <value>The message could not be sent</value>
+  </data>
+  <data name="addFriendSearchTooltip" xml:space="preserve">
+    <value>Search friends</value>
+  </data>
+  <data name="chatTitle" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="system" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="lobbyPlayerJoined" xml:space="preserve">
+    <value>A player joined the lobby</value>
+  </data>
+  <data name="lobbyPlayerLeft" xml:space="preserve">
+    <value>A player left the lobby</value>
+  </data>
+  <data name="player" xml:space="preserve">
+    <value>Player</value>
+  </data>
+  <data name="btnCreateLobby" xml:space="preserve">
+    <value>Create lobby</value>
+  </data>
+  <data name="btnJoinByCode" xml:space="preserve">
+    <value>Join by a code</value>
   </data>
 </root>

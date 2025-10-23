@@ -28,17 +28,13 @@
 
         <TextBlock Text="Solicitudes de amistad" FontSize="22" FontWeight="Bold"/>
 
-        <!-- OJO: ColumnDefinitions con sintaxis WPF + espacio con Margin -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Recibidas -->
-            <Border Grid.Column="0"
-                    Margin="0,0,8,0"
-                    BorderBrush="#40000000" BorderThickness="1" CornerRadius="6" Padding="8">
+            <Border Grid.Column="0" Margin="0,0,8,0" BorderBrush="#40000000" BorderThickness="1" CornerRadius="6" Padding="8">
                 <DockPanel LastChildFill="True">
                     <TextBlock Text="Recibidas" FontWeight="SemiBold" DockPanel.Dock="Top" Margin="0,0,0,8"/>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -49,25 +45,24 @@
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="44"/>
-                                                <!-- avatar -->
                                                 <ColumnDefinition Width="*"/>
-                                                <!-- texto -->
                                                 <ColumnDefinition Width="Auto"/>
-                                                <!-- acciones -->
                                             </Grid.ColumnDefinitions>
 
-                                            <Image Grid.Column="0" Width="36" Height="36" Margin="0,0,8,0"
-             Stretch="UniformToFill" Source="{Binding Avatar}" ClipToBounds="True"/>
+                                            <Image Grid.Column="0"
+                                                   Width="36" Height="36" Margin="0,0,8,0"
+                                                   Stretch="UniformToFill"
+                                                   Source="{Binding Avatar}"
+                                                   ClipToBounds="True"/>
 
                                             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
                                                 <TextBlock Text="{Binding Subtitle}" Opacity="0.7" FontSize="12"/>
                                             </StackPanel>
 
-                                            <!-- Recibidas: aceptar + rechazar -->
                                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                                <Button Content="Aceptar" Click="btnAccept_Click"/>
-                                                <Button Content="Rechazar" Click="btnReject_Click"/>
+                                                <Button Content="Aceptar" Click="BtnAcceptClick"/>
+                                                <Button Content="Rechazar" Click="BtnRejectClick"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -78,10 +73,7 @@
                 </DockPanel>
             </Border>
 
-            <!-- Enviadas -->
-            <Border Grid.Column="1"
-                    Margin="8,0,0,0"
-                    BorderBrush="#40000000" BorderThickness="1" CornerRadius="6" Padding="8">
+            <Border Grid.Column="1" Margin="8,0,0,0" BorderBrush="#40000000" BorderThickness="1" CornerRadius="6" Padding="8">
                 <DockPanel LastChildFill="True">
                     <TextBlock Text="Enviadas" FontWeight="SemiBold" DockPanel.Dock="Top" Margin="0,0,0,8"/>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -92,24 +84,23 @@
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="44"/>
-                                                <!-- avatar -->
                                                 <ColumnDefinition Width="*"/>
-                                                <!-- texto -->
                                                 <ColumnDefinition Width="Auto"/>
-                                                <!-- acciones -->
                                             </Grid.ColumnDefinitions>
 
-                                            <Image Grid.Column="0" Width="36" Height="36" Margin="0,0,8,0"
-             Stretch="UniformToFill" Source="{Binding Avatar}" ClipToBounds="True"/>
+                                            <Image Grid.Column="0"
+                                                   Width="36" Height="36" Margin="0,0,8,0"
+                                                   Stretch="UniformToFill"
+                                                   Source="{Binding Avatar}"
+                                                   ClipToBounds="True"/>
 
                                             <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
                                                 <TextBlock Text="{Binding Subtitle}" Opacity="0.7" FontSize="12"/>
                                             </StackPanel>
 
-                                            <!-- Recibidas: aceptar + rechazar -->
                                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                                <Button Content="Cancelar" Click="btnCancel_Click"/>
+                                                <Button Content="Cancelar" Click="BtnCancelClick"/>
                                             </StackPanel>
                                         </Grid>
                                     </Border>
@@ -122,7 +113,7 @@
         </Grid>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Cerrar" Click="btnClose_Click"/>
+            <Button Content="Cerrar" Click="BtnCloseClick"/>
         </StackPanel>
     </Grid>
 </Page>
