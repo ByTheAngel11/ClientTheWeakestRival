@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -118,166 +118,166 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lblWelcome" xml:space="preserve">
-    <value>Bienvenido</value>
+    <value>Bem-vindo</value>
   </data>
   <data name="lblEmail" xml:space="preserve">
-    <value>Correo electronico</value>
+    <value>E-mail</value>
   </data>
   <data name="lblPassword" xml:space="preserve">
-    <value>Contraseña</value>
+    <value>Senha</value>
   </data>
   <data name="en" xml:space="preserve">
-    <value>Ingles</value>
+    <value>Inglês</value>
   </data>
   <data name="es" xml:space="preserve">
-    <value>Español</value>
+    <value>Espanhol</value>
   </data>
   <data name="emailPlaceholder" xml:space="preserve">
-    <value>correo@ejemplo.com</value>
+    <value>email@exemplo.com</value>
   </data>
   <data name="passwordPlaceHolder" xml:space="preserve">
-    <value>Introduce tu contraseña</value>
+    <value>Digite sua senha</value>
   </data>
   <data name="btnLogin" xml:space="preserve">
-    <value>Iniciar sesión</value>
+    <value>Conecte-se</value>
   </data>
   <data name="loginTitle" xml:space="preserve">
-    <value>Iniciar sesión</value>
+    <value>Conecte-se</value>
   </data>
   <data name="registerTitle" xml:space="preserve">
-    <value>Registro</value>
+    <value>Cadastro</value>
   </data>
   <data name="registHeader" xml:space="preserve">
-    <value>Registro</value>
+    <value>Cadastro</value>
   </data>
   <data name="registerDisplayName" xml:space="preserve">
-    <value>Nombre de usuario</value>
+    <value>Nome de usuário</value>
   </data>
   <data name="lblConfirmPassword" xml:space="preserve">
-    <value>Confirma tu contraseña</value>
+    <value>Confirme sua senha</value>
   </data>
   <data name="cancel" xml:space="preserve">
     <value>Cancelar</value>
   </data>
   <data name="regist" xml:space="preserve">
-    <value>Registrarse</value>
+    <value>Cadastro</value>
   </data>
   <data name="registerError" xml:space="preserve">
-    <value>Error al registrarte</value>
+    <value>Erro de registro</value>
   </data>
   <data name="notAccount" xml:space="preserve">
-    <value>¿No tienes cuenta?</value>
+    <value>Você não tem conta?</value>
   </data>
   <data name="errorMisingFields" xml:space="preserve">
-    <value>Faltaron campos por rellenar</value>
+    <value>Faltavam campos para preencher</value>
   </data>
   <data name="errorInvalidateCredentials" xml:space="preserve">
-    <value>Correo o contraseña incorrectos</value>
+    <value>E-mail ou senha incorretos</value>
   </data>
   <data name="succesLoginMessage" xml:space="preserve">
-    <value>Bienvenido a El rival mas debil</value>
+    <value>Bem vindo ao rival mais fraco</value>
   </data>
   <data name="playAsGuest" xml:space="preserve">
-    <value>Jugar como invitado</value>
+    <value>Jogue como convidado</value>
   </data>
   <data name="btnImageChooser" xml:space="preserve">
-    <value>Elige una imagen</value>
+    <value>Escolha uma imagem</value>
   </data>
   <data name="registSucces" xml:space="preserve">
-    <value>El registro ha sido exitoso</value>
+    <value>A inscrição foi um sucesso</value>
   </data>
   <data name="errorMatchingPasswords" xml:space="preserve">
-    <value>Las contraseñas no coinciden</value>
+    <value>As senhas não coincidem</value>
   </data>
   <data name="btnChooseImage" xml:space="preserve">
-    <value>Elige una imagen</value>
+    <value>Selecione uma imagem</value>
   </data>
   <data name="generalRegistError" xml:space="preserve">
-    <value>Error al registrarte</value>
+    <value>Erro no cadastro</value>
   </data>
   <data name="imageLogo" xml:space="preserve">
-    <value>/Properties/Images/logo_es.png</value>
+    <value>#TODO</value>
   </data>
   <data name="colorLogin" xml:space="preserve">
-    <value>#ede1d8</value>
+    <value>#cb102c</value>
   </data>
   <data name="errorUsernameWithoutSpaces" xml:space="preserve">
-    <value>El nombre de usuario no debe tener espacios</value>
+    <value>O nome de usuário não deve conter espaços</value>
   </data>
   <data name="errorInvalidEmail" xml:space="preserve">
-    <value>El email no tiene la estructura necesaria</value>
+    <value>O e-mail não possui a estrutura necessária</value>
   </data>
   <data name="errorPasswordStructure" xml:space="preserve">
-    <value>La contraseña debe tener al menos 9 caracteres, una letra mayúscula y un símbolo.</value>
+    <value>A senha deve ter pelo menos 9 caracteres, uma letra maiúscula e um símbolo.</value>
   </data>
   <data name="errorEmailExists" xml:space="preserve">
-    <value>El email ya esta registrado</value>
+    <value>O e-mail já está cadastrado</value>
   </data>
   <data name="errorUsernameExists" xml:space="preserve">
-    <value>El nombre de usuario ya está en uso</value>
+    <value>O nome de usuário já existe</value>
   </data>
   <data name="forgotPassword" xml:space="preserve">
-    <value>¿Olvidaste tu contraseña?</value>
+    <value>Esqueceu sua senha?</value>
   </data>
   <data name="txtEmail" xml:space="preserve">
-    <value>Correo Electronico</value>
+    <value>E-mail</value>
   </data>
   <data name="txtPassword" xml:space="preserve">
-    <value>Contraseña</value>
+    <value>Senha</value>
   </data>
   <data name="Logo" xml:space="preserve">
-    <value>/Properties/Images/logo_es.png"</value>
+    <value>/Propriedades/Imagens/logoen.png</value>
   </data>
   <data name="lblNoFriends" xml:space="preserve">
-    <value>Aún no tienes amigos</value>
+    <value>Você ainda não tem amigos</value>
   </data>
   <data name="lblSendInvitations" xml:space="preserve">
-    <value>Usa “Enviar solicitud” para agregar nuevos</value>
+    <value>Use “Enviar solicitação” para adicionar novos</value>
   </data>
   <data name="btnPersonalization" xml:space="preserve">
-    <value>Personalización</value>
+    <value>Personalização</value>
   </data>
   <data name="btnScoreboard" xml:space="preserve">
-    <value>Marcadores</value>
+    <value>Placar</value>
   </data>
   <data name="btnFriends" xml:space="preserve">
     <value>Amigos</value>
   </data>
   <data name="btnPlay" xml:space="preserve">
-    <value>JUGAR</value>
+    <value>JOGAR</value>
   </data>
   <data name="btnSendRequests" xml:space="preserve">
-    <value>Enviar solicitud</value>
+    <value>Enviar solicitação</value>
   </data>
   <data name="btnRequests" xml:space="preserve">
-    <value>Ver solicitudes</value>
+    <value>Solicitações</value>
   </data>
   <data name="noValidSessionCode" xml:space="preserve">
-    <value>Sesión no válida</value>
+    <value>Nenhuma sessão válida</value>
   </data>
   <data name="btnLogout" xml:space="preserve">
-    <value>Cerrar sesión</value>
+    <value>Sair</value>
   </data>
   <data name="lblSettings" xml:space="preserve">
-    <value>Configuración</value>
+    <value>Configurações</value>
   </data>
   <data name="addFriendTitle" xml:space="preserve">
-    <value>Agregar amigos</value>
+    <value>Adicionar amigos</value>
   </data>
   <data name="commonClose" xml:space="preserve">
-    <value>Cerrar</value>
+    <value>Fechar</value>
   </data>
   <data name="commonSearch" xml:space="preserve">
-    <value>Buscar</value>
+    <value>Procurar</value>
   </data>
   <data name="commonSucces" xml:space="preserve">
-    <value>Éxito</value>
+    <value>Sucesso</value>
   </data>
   <data name="profileUpdated" xml:space="preserve">
-    <value>Perfil actualizado</value>
+    <value>Perfil atualizado</value>
   </data>
   <data name="addFriendAccept" xml:space="preserve">
-    <value>Aceptar</value>
+    <value>Aceitar</value>
   </data>
   <data name="modifyProfileTitle" xml:space="preserve">
     <value>Modificar perfil</value>
@@ -286,108 +286,108 @@
     <value>Perfil</value>
   </data>
   <data name="profileSelectAvatarTitle" xml:space="preserve">
-    <value>Selecciona tu foto de perfil</value>
+    <value>Selecione sua foto de perfil</value>
   </data>
   <data name="profileImageFilter" xml:space="preserve">
-    <value>Filtro de imagen</value>
+    <value>Filtrar imagem</value>
   </data>
   <data name="logoutConfirmMessage" xml:space="preserve">
-    <value>Sesión cerrada correctamente.</value>
+    <value>Sessão encerrada com sucesso.</value>
   </data>
   <data name="logoutTitle" xml:space="preserve">
-    <value>Cerrar sesión</value>
+    <value>Sair</value>
   </data>
   <data name="searching" xml:space="preserve">
-    <value>Buscando...</value>
+    <value>Procurando...</value>
   </data>
   <data name="noResults" xml:space="preserve">
-    <value>No se encontraron resultados</value>
+    <value>Nenhum resultado encontrado</value>
   </data>
   <data name="results" xml:space="preserve">
     <value>Resultados</value>
   </data>
   <data name="addFriendServiceError" xml:space="preserve">
-    <value>Tuvimos un error en el servicio de amigos inténtalo después</value>
+    <value>Ocorreu um erro no FriendService, tente novamente mais tarde</value>
   </data>
   <data name="noConnection" xml:space="preserve">
-    <value>No hay conexión</value>
+    <value>Não há conexão</value>
   </data>
   <data name="nowFriends" xml:space="preserve">
-    <value>Ahora son amigos</value>
+    <value>Agora são amigos</value>
   </data>
   <data name="statusPendingOut" xml:space="preserve">
-    <value>Solicitud enviada</value>
+    <value>Solicitação enviada</value>
   </data>
   <data name="statusPendingIn" xml:space="preserve">
-    <value>Solicitud recibida</value>
+    <value>Solicitação recebida</value>
   </data>
   <data name="stateSuggested" xml:space="preserve">
     <value>Sugerido</value>
   </data>
   <data name="stateAlreadyFriends" xml:space="preserve">
-    <value>Ya son amigos</value>
+    <value>Você já é amigo</value>
   </data>
   <data name="statusAvailable" xml:space="preserve">
-    <value>Disponible</value>
+    <value>Disponível</value>
   </data>
   <data name="statusOffline" xml:space="preserve">
-    <value>Desconectado</value>
+    <value>Off-line</value>
   </data>
   <data name="errorLoadFriends" xml:space="preserve">
-    <value>Error al cargar amigos:</value>
+    <value>Erro ao carregar amigos:</value>
   </data>
   <data name="lobbyTitle" xml:space="preserve">
-    <value>Lobby</value>
+    <value>Salão</value>
   </data>
   <data name="lobbyCreateFailed" xml:space="preserve">
-    <value>No se pudo crear el lobby</value>
+    <value>Não foi possível criar o lobby</value>
   </data>
   <data name="lobbyCreated" xml:space="preserve">
-    <value>El lobby fue creado con éxito</value>
+    <value>O lobby foi criado com sucesso</value>
   </data>
   <data name="lobbyEnterAccessCode" xml:space="preserve">
-    <value>Ingresa un código de acceso</value>
+    <value>Digite um código de acesso</value>
   </data>
   <data name="lobbyJoinFailed" xml:space="preserve">
-    <value>No se pudo unir al lobby</value>
+    <value>Não foi possível entrar no lobby</value>
   </data>
   <data name="lobbyJoined" xml:space="preserve">
-    <value>Te uniste al lobby</value>
+    <value>Você entrou no lobby</value>
   </data>
   <data name="lobbyIdPrefix" xml:space="preserve">
-    <value>LobbyId</value>
+    <value>ID do lobby</value>
   </data>
   <data name="lobbyCodePrefix" xml:space="preserve">
     <value>Código:</value>
   </data>
   <data name="chatCreateOrJoinFirst" xml:space="preserve">
-    <value>Primero crea o únete a un lobby</value>
+    <value>Primeiro crie ou participe de um lobby</value>
   </data>
   <data name="chatSendFailed" xml:space="preserve">
-    <value>No se pudo enviar el mensaje</value>
+    <value>A mensagem não pôde ser enviada</value>
   </data>
   <data name="addFriendSearchTooltip" xml:space="preserve">
-    <value>Busca amigos</value>
+    <value>Pesquisar amigos</value>
   </data>
   <data name="chatTitle" xml:space="preserve">
-    <value>Chat</value>
+    <value>Bater papo</value>
   </data>
   <data name="system" xml:space="preserve">
     <value>Sistema</value>
   </data>
   <data name="lobbyPlayerJoined" xml:space="preserve">
-    <value>Un jugador se unió al lobby</value>
+    <value>Um jogador entrou no lobby</value>
   </data>
   <data name="lobbyPlayerLeft" xml:space="preserve">
-    <value>Un jugador salió del lobby</value>
+    <value>Um jogador saiu do lobby</value>
   </data>
   <data name="player" xml:space="preserve">
-    <value>Jugador</value>
+    <value>Jogador</value>
   </data>
   <data name="btnCreateLobby" xml:space="preserve">
-    <value>Crear lobby</value>
+    <value>Criar lobby</value>
   </data>
   <data name="btnJoinByCode" xml:space="preserve">
-    <value>Únete por un código</value>
+    <value>Participe por um código</value>
   </data>
 </root>
