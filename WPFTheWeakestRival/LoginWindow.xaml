@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFTheWeakestRival"
-        xmlns:language="clr-namespace:WPFTheWeakestRival.Properties.Langs"
+        xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
         mc:Ignorable="d"
         Title="LoginWindow"
         Height="450" Width="850"
@@ -24,8 +24,9 @@
         </StackPanel>
 
         <StackPanel Grid.Column="1" Margin="40,0,40,0" VerticalAlignment="Center" Height="375">
+
             <Label x:Name="lblWelcome"
-                   Content="{x:Static language:Lang.lblWelcome}"
+                   Content="{loc:Loc lblWelcome}"
                    HorizontalAlignment="Center"
                    FontSize="28"
                    FontWeight="Bold"
@@ -39,7 +40,7 @@
                          Padding="8,6"
                          HorizontalContentAlignment="Center"/>
                 <TextBlock x:Name="placeholderEmail"
-                           Text="{x:Static language:Lang.emailPlaceholder}"
+                           Text="{loc:Loc emailPlaceholder}"
                            Foreground="Gray"
                            IsHitTestVisible="False"
                            HorizontalAlignment="Center"
@@ -79,7 +80,7 @@
                          HorizontalContentAlignment="Center"/>
 
                 <TextBlock x:Name="placeholderPassword"
-                           Text="{x:Static language:Lang.passwordPlaceHolder}"
+                           Text="{loc:Loc passwordPlaceHolder}"
                            Foreground="Gray"
                            IsHitTestVisible="False"
                            HorizontalAlignment="Center"
@@ -100,45 +101,53 @@
             </Grid>
 
             <Button x:Name="btnLogin"
-                    Content="{x:Static language:Lang.btnLogin}"
+                    Content="{loc:Loc btnLogin}"
                     Width="120"
                     Margin="0,0,0,10"
                     Background="Transparent"
                     Click="BtnLoginClick"/>
 
             <Button x:Name="btnForgotPassword"
-                    Content="{x:Static language:Lang.forgotPassword}"
+                    Content="{loc:Loc forgotPassword}"
                     Width="164"
                     Background="Transparent"
                     Margin="0,0,0,10"
                     BorderThickness="0"/>
 
             <Button x:Name="btnNotAccount"
-                    Content="{x:Static language:Lang.notAccount}"
+                    Content="{loc:Loc notAccount}"
                     Width="164"
                     Background="Transparent"
                     Margin="0,0,0,10"
                     BorderThickness="0"/>
 
             <Button x:Name="btnRegist"
-                    Content="{x:Static language:Lang.regist}"
+                    Content="{loc:Loc regist}"
                     Width="120"
                     Margin="0,0,0,10"
                     Background="Transparent"
                     Click="RegistrationClick"/>
 
             <Button x:Name="btnPlayAsGuest"
-                    Content="{x:Static language:Lang.playAsGuest}"
+                    Content="{loc:Loc playAsGuest}"
                     Width="140"
                     Background="Transparent"/>
         </StackPanel>
 
+        
         <ComboBox x:Name="cmblanguage"
                   Grid.Column="1"
                   HorizontalAlignment="Left"
                   Margin="280,10,0,0"
                   VerticalAlignment="Top"
                   Width="120"
-                  SelectionChanged="CmbLanguageSelectionChanged"/>
+                  SelectionChanged="CmbLanguageSelectionChanged">
+            
+            <ComboBoxItem Tag="es" Content="{loc:Loc es}" />
+            <ComboBoxItem Tag="en" Content="{loc:Loc en}" />
+            <ComboBoxItem Tag="pt" Content="{loc:Loc pt}" />
+            <ComboBoxItem Tag="it" Content="{loc:Loc it}" />
+            <ComboBoxItem Tag="fr" Content="{loc:Loc fr}" />
+        </ComboBox>
     </Grid>
 </Window>

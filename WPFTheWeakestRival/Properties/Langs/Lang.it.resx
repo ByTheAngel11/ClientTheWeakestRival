@@ -390,4 +390,13 @@
   <data name="btnJoinByCode" xml:space="preserve">
     <value>Iscriviti tramite un codice</value>
   </data>
+  <data name="pt" xml:space="preserve">
+    <value>portoghese</value>
+  </data>
+  <data name="it" xml:space="preserve">
+    <value>Italiano</value>
+  </data>
+  <data name="fr" xml:space="preserve">
+    <value>francese</value>
+  </data>
 </root>
