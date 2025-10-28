@@ -21,14 +21,13 @@ namespace WPFTheWeakestRival
 {
     public partial class LobbyWindow : Window, ILobbyServiceCallback
     {
-        private const double OverlayBlurMaxRadius = 6.0;
-        private const int OverlayFadeInDurationMs = 180;
-        private const int OverlayFadeOutDurationMs = 160;
-        private const int DrawerAnimInMs = 180;
-        private const int DrawerAnimOutMs = 160;
-
-        private const int HeartbeatIntervalSeconds = 30;
-        private const int FriendsRefreshIntervalSeconds = 45;
+        private const double OVERLAY_BLUR_MAX_RADIUS = 6.0;
+        private const int OVERLAY_FADE_IN_DURATION_MS = 180;
+        private const int OVERLAY_FADE_OUT_DURATION_MS = 160;
+        private const int DRAWER_ANIM_IN_MS = 180;
+        private const int DRAWER_ANIM_OUT_MS = 160;
+        private const int HEARTBEAT_INTERVAL_SECONDS = 30;
+        private const int FRIENDS_REFRESH_INTERVAL_SECONDS = 45;
 
         private readonly LobbyServiceClient lobbyClient;
         private readonly FriendServiceClient friendServiceClient;
@@ -68,12 +67,12 @@ namespace WPFTheWeakestRival
 
             RefreshProfileButtonAvatar();
 
-            presenceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(HeartbeatIntervalSeconds) };
+            presenceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(HEARTBEAT_INTERVAL_SECONDS) };
             presenceTimer.Tick += async (_, __) => await SendHeartbeatAsync();
             presenceTimer.Start();
             _ = SendHeartbeatAsync();
 
-            friendsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(FriendsRefreshIntervalSeconds) };
+            friendsTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(FRIENDS_REFRESH_INTERVAL_SECONDS) };
             friendsTimer.Tick += async (_, __) =>
             {
                 if (friendsDrawerHost.Visibility == Visibility.Visible)
@@ -136,14 +135,14 @@ namespace WPFTheWeakestRival
 
             pnlOverlayHost.BeginAnimation(
                 OpacityProperty,
-                new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(OverlayFadeInDurationMs))
+                new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(OVERLAY_FADE_IN_DURATION_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(0, OverlayBlurMaxRadius, TimeSpan.FromMilliseconds(OverlayFadeInDurationMs))
+                new DoubleAnimation(0, OVERLAY_BLUR_MAX_RADIUS, TimeSpan.FromMilliseconds(OVERLAY_FADE_IN_DURATION_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
@@ -151,7 +150,7 @@ namespace WPFTheWeakestRival
 
         private void HideOverlayPanel()
         {
-            var fadeOut = new DoubleAnimation(pnlOverlayHost.Opacity, 0, TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs))
+            var fadeOut = new DoubleAnimation(pnlOverlayHost.Opacity, 0, TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
             {
                 EasingFunction = new QuadraticEase()
             };
@@ -173,7 +172,7 @@ namespace WPFTheWeakestRival
             {
                 currentBlur.BeginAnimation(
                     BlurEffect.RadiusProperty,
-                    new DoubleAnimation(currentBlur.Radius, 0, TimeSpan.FromMilliseconds(OverlayFadeOutDurationMs))
+                    new DoubleAnimation(currentBlur.Radius, 0, TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
                     {
                         EasingFunction = new QuadraticEase()
                     });
@@ -270,7 +269,7 @@ namespace WPFTheWeakestRival
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(overlayBlur.Radius, 3.0, TimeSpan.FromMilliseconds(DrawerAnimInMs))
+                new DoubleAnimation(overlayBlur.Radius, 3.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
@@ -311,7 +310,7 @@ namespace WPFTheWeakestRival
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(overlayBlur.Radius, 0.0, TimeSpan.FromMilliseconds(DrawerAnimOutMs))
+                new DoubleAnimation(overlayBlur.Radius, 0.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
