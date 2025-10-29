@@ -394,6 +394,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a French.
+        /// </summary>
+        public static string fr {
+            get {
+                return ResourceManager.GetString("fr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Error on the registration.
         /// </summary>
         public static string generalRegistError {
@@ -408,6 +417,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string imageLogo {
             get {
                 return ResourceManager.GetString("imageLogo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Italian.
+        /// </summary>
+        public static string it {
+            get {
+                return ResourceManager.GetString("it", resourceCulture);
             }
         }
         
@@ -714,6 +732,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string profileUpdated {
             get {
                 return ResourceManager.GetString("profileUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Portuguese.
+        /// </summary>
+        public static string pt {
+            get {
+                return ResourceManager.GetString("pt", resourceCulture);
             }
         }
         

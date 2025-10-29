@@ -292,7 +292,7 @@
     <value>Filtro de imagen</value>
   </data>
   <data name="logoutConfirmMessage" xml:space="preserve">
-    <value>Sesión cerrada correctamente</value>
+    <value>Sesión cerrada correctamente.</value>
   </data>
   <data name="logoutTitle" xml:space="preserve">
     <value>Cerrar sesión</value>
@@ -389,5 +389,14 @@
   </data>
   <data name="btnJoinByCode" xml:space="preserve">
     <value>Únete por un código</value>
+  </data>
+  <data name="pt" xml:space="preserve">
+    <value>portugués</value>
+  </data>
+  <data name="it" xml:space="preserve">
+    <value>italiano</value>
+  </data>
+  <data name="fr" xml:space="preserve">
+    <value>Francés</value>
   </data>
 </root>

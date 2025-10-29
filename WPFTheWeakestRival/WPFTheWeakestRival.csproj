@@ -91,6 +91,8 @@
     <Compile Include="EmailVerificationWindow.xaml.cs">
       <DependentUpon>EmailVerificationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Globalization\LocalizationManager.cs" />
+    <Compile Include="Globalization\LocExtension.cs" />
     <Compile Include="Helpers\UiChat.cs" />
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
@@ -176,6 +178,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Properties\Langs\Lang.es.resx" />
+    <EmbeddedResource Include="Properties\Langs\Lang.fr.resx" />
+    <EmbeddedResource Include="Properties\Langs\Lang.it.resx" />
+    <EmbeddedResource Include="Properties\Langs\Lang.pt.resx" />
     <EmbeddedResource Include="Properties\Langs\Lang.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Lang.Designer.cs</LastGenOutput>

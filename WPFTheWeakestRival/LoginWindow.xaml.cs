@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
+using WPFTheWeakestRival.Globalization; // <<— para LocalizationManager
 using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
@@ -16,20 +17,29 @@ namespace WPFTheWeakestRival
         public LoginWindow()
         {
             InitializeComponent();
-            UpdateMainImage();
 
-            cmblanguage.Items.Add(Lang.es);
-            cmblanguage.Items.Add(Lang.en);
-            cmblanguage.SelectedIndex = 0;
+            // Ajusta selección inicial del combo según la cultura actual
+            var current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
+            cmblanguage.SelectedIndex = (current == "es") ? 0 : 1;
 
-            cmblanguage.SelectionChanged += CmbLanguageSelectionChanged;
+            UpdateMainImage(); // carga logo según idioma actual
+        }
+
+        private void CmbLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cmblanguage.SelectedItem is ComboBoxItem item)
+            {
+                var code = (item.Tag as string) ?? "es";
+                LocalizationManager.Current.SetCulture(code); // refresca TODOS los {loc:Loc ...}
+                UpdateMainImage(); // re-resuelve Lang.imageLogo con nueva cultura
+            }
         }
 
         private void UpdateMainImage()
         {
             try
             {
-                var path = Lang.imageLogo;
+                var path = Lang.imageLogo; // depende de Lang.Culture (ya sincronizada por LocalizationManager)
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     logoImage.Source = null;
@@ -41,41 +51,6 @@ namespace WPFTheWeakestRival
             {
                 logoImage.Source = null;
             }
-        }
-
-        private void CmbLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var selected = cmblanguage.SelectedItem as string;
-            Lang.Culture = string.Equals(selected, Lang.es, StringComparison.Ordinal)
-                ? new CultureInfo("es")
-                : new CultureInfo("en");
-
-            UpdateUiLanguage();
-            UpdateMainImage();
-        }
-
-        private void UpdateUiLanguage()
-        {
-            lblWelcome.Content = Lang.lblWelcome;
-
-            if (placeholderEmail != null)
-                placeholderEmail.Text = Lang.emailPlaceholder;
-
-            if (placeholderPassword != null)
-                placeholderPassword.Text = Lang.passwordPlaceHolder;
-
-            btnLogin.Content = Lang.btnLogin;
-            btnForgotPassword.Content = Lang.forgotPassword;
-            btnNotAccount.Content = Lang.notAccount;
-            btnRegist.Content = Lang.regist;
-            btnPlayAsGuest.Content = Lang.playAsGuest;
-
-            cmblanguage.SelectionChanged -= CmbLanguageSelectionChanged;
-            cmblanguage.Items.Clear();
-            cmblanguage.Items.Add(Lang.es);
-            cmblanguage.Items.Add(Lang.en);
-            cmblanguage.SelectedIndex = Lang.Culture.TwoLetterISOLanguageName == "es" ? 0 : 1;
-            cmblanguage.SelectionChanged += CmbLanguageSelectionChanged;
         }
 
         private void RegistrationClick(object sender, RoutedEventArgs e)
