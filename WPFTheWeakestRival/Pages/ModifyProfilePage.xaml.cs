@@ -46,7 +46,7 @@ namespace WPFTheWeakestRival
                 txtEmail.Text = profile.Email ?? string.Empty;
                 txtDisplayName.Text = profile.DisplayName ?? string.Empty;
                 txtAvatarUrl.Text = profile.ProfileImageUrl ?? string.Empty;
-                CargarPreviewDesdeUrl(txtAvatarUrl.Text);
+                LoadPreviewFromURL(txtAvatarUrl.Text);
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
@@ -119,7 +119,7 @@ namespace WPFTheWeakestRival
             var result = dialog.ShowDialog();
             if (result == true)
             {
-                CargarPreviewDesdeArchivo(dialog.FileName);
+                LoadPreviewFromFile(dialog.FileName);
                 txtAvatarUrl.Text = new Uri(dialog.FileName, UriKind.Absolute).AbsoluteUri;
             }
         }
@@ -130,7 +130,7 @@ namespace WPFTheWeakestRival
             imgPreview.Source = null;
         }
 
-        private void CargarPreviewDesdeArchivo(string filePath)
+        private void LoadPreviewFromFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
             {
@@ -141,7 +141,7 @@ namespace WPFTheWeakestRival
             imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(filePath, 128);
         }
 
-        private void CargarPreviewDesdeUrl(string source)
+        private void LoadPreviewFromURL(string source)
         {
             imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(source, 128);
         }
