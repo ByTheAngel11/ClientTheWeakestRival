@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -78,6 +79,7 @@ namespace WPFTheWeakestRival
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
+            // TODO: Settings page
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -264,7 +266,7 @@ namespace WPFTheWeakestRival
             txtRequestsCount.Text = pendingRequests.ToString();
         }
 
-        private async void OpenFriendsDrawer()
+        private async Task OpenFriendsDrawer()
         {
             if (friendsDrawerHost.Visibility == Visibility.Visible) return;
 
