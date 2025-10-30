@@ -59,7 +59,10 @@ namespace WPFTheWeakestRival.Infrastructure
                     Device = "WPF"
                 });
             }
-            catch { }
+            catch 
+            {
+                // Ignore
+            }
         }
 
         private async Task RefreshFriendsSafeAsync()
@@ -96,9 +99,18 @@ namespace WPFTheWeakestRival.Infrastructure
                 var pending = Math.Max(0, res.PendingIncoming?.Length ?? 0);
                 FriendsUpdated?.Invoke(list, pending);
             }
-            catch (FaultException<FriendService.ServiceFault>) { }
-            catch (CommunicationException) { }
-            catch (Exception) { }
+            catch (FaultException<FriendService.ServiceFault>) 
+            {
+                // Ignore
+            }
+            catch (CommunicationException) 
+            {
+                // Ignore
+            }
+            catch (Exception) 
+            {
+                // Ignore
+            }
         }
 
         public void Dispose()
@@ -111,7 +123,14 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             catch
             {
-                try { client.Abort(); } catch { }
+                try 
+                { 
+                    client.Abort(); 
+                } 
+                catch 
+                {
+                    // Ignore
+                }
             }
         }
     }

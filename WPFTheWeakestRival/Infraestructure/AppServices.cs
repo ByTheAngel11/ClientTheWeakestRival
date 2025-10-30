@@ -9,8 +9,22 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public static void DisposeAll()
         {
-            try { Friends?.Dispose(); } catch { }
-            try { Lobby?.Dispose(); } catch { }
+            try 
+            { 
+                Friends?.Dispose(); 
+            } 
+            catch 
+            {
+                // Ignore
+            }
+            try 
+            { 
+                Lobby?.Dispose(); 
+            } 
+            catch 
+            {
+                // Ignore
+            }
         }
     }
 }

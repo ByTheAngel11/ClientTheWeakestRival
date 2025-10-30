@@ -105,22 +105,22 @@ namespace WPFTheWeakestRival.Infrastructure
             return client.GetMyProfile(token);
         }
 
-        void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobbyInfo)
+        void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
         {
-            if (lobbyInfo != null)
+            if (lobby != null)
             {
-                CurrentLobbyId = lobbyInfo.LobbyId;
-                if (!string.IsNullOrWhiteSpace(lobbyInfo.AccessCode))
+                CurrentLobbyId = lobby.LobbyId;
+                if (!string.IsNullOrWhiteSpace(lobby.AccessCode))
                 {
-                    CurrentAccessCode = lobbyInfo.AccessCode;
+                    CurrentAccessCode = lobby.AccessCode;
                 }
             }
-            LobbyUpdated?.Invoke(lobbyInfo);
+            LobbyUpdated?.Invoke(lobby);
         }
 
-        void ILobbyServiceCallback.OnPlayerJoined(PlayerSummary playerSummary)
+        void ILobbyServiceCallback.OnPlayerJoined(PlayerSummary player)
         {
-            PlayerJoined?.Invoke(playerSummary);
+            PlayerJoined?.Invoke(player);
         }
 
         void ILobbyServiceCallback.OnPlayerLeft(Guid playerId)
@@ -128,9 +128,9 @@ namespace WPFTheWeakestRival.Infrastructure
             PlayerLeft?.Invoke(playerId);
         }
 
-        void ILobbyServiceCallback.OnChatMessageReceived(ChatMessage chatMessage)
+        void ILobbyServiceCallback.OnChatMessageReceived(ChatMessage message)
         {
-            ChatMessageReceived?.Invoke(chatMessage);
+            ChatMessageReceived?.Invoke(message);
         }
 
         public void Dispose()
@@ -148,7 +148,14 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             catch
             {
-                try { client.Abort(); } catch { }
+                try 
+                { 
+                    client.Abort(); 
+                } 
+                catch 
+                {
+                    // Ignore
+                }
             }
         }
     }
