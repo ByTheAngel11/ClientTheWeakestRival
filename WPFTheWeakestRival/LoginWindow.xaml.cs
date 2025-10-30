@@ -158,8 +158,8 @@ namespace WPFTheWeakestRival
 
                 AppSession.CurrentToken = token;
 
-                var lobby = new LobbyWindow();
-                lobby.Show();
+                var main = new MainMenuWindow();
+                main.Show();
                 Close();
             }
             finally

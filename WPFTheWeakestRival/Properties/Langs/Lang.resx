@@ -399,4 +399,34 @@
   <data name="fr" xml:space="preserve">
     <value>French</value>
   </data>
+  <data name="playOptionsTitle" xml:space="preserve">
+    <value>Play Options</value>
+  </data>
+  <data name="matchStartingSoon" xml:space="preserve">
+    <value>Match Starting soon...</value>
+  </data>
+  <data name="mainMenuTitle" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
+  <data name="noLobby" xml:space="preserve">
+    <value>No Lobby</value>
+  </data>
+  <data name="lobbyJoinByCode" xml:space="preserve">
+    <value>Join a lobby by code</value>
+  </data>
+  <data name="playChoose" xml:space="preserve">
+    <value>What you want to do?</value>
+  </data>
+  <data name="playEnterCode" xml:space="preserve">
+    <value>Enter de access code</value>
+  </data>
+  <data name="startMatch" xml:space="preserve">
+    <value>Start match</value>
+  </data>
+  <data name="chatPlaceholder" xml:space="preserve">
+    <value>Write and press enter...</value>
+  </data>
+  <data name="featureNotImplemented" xml:space="preserve">
+    <value>Feature not implemented</value>
+  </data>
 </root>

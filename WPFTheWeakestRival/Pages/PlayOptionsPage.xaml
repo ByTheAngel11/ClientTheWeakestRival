@@ -1,0 +1,36 @@
+﻿<Page x:Class="WPFTheWeakestRival.Pages.PlayOptionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
+      Title="{loc:Loc playOptionsTitle}">
+    <Grid Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{loc:Loc playChoose}"
+                   FontSize="16" FontWeight="SemiBold"/>
+
+        <Button Grid.Row="2" x:Name="btnCreate"
+                Height="38" Margin="0,0,0,6"
+                Content="{loc:Loc btnCreateLobby}"
+                Click="BtnCreateClick"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBox x:Name="txtCode"
+                     Width="180" Height="32"
+                     VerticalContentAlignment="Center"
+                     MaxLength="12"
+                     ToolTip="{loc:Loc playEnterCodeTip}"
+                     Margin="0,0,8,0"/>
+            <Button x:Name="btnJoin"
+                    Height="32" Width="160"
+                    Content="{loc:Loc lobbyJoinByCode}"
+                    Click="BtnJoinClick"/>
+        </StackPanel>
+    </Grid>
+</Page>

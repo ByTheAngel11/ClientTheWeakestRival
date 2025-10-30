@@ -96,6 +96,11 @@
     <Compile Include="Helpers\UiChat.cs" />
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
+    <Compile Include="Infraestructure\AppServices.cs" />
+    <Compile Include="Infraestructure\FriendManager.cs" />
+    <Compile Include="Infraestructure\FriendsDrawer.cs" />
+    <Compile Include="Infraestructure\LobbyEventBus.cs" />
+    <Compile Include="Infraestructure\LobbyHub.cs" />
     <Compile Include="LobbyCallback.cs" />
     <Compile Include="LobbyWindow.xaml.cs">
       <DependentUpon>LobbyWindow.xaml</DependentUpon>
@@ -103,6 +108,10 @@
     <Compile Include="LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MainMenuWindow.xaml.cs">
+      <DependentUpon>MainMenuWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FriendItem.cs" />
     <Compile Include="Pages\ModifyProfilePage.xaml.cs">
       <DependentUpon>ModifyProfilePage.xaml</DependentUpon>
     </Compile>
@@ -111,6 +120,9 @@
     </Compile>
     <Compile Include="Pages\FriendRequestsPage.xaml.cs">
       <DependentUpon>FriendRequestsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\PlayOptionsPage.xaml.cs">
+      <DependentUpon>PlayOptionsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\Langs\Lang.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -131,6 +143,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainMenuWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -155,6 +171,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\FriendRequestsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\PlayOptionsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -461,6 +481,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Icons\friends.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Properties\Images\logo_fr.png" />
+    <Resource Include="Properties\Images\logo_it.png" />
+    <Resource Include="Properties\Images\logo_pt.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

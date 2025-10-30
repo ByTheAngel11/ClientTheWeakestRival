@@ -196,7 +196,7 @@
     <value>Errore nella registrazione</value>
   </data>
   <data name="imageLogo" xml:space="preserve">
-    <value>#TODO</value>
+    <value>/Properties/Images/logo_it.png</value>
   </data>
   <data name="colorLogin" xml:space="preserve">
     <value>#cb102c</value>
@@ -398,5 +398,35 @@
   </data>
   <data name="fr" xml:space="preserve">
     <value>francese</value>
+  </data>
+  <data name="playOptionsTitle" xml:space="preserve">
+    <value>Opzioni di gioco</value>
+  </data>
+  <data name="matchStartingSoon" xml:space="preserve">
+    <value>Partita che inizierà presto...</value>
+  </data>
+  <data name="mainMenuTitle" xml:space="preserve">
+    <value>Menù principale</value>
+  </data>
+  <data name="noLobby" xml:space="preserve">
+    <value>Nessuna lobby</value>
+  </data>
+  <data name="lobbyJoinByCode" xml:space="preserve">
+    <value>Partecipa a una lobby tramite codice</value>
+  </data>
+  <data name="playChoose" xml:space="preserve">
+    <value>Cosa vuoi fare?</value>
+  </data>
+  <data name="playEnterCode" xml:space="preserve">
+    <value>Inserisci il codice di accesso</value>
+  </data>
+  <data name="startMatch" xml:space="preserve">
+    <value>Inizia la partita</value>
+  </data>
+  <data name="chatPlaceholder" xml:space="preserve">
+    <value>Scrivi e premi invio...</value>
+  </data>
+  <data name="featureNotImplemented" xml:space="preserve">
+    <value>Funzionalità non implementata</value>
   </data>
 </root>

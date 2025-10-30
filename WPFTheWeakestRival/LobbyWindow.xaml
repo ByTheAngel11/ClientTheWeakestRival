@@ -1,41 +1,24 @@
 ﻿<Window x:Class="WPFTheWeakestRival.LobbyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        Title="Lobby"
+        xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
+        Title="{loc:Loc lobbyTitle}"
         Height="540" Width="1100"
         MinWidth="1024" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
-        TextOptions.TextRenderingMode="Aliased">
-
+        TextOptions.TextRenderingMode="Aliased"
+        KeyDown="Window_KeyDown">
     <Window.Resources>
-        <sys:Double x:Key="TopBarButtonWidth">130</sys:Double>
-        <sys:Double x:Key="TopBarButtonHeight">32</sys:Double>
-        <Thickness x:Key="TopBarButtonMargin">0,0,12,0</Thickness>
-
         <SolidColorBrush x:Key="PresenceOnlineBg" Color="#E9FFEF"/>
         <SolidColorBrush x:Key="PresenceOnlineFg" Color="#2FA35A"/>
         <SolidColorBrush x:Key="PresenceOfflineBg" Color="#E9F2FF"/>
         <SolidColorBrush x:Key="PresenceOfflineFg" Color="#2F5AA3"/>
-
-        <BitmapImage x:Key="SettingsIcon" UriSource="pack://application:,,,/Assets/Icons/settings.png" />
+        <BitmapImage x:Key="SettingsIcon" UriSource="pack://application:,,,/Assets/Icons/settings.png"/>
         <BitmapImage x:Key="FriendsIcon"  UriSource="pack://application:,,,/Assets/Icons/friends.png"/>
-
-        <sys:Double x:Key="AvatarSize">28</sys:Double>
         <SolidColorBrush x:Key="OverlayBackdropBrush" Color="#99000000"/>
-        <SolidColorBrush x:Key="OverlayCardBackgroundBrush" Color="#FAFFFFFF"/>
-        <CornerRadius x:Key="OverlayCardCornerRadius">14</CornerRadius>
-        <sys:Double x:Key="OverlayShadowBlur">16</sys:Double>
-        <sys:Double x:Key="OverlayShadowOpacity">0.45</sys:Double>
-
-        <Style x:Key="TopBarButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="{StaticResource TopBarButtonWidth}"/>
-            <Setter Property="Height" Value="{StaticResource TopBarButtonHeight}"/>
-            <Setter Property="Margin" Value="{StaticResource TopBarButtonMargin}"/>
-        </Style>
-
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFFFF"/>
         <Style x:Key="OverlayCloseButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="32"/>
             <Setter Property="Height" Value="32"/>
@@ -45,64 +28,6 @@
             <Setter Property="Content" Value="✕"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
-
-        <FontFamily x:Key="IconFont">Segoe MDL2 Assets</FontFamily>
-
-        <Style x:Key="TopBarIconButtonStyle" TargetType="Button" BasedOn="{StaticResource TopBarButtonStyle}">
-            <Setter Property="Width" Value="40"/>
-            <Setter Property="Height" Value="{StaticResource TopBarButtonHeight}"/>
-            <Setter Property="FontFamily" Value="{StaticResource IconFont}"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="Content" Value="&#xE713;"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="ToolTip" Value="Configuración"/>
-            <Setter Property="AutomationProperties.Name" Value="Configuración"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#22000000"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#33000000"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="AvatarButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="{StaticResource AvatarSize}"/>
-            <Setter Property="Height" Value="{StaticResource AvatarSize}"/>
-            <Setter Property="Margin" Value="{StaticResource TopBarButtonMargin}"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="ToolTip" Value="Perfil"/>
-            <Setter Property="AutomationProperties.Name" Value="Perfil"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Border x:Name="HoverRing" CornerRadius="999" Background="#22000000" Opacity="0"/>
-                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="HoverRing" Property="Opacity" Value="1"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="HoverRing" Property="Background" Value="#33000000"/>
-                                <Setter TargetName="HoverRing" Property="Opacity" Value="1"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.6"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <DataTemplate x:Key="FriendItemTemplate">
             <Grid Margin="0,4">
                 <Grid.ColumnDefinitions>
@@ -110,29 +35,17 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
                 <Border Width="40" Height="40" CornerRadius="10" Background="#FFEFEFEF">
                     <Image Source="{Binding Avatar}" Stretch="UniformToFill" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Border>
-
                 <StackPanel Grid.Column="1" Margin="8,0,8,0">
                     <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
                     <TextBlock Text="{Binding StatusText}" Opacity="0.7" FontSize="12"/>
                 </StackPanel>
-
-                <Border x:Name="PresencePill"
-                        Grid.Column="2"
-                        Background="{StaticResource PresenceOfflineBg}"
-                        CornerRadius="8"
-                        Padding="8,3"
-                        Margin="0,0,4,0">
-                    <TextBlock x:Name="PresenceText"
-                               Text="{Binding Presence}"
-                               FontSize="12"
-                               Foreground="{StaticResource PresenceOfflineFg}"/>
+                <Border x:Name="PresencePill" Grid.Column="2" Background="{StaticResource PresenceOfflineBg}" CornerRadius="8" Padding="8,3" Margin="0,0,4,0">
+                    <TextBlock x:Name="PresenceText" Text="{Binding Presence}" FontSize="12" Foreground="{StaticResource PresenceOfflineFg}"/>
                 </Border>
             </Grid>
-
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsOnline}" Value="True">
                     <Setter TargetName="PresencePill" Property="Background" Value="{StaticResource PresenceOnlineBg}"/>
@@ -140,244 +53,119 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
-
         <Storyboard x:Key="sbOpenFriendsDrawer">
-            <DoubleAnimation Storyboard.TargetName="friendsDrawerTT" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.18" />
-            <DoubleAnimation Storyboard.TargetName="friendsDrawerHost" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.18" />
+            <DoubleAnimation Storyboard.TargetName="friendsDrawerTT" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.18"/>
+            <DoubleAnimation Storyboard.TargetName="friendsDrawerHost" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.18"/>
         </Storyboard>
-
         <Storyboard x:Key="sbCloseFriendsDrawer">
-            <DoubleAnimation Storyboard.TargetName="friendsDrawerTT" Storyboard.TargetProperty="X" To="340" Duration="0:0:0.16" />
-            <DoubleAnimation Storyboard.TargetName="friendsDrawerHost" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.16" />
+            <DoubleAnimation Storyboard.TargetName="friendsDrawerTT" Storyboard.TargetProperty="X" To="340" Duration="0:0:0.16"/>
+            <DoubleAnimation Storyboard.TargetName="friendsDrawerHost" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.16"/>
         </Storyboard>
     </Window.Resources>
 
     <Grid Margin="12">
-        <Grid x:Name="grdMainArea">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Margin="0,0,0,8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Button x:Name="btnSettings"
-                            Style="{StaticResource TopBarIconButtonStyle}"
-                            Height="51" Width="57"
-                            Margin="0,0,12,0"
-                            Click="BtnSettingsClick"
-                            ToolTip="Configuración">
-                        <Image Source="{StaticResource SettingsIcon}"
-                               Width="52" Height="51"
-                               Stretch="Uniform"
-                               SnapsToDevicePixels="True"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
-                    </Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Button x:Name="btnSettings" Width="40" Height="32" Click="BtnSettingsClick">
+                    <Image Source="{StaticResource SettingsIcon}" Stretch="Uniform" Width="22" Height="22"/>
+                </Button>
+            </StackPanel>
 
-                    <Button Style="{StaticResource TopBarButtonStyle}" Content="Personalización"/>
-                    <Button Style="{StaticResource TopBarButtonStyle}" Width="130" Content="Marcador"/>
-                </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button x:Name="btnFriends" Width="40" Height="32" Click="BtnFriendsClick" Margin="0,0,8,0">
+                    <Image Source="{StaticResource FriendsIcon}" Stretch="Uniform" Width="22" Height="22"/>
+                </Button>
+                <Button x:Name="btnProfile" Width="40" Height="40" Click="BtnModifyProfileClick">
+                    <Image x:Name="imgAvatar" Width="40" Height="40" Stretch="UniformToFill" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Button>
+            </StackPanel>
+        </Grid>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button x:Name="btnFriends"
-                            Style="{StaticResource TopBarIconButtonStyle}"
-                            Height="51" Width="57"
-                            Click="BtnFriendsClick"
-                            ToolTip="Amigos">
-                        <Image Source="{StaticResource FriendsIcon}"
-                               Width="47" Height="49"
-                               Stretch="Uniform"
-                               SnapsToDevicePixels="True"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
-                    </Button>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="380"/>
+            </Grid.ColumnDefinitions>
 
-                    <Button x:Name="btnProfile"
-                            Style="{StaticResource AvatarButtonStyle}"
-                            Margin="12,0,0,0"
-                            Click="BtnModifyProfileClick"
-                            Height="48" Width="48">
-                        <Image x:Name="imgAvatar"
-                               Width="48" Height="48"
-                               Stretch="UniformToFill"
-                               SnapsToDevicePixels="True"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
-                    </Button>
-                </StackPanel>
+            <Grid Grid.Column="0" Margin="8">
+                <Image Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="btnStart" Content="{loc:Loc startMatch}" Width="180" Height="46" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8" Click="BtnStartMatchClick"/>
             </Grid>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="380"/>
-                </Grid.ColumnDefinitions>
+            <Border Grid.Column="1" Margin="8" Background="{StaticResource CardBackgroundBrush}" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="8">
+                <Grid Margin="10" MinWidth="360">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Column="0" Margin="8">
-                    <Image Width="200" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button Content="Jugar" Width="180" Height="46" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"/>
-                </Grid>
-
-                <Border Grid.Column="1" Margin="8" Background="#FFFFFFFF" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="8">
-                    <Grid Margin="10" MinWidth="360">
+                    <Grid Grid.Row="0" Margin="0,0,0,6">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="8"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="40"/>
                         </Grid.RowDefinitions>
-
-                        <Grid Grid.Row="0" Margin="0,0,0,6">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0"
-                                       x:Name="txtLobbyHeader"
-                                       Text="Sin lobby"
-                                       FontSize="16"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,6"/>
-
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="130"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="150"/>
-                                </Grid.ColumnDefinitions>
-
-                                <Button x:Name="btnCreateLobby"
-                                        Grid.Column="0"
-                                        Content="Crear lobby"
-                                        Height="30"
-                                        Click="BtnCreateLobbyClick"/>
-
-                                <TextBox x:Name="txtJoinCode"
-                                         Grid.Column="1"
-                                         Height="30"
-                                         MaxLength="12"
-                                         VerticalContentAlignment="Center"
-                                         ToolTip="Código de acceso (8–12 caracteres)"
-                                         Grid.ColumnSpan="4"
-                                         Margin="5,0,146,0"/>
-
-                                <Button x:Name="btnJoinByCode"
-                                        Grid.Column="4"
-                                        Content="Unirse por código"
-                                        Height="30"
-                                        Click="BtnJoinByCodeClick"
-                                        Margin="10,0,18,0"/>
-                            </Grid>
-                        </Grid>
-
-                        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,2,0,0">
-                            <TextBlock x:Name="txtLobbyId"    FontSize="11" Opacity="0.75"/>
+                        <TextBlock Grid.Row="0" x:Name="txtLobbyHeader" Text="{loc:Loc lobbyTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
                             <TextBlock x:Name="txtAccessCode" FontSize="11" Opacity="0.75"/>
                         </StackPanel>
-
-                        <ListBox Grid.Row="3"
-                                 x:Name="lstChatMessages"
-                                 Margin="0,4,0,0"
-                                 BorderBrush="#DDDDDD" BorderThickness="1"
-                                 Padding="6"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                 VirtualizingPanel.IsVirtualizing="True"
-                                 VirtualizingPanel.ScrollUnit="Pixel">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Margin="0,3">
-                                        <TextBlock>
-                                            <Run Text="{Binding Author}" FontWeight="SemiBold"/>
-                                            <Run Text=" · "/>
-                                            <Run Text="{Binding Time}"/>
-                                        </TextBlock>
-                                        <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-
-                        <Grid Grid.Row="4" Margin="0,6,0,0">
-                            <Border Background="#FFFFFFFF" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4"/>
-                            <TextBox x:Name="txtChatInput"
-                                     Margin="4"
-                                     BorderThickness="0"
-                                     VerticalContentAlignment="Center"
-                                     KeyDown="TxtChatInputKeyDown"/>
-                            <TextBlock Text="Escribe y presiona Enter..."
-                                       Margin="10,0,0,0"
-                                       Foreground="#99000000"
-                                       VerticalAlignment="Center"
-                                       IsHitTestVisible="False">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Text, ElementName=txtChatInput}" Value="">
-                                                <Setter Property="Visibility" Value="Visible"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=txtChatInput}" Value="True">
-                                                <Setter Property="Foreground" Value="#55000000"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
                     </Grid>
-                </Border>
-            </Grid>
-        </Grid>
 
-        <Grid x:Name="pnlOverlayHost" Visibility="Collapsed" Opacity="0" Panel.ZIndex="99">
-            <Rectangle Fill="{StaticResource OverlayBackdropBrush}"/>
-            <Border Width="700" Height="420"
-                    Background="{StaticResource OverlayCardBackgroundBrush}"
-                    CornerRadius="{StaticResource OverlayCardCornerRadius}"
-                    Padding="16"
-                    HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="{StaticResource OverlayShadowBlur}" ShadowDepth="0" Opacity="{StaticResource OverlayShadowOpacity}"/>
-                </Border.Effect>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="2" x:Name="lstChatMessages" Margin="0,4,0,0" BorderBrush="#DDDDDD" BorderThickness="1" Padding="6" ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,3">
+                                    <TextBlock>
+                                        <Run Text="{Binding Author}" FontWeight="SemiBold"/>
+                                        <Run Text=" · "/>
+                                        <Run Text="{Binding Time}"/>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
 
-                    <DockPanel LastChildFill="False" Margin="0,0,0,12">
-                        <TextBlock Text="{Binding ElementName=frmOverlayFrame, Path=Content.Title, FallbackValue=Página}"
-                                   FontSize="22" FontWeight="Bold"
-                                   DockPanel.Dock="Left" VerticalAlignment="Center"/>
-                        <Button Style="{StaticResource OverlayCloseButtonStyle}" DockPanel.Dock="Right" Click="CloseOverlayClick"/>
-                    </DockPanel>
-
-                    <Frame x:Name="frmOverlayFrame" Grid.Row="1" NavigationUIVisibility="Hidden" Background="Transparent"/>
+                    <Grid Grid.Row="3" Margin="0,6,0,0">
+                        <Border Background="#FFFFFFFF" BorderBrush="#DDDDDD" BorderThickness="1" CornerRadius="4"/>
+                        <TextBox x:Name="txtChatInput" Margin="4" BorderThickness="0" VerticalContentAlignment="Center" KeyDown="TxtChatInputKeyDown"/>
+                        <TextBlock Text="{loc:Loc chatPlaceholder}" Margin="10,0,0,0" Foreground="#99000000" VerticalAlignment="Center" IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=txtChatInput}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=txtChatInput}" Value="True">
+                                            <Setter Property="Foreground" Value="#55000000"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
 
         <Grid x:Name="friendsDrawerHost" Visibility="Collapsed" Opacity="0" Panel.ZIndex="95">
             <Rectangle x:Name="friendsDimmer" Fill="{StaticResource OverlayBackdropBrush}" MouseDown="FriendsDimmerMouseDown"/>
-
-            <Border x:Name="friendsDrawer"
-                    Width="340"
-                    Background="#FFFFFFFF"
-                    CornerRadius="14,0,0,14"
-                    Padding="14"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Stretch">
+            <Border x:Name="friendsDrawer" Width="340" Background="#FFFFFFFF" CornerRadius="14,0,0,14" Padding="14" HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="friendsDrawerTT" X="340"/>
                 </Border.RenderTransform>
-
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -386,33 +174,23 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,10">
-                        <TextBlock Text="Amigos" FontSize="20" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Loc friends}" FontSize="20" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center"/>
                         <Button Content="✕" Style="{StaticResource OverlayCloseButtonStyle}" DockPanel.Dock="Right" Click="BtnCloseFriendsClick"/>
                     </DockPanel>
 
                     <Grid Grid.Row="1">
                         <StackPanel x:Name="friendsEmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16" Visibility="Collapsed">
-                            <TextBlock Text="Sin amigos" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Envía invitaciones" Opacity="0.75" Margin="0,4,0,0" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc noFriends}" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{loc:Loc inviteFriends}" Opacity="0.75" Margin="0,4,0,0" HorizontalAlignment="Center"/>
                         </StackPanel>
-
-                        <ListBox x:Name="lstFriends"
-                                 ItemTemplate="{StaticResource FriendItemTemplate}"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                 VirtualizingPanel.IsVirtualizing="True"
-                                 VirtualizingPanel.ScrollUnit="Pixel"/>
+                        <ListBox x:Name="lstFriends" ItemTemplate="{StaticResource FriendItemTemplate}" ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"/>
                     </Grid>
 
                     <StackPanel Grid.Row="2" Margin="0,10,0,0">
-                        <Button x:Name="btnSendFriendRequest"
-                                Height="36"
-                                Margin="0,0,0,8"
-                                Content="Enviar solicitud"
-                                Click="BtnSendFriendRequestClick"/>
-
+                        <Button x:Name="btnSendFriendRequest" Height="36" Margin="0,0,0,8" Content="{loc:Loc sendRequest}" Click="BtnSendFriendRequestClick"/>
                         <Button x:Name="btnViewRequests" Height="36" Click="BtnViewRequestsClick">
                             <Grid>
-                                <TextBlock Text="Solicitudes" VerticalAlignment="Center" Margin="0,0,36,0"/>
+                                <TextBlock Text="{loc:Loc requests}" VerticalAlignment="Center" Margin="0,0,36,0"/>
                                 <Border Background="#FFEFEFEF" CornerRadius="10" Padding="6,2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                     <TextBlock x:Name="txtRequestsCount" Text="0" FontWeight="Bold"/>
                                 </Border>

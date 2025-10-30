@@ -223,6 +223,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Write and press enter....
+        /// </summary>
+        public static string chatPlaceholder {
+            get {
+                return ResourceManager.GetString("chatPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a The message could not be sent.
         /// </summary>
         public static string chatSendFailed {
@@ -385,6 +394,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Feature not implemented.
+        /// </summary>
+        public static string featureNotImplemented {
+            get {
+                return ResourceManager.GetString("featureNotImplemented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Forgot your password?.
         /// </summary>
         public static string forgotPassword {
@@ -538,6 +556,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Join a lobby by code.
+        /// </summary>
+        public static string lobbyJoinByCode {
+            get {
+                return ResourceManager.GetString("lobbyJoinByCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a You joined the lobby.
         /// </summary>
         public static string lobbyJoined {
@@ -619,6 +646,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Main Menu.
+        /// </summary>
+        public static string mainMenuTitle {
+            get {
+                return ResourceManager.GetString("mainMenuTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Match Starting soon....
+        /// </summary>
+        public static string matchStartingSoon {
+            get {
+                return ResourceManager.GetString("matchStartingSoon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Modify Profile.
         /// </summary>
         public static string modifyProfileTitle {
@@ -633,6 +678,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string noConnection {
             get {
                 return ResourceManager.GetString("noConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No Lobby.
+        /// </summary>
+        public static string noLobby {
+            get {
+                return ResourceManager.GetString("noLobby", resourceCulture);
             }
         }
         
@@ -691,11 +745,38 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a What you want to do?.
+        /// </summary>
+        public static string playChoose {
+            get {
+                return ResourceManager.GetString("playChoose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Enter de access code.
+        /// </summary>
+        public static string playEnterCode {
+            get {
+                return ResourceManager.GetString("playEnterCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Player.
         /// </summary>
         public static string player {
             get {
                 return ResourceManager.GetString("player", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Play Options.
+        /// </summary>
+        public static string playOptionsTitle {
+            get {
+                return ResourceManager.GetString("playOptionsTitle", resourceCulture);
             }
         }
         
@@ -813,6 +894,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string searching {
             get {
                 return ResourceManager.GetString("searching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Start match.
+        /// </summary>
+        public static string startMatch {
+            get {
+                return ResourceManager.GetString("startMatch", resourceCulture);
             }
         }
         
