@@ -93,7 +93,6 @@
     </Compile>
     <Compile Include="Globalization\LocalizationManager.cs" />
     <Compile Include="Globalization\LocExtension.cs" />
-    <Compile Include="Helpers\UiChat.cs" />
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
     <Compile Include="Infraestructure\AppServices.cs" />

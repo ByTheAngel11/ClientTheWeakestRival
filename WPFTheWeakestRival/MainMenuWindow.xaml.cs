@@ -10,7 +10,6 @@ using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Infrastructure;
-using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Properties.Langs;
 
