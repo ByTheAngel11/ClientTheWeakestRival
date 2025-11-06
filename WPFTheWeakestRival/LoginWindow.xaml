@@ -194,7 +194,8 @@
                             Background="Transparent"
                             Foreground="White"
                             Margin="0,0,0,4"
-                            BorderThickness="0"/>
+                            BorderThickness="0"
+                            Click="BtnForgotPassword"/>
 
                     <Button x:Name="btnNotAccount"
                             Content="{loc:Loc notAccount}"

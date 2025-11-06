@@ -770,6 +770,189 @@ namespace WPFTheWeakestRival.AuthService {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BeginPasswordResetRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class BeginPasswordResetRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string EmailField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Email {
+            get {
+                return this.EmailField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BeginPasswordResetResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class BeginPasswordResetResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime ExpiresAtUtcField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int ResendAfterSecondsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime ExpiresAtUtc {
+            get {
+                return this.ExpiresAtUtcField;
+            }
+            set {
+                if ((this.ExpiresAtUtcField.Equals(value) != true)) {
+                    this.ExpiresAtUtcField = value;
+                    this.RaisePropertyChanged("ExpiresAtUtc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ResendAfterSeconds {
+            get {
+                return this.ResendAfterSecondsField;
+            }
+            set {
+                if ((this.ResendAfterSecondsField.Equals(value) != true)) {
+                    this.ResendAfterSecondsField = value;
+                    this.RaisePropertyChanged("ResendAfterSeconds");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CompletePasswordResetRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class CompletePasswordResetRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string CodeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string EmailField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NewPasswordField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Code {
+            get {
+                return this.CodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CodeField, value) != true)) {
+                    this.CodeField = value;
+                    this.RaisePropertyChanged("Code");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Email {
+            get {
+                return this.EmailField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string NewPassword {
+            get {
+                return this.NewPasswordField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NewPasswordField, value) != true)) {
+                    this.NewPasswordField = value;
+                    this.RaisePropertyChanged("NewPassword");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="AuthService.IAuthService")]
     public interface IAuthService {
@@ -813,6 +996,18 @@ namespace WPFTheWeakestRival.AuthService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/Logout", ReplyAction="http://tempuri.org/IAuthService/LogoutResponse")]
         System.Threading.Tasks.Task LogoutAsync(WPFTheWeakestRival.AuthService.LogoutRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/BeginPasswordReset", ReplyAction="http://tempuri.org/IAuthService/BeginPasswordResetResponse")]
+        WPFTheWeakestRival.AuthService.BeginPasswordResetResponse BeginPasswordReset(WPFTheWeakestRival.AuthService.BeginPasswordResetRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/BeginPasswordReset", ReplyAction="http://tempuri.org/IAuthService/BeginPasswordResetResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.BeginPasswordResetResponse> BeginPasswordResetAsync(WPFTheWeakestRival.AuthService.BeginPasswordResetRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/CompletePasswordReset", ReplyAction="http://tempuri.org/IAuthService/CompletePasswordResetResponse")]
+        void CompletePasswordReset(WPFTheWeakestRival.AuthService.CompletePasswordResetRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/CompletePasswordReset", ReplyAction="http://tempuri.org/IAuthService/CompletePasswordResetResponse")]
+        System.Threading.Tasks.Task CompletePasswordResetAsync(WPFTheWeakestRival.AuthService.CompletePasswordResetRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -888,6 +1083,22 @@ namespace WPFTheWeakestRival.AuthService {
         
         public System.Threading.Tasks.Task LogoutAsync(WPFTheWeakestRival.AuthService.LogoutRequest request) {
             return base.Channel.LogoutAsync(request);
+        }
+        
+        public WPFTheWeakestRival.AuthService.BeginPasswordResetResponse BeginPasswordReset(WPFTheWeakestRival.AuthService.BeginPasswordResetRequest request) {
+            return base.Channel.BeginPasswordReset(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.BeginPasswordResetResponse> BeginPasswordResetAsync(WPFTheWeakestRival.AuthService.BeginPasswordResetRequest request) {
+            return base.Channel.BeginPasswordResetAsync(request);
+        }
+        
+        public void CompletePasswordReset(WPFTheWeakestRival.AuthService.CompletePasswordResetRequest request) {
+            base.Channel.CompletePasswordReset(request);
+        }
+        
+        public System.Threading.Tasks.Task CompletePasswordResetAsync(WPFTheWeakestRival.AuthService.CompletePasswordResetRequest request) {
+            return base.Channel.CompletePasswordResetAsync(request);
         }
     }
 }

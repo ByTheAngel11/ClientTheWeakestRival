@@ -30,8 +30,8 @@
         <BitmapImage x:Key="FriendsIcon"  UriSource="pack://application:,,,/Assets/Icons/friends.png"/>
 
         <!-- Fondos -->
-        <BitmapImage x:Key="ChalkboardBackground"
-                     UriSource="pack://application:,,,/Assets/Backgrounds/ChalkboardGreen.png"/>
+        <BitmapImage x:Key="LobbyBackground"
+                     UriSource="pack://application:,,,/Assets/Backgrounds/LobbyBackground.png"/>
         <BitmapImage x:Key="FriendsLockerBackground"
                      UriSource="pack://application:,,,/Assets/Backgrounds/BackgroundListFriends.png"/>
 
@@ -270,7 +270,7 @@
     <Grid Margin="12">
         <!-- Fondo de pizarrón igual al MainMenu -->
         <Grid.Background>
-            <ImageBrush ImageSource="{StaticResource ChalkboardBackground}"
+            <ImageBrush ImageSource="{StaticResource LobbyBackground}"
                         Stretch="UniformToFill"
                         AlignmentX="Center"
                         AlignmentY="Center"/>
@@ -431,6 +431,7 @@
                                  BorderThickness="1"
                                  Padding="6"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 Foreground="White"
                                  VirtualizingPanel.IsVirtualizing="True"
                                  VirtualizingPanel.ScrollUnit="Pixel">
                             <ListBox.ItemTemplate>

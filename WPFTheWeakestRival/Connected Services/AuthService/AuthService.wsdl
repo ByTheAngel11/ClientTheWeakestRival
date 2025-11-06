@@ -400,6 +400,82 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
+  <wsp:Policy wsu:Id="WSHttpBinding_IAuthService_BeginPasswordReset_Input_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSHttpBinding_IAuthService_BeginPasswordReset_output_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSHttpBinding_IAuthService_CompletePasswordReset_Input_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSHttpBinding_IAuthService_CompletePasswordReset_output_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
       <xsd:import schemaLocation="http://localhost:8082/auth/?xsd=xsd0" namespace="http://tempuri.org/" />
@@ -455,6 +531,18 @@
   <wsdl:message name="IAuthService_Logout_OutputMessage">
     <wsdl:part name="parameters" element="tns:LogoutResponse" />
   </wsdl:message>
+  <wsdl:message name="IAuthService_BeginPasswordReset_InputMessage">
+    <wsdl:part name="parameters" element="tns:BeginPasswordReset" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_BeginPasswordReset_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BeginPasswordResetResponse" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_CompletePasswordReset_InputMessage">
+    <wsdl:part name="parameters" element="tns:CompletePasswordReset" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_CompletePasswordReset_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CompletePasswordResetResponse" />
+  </wsdl:message>
   <wsdl:portType name="IAuthService">
     <wsdl:operation name="Ping">
       <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/Ping" message="tns:IAuthService_Ping_InputMessage" />
@@ -483,6 +571,14 @@
     <wsdl:operation name="Logout">
       <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/Logout" message="tns:IAuthService_Logout_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/LogoutResponse" message="tns:IAuthService_Logout_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BeginPasswordReset">
+      <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/BeginPasswordReset" message="tns:IAuthService_BeginPasswordReset_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/BeginPasswordResetResponse" message="tns:IAuthService_BeginPasswordReset_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CompletePasswordReset">
+      <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/CompletePasswordReset" message="tns:IAuthService_CompletePasswordReset_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/CompletePasswordResetResponse" message="tns:IAuthService_CompletePasswordReset_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WSHttpBinding_IAuthService" type="tns:IAuthService">
@@ -570,6 +666,28 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="BeginPasswordReset">
+      <soap12:operation soapAction="http://tempuri.org/IAuthService/BeginPasswordReset" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="#WSHttpBinding_IAuthService_BeginPasswordReset_Input_policy" />
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSHttpBinding_IAuthService_BeginPasswordReset_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CompletePasswordReset">
+      <soap12:operation soapAction="http://tempuri.org/IAuthService/CompletePasswordReset" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="#WSHttpBinding_IAuthService_CompletePasswordReset_Input_policy" />
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSHttpBinding_IAuthService_CompletePasswordReset_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="AuthService">
     <wsdl:port name="WSHttpBinding_IAuthService" binding="tns:WSHttpBinding_IAuthService">
@@ -577,7 +695,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>http://localhost:8082/auth/</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>ANGEL\Angel</Upn>
+          <Upn>LAP-MANUGOD\manit</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

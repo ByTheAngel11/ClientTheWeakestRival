@@ -18,11 +18,10 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            // Ajusta selección inicial del combo según la cultura actual
             var current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
             cmblanguage.SelectedIndex = (current == "es") ? 0 : 1;
 
-            UpdateMainImage(); // carga logo según idioma actual
+            UpdateMainImage();
         }
 
         private void CmbLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -30,8 +29,8 @@ namespace WPFTheWeakestRival
             if (cmblanguage.SelectedItem is ComboBoxItem item)
             {
                 var code = (item.Tag as string) ?? "es";
-                LocalizationManager.Current.SetCulture(code); // refresca TODOS los {loc:Loc ...}
-                UpdateMainImage(); // re-resuelve Lang.imageLogo con nueva cultura
+                LocalizationManager.Current.SetCulture(code);
+                UpdateMainImage();
             }
         }
 
@@ -39,7 +38,7 @@ namespace WPFTheWeakestRival
         {
             try
             {
-                var path = Lang.imageLogo; // depende de Lang.Culture (ya sincronizada por LocalizationManager)
+                var path = Lang.imageLogo;
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     logoImage.Source = null;
@@ -171,6 +170,14 @@ namespace WPFTheWeakestRival
         public static class AppSession
         {
             public static AuthToken CurrentToken { get; set; }
+        }
+
+        private void BtnForgotPassword(object sender, RoutedEventArgs e)
+        {
+            var forgotWindow = new ForgotPasswordWindow(txtEmail.Text, 60);
+            forgotWindow.Owner = this;
+            forgotWindow.Show();
+            this.Hide();
         }
     }
 }

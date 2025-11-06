@@ -34,7 +34,7 @@
                   Width="140"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Top"
-                  Margin="0,8,8,0"
+                  Margin="0,10,82,0"
                   SelectionChanged="CmbLanguageSelectionChanged">
             <ComboBoxItem Tag="es" Content="{loc:Loc es}" />
             <ComboBoxItem Tag="en" Content="{loc:Loc en}" />

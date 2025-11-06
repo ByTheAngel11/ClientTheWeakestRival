@@ -13,7 +13,6 @@ namespace WPFTheWeakestRival.Globalization
         private CultureInfo _culture = new CultureInfo("es");
         public CultureInfo Culture => _culture;
 
-        // Indexador: permite usar Binding a claves: [Key]
         public string this[string key]
         {
             get
@@ -35,14 +34,11 @@ namespace WPFTheWeakestRival.Globalization
 
             _culture = ci;
 
-            // Sincroniza cultura de hilo (opcional)
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
 
-            // MUY IMPORTANTE: también mueve la cultura del .resx tipado (para MessageBox, etc.)
             Properties.Langs.Lang.Culture = ci;
 
-            // Notifica a todos los bindings que usan el indexador
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
         }
 

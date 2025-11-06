@@ -69,7 +69,6 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (TaskCanceledException ex)
             {
-                // Cancelación esperada por debounce
                 Logger.Debug("Search debounce task was canceled.", ex);
             }
             finally

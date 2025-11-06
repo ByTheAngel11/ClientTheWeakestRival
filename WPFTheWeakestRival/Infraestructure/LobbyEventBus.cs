@@ -3,10 +3,6 @@ using WPFTheWeakestRival.LobbyService;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
-    /// <summary>
-    /// Reenvía callbacks de WCF a las ventanas/páginas suscritas.
-    /// Evita tener múltiples proxies con distintos callbacks.
-    /// </summary>
     public static class LobbyEventBus
     {
         public static event Action<LobbyInfo> LobbyUpdated;

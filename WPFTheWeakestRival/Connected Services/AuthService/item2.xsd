@@ -83,4 +83,30 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
+  <xs:element name="BeginPasswordReset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q12:BeginPasswordResetRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BeginPasswordResetResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="BeginPasswordResetResult" nillable="true" type="q13:BeginPasswordResetResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CompletePasswordReset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q14:CompletePasswordResetRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CompletePasswordResetResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

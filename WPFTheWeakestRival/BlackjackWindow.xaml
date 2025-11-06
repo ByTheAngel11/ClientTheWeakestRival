@@ -1,0 +1,234 @@
+﻿<Window x:Class="WPFTheWeakestRival.BlackjackWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Blackjack"
+        Height="360"
+        Width="620"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True"
+        Background="Transparent">
+
+    <Border Background="#051208"
+            Padding="10">
+        <Border Background="#134425"
+                CornerRadius="18"
+                Padding="14"
+                BorderBrush="#55FFFFFF"
+                BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Mensaje principal -->
+                <Border Grid.Row="0"
+                        Background="#1D5B33"
+                        CornerRadius="10"
+                        Padding="10"
+                        BorderBrush="#88FFFFFF"
+                        BorderThickness="0.8">
+                    <TextBlock x:Name="lblStatus"
+                               Text="Tu turno: pide carta o plántate."
+                               FontFamily="Segoe UI"
+                               FontWeight="SemiBold"
+                               FontSize="18"
+                               Foreground="#FDFDFD"
+                               TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- Manos -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="18"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- MANO JUGADOR -->
+                    <Border Grid.Column="0"
+                            Background="#0E331E"
+                            CornerRadius="10"
+                            Padding="10"
+                            BorderBrush="#55FFFFFF"
+                            BorderThickness="0.8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Encabezado + puntos -->
+                            <StackPanel Grid.Row="0"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="Tu mano"
+                                           FontFamily="Segoe UI"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#F5F5F5"
+                                           Margin="0,0,10,0"/>
+
+                                <Border Background="#FFFDFD"
+                                        CornerRadius="999"
+                                        Padding="8,2"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Puntos:"
+                                                   FontFamily="Segoe UI"
+                                                   FontWeight="Bold"
+                                                   Foreground="#333333"/>
+                                        <TextBlock x:Name="lblPlayerScore"
+                                                   Margin="4,0,0,0"
+                                                   FontFamily="Segoe UI"
+                                                   FontWeight="Bold"
+                                                   FontSize="20"
+                                                   Foreground="#333333"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Cartas jugador -->
+                            <StackPanel Grid.Row="2">
+                                <TextBlock Text="Cartas:"
+                                           FontFamily="Segoe UI"
+                                           FontWeight="SemiBold"
+                                           Foreground="#F5F5F5"
+                                           Margin="0,0,0,4"/>
+                                <StackPanel x:Name="playerCardsPanel"
+                                            Orientation="Horizontal"
+                                            Margin="0,2,0,0"
+                                            VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- MANO CRUPIER -->
+                    <Border Grid.Column="2"
+                            Background="#0E331E"
+                            CornerRadius="10"
+                            Padding="10"
+                            BorderBrush="#55FFFFFF"
+                            BorderThickness="0.8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Encabezado + puntos -->
+                            <StackPanel Grid.Row="0"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center">
+                                <Border Background="#FFFDFD"
+                                        CornerRadius="999"
+                                        Padding="8,2"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Puntos:"
+                                                   FontFamily="Segoe UI"
+                                                   FontWeight="Bold"
+                                                   Foreground="#333333"/>
+                                        <TextBlock x:Name="lblDealerScore"
+                                                   Margin="4,0,0,0"
+                                                   FontFamily="Segoe UI"
+                                                   FontWeight="Bold"
+                                                   FontSize="20"
+                                                   Foreground="#333333"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Crupier"
+                                           FontFamily="Segoe UI"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#F5F5F5"
+                                           Margin="10,0,0,0"/>
+                            </StackPanel>
+
+                            <!-- Cartas crupier -->
+                            <StackPanel Grid.Row="2"
+                                        HorizontalAlignment="Right">
+                                <TextBlock Text="Cartas:"
+                                           FontFamily="Segoe UI"
+                                           FontWeight="SemiBold"
+                                           Foreground="#F5F5F5"
+                                           Margin="0,0,0,4"
+                                           TextAlignment="Right"/>
+                                <StackPanel x:Name="dealerCardsPanel"
+                                            Orientation="Horizontal"
+                                            Margin="0,2,0,0"
+                                            HorizontalAlignment="Right"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Botones -->
+                <StackPanel Grid.Row="4"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,0">
+                    <Button x:Name="btnHit"
+                            Width="130"
+                            Margin="4,0"
+                            Padding="6,4"
+                            Content="Pedir carta"
+                            FontFamily="Segoe UI"
+                            Click="HitClick">
+                        <Button.Background>
+                            <SolidColorBrush Color="#F5F5F5"/>
+                        </Button.Background>
+                    </Button>
+
+                    <Button x:Name="btnStand"
+                            Width="130"
+                            Margin="4,0"
+                            Padding="6,4"
+                            Content="Plantarse"
+                            FontFamily="Segoe UI"
+                            Click="StandClick">
+                        <Button.Background>
+                            <SolidColorBrush Color="#F5F5F5"/>
+                        </Button.Background>
+                    </Button>
+
+                    <Button x:Name="btnNewHand"
+                            Width="130"
+                            Margin="4,0"
+                            Padding="6,4"
+                            Content="Nueva mano"
+                            FontFamily="Segoe UI"
+                            Click="NewHandClick"
+                            IsEnabled="False">
+                        <Button.Background>
+                            <SolidColorBrush Color="#F5F5F5"/>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
+
+                <!-- Nota -->
+                <TextBlock Grid.Row="6"
+                           Text="No podrás salir de esta ventana hasta ganar una mano."
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"
+                           Opacity="0.8"
+                           Foreground="#F5F5F5"
+                           FontFamily="Segoe UI"
+                           FontSize="12"/>
+            </Grid>
+        </Border>
+    </Border>
+</Window>
+ 

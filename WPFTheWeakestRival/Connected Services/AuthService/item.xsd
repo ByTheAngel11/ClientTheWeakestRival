@@ -93,4 +93,25 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LogoutRequest" nillable="true" type="tns:LogoutRequest" />
+  <xs:complexType name="BeginPasswordResetRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BeginPasswordResetRequest" nillable="true" type="tns:BeginPasswordResetRequest" />
+  <xs:complexType name="BeginPasswordResetResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ExpiresAtUtc" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ResendAfterSeconds" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BeginPasswordResetResponse" nillable="true" type="tns:BeginPasswordResetResponse" />
+  <xs:complexType name="CompletePasswordResetRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Code" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="NewPassword" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CompletePasswordResetRequest" nillable="true" type="tns:CompletePasswordResetRequest" />
 </xs:schema>
