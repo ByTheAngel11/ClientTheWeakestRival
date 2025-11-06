@@ -199,7 +199,7 @@
     <value>/Properties/Images/logo_it.png</value>
   </data>
   <data name="colorLogin" xml:space="preserve">
-    <value>#cb102c</value>
+    <value>#074220</value>
   </data>
   <data name="errorUsernameWithoutSpaces" xml:space="preserve">
     <value>Il nome utente non deve contenere spazi</value>
@@ -391,13 +391,13 @@
     <value>Iscriviti tramite un codice</value>
   </data>
   <data name="pt" xml:space="preserve">
-    <value>portoghese</value>
+    <value>Portoghese</value>
   </data>
   <data name="it" xml:space="preserve">
     <value>Italiano</value>
   </data>
   <data name="fr" xml:space="preserve">
-    <value>francese</value>
+    <value>Francese</value>
   </data>
   <data name="playOptionsTitle" xml:space="preserve">
     <value>Opzioni di gioco</value>

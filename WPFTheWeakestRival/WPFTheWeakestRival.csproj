@@ -486,5 +486,23 @@
     <Resource Include="Properties\Images\logo_it.png" />
     <Resource Include="Properties\Images\logo_pt.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\ChalkboardGreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\BackgroundListFriends.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LoginBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LoginBackground.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LoginBackgroundWall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\RegistrationBackground.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

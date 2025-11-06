@@ -2,7 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
-      Title="{loc:Loc playOptionsTitle}">
+      Title="{loc:Loc playOptionsTitle}"
+      Background="White">
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,11 +14,13 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="{loc:Loc playChoose}"
-                   FontSize="16" FontWeight="SemiBold"/>
+                   FontSize="16" FontWeight="SemiBold"
+                   HorizontalAlignment="Center"/>
 
         <Button Grid.Row="2" x:Name="btnCreate"
                 Height="38" Margin="0,0,0,6"
                 Content="{loc:Loc btnCreateLobby}"
+                Background="#1B6BB6"
                 Click="BtnCreateClick"/>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Center">
@@ -30,6 +33,7 @@
             <Button x:Name="btnJoin"
                     Height="32" Width="160"
                     Content="{loc:Loc lobbyJoinByCode}"
+                    Background="#D4CE20"
                     Click="BtnJoinClick"/>
         </StackPanel>
     </Grid>

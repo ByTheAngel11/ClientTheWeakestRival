@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -9,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
+using WPFTheWeakestRival.Globalization;
 using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
@@ -22,32 +22,38 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            cmbLanguage.Items.Add(Lang.es);
-            cmbLanguage.Items.Add(Lang.en);
-            cmbLanguage.SelectedIndex = 0;
-            cmbLanguage.SelectionChanged += CmbLanguageSelectionChanged;
+            var current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
+            switch (current)
+            {
+                case "es":
+                    cmbLanguage.SelectedIndex = 0;
+                    break;
+                case "en":
+                    cmbLanguage.SelectedIndex = 1;
+                    break;
+                case "pt":
+                    cmbLanguage.SelectedIndex = 2;
+                    break;
+                case "it":
+                    cmbLanguage.SelectedIndex = 3;
+                    break;
+                case "fr":
+                    cmbLanguage.SelectedIndex = 4;
+                    break;
+                default:
+                    cmbLanguage.SelectedIndex = 0;
+                    break;
+            }
         }
 
         private void CmbLanguageSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selected = cmbLanguage.SelectedItem as string;
-            Lang.Culture = string.Equals(selected, Lang.es, StringComparison.Ordinal)
-                ? new CultureInfo("es")
-                : new CultureInfo("en");
+            if (cmbLanguage.SelectedItem is ComboBoxItem item)
+            {
+                var code = (item.Tag as string) ?? "es";
 
-            UpdateUiLanguage();
-        }
-
-        private void UpdateUiLanguage()
-        {
-            lblRegistration.Content = Lang.registerTitle;
-            lblUsername.Content = Lang.registerDisplayName;
-            lblEmail.Content = Lang.lblEmail;
-            lblPassword.Content = Lang.lblPassword;
-            lblConfirmPassword.Content = Lang.lblConfirmPassword;
-            btnChooseImage.Content = Lang.btnChooseImage;
-            btnRegister.Content = Lang.regist;
-            btnBack.Content = Lang.cancel;
+                LocalizationManager.Current.SetCulture(code);
+            }
         }
 
         private void ChooseImageClick(object sender, RoutedEventArgs e)
@@ -72,13 +78,16 @@ namespace WPFTheWeakestRival
                 bitmap.Freeze();
 
                 imgPreview.Source = bitmap;
-                txtImgName.Text = System.IO.Path.GetFileName(selectedImagePath);
+                txtImgName.Text = Path.GetFileName(selectedImagePath);
             }
         }
 
         private static string SaveProfileImageCopy(string sourcePath)
         {
-            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath)) return null;
+            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
+            {
+                return null;
+            }
 
             var destinationDirectory = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -97,7 +106,11 @@ namespace WPFTheWeakestRival
 
         private static bool IsValidEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email)) return false;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
             try
             {
                 var addr = new MailAddress(email.Trim());
@@ -111,8 +124,15 @@ namespace WPFTheWeakestRival
 
         private static bool PasswordMeetsRequirements(string password)
         {
-            if (string.IsNullOrEmpty(password)) return false;
-            if (password.Length < 8) return false;
+            if (string.IsNullOrEmpty(password))
+            {
+                return false;
+            }
+
+            if (password.Length < 8)
+            {
+                return false;
+            }
 
             var hasUpper = password.Any(char.IsUpper);
             var hasLower = password.Any(char.IsLower);
@@ -123,7 +143,11 @@ namespace WPFTheWeakestRival
 
         private static bool UsernameHasNoSpaces(string username)
         {
-            if (string.IsNullOrWhiteSpace(username)) return false;
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return false;
+            }
+
             return !username.Any(char.IsWhiteSpace);
         }
 
@@ -140,25 +164,41 @@ namespace WPFTheWeakestRival
 
                 if (!UsernameHasNoSpaces(displayName))
                 {
-                    MessageBox.Show(Lang.errorUsernameWithoutSpaces, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(
+                        Lang.errorUsernameWithoutSpaces,
+                        Lang.registerTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!IsValidEmail(email))
                 {
-                    MessageBox.Show(Lang.errorInvalidEmail, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(
+                        Lang.errorInvalidEmail,
+                        Lang.registerTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!PasswordMeetsRequirements(password))
                 {
-                    MessageBox.Show(Lang.errorPasswordStructure, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(
+                        Lang.errorPasswordStructure,
+                        Lang.registerTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!string.Equals(password, confirmPassword, StringComparison.Ordinal))
                 {
-                    MessageBox.Show(Lang.errorMatchingPasswords, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(
+                        Lang.errorMatchingPasswords,
+                        Lang.registerTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                     return;
                 }
 
@@ -177,7 +217,14 @@ namespace WPFTheWeakestRival
                         Email = email
                     });
 
-                    if (authClient.State != CommunicationState.Faulted) authClient.Close(); else authClient.Abort();
+                    if (authClient.State != CommunicationState.Faulted)
+                    {
+                        authClient.Close();
+                    }
+                    else
+                    {
+                        authClient.Abort();
+                    }
 
                     var verificationWindow = new EmailVerificationWindow(
                         email: email,
@@ -195,12 +242,20 @@ namespace WPFTheWeakestRival
                 catch (FaultException<ServiceFault> fx)
                 {
                     authClient.Abort();
-                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(
+                        $"{fx.Detail.Code}: {fx.Detail.Message}",
+                        "Auth",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                 }
                 catch (Exception ex)
                 {
                     authClient.Abort();
-                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(
+                        "Error de red/servicio: " + ex.Message,
+                        "Auth",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             }
             finally

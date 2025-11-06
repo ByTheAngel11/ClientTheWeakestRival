@@ -10,7 +10,8 @@
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
         TextOptions.TextRenderingMode="Aliased"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown"
+        Background="Transparent">
     <Window.Resources>
         <sys:Double x:Key="TopBarButtonWidth">130</sys:Double>
         <sys:Double x:Key="TopBarButtonHeight">32</sys:Double>
@@ -21,9 +22,13 @@
         <SolidColorBrush x:Key="PresenceOfflineFg" Color="#2F5AA3"/>
         <BitmapImage x:Key="SettingsIcon" UriSource="pack://application:,,,/Assets/Icons/settings.png"/>
         <BitmapImage x:Key="FriendsIcon"  UriSource="pack://application:,,,/Assets/Icons/friends.png"/>
+        <BitmapImage x:Key="ChalkboardBackground"
+             UriSource="pack://application:,,,/Assets/Backgrounds/ChalkboardGreen.png"/>
+        <BitmapImage x:Key="FriendsLockerBackground"
+             UriSource="pack://application:,,,/Assets/Backgrounds/BackgroundListFriends.png" />
         <sys:Double x:Key="AvatarSize">28</sys:Double>
         <SolidColorBrush x:Key="OverlayBackdropBrush" Color="#99000000"/>
-        <SolidColorBrush x:Key="OverlayCardBackgroundBrush" Color="#FAFFFFFF"/>
+        <SolidColorBrush x:Key="OverlayCardBackgroundBrush" Color="White"/>
         <CornerRadius x:Key="OverlayCardCornerRadius">14</CornerRadius>
         <sys:Double x:Key="OverlayShadowBlur">16</sys:Double>
         <sys:Double x:Key="OverlayShadowOpacity">0.45</sys:Double>
@@ -35,7 +40,7 @@
         <Style x:Key="OverlayCloseButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="32"/>
             <Setter Property="Height" Value="32"/>
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Background" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Content" Value="✕"/>
@@ -100,23 +105,49 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="44"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Border Width="40" Height="40" CornerRadius="10" Background="#FFEFEFEF">
-                    <Image Source="{Binding Avatar}" Stretch="UniformToFill" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                <!-- Avatar -->
+                <Border Width="40"
+                Height="40"
+                CornerRadius="10"
+                Background="Transparent">
+                    <Image Source="{Binding Avatar}"
+                   Stretch="UniformToFill"
+                   SnapsToDevicePixels="True"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
                 </Border>
-                <StackPanel Grid.Column="1" Margin="8,0,8,0">
-                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding StatusText}" Opacity="0.7" FontSize="12"/>
+
+                <!-- Nombre + pill de estado debajo -->
+                <StackPanel Grid.Column="1"
+                    Margin="8,0,8,0"
+                    VerticalAlignment="Center">
+                    <TextBlock Text="{Binding DisplayName}"
+                       FontWeight="SemiBold"
+                       Foreground="White"/>
+
+                    <Border x:Name="PresencePill"
+                    Margin="0,3,0,0"
+                    Padding="8,2"
+                    CornerRadius="10"
+                    Background="{StaticResource PresenceOfflineBg}"
+                    HorizontalAlignment="Left">
+                        <TextBlock x:Name="PresenceText"
+                           Text="{Binding Presence}"
+                           FontSize="11"
+                           Foreground="{StaticResource PresenceOfflineFg}"/>
+                    </Border>
                 </StackPanel>
-                <Border x:Name="PresencePill" Grid.Column="2" Background="{StaticResource PresenceOfflineBg}" CornerRadius="8" Padding="8,3" Margin="0,0,4,0">
-                    <TextBlock x:Name="PresenceText" Text="{Binding Presence}" FontSize="12" Foreground="{StaticResource PresenceOfflineFg}"/>
-                </Border>
             </Grid>
+
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding IsOnline}" Value="True">
-                    <Setter TargetName="PresencePill" Property="Background" Value="{StaticResource PresenceOnlineBg}"/>
-                    <Setter TargetName="PresenceText" Property="Foreground" Value="{StaticResource PresenceOnlineFg}"/>
+                    <Setter TargetName="PresencePill"
+                    Property="Background"
+                    Value="{StaticResource PresenceOnlineBg}"/>
+                    <Setter TargetName="PresenceText"
+                    Property="Foreground"
+                    Value="{StaticResource PresenceOnlineFg}"/>
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -131,7 +162,13 @@
     </Window.Resources>
 
     <Grid Margin="12">
-        <Grid x:Name="grdMainArea">
+        <Grid.Background>
+            <ImageBrush ImageSource="{StaticResource ChalkboardBackground}"
+                        Stretch="UniformToFill"
+                        AlignmentX="Center"
+                        AlignmentY="Center" />
+        </Grid.Background>
+            <Grid x:Name="grdMainArea">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -161,7 +198,7 @@
                             Style="{StaticResource TopBarIconButtonStyle}"
                             Height="51" Width="57"
                             Click="BtnFriendsClick"
-                            ToolTip="{loc:Loc friends}">
+                            ToolTip="{loc:Loc btnFriends}">
                         <Image Source="{StaticResource FriendsIcon}" Width="47" Height="49" Stretch="Uniform" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality"/>
                     </Button>
                     <Button x:Name="btnProfile"
@@ -229,12 +266,35 @@
             </Border>
         </Grid>
 
-        <Grid x:Name="friendsDrawerHost" Visibility="Collapsed" Opacity="0" Panel.ZIndex="95">
-            <Rectangle x:Name="friendsDimmer" Fill="{StaticResource OverlayBackdropBrush}" MouseDown="FriendsDimmerMouseDown"/>
-            <Border x:Name="friendsDrawer" Width="340" Background="#FFFFFFFF" CornerRadius="14,0,0,14" Padding="14" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+        <Grid x:Name="friendsDrawerHost"
+      Visibility="Collapsed"
+      Opacity="0"
+      Panel.ZIndex="95">
+
+            <Rectangle x:Name="friendsDimmer"
+               Fill="{StaticResource OverlayBackdropBrush}"
+               MouseDown="FriendsDimmerMouseDown"/>
+
+            <Border x:Name="friendsDrawer"
+            Width="340"
+            CornerRadius="20,0,0,14"
+            Padding="14"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Stretch">
+
+                <!-- Transform para la animación -->
                 <Border.RenderTransform>
                     <TranslateTransform x:Name="friendsDrawerTT" X="340"/>
                 </Border.RenderTransform>
+
+                <!-- Fondo del casillero -->
+                <Border.Background>
+                    <ImageBrush ImageSource="{StaticResource FriendsLockerBackground}"
+                        Stretch="UniformToFill"
+                        AlignmentX="Center"
+                        AlignmentY="Center" />
+                </Border.Background>
+
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -242,32 +302,100 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,10">
-                        <TextBlock Text="{loc:Loc friends}" FontSize="20" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center"/>
-                        <Button Content="✕" Style="{StaticResource OverlayCloseButtonStyle}" DockPanel.Dock="Right" Click="BtnCloseFriendsClick"/>
+                    <!-- Header -->
+                    <!-- Header -->
+                    <DockPanel Grid.Row="0"
+                       Margin="150,0,16,10"
+                       LastChildFill="False">
+                                    <TextBlock Text="{loc:Loc btnFriends}"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           DockPanel.Dock="Left"
+                           VerticalAlignment="Center"
+                           Foreground="White"/>
                     </DockPanel>
 
+                    <!-- Zona central: lista dentro del interior negro -->
                     <Grid Grid.Row="1">
-                        <StackPanel x:Name="friendsEmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16" Visibility="Collapsed">
-                            <TextBlock Text="{loc:Loc noFriends}" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{loc:Loc inviteFriends}" Opacity="0.75" Margin="0,4,0,0" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                        <ListBox x:Name="lstFriends" ItemTemplate="{StaticResource FriendItemTemplate}" ScrollViewer.VerticalScrollBarVisibility="Auto" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"/>
+                        <Border Background="#DD000000"
+            CornerRadius="12"
+            Margin="150,8,16,8"
+            HorizontalAlignment="Stretch">
+                            <Grid>
+                                <StackPanel x:Name="friendsEmptyPanel"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="16"
+                        Visibility="Collapsed">
+                                    <TextBlock Text="{loc:Loc noFriends}"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Foreground="White"/>
+                                    <TextBlock Text="{loc:Loc inviteFriends}"
+                                       Opacity="0.75"
+                                       Margin="0,4,0,0"
+                                       HorizontalAlignment="Center"
+                                       Foreground="White"/>
+                                </StackPanel>
+
+                                <ListBox x:Name="lstFriends"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ItemTemplate="{StaticResource FriendItemTemplate}"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.ScrollUnit="Pixel"
+                                     Margin="4"/>
+                            </Grid>
+                        </Border>
                     </Grid>
 
-                    <StackPanel Grid.Row="2" Margin="0,10,0,0">
-                        <Button x:Name="btnSendFriendRequest" Height="36" Margin="0,0,0,8" Content="{loc:Loc sendRequest}" Click="BtnSendFriendRequestClick"/>
-                        <Button x:Name="btnViewRequests" Height="36" Click="BtnViewRequestsClick">
-                            <Grid>
-                                <TextBlock Text="{loc:Loc requests}" VerticalAlignment="Center" Margin="0,0,36,0"/>
-                                <Border Background="#FFEFEFEF" CornerRadius="10" Padding="6,2" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <TextBlock x:Name="txtRequestsCount" Text="0" FontWeight="Bold"/>
-                                </Border>
-                            </Grid>
-                        </Button>
+                    <!-- Botones de abajo alineados con el panel negro -->
+                    <StackPanel Grid.Row="2"
+                            Margin="150,10,16,10">
+                        <Border Background="Transparent"
+                        CornerRadius="12"
+                        Padding="8,6,8,6"
+                        Margin="0,0,0,8">
+                            <Button x:Name="btnSendFriendRequest"
+                            Height="30"
+                            Content="{loc:Loc btnSendRequests}"
+                            Click="BtnSendFriendRequestClick"
+                            Background="#FFEFEFEF"
+                            BorderThickness="0"/>
+                        </Border>
+
+                        <Border Background="#DD000000"
+                        CornerRadius="12"
+                        Padding="6,6,6,6">
+                            <Button x:Name="btnViewRequests"
+                            Height="30"
+                            Click="BtnViewRequestsClick"
+                            Background="Transparent"
+                            BorderThickness="0">
+                                <Grid>
+                                    <TextBlock Text="{loc:Loc btnRequests}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,36,0"
+                                       Foreground="White"/>
+                                    <Border Background="#FFEFEFEF"
+                                    CornerRadius="10"
+                                    Padding="6,2"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center">
+                                        <TextBlock x:Name="txtRequestsCount"
+                                           Text="0"
+                                           FontWeight="Bold"/>  
+                                    </Border>
+                                </Grid>
+                            </Button>
+                        </Border>
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
+
     </Grid>
 </Window>

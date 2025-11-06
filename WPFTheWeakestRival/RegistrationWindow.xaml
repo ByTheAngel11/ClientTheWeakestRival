@@ -3,131 +3,193 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:language="clr-namespace:WPFTheWeakestRival.Properties.Langs"
+        xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
         mc:Ignorable="d"
-        Title="{x:Static language:Lang.registHeader}"
-        Height="450" Width="800"
+        Title="{loc:Loc registHeader}"
+        Height="450"
+        Width="800"
         WindowStartupLocation="CenterScreen"
         SnapsToDevicePixels="True"
         UseLayoutRounding="True"
-        TextOptions.TextRenderingMode="Aliased">
+        TextOptions.TextRenderingMode="Aliased"
+        Background="Transparent">
+
+    <Window.Resources>
+        <!-- Fondo de tablilla / clipboard para registro -->
+        <BitmapImage x:Key="RegistrationBackground"
+                     UriSource="pack://application:,,,/Assets/Backgrounds/RegistrationBackground.png" />
+    </Window.Resources>
 
     <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="12"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="12"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <!-- Imagen de fondo -->
+        <Grid.Background>
+            <ImageBrush ImageSource="{StaticResource RegistrationBackground}"
+                        Stretch="UniformToFill"
+                        AlignmentX="Center"
+                        AlignmentY="Center" />
+        </Grid.Background>
 
-        <!-- Encabezado + selector de idioma -->
-        <DockPanel Grid.Row="0" LastChildFill="False">
-            <ComboBox x:Name="cmbLanguage"
-                      Width="140"
-                      DockPanel.Dock="Right"
-                      VerticalAlignment="Center"
-                      Margin="0,0,0,0"/>
-            <Label x:Name="lblRegistration"
-                   Content="{x:Static language:Lang.registerTitle}"
-                   FontSize="28"
-                   FontWeight="Bold"
-                   HorizontalAlignment="Center"
-                   HorizontalContentAlignment="Center"/>
-        </DockPanel>
+        <!-- Selector de idioma, flotando arriba a la derecha (como en Login) -->
+        <ComboBox x:Name="cmbLanguage"
+                  Width="140"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  Margin="0,8,8,0"
+                  SelectionChanged="CmbLanguageSelectionChanged">
+            <ComboBoxItem Tag="es" Content="{loc:Loc es}" />
+            <ComboBoxItem Tag="en" Content="{loc:Loc en}" />
+            <ComboBoxItem Tag="pt" Content="{loc:Loc pt}" />
+            <ComboBoxItem Tag="it" Content="{loc:Loc it}" />
+            <ComboBoxItem Tag="fr" Content="{loc:Loc fr}" />
+        </ComboBox>
 
-        <!-- Formulario -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="24"/>
-                <ColumnDefinition Width="140"/>
-            </Grid.ColumnDefinitions>
+        <!-- HOST centrado sobre la hoja -->
+        <Grid x:Name="contentHost"
+              Width="620"
+              Height="320"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Margin="0,20,0,0">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="10"/>
-                <RowDefinition Height="Auto"/>
+                <!-- Título -->
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="*"/>
+                <!-- Formulario -->
                 <RowDefinition Height="16"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="6"/>
+                <!-- Botones -->
+                <RowDefinition Height="8"/>
                 <RowDefinition Height="Auto"/>
+                <!-- Nombre de imagen -->
             </Grid.RowDefinitions>
 
-            <Label x:Name="lblUsername"
-                   Grid.Row="0" Grid.Column="0"
-                   Content="{x:Static language:Lang.registerDisplayName}"
-                   HorizontalContentAlignment="Right" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtUsername"
-                     Grid.Row="0" Grid.Column="2"
-                     MinWidth="220" />
+            <!-- Título -->
+            <Label x:Name="lblRegistration"
+                   Grid.Row="0"
+                   Content="{loc:Loc registerTitle}"
+                   FontSize="26"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   HorizontalContentAlignment="Center"
+                   Foreground="Black"/>
 
-            <Label x:Name="lblEmail"
-                   Grid.Row="2" Grid.Column="0"
-                   Content="{x:Static language:Lang.lblEmail}"
-                   HorizontalContentAlignment="Right" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtEmail"
-                     Grid.Row="2" Grid.Column="2"
-                     MinWidth="220"/>
+            <!-- Formulario principal -->
+            <Grid Grid.Row="2" Margin="40,0,40,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="135"/>
+                    <!-- Labels -->
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                    <!-- Inputs -->
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition Width="140"/>
+                    <!-- Preview imagen -->
+                </Grid.ColumnDefinitions>
 
-            <Label x:Name="lblPassword"
-                   Grid.Row="4" Grid.Column="0"
-                   Content="{x:Static language:Lang.lblPassword}"
-                   HorizontalContentAlignment="Right" VerticalAlignment="Center"/>
-            <PasswordBox x:Name="pstPassword"
-                         Grid.Row="4" Grid.Column="2"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Usuario -->
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Email -->
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Password -->
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Confirm -->
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Botón imagen -->
+                </Grid.RowDefinitions>
+
+                <!-- Nombre de usuario -->
+                <Label x:Name="lblUsername"
+                       Content="{loc:Loc registerDisplayName}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center" Height="26" Width="114"/>
+                <TextBox x:Name="txtUsername"
+                         Grid.Row="0" Grid.Column="2"
                          MinWidth="220"/>
 
-            <Label x:Name="lblConfirmPassword"
-                   Grid.Row="6" Grid.Column="0"
-                   Content="{x:Static language:Lang.lblConfirmPassword}"
-                   HorizontalContentAlignment="Right" VerticalAlignment="Center"/>
-            <PasswordBox x:Name="pstConfirmPassword"
-                         Grid.Row="6" Grid.Column="2"
+                <!-- Correo electrónico -->
+                <Label x:Name="lblEmail"
+                       Grid.Row="2" Grid.Column="0"
+                       Content="{loc:Loc lblEmail}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Height="26" Margin="16,0,0,0" Width="108"/>
+                <TextBox x:Name="txtEmail"
+                         Grid.Row="2" Grid.Column="2"
                          MinWidth="220"/>
 
-            <!-- Vista previa de imagen (columna derecha) -->
-            <Image x:Name="imgPreview"
-                   Grid.Row="0" Grid.Column="4"
-                   Grid.RowSpan="7"
-                   Width="120" Height="120"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"
-                   Stretch="UniformToFill"/>
+                <!-- Contraseña -->
+                <Label x:Name="lblPassword"
+                       Grid.Row="4" Grid.Column="0"
+                       Content="{loc:Loc lblPassword}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left" Height="26" Margin="54,0,0,0" Width="70"/>
+                <PasswordBox x:Name="pstPassword"
+                             Grid.Row="4" Grid.Column="2"
+                             MinWidth="220"/>
 
-            <Button x:Name="btnChooseImage"
-                    Grid.Row="8" Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    Content="{x:Static language:Lang.btnChooseImage}"
-                    Width="160" Height="28"
-                    HorizontalAlignment="Left"
-                    Click="ChooseImageClick"/>
+                <!-- Confirmar contraseña -->
+                <Label x:Name="lblConfirmPassword"
+                       FontSize="11"
+                       Grid.Row="6"
+                       Content="{loc:Loc lblConfirmPassword}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       HorizontalContentAlignment="Center" Height="26" Width="124"/>
+                <PasswordBox x:Name="pstConfirmPassword"
+                             Grid.Row="6" Grid.Column="2"
+                             MinWidth="220"/>
 
+                <!-- Vista previa de imagen -->
+                <Image x:Name="imgPreview"
+                       Grid.Row="0" Grid.Column="4"
+                       Grid.RowSpan="6"
+                       Width="120" Height="120"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Stretch="UniformToFill"
+                       Margin="0,0,0,0"/>
+
+                <!-- Botón elegir imagen -->
+                <Button x:Name="btnChooseImage"
+                        Grid.Row="8" Grid.Column="2"
+                        Content="{loc:Loc btnChooseImage}"
+                        Width="160"
+                        HorizontalAlignment="Left"
+                        Click="ChooseImageClick" Margin="0,1,0,0"/>
+            </Grid>
+
+            <!-- Botones de acción -->
+            <StackPanel Grid.Row="4"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+                <Button x:Name="btnBack"
+                        Content="{loc:Loc cancel}"
+                        Width="140" Height="30"
+                        Margin="0,0,12,0"
+                        Background="Red"
+                        Foreground="White"
+                        Click="CancelClick"/>
+                <Button x:Name="btnRegister"
+                        Content="{loc:Loc regist}"
+                        Width="140" Height="30"
+                        Background="Blue"
+                        Foreground="White"
+                        Click="RegisterClick"/>
+            </StackPanel>
+
+            <!-- Nombre de la imagen seleccionada -->
             <TextBlock x:Name="txtImgName"
-                       Grid.Row="10" Grid.Column="0"
-                       Grid.ColumnSpan="5"
+                       Grid.Row="6"
                        TextAlignment="Center"
-                       TextTrimming="CharacterEllipsis"/>
+                       TextTrimming="CharacterEllipsis"
+                       Margin="20,0,20,0"/>
         </Grid>
-
-        <!-- Acciones -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="btnBack"
-                    Content="{x:Static language:Lang.cancel}"
-                    Width="140" Height="30"
-                    Margin="0,0,12,0"
-                    Background="Red" Foreground="White"
-                    Click="CancelClick"/>
-            <Button x:Name="btnRegister"
-                    Content="{x:Static language:Lang.regist}"
-                    Width="140" Height="30"
-                    Background="Blue" Foreground="White"
-                    Click="RegisterClick"/>
-        </StackPanel>
     </Grid>
 </Window>

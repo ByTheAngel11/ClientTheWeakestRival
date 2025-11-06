@@ -42,36 +42,47 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Título -->
         <TextBlock x:Name="lblTitle"
                    Text="{x:Static language:Lang.addFriendTitle}"
                    FontSize="22"
                    FontWeight="Bold"/>
 
+        <!-- Buscador -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Center">
             <TextBox x:Name="txtSearchQuery"
                      Width="360"
                      Height="28"
                      Margin="0,0,8,0"
                      VerticalContentAlignment="Center"
-                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                     TextChanged="TxtSearchQueryTextChanged"
                      ToolTip="{x:Static language:Lang.addFriendSearchTooltip}"/>
+
             <Button x:Name="btnSearch"
                     Style="{StaticResource HoverScaleButton}"
                     Content="{x:Static language:Lang.commonSearch}"
-                    Command="{Binding SearchCommand}"/>
+                    Click="BtnSearchClick"/>
+
             <TextBlock x:Name="lblStatus"
                        Margin="12,0,0,0"
-                       VerticalAlignment="Center"
-                       Text="{Binding StatusText}"/>
+                       VerticalAlignment="Center"/>
         </StackPanel>
 
-        <Border Grid.Row="4" BorderBrush="#40000000" BorderThickness="1" CornerRadius="6" Padding="8">
+        <!-- Resultados -->
+        <Border Grid.Row="4"
+                BorderBrush="#40000000"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="8">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl x:Name="lstResults"
-                              ItemsSource="{Binding Results}">
+                <!-- ItemsSource lo seteas en code-behind: lstResults.ItemsSource = results; -->
+                <ItemsControl x:Name="lstResults">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Margin="0,4" Padding="8" CornerRadius="6" Background="#0A000000">
+                            <Border Margin="0,4"
+                                    Padding="8"
+                                    CornerRadius="6"
+                                    Background="#0A000000">
                                 <DockPanel LastChildFill="False">
                                     <Image Width="36"
                                            Height="36"
@@ -79,25 +90,34 @@
                                            Margin="0,0,8,0"
                                            Source="{Binding Avatar}"
                                            ClipToBounds="True"/>
+
                                     <StackPanel Orientation="Vertical"
                                                 VerticalAlignment="Center"
                                                 DockPanel.Dock="Left"
                                                 Width="320">
-                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding Email}" Opacity="0.7" FontSize="12"/>
-                                        <TextBlock Text="{Binding StateText}" FontSize="12" Margin="0,4,0,0"/>
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Email}"
+                                                   Opacity="0.7"
+                                                   FontSize="12"/>
+                                        <TextBlock Text="{Binding StateText}"
+                                                   FontSize="12"
+                                                   Margin="0,4,0,0"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+                                        <!-- Aceptar solicitud -->
                                         <Button Style="{StaticResource HoverScaleButton}"
                                                 Content="{x:Static language:Lang.addFriendAccept}"
                                                 Visibility="{Binding ShowAccept, Converter={StaticResource BoolToVis}}"
-                                                Command="{Binding DataContext.AcceptCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"/>
+                                                Click="BtnAcceptClick"/>
+
+                                        <!-- Agregar / Pendiente / Amigos (según VM) -->
                                         <Button Style="{StaticResource HoverScaleButton}"
                                                 Content="{Binding AddButtonText}"
                                                 IsEnabled="{Binding CanAdd}"
-                                                Command="{Binding DataContext.AddCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                                CommandParameter="{Binding}"/>
+                                                Click="BtnAddClick"/>
                                     </StackPanel>
                                 </DockPanel>
                             </Border>
@@ -107,11 +127,15 @@
             </ScrollViewer>
         </Border>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+        <!-- Cerrar -->
+        <StackPanel Grid.Row="5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,8,0,0">
             <Button x:Name="btnClose"
                     Style="{StaticResource HoverScaleButton}"
                     Content="{x:Static language:Lang.commonClose}"
-                    Command="{Binding CloseCommand}"/>
+                    Click="BtnCloseClick"/>
         </StackPanel>
     </Grid>
 </Page>

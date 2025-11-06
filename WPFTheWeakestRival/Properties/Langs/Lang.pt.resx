@@ -199,7 +199,7 @@
     <value>/Properties/Images/logo_pt.png</value>
   </data>
   <data name="colorLogin" xml:space="preserve">
-    <value>#cb102c</value>
+    <value>#004aad</value>
   </data>
   <data name="errorUsernameWithoutSpaces" xml:space="preserve">
     <value>O nome de usuário não deve conter espaços</value>
@@ -394,7 +394,7 @@
     <value>Português</value>
   </data>
   <data name="it" xml:space="preserve">
-    <value>italiano</value>
+    <value>Italiano</value>
   </data>
   <data name="fr" xml:space="preserve">
     <value>Francês</value>
