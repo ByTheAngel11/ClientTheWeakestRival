@@ -70,14 +70,6 @@ namespace WPFTheWeakestRival
             {
                 Logger.Warn("Error stopping Friends service on window unload.", ex);
             }
-
-            // IMPORTANTE:
-            // Ya NO llamamos a AppServices.DisposeAll() aquí, porque luego
-            // se vuelve a usar AppServices (Lobby, Auth, etc.) al reabrir sesión
-            // y el ServiceChannel ya está desechado.
-            //
-            // El DisposeAll debería llamarse solo cuando la app realmente termine
-            // (por ejemplo, en App.xaml.cs -> Application_Exit).
         }
 
         private int GetAvatarSize()

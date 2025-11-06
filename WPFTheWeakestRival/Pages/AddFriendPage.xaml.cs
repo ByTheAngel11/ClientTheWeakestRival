@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using log4net;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Properties.Langs;
@@ -18,6 +19,8 @@ namespace WPFTheWeakestRival.Pages
     {
         private const int SearchDebounceMilliseconds = 300;
         private const int MaxSearchResults = 20;
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(AddFriendPage));
 
         private readonly FriendServiceClient friendServiceClient;
         private readonly string authToken;
@@ -42,25 +45,42 @@ namespace WPFTheWeakestRival.Pages
 
         private async void TxtSearchQueryTextChanged(object sender, TextChangedEventArgs e)
         {
+            // Cancelar la búsqueda anterior (si existe)
             if (debounceCancellation != null)
             {
                 debounceCancellation.Cancel();
             }
 
-            debounceCancellation = new CancellationTokenSource();
-            var ct = debounceCancellation.Token;
+            // Crear un CTS nuevo para esta "ronda" de debounce
+            var currentCts = new CancellationTokenSource();
+            debounceCancellation = currentCts;
+            var ct = currentCts.Token;
 
             try
             {
                 await Task.Delay(SearchDebounceMilliseconds, ct);
+
                 if (!ct.IsCancellationRequested)
                 {
                     var textBox = (TextBox)sender;
                     await SearchAsync(textBox.Text);
                 }
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
+                // Cancelación esperada por debounce
+                Logger.Debug("Search debounce task was canceled.", ex);
+            }
+            finally
+            {
+                // Asegurarnos de liberar el CTS siempre
+                currentCts.Dispose();
+
+                // Solo limpiamos el campo si sigue apuntando a este CTS
+                if (ReferenceEquals(debounceCancellation, currentCts))
+                {
+                    debounceCancellation = null;
+                }
             }
         }
 
@@ -92,7 +112,8 @@ namespace WPFTheWeakestRival.Pages
 
                 foreach (var item in serviceResults)
                 {
-                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(item.AvatarUrl, 36) ?? UiImageHelper.DefaultAvatar(36);
+                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(item.AvatarUrl, 36)
+                                 ?? UiImageHelper.DefaultAvatar(36);
 
                     results.Add(new FriendSearchResultVm
                     {
@@ -113,12 +134,22 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, Lang.addFriendSearchTooltip, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    Lang.addFriendSearchTooltip,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
                 lblStatus.Text = Lang.addFriendServiceError;
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(Lang.noConnection + Environment.NewLine + ex.Message, Lang.addFriendSearchTooltip, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.addFriendSearchTooltip,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 lblStatus.Text = Lang.noConnection;
             }
             finally
@@ -165,7 +196,11 @@ namespace WPFTheWeakestRival.Pages
                         handler(this, EventArgs.Empty);
                     }
 
-                    MessageBox.Show(string.Format(Lang.nowFriends, viewModel.DisplayName), Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(
+                        string.Format(Lang.nowFriends, viewModel.DisplayName),
+                        Lang.addFriendTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
                 }
                 else
                 {
@@ -175,11 +210,19 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(Lang.noConnection + Environment.NewLine + ex.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -232,11 +275,19 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(Lang.noConnection + Environment.NewLine + ex.Message, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -249,7 +300,10 @@ namespace WPFTheWeakestRival.Pages
             var window = Window.GetWindow(this) as LobbyWindow;
             if (window != null)
             {
-                var method = window.GetType().GetMethod("OnCloseOverlayClick", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                var method = window.GetType().GetMethod(
+                    "OnCloseOverlayClick",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
                 if (method != null)
                 {
                     method.Invoke(window, new object[] { this, new RoutedEventArgs() });

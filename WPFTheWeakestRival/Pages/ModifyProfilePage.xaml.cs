@@ -4,6 +4,7 @@ using System.IO;
 using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
+using log4net;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.AuthService;
@@ -13,6 +14,8 @@ namespace WPFTheWeakestRival
 {
     public partial class ModifyProfilePage : Page
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(ModifyProfilePage));
+
         private readonly LobbyServiceClient lobbyClient;
         private readonly AuthServiceClient authClient;
         private readonly string authToken;
@@ -50,15 +53,30 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
-                MessageBox.Show($"{ex.Detail.Code}: {ex.Detail.Message}", Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                Logger.Warn("Auth fault while loading profile.", ex);
+                MessageBox.Show(
+                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    Lang.profileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(ex.Message, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                Logger.Error("Communication error while loading profile.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    Lang.profileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error("Unexpected error while loading profile.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    Lang.profileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -85,7 +103,11 @@ namespace WPFTheWeakestRival
 
                 lobbyClient.UpdateAccount(request);
 
-                MessageBox.Show(Lang.profileUpdated, Lang.commonSucces, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    Lang.profileUpdated,
+                    Lang.commonSucces,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
 
                 var handler = Closed;
                 if (handler != null)
@@ -95,15 +117,30 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
-                MessageBox.Show($"{ex.Detail.Code}: {ex.Detail.Message}", Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                Logger.Warn("Auth fault while updating profile.", ex);
+                MessageBox.Show(
+                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    Lang.modifyProfileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(ex.Message, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                Logger.Error("Communication error while updating profile.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    Lang.modifyProfileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error("Unexpected error while updating profile.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    Lang.modifyProfileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -134,6 +171,10 @@ namespace WPFTheWeakestRival
         {
             if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
             {
+                Logger.WarnFormat(
+                    "Requested avatar preview from invalid file path: '{0}'.",
+                    filePath ?? "<null>");
+
                 imgPreview.Source = null;
                 return;
             }
@@ -148,7 +189,12 @@ namespace WPFTheWeakestRival
 
         private void LogoutClick(object sender, RoutedEventArgs e)
         {
-            var confirm = MessageBox.Show(Lang.logoutConfirmMessage, Lang.logoutTitle, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var confirm = MessageBox.Show(
+                Lang.logoutConfirmMessage,
+                Lang.logoutTitle,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
             if (confirm != MessageBoxResult.Yes)
             {
                 return;
@@ -160,26 +206,42 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
-                MessageBox.Show($"{ex.Detail.Code}: {ex.Detail.Message}", Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                Logger.Warn("Auth fault while logging out.", ex);
+                MessageBox.Show(
+                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    Lang.logoutTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(ex.Message, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                Logger.Error("Communication error while logging out.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    Lang.logoutTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error("Unexpected error while logging out.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    Lang.logoutTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
-                try 
-                { 
-                    LoginWindow.AppSession.CurrentToken = null; 
-                } 
-                catch 
+                try
                 {
-
+                    LoginWindow.AppSession.CurrentToken = null;
                 }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Error clearing current session token during logout.", ex);
+                }
+
                 var handler = LoggedOut;
                 if (handler != null)
                 {
