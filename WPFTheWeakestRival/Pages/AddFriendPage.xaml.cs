@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,13 +46,11 @@ namespace WPFTheWeakestRival.Pages
 
         private async void TxtSearchQueryTextChanged(object sender, TextChangedEventArgs e)
         {
-            // Cancelar la búsqueda anterior (si existe)
             if (debounceCancellation != null)
             {
                 debounceCancellation.Cancel();
             }
 
-            // Crear un CTS nuevo para esta "ronda" de debounce
             var currentCts = new CancellationTokenSource();
             debounceCancellation = currentCts;
             var ct = currentCts.Token;
@@ -73,10 +72,8 @@ namespace WPFTheWeakestRival.Pages
             }
             finally
             {
-                // Asegurarnos de liberar el CTS siempre
                 currentCts.Dispose();
 
-                // Solo limpiamos el campo si sigue apuntando a este CTS
                 if (ReferenceEquals(debounceCancellation, currentCts))
                 {
                     debounceCancellation = null;
@@ -297,21 +294,19 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(this) as LobbyWindow;
-            if (window != null)
+            // Solo cerramos la ventana que hospeda esta Page
+            var hostWindow = Window.GetWindow(this);
+            if (hostWindow != null)
             {
-                var method = window.GetType().GetMethod(
-                    "OnCloseOverlayClick",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-
-                if (method != null)
-                {
-                    method.Invoke(window, new object[] { this, new RoutedEventArgs() });
-                }
+                hostWindow.Close();
             }
         }
 
-        private class FriendSearchResultVm : INotifyPropertyChanged
+        [SuppressMessage(
+            "Major Code Smell",
+            "S1144:Unused private types or members should be removed",
+            Justification = "Properties are used via WPF data binding in XAML.")]
+        private sealed class FriendSearchResultVm : INotifyPropertyChanged
         {
             public int AccountId { get; set; }
             public string DisplayName { get; set; } = string.Empty;

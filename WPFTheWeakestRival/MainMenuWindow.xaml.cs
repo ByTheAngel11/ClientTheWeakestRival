@@ -150,7 +150,7 @@ namespace WPFTheWeakestRival
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
-            // TODO: Settings page
+            // Settings button reserved for future implementation.
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

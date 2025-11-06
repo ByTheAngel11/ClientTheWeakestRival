@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using log4net;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
@@ -20,6 +22,8 @@ namespace WPFTheWeakestRival
     {
         private const int DRAWER_ANIM_IN_MS = 180;
         private const int DRAWER_ANIM_OUT_MS = 160;
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyWindow));
 
         private readonly BlurEffect overlayBlur = new BlurEffect { Radius = 0 };
 
@@ -71,7 +75,18 @@ namespace WPFTheWeakestRival
 
             RefreshProfileButtonAvatar();
 
-            Loaded += async (_, __) => await AppServices.Friends.ManualRefreshAsync();
+            Loaded += async (_, __) =>
+            {
+                try
+                {
+                    await AppServices.Friends.ManualRefreshAsync();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Error refreshing friends list on lobby window load.", ex);
+                }
+            };
+
             Unloaded += OnWindowUnloaded;
         }
 
@@ -79,16 +94,17 @@ namespace WPFTheWeakestRival
         {
             currentLobbyId = lobbyId;
             currentAccessCode = accessCode;
-            UpdateLobbyHeader(lobbyName, currentLobbyId, currentAccessCode);
+            UpdateLobbyHeader(lobbyName, currentAccessCode);
         }
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
+            // Settings button intentionally left empty; settings page will be implemented later.
         }
 
         private void BtnFriendsClick(object sender, RoutedEventArgs e)
         {
-            OpenFriendsDrawer();
+            _ = OpenFriendsDrawerAsync();
         }
 
         private void FriendsDimmerMouseDown(object sender, MouseButtonEventArgs e)
@@ -101,11 +117,14 @@ namespace WPFTheWeakestRival
             CloseFriendsDrawer();
         }
 
-        private async void OpenFriendsDrawer()
+        private async Task OpenFriendsDrawerAsync()
         {
-            if (friendsDrawerHost.Visibility == Visibility.Visible) return;
+            if (friendsDrawerHost.Visibility == Visibility.Visible)
+            {
+                return;
+            }
 
-            this.Effect = overlayBlur;
+            Effect = overlayBlur;
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
                 new DoubleAnimation(overlayBlur.Radius, 3.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
@@ -113,7 +132,14 @@ namespace WPFTheWeakestRival
                     EasingFunction = new QuadraticEase()
                 });
 
-            await AppServices.Friends.ManualRefreshAsync();
+            try
+            {
+                await AppServices.Friends.ManualRefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error refreshing friends list while opening friends drawer.", ex);
+            }
 
             friendsDrawerTT.X = 340;
             friendsDrawerHost.Opacity = 0;
@@ -127,14 +153,17 @@ namespace WPFTheWeakestRival
 
         private void CloseFriendsDrawer()
         {
-            if (friendsDrawerHost.Visibility != Visibility.Visible) return;
+            if (friendsDrawerHost.Visibility != Visibility.Visible)
+            {
+                return;
+            }
 
             if (FindResource("sbCloseFriendsDrawer") is Storyboard close)
             {
                 close.Completed += (_, __) =>
                 {
                     friendsDrawerHost.Visibility = Visibility.Collapsed;
-                    this.Effect = null;
+                    Effect = null;
                 };
                 close.Begin(this, true);
             }
@@ -156,21 +185,29 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
-            var win = new Window
+            try
             {
-                Title = Lang.btnSendRequests,
-                Content = new Frame
+                var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+                var win = new Window
                 {
-                    Content = page,
-                    NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
-                },
-                Width = 600,
-                Height = 420,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = this
-            };
-            win.ShowDialog();
+                    Title = Lang.btnSendRequests,
+                    Content = new Frame
+                    {
+                        Content = page,
+                        NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
+                    },
+                    Width = 600,
+                    Height = 420,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+                win.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error opening AddFriendPage dialog from lobby.", ex);
+                MessageBox.Show(Lang.addFriendServiceError, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
@@ -182,34 +219,45 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var page = new Pages.FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
-            var win = new Window
+            try
             {
-                Title = Lang.btnRequests,
-                Content = new Frame
+                var page = new Pages.FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+                var win = new Window
                 {
-                    Content = page,
-                    NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
-                },
-                Width = 600,
-                Height = 420,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = this
-            };
-            win.ShowDialog();
+                    Title = Lang.btnRequests,
+                    Content = new Frame
+                    {
+                        Content = page,
+                        NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
+                    },
+                    Width = 600,
+                    Height = 420,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+                win.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error opening FriendRequestsPage dialog from lobby.", ex);
+                MessageBox.Show(Lang.addFriendServiceError, Lang.btnRequests, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            if (e.Key != Key.Escape)
             {
-                if (friendsDrawerHost.Visibility == Visibility.Visible)
-                {
-                    CloseFriendsDrawer();
-                    return;
-                }
-                Close();
+                return;
             }
+
+            if (friendsDrawerHost.Visibility == Visibility.Visible)
+            {
+                CloseFriendsDrawer();
+                return;
+            }
+
+            Close();
         }
 
         private void BtnModifyProfileClick(object sender, RoutedEventArgs e)
@@ -221,30 +269,60 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var page = new ModifyProfilePage(
-                AppServices.Lobby.RawClient,
-                new AuthServiceClient("WSHttpBinding_IAuthService"),
-                token)
+            try
             {
-                Title = Lang.profileTitle
-            };
-
-            var win = new Window
-            {
-                Title = Lang.profileTitle,
-                Content = new Frame
+                var page = new ModifyProfilePage(
+                    AppServices.Lobby.RawClient,
+                    new AuthServiceClient("WSHttpBinding_IAuthService"),
+                    token)
                 {
-                    Content = page,
-                    NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
-                },
-                Width = 720,
-                Height = 460,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = this
-            };
-            win.ShowDialog();
+                    Title = Lang.profileTitle
+                };
 
-            RefreshProfileButtonAvatar();
+                var win = new Window
+                {
+                    Title = Lang.profileTitle,
+                    Content = new Frame
+                    {
+                        Content = page,
+                        NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
+                    },
+                    Width = 720,
+                    Height = 460,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = this
+                };
+                win.ShowDialog();
+
+                RefreshProfileButtonAvatar();
+            }
+            catch (FaultException<AuthService.ServiceFault> ex)
+            {
+                Logger.Warn("Auth fault while opening ModifyProfilePage from lobby.", ex);
+                MessageBox.Show(
+                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    Lang.profileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Communication error while opening ModifyProfilePage from lobby.", ex);
+                MessageBox.Show(
+                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.profileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while opening ModifyProfilePage from lobby.", ex);
+                MessageBox.Show(
+                    Lang.profileTitle,
+                    Lang.profileTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         private void RefreshProfileButtonAvatar()
@@ -260,18 +338,37 @@ namespace WPFTheWeakestRival
                 var myProfile = AppServices.Lobby.GetMyProfile(token);
                 myDisplayName = string.IsNullOrWhiteSpace(myProfile?.DisplayName) ? "Yo" : myProfile.DisplayName;
 
-                var avatarSource = UiImageHelper.TryCreateFromUrlOrPath(myProfile?.ProfileImageUrl) ?? UiImageHelper.DefaultAvatar(40);
+                var avatarSource =
+                    UiImageHelper.TryCreateFromUrlOrPath(myProfile?.ProfileImageUrl) ??
+                    UiImageHelper.DefaultAvatar(40);
+
                 if (imgAvatar != null)
                 {
                     imgAvatar.Source = avatarSource;
                 }
             }
-            catch
+            catch (FaultException<AuthService.ServiceFault> ex)
             {
-                var fallback = UiImageHelper.DefaultAvatar(40);
+                Logger.Warn("Auth fault while refreshing profile button avatar in lobby.", ex);
                 if (imgAvatar != null)
                 {
-                    imgAvatar.Source = fallback;
+                    imgAvatar.Source = UiImageHelper.DefaultAvatar(40);
+                }
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Communication error while refreshing profile button avatar in lobby.", ex);
+                if (imgAvatar != null)
+                {
+                    imgAvatar.Source = UiImageHelper.DefaultAvatar(40);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while refreshing profile button avatar in lobby.", ex);
+                if (imgAvatar != null)
+                {
+                    imgAvatar.Source = UiImageHelper.DefaultAvatar(40);
                 }
             }
         }
@@ -281,7 +378,7 @@ namespace WPFTheWeakestRival
             MessageBox.Show(Lang.matchStartingSoon);
         }
 
-        private void UpdateLobbyHeader(string lobbyName, Guid? lobbyId, string accessCode)
+        private void UpdateLobbyHeader(string lobbyName, string accessCode)
         {
             if (txtLobbyHeader != null)
             {
@@ -290,7 +387,9 @@ namespace WPFTheWeakestRival
 
             if (txtAccessCode != null)
             {
-                txtAccessCode.Text = string.IsNullOrWhiteSpace(accessCode) ? string.Empty : $"{Lang.lobbyCodePrefix}{accessCode}";
+                txtAccessCode.Text = string.IsNullOrWhiteSpace(accessCode)
+                    ? string.Empty
+                    : Lang.lobbyCodePrefix + accessCode;
             }
         }
 
@@ -305,7 +404,8 @@ namespace WPFTheWeakestRival
 
             if (lstChatMessages != null && lstChatMessages.Items.Count > 0)
             {
-                lstChatMessages.ScrollIntoView(lstChatMessages.Items[lstChatMessages.Items.Count - 1]);
+                lstChatMessages.ScrollIntoView(
+                    lstChatMessages.Items[lstChatMessages.Items.Count - 1]);
             }
         }
 
@@ -357,11 +457,21 @@ namespace WPFTheWeakestRival
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show(Lang.chatSendFailed + Environment.NewLine + ex.Message, Lang.chatTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error("Communication error while sending chat message in lobby.", ex);
+                MessageBox.Show(
+                    Lang.chatSendFailed + Environment.NewLine + ex.Message,
+                    Lang.chatTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(Lang.chatSendFailed + " " + ex.Message, Lang.chatTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error("Unexpected error while sending chat message in lobby.", ex);
+                MessageBox.Show(
+                    Lang.chatSendFailed + " " + ex.Message,
+                    Lang.chatTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -380,10 +490,12 @@ namespace WPFTheWeakestRival
                     currentAccessCode = info.AccessCode;
                 }
 
-                Dispatcher.Invoke(() => UpdateLobbyHeader(info.LobbyName, info.LobbyId, currentAccessCode));
+                Dispatcher.Invoke(
+                    () => UpdateLobbyHeader(info.LobbyName, currentAccessCode));
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error("Error handling lobby update from hub.", ex);
             }
         }
 
@@ -393,8 +505,9 @@ namespace WPFTheWeakestRival
             {
                 Dispatcher.Invoke(() => AppendSystemLine(Lang.lobbyPlayerJoined));
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error("Error handling player-joined event from hub.", ex);
             }
         }
 
@@ -404,8 +517,9 @@ namespace WPFTheWeakestRival
             {
                 Dispatcher.Invoke(() => AppendSystemLine(Lang.lobbyPlayerLeft));
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error("Error handling player-left event from hub.", ex);
             }
         }
 
@@ -420,7 +534,9 @@ namespace WPFTheWeakestRival
 
                 Dispatcher.Invoke(() =>
                 {
-                    var author = string.IsNullOrWhiteSpace(chat.FromPlayerName) ? Lang.player : chat.FromPlayerName;
+                    var author = string.IsNullOrWhiteSpace(chat.FromPlayerName)
+                        ? Lang.player
+                        : chat.FromPlayerName;
 
                     var isMyRecentEcho =
                         string.Equals(author, myDisplayName, StringComparison.OrdinalIgnoreCase) &&
@@ -433,18 +549,21 @@ namespace WPFTheWeakestRival
                     }
                 });
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error("Error handling chat message received from hub.", ex);
             }
         }
 
         private void OnFriendsUpdated(System.Collections.Generic.IReadOnlyList<FriendItem> list, int pending)
         {
             friendItems.Clear();
+
             foreach (var f in list)
             {
                 friendItems.Add(f);
             }
+
             pendingRequests = pending;
             UpdateFriendDrawerUi();
         }
@@ -453,12 +572,16 @@ namespace WPFTheWeakestRival
         {
             if (friendsEmptyPanel != null)
             {
-                friendsEmptyPanel.Visibility = friendItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+                friendsEmptyPanel.Visibility =
+                    friendItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             }
+
             if (lstFriends != null)
             {
-                lstFriends.Visibility = friendItems.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+                lstFriends.Visibility =
+                    friendItems.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
             }
+
             if (txtRequestsCount != null)
             {
                 txtRequestsCount.Text = pendingRequests.ToString();
@@ -475,8 +598,9 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.ChatMessageReceived -= OnChatMessageReceivedFromHub;
                 AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Warn("Error detaching lobby and friends event handlers on window unload.", ex);
             }
         }
 
@@ -490,9 +614,15 @@ namespace WPFTheWeakestRival
                     await AppServices.Lobby.LeaveLobbyAsync(token);
                 }
             }
-            catch
+            catch (CommunicationException ex)
             {
+                Logger.Error("Communication error while leaving lobby on window close.", ex);
             }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while leaving lobby on window close.", ex);
+            }
+
             base.OnClosed(e);
         }
     }
