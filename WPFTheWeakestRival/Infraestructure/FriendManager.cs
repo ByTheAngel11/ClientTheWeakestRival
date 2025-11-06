@@ -12,26 +12,53 @@ namespace WPFTheWeakestRival.Infrastructure
     {
         private const int HEARTBEAT_SECONDS = 30;
         private const int REFRESH_SECONDS = 45;
+        private const int DEFAULT_AVATAR_SIZE = 36;
+        private const string DEVICE_NAME = "WPF";
 
-        private readonly FriendServiceClient client;
+        private readonly string endpointName;
         private readonly DispatcherTimer heartbeatTimer;
         private readonly DispatcherTimer refreshTimer;
+
+        private FriendServiceClient client;
+        private bool isDisposed;
 
         public event Action<IReadOnlyList<Models.FriendItem>, int> FriendsUpdated;
 
         public FriendManager(string endpointName)
         {
-            client = new FriendServiceClient(endpointName);
-            heartbeatTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(HEARTBEAT_SECONDS) };
+            if (string.IsNullOrWhiteSpace(endpointName))
+            {
+                throw new ArgumentException("Endpoint name cannot be null or whitespace.", nameof(endpointName));
+            }
+
+            this.endpointName = endpointName;
+            client = CreateClient();
+
+            heartbeatTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(HEARTBEAT_SECONDS)
+            };
+
             heartbeatTimer.Tick += async (_, __) => await SendHeartbeatSafeAsync();
-            refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(REFRESH_SECONDS) };
+
+            refreshTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(REFRESH_SECONDS)
+            };
+
             refreshTimer.Tick += async (_, __) => await RefreshFriendsSafeAsync();
         }
 
         public void Start()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
             heartbeatTimer.Start();
             refreshTimer.Start();
+
             _ = RefreshFriendsSafeAsync();
         }
 
@@ -46,88 +73,172 @@ namespace WPFTheWeakestRival.Infrastructure
             return RefreshFriendsSafeAsync();
         }
 
+        private FriendServiceClient CreateClient()
+        {
+            return new FriendServiceClient(endpointName);
+        }
+
+        private FriendServiceClient GetOrCreateClient()
+        {
+            if (isDisposed)
+            {
+                return null;
+            }
+
+            if (client == null ||
+                client.State == CommunicationState.Closed ||
+                client.State == CommunicationState.Faulted)
+            {
+                try
+                {
+                    client?.Abort();
+                }
+                catch
+                {
+                    // Ignore
+                }
+
+                client = CreateClient();
+            }
+
+            return client;
+        }
+
         private async Task SendHeartbeatSafeAsync()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
             try
             {
                 var token = LoginWindow.AppSession.CurrentToken?.Token;
-                if (string.IsNullOrWhiteSpace(token)) return;
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return;
+                }
 
-                await client.PresenceHeartbeatAsync(new HeartbeatRequest
+                var proxy = GetOrCreateClient();
+                if (proxy == null)
+                {
+                    return;
+                }
+
+                await proxy.PresenceHeartbeatAsync(new HeartbeatRequest
                 {
                     Token = token,
-                    Device = "WPF"
+                    Device = DEVICE_NAME
                 });
             }
-            catch 
+            catch
             {
-                // Ignore
+                // Ignore: heartbeat es best-effort
             }
         }
 
         private async Task RefreshFriendsSafeAsync()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
             var token = LoginWindow.AppSession.CurrentToken?.Token;
-            if (string.IsNullOrWhiteSpace(token)) return;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                return;
+            }
 
             try
             {
-                var res = await Task.Run(() =>
-                    client.ListFriends(new ListFriendsRequest
+                var proxy = GetOrCreateClient();
+                if (proxy == null)
+                {
+                    return;
+                }
+
+                var response = await Task.Run(() =>
+                    proxy.ListFriends(new ListFriendsRequest
                     {
                         Token = token,
                         IncludePendingIncoming = true,
                         IncludePendingOutgoing = false
                     }));
 
-                var list = new List<Models.FriendItem>();
-                foreach (var f in res.Friends ?? Array.Empty<FriendSummary>())
-                {
-                    var name = string.IsNullOrWhiteSpace(f.DisplayName) ? f.Username : f.DisplayName;
-                    var img = UiImageHelper.TryCreateFromUrlOrPath(f.AvatarUrl) ?? UiImageHelper.DefaultAvatar(36);
+                var items = new List<Models.FriendItem>();
 
-                    list.Add(new Models.FriendItem
+                foreach (var friend in response.Friends ?? Array.Empty<FriendSummary>())
+                {
+                    var displayName = string.IsNullOrWhiteSpace(friend.DisplayName)
+                        ? friend.Username
+                        : friend.DisplayName;
+
+                    var avatarImage = UiImageHelper.TryCreateFromUrlOrPath(friend.AvatarUrl)
+                                      ?? UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
+
+                    items.Add(new Models.FriendItem
                     {
-                        DisplayName = name ?? string.Empty,
-                        StatusText = f.IsOnline ? Properties.Langs.Lang.statusAvailable : Properties.Langs.Lang.statusOffline,
-                        Presence = f.IsOnline ? "Online" : "Offline",
-                        Avatar = img,
-                        IsOnline = f.IsOnline
+                        DisplayName = displayName ?? string.Empty,
+                        StatusText = friend.IsOnline
+                            ? Properties.Langs.Lang.statusAvailable
+                            : Properties.Langs.Lang.statusOffline,
+                        Presence = friend.IsOnline ? "Online" : "Offline",
+                        Avatar = avatarImage,
+                        IsOnline = friend.IsOnline
                     });
                 }
 
-                var pending = Math.Max(0, res.PendingIncoming?.Length ?? 0);
-                FriendsUpdated?.Invoke(list, pending);
+                var pendingCount = Math.Max(0, response.PendingIncoming?.Length ?? 0);
+
+                FriendsUpdated?.Invoke(items, pendingCount);
             }
-            catch (FaultException<FriendService.ServiceFault>) 
+            catch (FaultException<FriendService.ServiceFault>)
             {
-                // Ignore
+                // Ignorar: errores de negocio ya se manejan en UI si hace falta
             }
-            catch (CommunicationException) 
+            catch (CommunicationException)
             {
-                // Ignore
+                // Ignorar: caída de red / canal, se reintentará en el siguiente tick
             }
-            catch (Exception) 
+            catch (Exception)
             {
-                // Ignore
+                // Ignorar cualquier otra cosa para no reventar el timer
             }
         }
 
         public void Dispose()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            isDisposed = true;
+
             Stop();
+
             try
             {
-                if (client.State == System.ServiceModel.CommunicationState.Faulted) client.Abort();
-                else client.Close();
+                if (client != null)
+                {
+                    if (client.State == CommunicationState.Faulted)
+                    {
+                        client.Abort();
+                    }
+                    else
+                    {
+                        client.Close();
+                    }
+                }
             }
             catch
             {
-                try 
-                { 
-                    client.Abort(); 
-                } 
-                catch 
+                try
+                {
+                    client?.Abort();
+                }
+                catch
                 {
                     // Ignore
                 }

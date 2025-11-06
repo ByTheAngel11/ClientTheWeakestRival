@@ -25,7 +25,11 @@
         <BitmapImage x:Key="ChalkboardBackground"
              UriSource="pack://application:,,,/Assets/Backgrounds/ChalkboardGreen.png"/>
         <BitmapImage x:Key="FriendsLockerBackground"
-             UriSource="pack://application:,,,/Assets/Backgrounds/BackgroundListFriends.png" />
+             UriSource="pack://application:,,,/Assets/Backgrounds/BackgroundListFriends.png"/>
+        <BitmapImage x:Key="PersonalizationIcon"
+             UriSource="pack://application:,,,/Assets/Icons/personalization.png"/>
+        <BitmapImage x:Key="ScoreboardIcon"
+             UriSource="pack://application:,,,/Assets/Icons/scoreboard.png"/>
         <sys:Double x:Key="AvatarSize">28</sys:Double>
         <SolidColorBrush x:Key="OverlayBackdropBrush" Color="#99000000"/>
         <SolidColorBrush x:Key="OverlayCardBackgroundBrush" Color="White"/>
@@ -189,8 +193,32 @@
                             ToolTip="{loc:Loc settings}">
                         <Image Source="{StaticResource SettingsIcon}" Width="52" Height="51" Stretch="Uniform" SnapsToDevicePixels="True" RenderOptions.BitmapScalingMode="HighQuality"/>
                     </Button>
-                    <Button x:Name="btnPersonalization" Style="{StaticResource TopBarButtonStyle}" Content="{loc:Loc btnPersonalization}"/>
-                    <Button x:Name="btnScore" Style="{StaticResource TopBarButtonStyle}" Width="130" Content="{loc:Loc btnScoreboard}"/>
+                    <Button x:Name="btnPersonalization"
+        Style="{StaticResource TopBarIconButtonStyle}"
+        Height="51"
+        Width="57"
+        Margin="0,0,12,0"
+        ToolTip="{loc:Loc btnPersonalization}">
+                        <Image Source="{StaticResource PersonalizationIcon}"
+           Width="52"
+           Height="51"
+           Stretch="Uniform"
+           SnapsToDevicePixels="True"
+           RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Button>
+
+                    <Button x:Name="btnScore"
+        Style="{StaticResource TopBarIconButtonStyle}"
+        Height="51"
+        Width="57"
+        ToolTip="{loc:Loc btnScoreboard}">
+                        <Image Source="{StaticResource ScoreboardIcon}"
+                           Width="52"
+                           Height="51"
+                           Stretch="Uniform"
+                           SnapsToDevicePixels="True"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+                    </Button>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">

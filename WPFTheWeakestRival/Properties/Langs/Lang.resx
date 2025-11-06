@@ -429,4 +429,13 @@
   <data name="featureNotImplemented" xml:space="preserve">
     <value>Feature not implemented</value>
   </data>
+  <data name="btnProfileBrowse" xml:space="preserve">
+    <value>Choose an image</value>
+  </data>
+  <data name="btnProfileRemoveImage" xml:space="preserve">
+    <value>Remove the image</value>
+  </data>
+  <data name="save" xml:space="preserve">
+    <value>Save</value>
+  </data>
 </root>

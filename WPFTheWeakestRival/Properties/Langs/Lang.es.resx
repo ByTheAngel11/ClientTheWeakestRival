@@ -429,4 +429,17 @@
   <data name="featureNotImplemented" xml:space="preserve">
     <value>Característica no implementada</value>
   </data>
+  <data name="btnProfileBrowse" xml:space="preserve">
+    <value>Elige una imagen</value>
+  </data>
+  <data name="btnProfileRemoveImage" xml:space="preserve">
+    <value>Quitar la imagen</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="save" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
 </root>

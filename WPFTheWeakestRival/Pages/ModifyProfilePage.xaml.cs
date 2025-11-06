@@ -172,7 +172,14 @@ namespace WPFTheWeakestRival
             }
             finally
             {
-                try { LoginWindow.AppSession.CurrentToken = null; } catch { }
+                try 
+                { 
+                    LoginWindow.AppSession.CurrentToken = null; 
+                } 
+                catch 
+                {
+
+                }
                 var handler = LoggedOut;
                 if (handler != null)
                 {

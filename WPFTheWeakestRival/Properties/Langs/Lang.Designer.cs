@@ -178,6 +178,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Choose an image.
+        /// </summary>
+        public static string btnProfileBrowse {
+            get {
+                return ResourceManager.GetString("btnProfileBrowse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Remove the image.
+        /// </summary>
+        public static string btnProfileRemoveImage {
+            get {
+                return ResourceManager.GetString("btnProfileRemoveImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Requests.
         /// </summary>
         public static string btnRequests {
@@ -885,6 +903,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string results {
             get {
                 return ResourceManager.GetString("results", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Save.
+        /// </summary>
+        public static string save {
+            get {
+                return ResourceManager.GetString("save", resourceCulture);
             }
         }
         
