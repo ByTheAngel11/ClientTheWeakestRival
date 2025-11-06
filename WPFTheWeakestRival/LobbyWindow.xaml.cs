@@ -124,7 +124,11 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            Effect = overlayBlur;
+            if (grdMainArea != null)
+            {
+                grdMainArea.Effect = overlayBlur;
+            }
+
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
                 new DoubleAnimation(overlayBlur.Radius, 3.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
@@ -163,7 +167,11 @@ namespace WPFTheWeakestRival
                 close.Completed += (_, __) =>
                 {
                     friendsDrawerHost.Visibility = Visibility.Collapsed;
-                    Effect = null;
+
+                    if (grdMainArea != null)
+                    {
+                        grdMainArea.Effect = null;
+                    }
                 };
                 close.Begin(this, true);
             }
@@ -625,5 +633,33 @@ namespace WPFTheWeakestRival
 
             base.OnClosed(e);
         }
+
+        private void BtnCopyCodeClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(currentAccessCode))
+                {
+                    MessageBox.Show(
+                        "No hay un código de lobby para copiar.",
+                        Lang.lobbyTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    return;
+                }
+
+                Clipboard.SetText(currentAccessCode);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error copying lobby access code to clipboard.", ex);
+                MessageBox.Show(
+                    "Ocurrió un error al copiar el código al portapapeles.",
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
     }
 }

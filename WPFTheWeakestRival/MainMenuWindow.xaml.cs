@@ -180,7 +180,14 @@ namespace WPFTheWeakestRival
 
         private Brush GetOverlayBackgroundForPage(Page page)
         {
-            if (page is Pages.AddFriendPage || page is Pages.FriendRequestsPage)
+            if (page == null)
+            {
+                return Brushes.Transparent;
+            }
+
+            if (page is Pages.AddFriendPage
+                || page is Pages.FriendRequestsPage
+                || page is Pages.PlayOptionsPage)
             {
                 try
                 {
@@ -197,7 +204,7 @@ namespace WPFTheWeakestRival
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn("Error loading AddFriend overlay background. Falling back to transparent background.", ex);
+                    Logger.Warn("Error loading overlay background. Falling back to transparent background.", ex);
                 }
             }
 
@@ -205,9 +212,9 @@ namespace WPFTheWeakestRival
         }
 
 
+
         private void ShowOverlay(Page page)
         {
-            // Fondo específico según la página
             if (overlayContentGrid != null)
             {
                 overlayContentGrid.Background = GetOverlayBackgroundForPage(page);
