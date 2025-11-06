@@ -519,5 +519,8 @@
   <ItemGroup>
     <Resource Include="Assets\Backgrounds\ModifyProfileBackground.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\AddFriendBackground.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

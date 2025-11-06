@@ -439,6 +439,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Requests recieved.
+        /// </summary>
+        public static string friendRequestsIncoming {
+            get {
+                return ResourceManager.GetString("friendRequestsIncoming", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Requests sended.
+        /// </summary>
+        public static string friendRequestsOutgoing {
+            get {
+                return ResourceManager.GetString("friendRequestsOutgoing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Error on the registration.
         /// </summary>
         public static string generalRegistError {
@@ -795,6 +813,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string playOptionsTitle {
             get {
                 return ResourceManager.GetString("playOptionsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Profile image.
+        /// </summary>
+        public static string profileAvatar {
+            get {
+                return ResourceManager.GetString("profileAvatar", resourceCulture);
             }
         }
         

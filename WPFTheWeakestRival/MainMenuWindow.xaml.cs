@@ -29,6 +29,7 @@ namespace WPFTheWeakestRival
 
         private const int DEFAULT_AVATAR_SIZE = 28;
         private const string AVATAR_SIZE_RESOURCE_KEY = "AvatarSize";
+        private const string ADD_FRIEND_BACKGROUND_RESOURCE_KEY = "AddFriendBackground";
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MainMenuWindow));
 
@@ -177,8 +178,41 @@ namespace WPFTheWeakestRival
             HideOverlay();
         }
 
+        private Brush GetOverlayBackgroundForPage(Page page)
+        {
+            if (page is Pages.AddFriendPage || page is Pages.FriendRequestsPage)
+            {
+                try
+                {
+                    var resource = FindResource(ADD_FRIEND_BACKGROUND_RESOURCE_KEY);
+                    if (resource is ImageSource imageSource)
+                    {
+                        return new ImageBrush(imageSource)
+                        {
+                            Stretch = Stretch.UniformToFill,
+                            AlignmentX = AlignmentX.Center,
+                            AlignmentY = AlignmentY.Center
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Error loading AddFriend overlay background. Falling back to transparent background.", ex);
+                }
+            }
+
+            return Brushes.Transparent;
+        }
+
+
         private void ShowOverlay(Page page)
         {
+            // Fondo específico según la página
+            if (overlayContentGrid != null)
+            {
+                overlayContentGrid.Background = GetOverlayBackgroundForPage(page);
+            }
+
             frmOverlayFrame.Content = page;
             grdMainArea.Effect = overlayBlur;
             pnlOverlayHost.Visibility = Visibility.Visible;
@@ -212,6 +246,11 @@ namespace WPFTheWeakestRival
             {
                 pnlOverlayHost.Visibility = Visibility.Collapsed;
                 frmOverlayFrame.Content = null;
+
+                if (overlayContentGrid != null)
+                {
+                    overlayContentGrid.Background = Brushes.Transparent;
+                }
 
                 if (friendsDrawerHost.Visibility != Visibility.Visible)
                 {
@@ -478,8 +517,15 @@ namespace WPFTheWeakestRival
             }
 
             var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+
+            page.CloseRequested += (_, __) =>
+            {
+                HideOverlay();
+            };
+
             ShowOverlay(page);
         }
+
 
         private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
         {
@@ -491,8 +537,15 @@ namespace WPFTheWeakestRival
             }
 
             var page = new Pages.FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+
+            page.CloseRequested += (_, __) =>
+            {
+                HideOverlay();
+            };
+
             ShowOverlay(page);
         }
+
 
         private void BtnModifyProfileClick(object sender, RoutedEventArgs e)
         {

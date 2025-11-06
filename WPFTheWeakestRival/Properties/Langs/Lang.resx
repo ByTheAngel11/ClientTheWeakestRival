@@ -438,4 +438,13 @@
   <data name="save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="profileAvatar" xml:space="preserve">
+    <value>Profile image</value>
+  </data>
+  <data name="friendRequestsIncoming" xml:space="preserve">
+    <value>Requests recieved</value>
+  </data>
+  <data name="friendRequestsOutgoing" xml:space="preserve">
+    <value>Requests sended</value>
+  </data>
 </root>

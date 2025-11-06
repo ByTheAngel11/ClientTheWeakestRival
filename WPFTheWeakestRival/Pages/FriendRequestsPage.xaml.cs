@@ -22,6 +22,8 @@ namespace WPFTheWeakestRival.Pages
         private readonly ObservableCollection<RequestViewModel> outgoingRequests = new ObservableCollection<RequestViewModel>();
 
         public event EventHandler FriendsChanged;
+        public event EventHandler CloseRequested;
+
 
         public FriendRequestsPage(FriendServiceClient client, string token)
         {
@@ -256,19 +258,13 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
-            var window = Window.GetWindow(this) as LobbyWindow;
-            if (window != null)
+            var handler = CloseRequested;
+            if (handler != null)
             {
-                var method = window.GetType().GetMethod(
-                    "OnCloseOverlayClick",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-
-                if (method != null)
-                {
-                    method.Invoke(window, new object[] { this, new RoutedEventArgs() });
-                }
+                handler(this, EventArgs.Empty);
             }
         }
+
 
         private class RequestViewModel : INotifyPropertyChanged
         {

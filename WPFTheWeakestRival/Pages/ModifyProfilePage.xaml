@@ -33,7 +33,7 @@
                    FontWeight="Bold"
                    Margin="32,20,32,0"
                    VerticalAlignment="Center"
-                   Foreground="Black"/>
+                   Foreground="White"/>
 
         <!-- Contenido en la zona central crema -->
         <Grid Grid.Row="1"
@@ -81,7 +81,7 @@
                 <!-- Email -->
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
-                           Text="{loc:Loc profileEmail}"
+                           Text="{loc:Loc lblEmail}"
                            VerticalAlignment="Center"/>
                 <TextBox x:Name="txtEmail"
                          Grid.Row="0"
@@ -93,7 +93,7 @@
                 <!-- Display name -->
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
-                           Text="{loc:Loc profileDisplayName}"
+                           Text="{loc:Loc registerDisplayName}"
                            VerticalAlignment="Center"/>
                 <TextBox x:Name="txtDisplayName"
                          Grid.Row="2"
@@ -105,7 +105,7 @@
                 <!-- URL + botones -->
                 <TextBlock Grid.Row="4"
                            Grid.Column="0"
-                           Text="{loc:Loc profileAvatarUrl}"
+                           Text="{loc:Loc profileAvatar}"
                            VerticalAlignment="Center"/>
                 <Grid Grid.Row="4"
                       Grid.Column="2">
@@ -123,14 +123,13 @@
                     <Button x:Name="btnBrowse"
                             Grid.Column="1"
                             Content="{loc:Loc btnProfileBrowse}"
-                            Margin="3,0,12,0"
+                            Margin="3,0,83,0"
                             Click="BtnBrowseClick"/>
 
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="1"
                             Content="{loc:Loc btnProfileRemoveImage}"
                             Width="100"
-                            Margin="0,0,0,0"
-                            Click="BtnClearImageClick"/>
+                            Click="BtnClearImageClick" Grid.ColumnSpan="2" Margin="155,0,10,0"/>
                 </Grid>
             </Grid>
         </Grid>
@@ -144,8 +143,12 @@
                     Width="96"
                     Height="28"
                     Margin="0,0,8,0"
+                    Background="DarkRed"
+                    Foreground="White"
                     Click="BtnCancelClick"/>
             <Button Content="{loc:Loc save}"
+                    Background="DarkBlue"
+                    Foreground="White"
                     Width="110"
                     Height="28"
                     Click="BtnSaveClick"/>

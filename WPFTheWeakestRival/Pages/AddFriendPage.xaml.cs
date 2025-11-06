@@ -30,6 +30,8 @@ namespace WPFTheWeakestRival.Pages
         private CancellationTokenSource debounceCancellation;
 
         public event EventHandler FriendsUpdated;
+        public event EventHandler CloseRequested;
+
 
         public AddFriendPage(FriendServiceClient client, string token)
         {
@@ -294,13 +296,13 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
-            // Solo cerramos la ventana que hospeda esta Page
-            var hostWindow = Window.GetWindow(this);
-            if (hostWindow != null)
+            var handler = CloseRequested;
+            if (handler != null)
             {
-                hostWindow.Close();
+                handler(this, EventArgs.Empty);
             }
         }
+
 
         [SuppressMessage(
             "Major Code Smell",
