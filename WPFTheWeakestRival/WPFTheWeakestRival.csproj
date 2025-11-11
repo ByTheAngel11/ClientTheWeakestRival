@@ -121,7 +121,13 @@
     <Compile Include="MainMenuWindow.xaml.cs">
       <DependentUpon>MainMenuWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MatchWindow.xaml.cs">
+      <DependentUpon>MatchWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\FriendItem.cs" />
+    <Compile Include="Pages\MatchSettingsPage.xaml.cs">
+      <DependentUpon>MatchSettingsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\ModifyProfilePage.xaml.cs">
       <DependentUpon>ModifyProfilePage.xaml</DependentUpon>
     </Compile>
@@ -180,6 +186,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MatchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\MatchSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ModifyProfilePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -339,6 +353,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\LobbyService\WPFTheWeakestRival.LobbyService.ListLobbiesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\LobbyService\WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\LobbyService\WPFTheWeakestRival.LobbyService.UpdateAccountResponse.datasource">

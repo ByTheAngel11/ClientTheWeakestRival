@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using System.Windows.Navigation;
 using log4net;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.FriendService;
@@ -15,6 +16,10 @@ using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Pages;
+
+using LobbyContracts = WPFTheWeakestRival.LobbyService;
+using MatchContracts = WPFTheWeakestRival.MatchmakingService;
 
 namespace WPFTheWeakestRival
 {
@@ -38,11 +43,43 @@ namespace WPFTheWeakestRival
         private readonly ObservableCollection<FriendItem> friendItems = new ObservableCollection<FriendItem>();
         private int pendingRequests;
 
+        // Config de la partida (por ahora solo privacidad y jugadores)
+        private bool _isPrivate = true;
+        private int _maxPlayers = 4;
+
         private sealed class ChatLine
         {
             public string Author { get; set; } = string.Empty;
             public string Text { get; set; } = string.Empty;
             public string Time { get; set; } = string.Empty;
+        }
+
+        private sealed class MatchmakingClientCallback : MatchContracts.IMatchmakingServiceCallback
+        {
+            public void OnMatchCreated(MatchContracts.MatchInfo match)
+            {
+                // Por ahora no hacemos nada aquí; la creación se maneja en la respuesta del CreateMatchAsync.
+            }
+
+            public void OnMatchStarted(MatchContracts.MatchInfo match)
+            {
+                // Futuro: podrías avisar al usuario cuando el server arranque la match.
+            }
+
+            public void OnMatchPlayerJoined(Guid matchId, MatchContracts.PlayerSummary player)
+            {
+                // Futuro: actualizar UI cuando alguien se una a la match.
+            }
+
+            public void OnMatchPlayerLeft(Guid matchId, Guid playerId)
+            {
+                // Futuro: actualizar UI cuando alguien salga de la match.
+            }
+
+            public void OnMatchCancelled(Guid matchId, string reason)
+            {
+                // Futuro: avisar que la match fue cancelada.
+            }
         }
 
         public LobbyWindow()
@@ -69,6 +106,7 @@ namespace WPFTheWeakestRival
             AppServices.Lobby.PlayerJoined += OnPlayerJoinedFromHub;
             AppServices.Lobby.PlayerLeft += OnPlayerLeftFromHub;
             AppServices.Lobby.ChatMessageReceived += OnChatMessageReceivedFromHub;
+            AppServices.Lobby.MatchStarted += OnMatchStartedFromHub;
 
             AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
             AppServices.Friends.Start();
@@ -99,7 +137,29 @@ namespace WPFTheWeakestRival
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
-            // Settings button intentionally left empty; settings page will be implemented later.
+            var page = new MatchSettingsPage(_isPrivate, _maxPlayers);
+
+            var win = new Window
+            {
+                Title = Lang.lblSettings,
+                Content = new Frame
+                {
+                    Content = page,
+                    NavigationUIVisibility = NavigationUIVisibility.Hidden
+                },
+                Width = 420,
+                Height = 260,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            var result = win.ShowDialog();
+            if (result == true)
+            {
+                _isPrivate = page.IsPrivate;
+                _maxPlayers = page.MaxPlayers;
+            }
         }
 
         private void BtnFriendsClick(object sender, RoutedEventArgs e)
@@ -202,7 +262,7 @@ namespace WPFTheWeakestRival
                     Content = new Frame
                     {
                         Content = page,
-                        NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
+                        NavigationUIVisibility = NavigationUIVisibility.Hidden
                     },
                     Width = 600,
                     Height = 420,
@@ -236,7 +296,7 @@ namespace WPFTheWeakestRival
                     Content = new Frame
                     {
                         Content = page,
-                        NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
+                        NavigationUIVisibility = NavigationUIVisibility.Hidden
                     },
                     Width = 600,
                     Height = 420,
@@ -293,7 +353,7 @@ namespace WPFTheWeakestRival
                     Content = new Frame
                     {
                         Content = page,
-                        NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden
+                        NavigationUIVisibility = NavigationUIVisibility.Hidden
                     },
                     Width = 720,
                     Height = 460,
@@ -381,10 +441,69 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void BtnStartMatchClick(object sender, RoutedEventArgs e)
+        private async void BtnStartMatchClick(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(Lang.matchStartingSoon);
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            if (btnStart != null)
+            {
+                btnStart.IsEnabled = false;
+            }
+
+            try
+            {
+                var client = AppServices.Lobby.RawClient;
+
+                var request = new LobbyService.StartLobbyMatchRequest
+                {
+                    Token = token
+                };
+
+                // Llamamos al servicio en un hilo de trabajo para no bloquear la UI.
+                // La navegación a la ventana de partida se hará solo en OnMatchStartedFromHub.
+                await Task.Run(() => client.StartLobbyMatch(request));
+            }
+            catch (FaultException<LobbyService.ServiceFault> ex)
+            {
+                Logger.Warn("Fault al iniciar partida desde Lobby.", ex);
+                MessageBox.Show(
+                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al iniciar partida desde Lobby.", ex);
+                MessageBox.Show(
+                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al iniciar partida desde Lobby.", ex);
+                MessageBox.Show(
+                    "Ocurrió un error al iniciar la partida." + Environment.NewLine + ex.Message,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (btnStart != null)
+                {
+                    btnStart.IsEnabled = true;
+                }
+            }
         }
+
 
         private void UpdateLobbyHeader(string lobbyName, string accessCode)
         {
@@ -507,7 +626,7 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void OnPlayerJoinedFromHub(PlayerSummary _)
+        private void OnPlayerJoinedFromHub(LobbyContracts.PlayerSummary _)
         {
             try
             {
@@ -604,6 +723,7 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.PlayerJoined -= OnPlayerJoinedFromHub;
                 AppServices.Lobby.PlayerLeft -= OnPlayerLeftFromHub;
                 AppServices.Lobby.ChatMessageReceived -= OnChatMessageReceivedFromHub;
+                AppServices.Lobby.MatchStarted -= OnMatchStartedFromHub;
                 AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
             }
             catch (Exception ex)
@@ -661,5 +781,33 @@ namespace WPFTheWeakestRival
             }
         }
 
+        private void OnMatchStartedFromHub(LobbyService.MatchInfo match)
+        {
+            try
+            {
+                if (match == null)
+                {
+                    return;
+                }
+
+                Dispatcher.Invoke(() =>
+                {
+                    var token = LoginWindow.AppSession.CurrentToken?.Token;
+                    var session = LoginWindow.AppSession.CurrentToken;
+                    var myUserId = session != null ? session.UserId : 0;
+
+                    // Desde el hub normalmente eres invitado, así que marcamos isHost = false
+                    var isHost = false;
+
+                    var win = new MatchWindow(match, token, myUserId, isHost, this);
+                    this.Hide();
+                    win.Show();
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error handling OnMatchStartedFromHub in LobbyWindow.", ex);
+            }
+        }
     }
 }

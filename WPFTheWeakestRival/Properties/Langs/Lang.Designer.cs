@@ -700,6 +700,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Match.
+        /// </summary>
+        public static string matchTitle {
+            get {
+                return ResourceManager.GetString("matchTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Modify Profile.
         /// </summary>
         public static string modifyProfileTitle {

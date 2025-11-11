@@ -18,6 +18,9 @@ namespace WPFTheWeakestRival.Infrastructure
         public event Action<Guid> PlayerLeft;
         public event Action<ChatMessage> ChatMessageReceived;
 
+        // ⬇⬇ NUEVO: evento para cuando el servidor arranca la partida
+        public event Action<MatchInfo> MatchStarted;
+
         public LobbyHub(string endpointName)
         {
             var ctx = new InstanceContext(this);
@@ -70,18 +73,38 @@ namespace WPFTheWeakestRival.Infrastructure
 
             try
             {
+                // Si el canal ya está en Faulted, no intentes llamar al servicio.
+                if (client.State == CommunicationState.Faulted)
+                {
+                    return;
+                }
+
                 await Task.Run(() => client.LeaveLobby(new LeaveLobbyRequest
                 {
                     Token = token,
                     LobbyId = CurrentLobbyId.Value
                 }));
             }
+            catch (CommunicationObjectFaultedException)
+            {
+                // El canal ya estaba roto, ignoramos de forma controlada.
+            }
+            catch (CommunicationException)
+            {
+                // Puedes loguear si quieres, pero no reventamos la app.
+            }
+            catch (TimeoutException)
+            {
+                // Igual, opcional log.
+            }
             finally
             {
+                // Siempre limpiamos el estado local del hub.
                 CurrentLobbyId = null;
                 CurrentAccessCode = null;
             }
         }
+
 
         public Task SendMessageAsync(string token, Guid lobbyId, string message)
         {
@@ -103,6 +126,22 @@ namespace WPFTheWeakestRival.Infrastructure
         public UpdateAccountResponse GetMyProfile(string token)
         {
             return client.GetMyProfile(token);
+        }
+
+        // ⬇⬇ NUEVO: helper para llamar StartLobbyMatch desde el cliente
+        public Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException("Token requerido.", nameof(token));
+            }
+
+            var req = new StartLobbyMatchRequest
+            {
+                Token = token
+            };
+
+            return Task.Run(() => client.StartLobbyMatch(req));
         }
 
         void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
@@ -133,6 +172,12 @@ namespace WPFTheWeakestRival.Infrastructure
             ChatMessageReceived?.Invoke(message);
         }
 
+        // ⬇⬇ NUEVO: implementación del callback de partida iniciada
+        void ILobbyServiceCallback.OnMatchStarted(MatchInfo match)
+        {
+            MatchStarted?.Invoke(match);
+        }
+
         public void Dispose()
         {
             try
@@ -148,11 +193,11 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             catch
             {
-                try 
-                { 
-                    client.Abort(); 
-                } 
-                catch 
+                try
+                {
+                    client.Abort();
+                }
+                catch
                 {
                     // Ignore
                 }

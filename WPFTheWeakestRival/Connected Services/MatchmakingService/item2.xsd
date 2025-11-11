@@ -5,9 +5,22 @@
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
       <xs:element name="MaxPlayers" type="xs:int" />
+      <xs:element name="IsPrivate" type="xs:boolean" />
+      <xs:element name="Config" nillable="true" type="tns:MatchConfigDto" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CreateMatchRequest" nillable="true" type="tns:CreateMatchRequest" />
+  <xs:complexType name="MatchConfigDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="StartingScore" type="xs:decimal" />
+      <xs:element minOccurs="0" name="MaxScore" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PointsPerCorrect" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PointsPerWrong" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PointsPerEliminationGain" type="xs:decimal" />
+      <xs:element minOccurs="0" name="AllowTiebreakCoinflip" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MatchConfigDto" nillable="true" type="tns:MatchConfigDto" />
   <xs:complexType name="CreateMatchResponse">
     <xs:sequence>
       <xs:element name="Match" nillable="true" type="tns:MatchInfo" />
@@ -20,6 +33,13 @@
       <xs:element minOccurs="0" name="MatchCode" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfPlayerSummary" />
       <xs:element minOccurs="0" name="State" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Config" nillable="true" type="tns:MatchConfigDto">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="MatchInfo" nillable="true" type="tns:MatchInfo" />

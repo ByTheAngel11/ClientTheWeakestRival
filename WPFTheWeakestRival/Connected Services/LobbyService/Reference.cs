@@ -1022,6 +1022,328 @@ namespace WPFTheWeakestRival.LobbyService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="StartLobbyMatchRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class StartLobbyMatchRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="StartLobbyMatchResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class StartLobbyMatchResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private WPFTheWeakestRival.LobbyService.MatchInfo MatchField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public WPFTheWeakestRival.LobbyService.MatchInfo Match {
+            get {
+                return this.MatchField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MatchField, value) != true)) {
+                    this.MatchField = value;
+                    this.RaisePropertyChanged("Match");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="MatchInfo", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class MatchInfo : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Guid MatchIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string MatchCodeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.PlayerSummary[] PlayersField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string StateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.MatchConfigDto ConfigField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Guid MatchId {
+            get {
+                return this.MatchIdField;
+            }
+            set {
+                if ((this.MatchIdField.Equals(value) != true)) {
+                    this.MatchIdField = value;
+                    this.RaisePropertyChanged("MatchId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public string MatchCode {
+            get {
+                return this.MatchCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MatchCodeField, value) != true)) {
+                    this.MatchCodeField = value;
+                    this.RaisePropertyChanged("MatchCode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public WPFTheWeakestRival.LobbyService.PlayerSummary[] Players {
+            get {
+                return this.PlayersField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PlayersField, value) != true)) {
+                    this.PlayersField = value;
+                    this.RaisePropertyChanged("Players");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public string State {
+            get {
+                return this.StateField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.StateField, value) != true)) {
+                    this.StateField = value;
+                    this.RaisePropertyChanged("State");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public WPFTheWeakestRival.LobbyService.MatchConfigDto Config {
+            get {
+                return this.ConfigField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ConfigField, value) != true)) {
+                    this.ConfigField = value;
+                    this.RaisePropertyChanged("Config");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="MatchConfigDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class MatchConfigDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal StartingScoreField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal MaxScoreField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerCorrectField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerWrongField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerEliminationGainField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool AllowTiebreakCoinflipField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public decimal StartingScore {
+            get {
+                return this.StartingScoreField;
+            }
+            set {
+                if ((this.StartingScoreField.Equals(value) != true)) {
+                    this.StartingScoreField = value;
+                    this.RaisePropertyChanged("StartingScore");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public decimal MaxScore {
+            get {
+                return this.MaxScoreField;
+            }
+            set {
+                if ((this.MaxScoreField.Equals(value) != true)) {
+                    this.MaxScoreField = value;
+                    this.RaisePropertyChanged("MaxScore");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public decimal PointsPerCorrect {
+            get {
+                return this.PointsPerCorrectField;
+            }
+            set {
+                if ((this.PointsPerCorrectField.Equals(value) != true)) {
+                    this.PointsPerCorrectField = value;
+                    this.RaisePropertyChanged("PointsPerCorrect");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public decimal PointsPerWrong {
+            get {
+                return this.PointsPerWrongField;
+            }
+            set {
+                if ((this.PointsPerWrongField.Equals(value) != true)) {
+                    this.PointsPerWrongField = value;
+                    this.RaisePropertyChanged("PointsPerWrong");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public decimal PointsPerEliminationGain {
+            get {
+                return this.PointsPerEliminationGainField;
+            }
+            set {
+                if ((this.PointsPerEliminationGainField.Equals(value) != true)) {
+                    this.PointsPerEliminationGainField = value;
+                    this.RaisePropertyChanged("PointsPerEliminationGain");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public bool AllowTiebreakCoinflip {
+            get {
+                return this.AllowTiebreakCoinflipField;
+            }
+            set {
+                if ((this.AllowTiebreakCoinflipField.Equals(value) != true)) {
+                    this.AllowTiebreakCoinflipField = value;
+                    this.RaisePropertyChanged("AllowTiebreakCoinflip");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ChatMessage", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class ChatMessage : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1170,6 +1492,13 @@ namespace WPFTheWeakestRival.LobbyService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/JoinByCode", ReplyAction="http://tempuri.org/ILobbyService/JoinByCodeResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.JoinByCodeResponse> JoinByCodeAsync(WPFTheWeakestRival.LobbyService.JoinByCodeRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/StartLobbyMatch", ReplyAction="http://tempuri.org/ILobbyService/StartLobbyMatchResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/StartLobbyMatchServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse StartLobbyMatch(WPFTheWeakestRival.LobbyService.StartLobbyMatchRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/StartLobbyMatch", ReplyAction="http://tempuri.org/ILobbyService/StartLobbyMatchResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse> StartLobbyMatchAsync(WPFTheWeakestRival.LobbyService.StartLobbyMatchRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1186,6 +1515,9 @@ namespace WPFTheWeakestRival.LobbyService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILobbyService/OnChatMessageReceived")]
         void OnChatMessageReceived(WPFTheWeakestRival.LobbyService.ChatMessage message);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILobbyService/OnMatchStarted")]
+        void OnMatchStarted(WPFTheWeakestRival.LobbyService.MatchInfo match);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1278,6 +1610,14 @@ namespace WPFTheWeakestRival.LobbyService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.JoinByCodeResponse> JoinByCodeAsync(WPFTheWeakestRival.LobbyService.JoinByCodeRequest request) {
             return base.Channel.JoinByCodeAsync(request);
+        }
+        
+        public WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse StartLobbyMatch(WPFTheWeakestRival.LobbyService.StartLobbyMatchRequest request) {
+            return base.Channel.StartLobbyMatch(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse> StartLobbyMatchAsync(WPFTheWeakestRival.LobbyService.StartLobbyMatchRequest request) {
+            return base.Channel.StartLobbyMatchAsync(request);
         }
     }
 }

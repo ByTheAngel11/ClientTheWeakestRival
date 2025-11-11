@@ -26,6 +26,10 @@ namespace WPFTheWeakestRival.MatchmakingService {
         
         private int MaxPlayersField;
         
+        private bool IsPrivateField;
+        
+        private WPFTheWeakestRival.MatchmakingService.MatchConfigDto ConfigField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -58,6 +62,157 @@ namespace WPFTheWeakestRival.MatchmakingService {
                 if ((this.MaxPlayersField.Equals(value) != true)) {
                     this.MaxPlayersField = value;
                     this.RaisePropertyChanged("MaxPlayers");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public bool IsPrivate {
+            get {
+                return this.IsPrivateField;
+            }
+            set {
+                if ((this.IsPrivateField.Equals(value) != true)) {
+                    this.IsPrivateField = value;
+                    this.RaisePropertyChanged("IsPrivate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public WPFTheWeakestRival.MatchmakingService.MatchConfigDto Config {
+            get {
+                return this.ConfigField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ConfigField, value) != true)) {
+                    this.ConfigField = value;
+                    this.RaisePropertyChanged("Config");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="MatchConfigDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class MatchConfigDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal StartingScoreField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal MaxScoreField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerCorrectField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerWrongField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerEliminationGainField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool AllowTiebreakCoinflipField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public decimal StartingScore {
+            get {
+                return this.StartingScoreField;
+            }
+            set {
+                if ((this.StartingScoreField.Equals(value) != true)) {
+                    this.StartingScoreField = value;
+                    this.RaisePropertyChanged("StartingScore");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public decimal MaxScore {
+            get {
+                return this.MaxScoreField;
+            }
+            set {
+                if ((this.MaxScoreField.Equals(value) != true)) {
+                    this.MaxScoreField = value;
+                    this.RaisePropertyChanged("MaxScore");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public decimal PointsPerCorrect {
+            get {
+                return this.PointsPerCorrectField;
+            }
+            set {
+                if ((this.PointsPerCorrectField.Equals(value) != true)) {
+                    this.PointsPerCorrectField = value;
+                    this.RaisePropertyChanged("PointsPerCorrect");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public decimal PointsPerWrong {
+            get {
+                return this.PointsPerWrongField;
+            }
+            set {
+                if ((this.PointsPerWrongField.Equals(value) != true)) {
+                    this.PointsPerWrongField = value;
+                    this.RaisePropertyChanged("PointsPerWrong");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public decimal PointsPerEliminationGain {
+            get {
+                return this.PointsPerEliminationGainField;
+            }
+            set {
+                if ((this.PointsPerEliminationGainField.Equals(value) != true)) {
+                    this.PointsPerEliminationGainField = value;
+                    this.RaisePropertyChanged("PointsPerEliminationGain");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public bool AllowTiebreakCoinflip {
+            get {
+                return this.AllowTiebreakCoinflipField;
+            }
+            set {
+                if ((this.AllowTiebreakCoinflipField.Equals(value) != true)) {
+                    this.AllowTiebreakCoinflipField = value;
+                    this.RaisePropertyChanged("AllowTiebreakCoinflip");
                 }
             }
         }
@@ -137,6 +292,9 @@ namespace WPFTheWeakestRival.MatchmakingService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string StateField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.MatchmakingService.MatchConfigDto ConfigField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -195,6 +353,19 @@ namespace WPFTheWeakestRival.MatchmakingService {
                 if ((object.ReferenceEquals(this.StateField, value) != true)) {
                     this.StateField = value;
                     this.RaisePropertyChanged("State");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public WPFTheWeakestRival.MatchmakingService.MatchConfigDto Config {
+            get {
+                return this.ConfigField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ConfigField, value) != true)) {
+                    this.ConfigField = value;
+                    this.RaisePropertyChanged("Config");
                 }
             }
         }

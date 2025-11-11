@@ -447,4 +447,7 @@
   <data name="friendRequestsOutgoing" xml:space="preserve">
     <value>Requests sended</value>
   </data>
+  <data name="matchTitle" xml:space="preserve">
+    <value>Match</value>
+  </data>
 </root>

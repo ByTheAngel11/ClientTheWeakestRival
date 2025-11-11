@@ -586,6 +586,75 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_ILobbyService_StartLobbyMatch_Input_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_ILobbyService_StartLobbyMatch_output_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_ILobbyService_StartLobbyMatch_ServiceFaultFault_Fault">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_ILobbyService_OnLobbyUpdated_output_policy">
     <wsp:ExactlyOne>
       <wsp:All>
@@ -678,6 +747,29 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_ILobbyService_OnMatchStarted_output_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
       <xsd:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd0" namespace="http://tempuri.org/" />
@@ -748,6 +840,15 @@
   <wsdl:message name="ILobbyService_JoinByCode_ServiceFaultFault_FaultMessage">
     <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q6:ServiceFault" />
   </wsdl:message>
+  <wsdl:message name="ILobbyService_StartLobbyMatch_InputMessage">
+    <wsdl:part name="parameters" element="tns:StartLobbyMatch" />
+  </wsdl:message>
+  <wsdl:message name="ILobbyService_StartLobbyMatch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartLobbyMatchResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILobbyService_StartLobbyMatch_ServiceFaultFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q7:ServiceFault" />
+  </wsdl:message>
   <wsdl:message name="ILobbyService_OnLobbyUpdated_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnLobbyUpdated" />
   </wsdl:message>
@@ -759,6 +860,9 @@
   </wsdl:message>
   <wsdl:message name="ILobbyService_OnChatMessageReceived_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnChatMessageReceived" />
+  </wsdl:message>
+  <wsdl:message name="ILobbyService_OnMatchStarted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnMatchStarted" />
   </wsdl:message>
   <wsdl:portType name="ILobbyService">
     <wsdl:operation name="JoinLobby">
@@ -798,6 +902,11 @@
       <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/JoinByCodeResponse" message="tns:ILobbyService_JoinByCode_OutputMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/ILobbyService/JoinByCodeServiceFaultFault" name="ServiceFaultFault" message="tns:ILobbyService_JoinByCode_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
+    <wsdl:operation name="StartLobbyMatch">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILobbyService/StartLobbyMatch" message="tns:ILobbyService_StartLobbyMatch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/StartLobbyMatchResponse" message="tns:ILobbyService_StartLobbyMatch_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/ILobbyService/StartLobbyMatchServiceFaultFault" name="ServiceFaultFault" message="tns:ILobbyService_StartLobbyMatch_ServiceFaultFault_FaultMessage" />
+    </wsdl:operation>
     <wsdl:operation name="OnLobbyUpdated">
       <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/OnLobbyUpdated" message="tns:ILobbyService_OnLobbyUpdated_OutputCallbackMessage" />
     </wsdl:operation>
@@ -809,6 +918,9 @@
     </wsdl:operation>
     <wsdl:operation name="OnChatMessageReceived">
       <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/OnChatMessageReceived" message="tns:ILobbyService_OnChatMessageReceived_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OnMatchStarted">
+      <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/OnMatchStarted" message="tns:ILobbyService_OnMatchStarted_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WSDualHttpBinding_ILobbyService" type="tns:ILobbyService">
@@ -922,6 +1034,21 @@
         <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
       </wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="StartLobbyMatch">
+      <soap12:operation soapAction="http://tempuri.org/ILobbyService/StartLobbyMatch" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_ILobbyService_StartLobbyMatch_Input_policy" />
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_ILobbyService_StartLobbyMatch_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceFaultFault">
+        <wsp:PolicyReference URI="#WSDualHttpBinding_ILobbyService_StartLobbyMatch_ServiceFaultFault_Fault" />
+        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
     <wsdl:operation name="OnLobbyUpdated">
       <soap12:operation soapAction="http://tempuri.org/ILobbyService/OnLobbyUpdated" style="document" />
       <wsdl:output>
@@ -950,6 +1077,13 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="OnMatchStarted">
+      <soap12:operation soapAction="http://tempuri.org/ILobbyService/OnMatchStarted" style="document" />
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_ILobbyService_OnMatchStarted_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="LobbyService">
     <wsdl:port name="WSDualHttpBinding_ILobbyService" binding="tns:WSDualHttpBinding_ILobbyService">
@@ -957,7 +1091,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>http://localhost:8082/lobby/</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>LAP-MANUGOD\manit</Upn>
+          <Upn>ANGEL\Angel</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>
