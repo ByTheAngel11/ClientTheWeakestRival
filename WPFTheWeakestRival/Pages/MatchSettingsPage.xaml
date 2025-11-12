@@ -6,40 +6,101 @@
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="8"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="8"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="Configuración de partida"
+        <!-- Título -->
+        <TextBlock Text="Configuración de la partida"
                    FontSize="18"
                    FontWeight="SemiBold"
-                   Margin="0,0,0,10"/>
+                   Margin="0,0,0,8"/>
 
-        <!-- Privacidad -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,4,0,4">
-            <CheckBox x:Name="chkPrivate" VerticalAlignment="Center"/>
-            <TextBlock Text="  Partida privada (usa código para unirse)"
-                       VerticalAlignment="Center"/>
-        </StackPanel>
+        <!-- Contenido -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <!-- Máx. jugadores -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,4,0,4">
-            <TextBlock Text="Máximo de jugadores:"
-                       VerticalAlignment="Center"
-                       Width="160"/>
-            <TextBox x:Name="txtMaxPlayers"
-                     Width="60"
-                     VerticalContentAlignment="Center"
-                     HorizontalContentAlignment="Right"/>
-        </StackPanel>
+            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                <!-- Privado -->
+                <CheckBox x:Name="chkPrivate"
+                          Content="Partida privada (requiere código)"
+                          Margin="0,0,0,8"/>
+
+                <!-- Max jugadores -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Máx. jugadores:"
+                               Width="130"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="txtMaxPlayers"
+                             Width="60"
+                             HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Starting score -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Puntaje inicial:"
+                               Width="130"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="txtStartingScore"
+                             Width="80"
+                             HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Max score -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Puntaje máximo:"
+                               Width="130"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="txtMaxScore"
+                             Width="80"
+                             HorizontalContentAlignment="Right"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                <!-- Points per correct -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Puntos por acierto:"
+                               Width="140"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="txtPointsCorrect"
+                             Width="80"
+                             HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Points per wrong -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Puntos por fallo:"
+                               Width="140"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="txtPointsWrong"
+                             Width="80"
+                             HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Points per elimination gain -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Puntos por eliminación:"
+                               Width="140"
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="txtPointsElimination"
+                             Width="80"
+                             HorizontalContentAlignment="Right"/>
+                </StackPanel>
+
+                <!-- Coinflip -->
+                <CheckBox x:Name="chkCoinflip"
+                          Content="Permitir coinflip en desempates"
+                          Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
 
         <!-- Botones -->
-        <StackPanel Grid.Row="6"
+        <StackPanel Grid.Row="3"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,12,0,0">
@@ -47,9 +108,10 @@
                     Width="90"
                     Margin="0,0,8,0"
                     Click="BtnCancelClick"/>
-            <Button Content="Guardar"
+            <Button Content="Aceptar"
                     Width="90"
-                    Click="BtnSaveClick"/>
+                    IsDefault="True"
+                    Click="BtnAcceptClick"/>
         </StackPanel>
     </Grid>
 </Page>

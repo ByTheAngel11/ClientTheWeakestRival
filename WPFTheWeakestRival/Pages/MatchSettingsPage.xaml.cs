@@ -1,58 +1,110 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WPFTheWeakestRival.Pages
 {
     public partial class MatchSettingsPage : Page
     {
+        // Propiedades que el Lobby leerá después del dialog
         public bool IsPrivate { get; private set; }
         public int MaxPlayers { get; private set; }
 
-        public MatchSettingsPage(bool isPrivate, int maxPlayers)
+        public decimal StartingScore { get; private set; }
+        public decimal MaxScore { get; private set; }
+        public decimal PointsPerCorrect { get; private set; }
+        public decimal PointsPerWrong { get; private set; }
+        public decimal PointsPerEliminationGain { get; private set; }
+        public bool AllowTiebreakCoinflip { get; private set; }
+
+        public MatchSettingsPage(
+            bool isPrivate,
+            int maxPlayers,
+            decimal startingScore,
+            decimal maxScore,
+            decimal pointsPerCorrect,
+            decimal pointsPerWrong,
+            decimal pointsPerEliminationGain,
+            bool allowTiebreakCoinflip)
         {
             InitializeComponent();
 
-            IsPrivate = isPrivate;
-            MaxPlayers = maxPlayers;
+            // Cargamos valores iniciales a los controles
+            chkPrivate.IsChecked = isPrivate;
+            txtMaxPlayers.Text = maxPlayers.ToString(CultureInfo.InvariantCulture);
 
-            if (chkPrivate != null)
-            {
-                chkPrivate.IsChecked = isPrivate;
-            }
-
-            if (txtMaxPlayers != null)
-            {
-                txtMaxPlayers.Text = maxPlayers.ToString();
-            }
+            txtStartingScore.Text = startingScore.ToString("0.##", CultureInfo.InvariantCulture);
+            txtMaxScore.Text = maxScore.ToString("0.##", CultureInfo.InvariantCulture);
+            txtPointsCorrect.Text = pointsPerCorrect.ToString("0.##", CultureInfo.InvariantCulture);
+            txtPointsWrong.Text = pointsPerWrong.ToString("0.##", CultureInfo.InvariantCulture);
+            txtPointsElimination.Text = pointsPerEliminationGain.ToString("0.##", CultureInfo.InvariantCulture);
+            chkCoinflip.IsChecked = allowTiebreakCoinflip;
         }
 
-        private void BtnSaveClick(object sender, RoutedEventArgs e)
+        private void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            int parsedMaxPlayers;
-            if (txtMaxPlayers == null || !int.TryParse(txtMaxPlayers.Text, out parsedMaxPlayers) || parsedMaxPlayers <= 0)
+            // Validaciones rápidas y asignación de propiedades
+            if (!int.TryParse(txtMaxPlayers.Text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var maxPlayers) ||
+                maxPlayers <= 0 || maxPlayers > 16)
             {
-                MessageBox.Show("Ingresa un número válido de jugadores (mayor que 0).",
-                    "Configuración de partida",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MessageBox.Show("Máx. jugadores debe ser un número entre 1 y 16.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtMaxPlayers.Focus();
+                txtMaxPlayers.SelectAll();
                 return;
             }
 
-            MaxPlayers = parsedMaxPlayers;
-            IsPrivate = chkPrivate != null && chkPrivate.IsChecked == true;
+            if (!TryParseDecimal(txtStartingScore.Text, out var startingScore))
+            {
+                MessageBox.Show("Puntaje inicial no es válido.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtStartingScore.Focus();
+                txtStartingScore.SelectAll();
+                return;
+            }
 
+            if (!TryParseDecimal(txtMaxScore.Text, out var maxScore))
+            {
+                MessageBox.Show("Puntaje máximo no es válido.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtMaxScore.Focus();
+                txtMaxScore.SelectAll();
+                return;
+            }
+
+            if (!TryParseDecimal(txtPointsCorrect.Text, out var pointsCorrect))
+            {
+                MessageBox.Show("Puntos por acierto no son válidos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPointsCorrect.Focus();
+                txtPointsCorrect.SelectAll();
+                return;
+            }
+
+            if (!TryParseDecimal(txtPointsWrong.Text, out var pointsWrong))
+            {
+                MessageBox.Show("Puntos por fallo no son válidos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPointsWrong.Focus();
+                txtPointsWrong.SelectAll();
+                return;
+            }
+
+            if (!TryParseDecimal(txtPointsElimination.Text, out var pointsElimination))
+            {
+                MessageBox.Show("Puntos por eliminación no son válidos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPointsElimination.Focus();
+                txtPointsElimination.SelectAll();
+                return;
+            }
+
+            // Si todo va bien: guardamos en las propiedades públicas
+            IsPrivate = chkPrivate.IsChecked == true;
+            MaxPlayers = maxPlayers;
+            StartingScore = startingScore;
+            MaxScore = maxScore;
+            PointsPerCorrect = pointsCorrect;
+            PointsPerWrong = pointsWrong;
+            PointsPerEliminationGain = pointsElimination;
+            AllowTiebreakCoinflip = chkCoinflip.IsChecked == true;
+
+            // Cerramos el diálogo padre
             var win = Window.GetWindow(this);
             if (win != null)
             {
@@ -69,6 +121,15 @@ namespace WPFTheWeakestRival.Pages
                 win.DialogResult = false;
                 win.Close();
             }
+        }
+
+        private static bool TryParseDecimal(string text, out decimal value)
+        {
+            return decimal.TryParse(
+                (text ?? string.Empty).Trim(),
+                NumberStyles.Number,
+                CultureInfo.InvariantCulture,
+                out value);
         }
     }
 }

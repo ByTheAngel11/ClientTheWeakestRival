@@ -43,9 +43,15 @@ namespace WPFTheWeakestRival
         private readonly ObservableCollection<FriendItem> friendItems = new ObservableCollection<FriendItem>();
         private int pendingRequests;
 
-        // Config de la partida (por ahora solo privacidad y jugadores)
         private bool _isPrivate = true;
         private int _maxPlayers = 4;
+        private decimal _startingScore = 0m;
+        private decimal _maxScore = 100m;
+        private decimal _pointsCorrect = 10m;
+        private decimal _pointsWrong = -5m;
+        private decimal _pointsEliminationGain = 5m;
+        private bool _allowCoinflip = true;
+
 
         private sealed class ChatLine
         {
@@ -137,7 +143,15 @@ namespace WPFTheWeakestRival
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
-            var page = new MatchSettingsPage(_isPrivate, _maxPlayers);
+            var page = new MatchSettingsPage(
+                _isPrivate,
+                _maxPlayers,
+                _startingScore,
+                _maxScore,
+                _pointsCorrect,
+                _pointsWrong,
+                _pointsEliminationGain,
+                _allowCoinflip);
 
             var win = new Window
             {
@@ -147,8 +161,8 @@ namespace WPFTheWeakestRival
                     Content = page,
                     NavigationUIVisibility = NavigationUIVisibility.Hidden
                 },
-                Width = 420,
-                Height = 260,
+                Width = 480,
+                Height = 420,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = this,
                 ResizeMode = ResizeMode.NoResize
@@ -159,8 +173,16 @@ namespace WPFTheWeakestRival
             {
                 _isPrivate = page.IsPrivate;
                 _maxPlayers = page.MaxPlayers;
+
+                _startingScore = page.StartingScore;
+                _maxScore = page.MaxScore;
+                _pointsCorrect = page.PointsPerCorrect;
+                _pointsWrong = page.PointsPerWrong;
+                _pointsEliminationGain = page.PointsPerEliminationGain;
+                _allowCoinflip = page.AllowTiebreakCoinflip;
             }
         }
+
 
         private void BtnFriendsClick(object sender, RoutedEventArgs e)
         {
@@ -461,11 +483,22 @@ namespace WPFTheWeakestRival
 
                 var request = new LobbyService.StartLobbyMatchRequest
                 {
-                    Token = token
+                    Token = token,
+                    MaxPlayers = _maxPlayers,      // lo que elegiste en MatchSettingsPage
+                    IsPrivate = _isPrivate,
+
+                    Config = new LobbyService.MatchConfigDto
+                    {
+                        StartingScore = _startingScore,
+                        MaxScore = _maxScore,
+                        PointsPerCorrect = _pointsCorrect,
+                        PointsPerWrong = _pointsWrong,
+                        PointsPerEliminationGain = _pointsEliminationGain,
+                        AllowTiebreakCoinflip = _allowCoinflip
+                    }
+
                 };
 
-                // Llamamos al servicio en un hilo de trabajo para no bloquear la UI.
-                // La navegación a la ventana de partida se hará solo en OnMatchStartedFromHub.
                 await Task.Run(() => client.StartLobbyMatch(request));
             }
             catch (FaultException<LobbyService.ServiceFault> ex)
