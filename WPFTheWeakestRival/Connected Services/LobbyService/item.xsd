@@ -92,9 +92,67 @@
       <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
       <xs:element name="CreatedAtUtc" type="xs:dateTime" />
       <xs:element name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Avatar" nillable="true" type="tns:AvatarAppearanceDto" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="UpdateAccountResponse" nillable="true" type="tns:UpdateAccountResponse" />
+  <xs:complexType name="AvatarAppearanceDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BodyColor" type="tns:AvatarBodyColor" />
+      <xs:element minOccurs="0" name="PantsColor" type="tns:AvatarPantsColor" />
+      <xs:element minOccurs="0" name="HatType" type="tns:AvatarHatType" />
+      <xs:element minOccurs="0" name="HatColor" type="tns:AvatarHatColor" />
+      <xs:element minOccurs="0" name="FaceType" type="tns:AvatarFaceType" />
+      <xs:element minOccurs="0" name="UseProfilePhotoAsFace" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AvatarAppearanceDto" nillable="true" type="tns:AvatarAppearanceDto" />
+  <xs:simpleType name="AvatarBodyColor">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Red" />
+      <xs:enumeration value="Blue" />
+      <xs:enumeration value="Green" />
+      <xs:enumeration value="Yellow" />
+      <xs:enumeration value="Purple" />
+      <xs:enumeration value="Gray" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarBodyColor" nillable="true" type="tns:AvatarBodyColor" />
+  <xs:simpleType name="AvatarPantsColor">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Black" />
+      <xs:enumeration value="DarkGray" />
+      <xs:enumeration value="BlueJeans" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarPantsColor" nillable="true" type="tns:AvatarPantsColor" />
+  <xs:simpleType name="AvatarHatType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Cap" />
+      <xs:enumeration value="TopHat" />
+      <xs:enumeration value="Beanie" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarHatType" nillable="true" type="tns:AvatarHatType" />
+  <xs:simpleType name="AvatarHatColor">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default" />
+      <xs:enumeration value="Red" />
+      <xs:enumeration value="Blue" />
+      <xs:enumeration value="Black" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarHatColor" nillable="true" type="tns:AvatarHatColor" />
+  <xs:simpleType name="AvatarFaceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default" />
+      <xs:enumeration value="Angry" />
+      <xs:enumeration value="Happy" />
+      <xs:enumeration value="Sleepy" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarFaceType" nillable="true" type="tns:AvatarFaceType" />
   <xs:complexType name="UpdateAccountRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
