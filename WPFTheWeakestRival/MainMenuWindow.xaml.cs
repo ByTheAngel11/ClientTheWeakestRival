@@ -1,4 +1,5 @@
-﻿using System;
+﻿// MainMenuWindow.xaml.cs
+using System;
 using System.Collections.ObjectModel;
 using System.ServiceModel;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Properties.Langs;
 using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.Controls;
+
 
 namespace WPFTheWeakestRival
 {
@@ -41,6 +44,14 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
+            RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
+            RenderOptions.SetBitmapScalingMode(imgAvatar, BitmapScalingMode.HighQuality);
+            if (UserAvatarControl != null)
+            {
+                RenderOptions.SetBitmapScalingMode(UserAvatarControl, BitmapScalingMode.HighQuality);
+            }
+
+
             lstFriends.ItemsSource = friendItems;
             UpdateFriendDrawerUi();
 
@@ -54,23 +65,11 @@ namespace WPFTheWeakestRival
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error detaching FriendsUpdated handler on window unload.", ex);
-            }
+            try { AppServices.Friends.FriendsUpdated -= OnFriendsUpdated; }
+            catch (Exception ex) { Logger.Warn("Error detaching FriendsUpdated handler on window unload.", ex); }
 
-            try
-            {
-                AppServices.Friends.Stop();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error stopping Friends service on window unload.", ex);
-            }
+            try { AppServices.Friends.Stop(); }
+            catch (Exception ex) { Logger.Warn("Error stopping Friends service on window unload.", ex); }
         }
 
         private int GetAvatarSize()
@@ -78,16 +77,12 @@ namespace WPFTheWeakestRival
             try
             {
                 var resource = FindResource(AVATAR_SIZE_RESOURCE_KEY);
-                if (resource is double doubleValue)
-                {
-                    return (int)doubleValue;
-                }
+                if (resource is double doubleValue) return (int)doubleValue;
             }
             catch (Exception ex)
             {
                 Logger.Warn("Error retrieving avatar size resource. Using default avatar size.", ex);
             }
-
             return DEFAULT_AVATAR_SIZE;
         }
 
@@ -104,6 +99,12 @@ namespace WPFTheWeakestRival
             var avatarSize = GetAvatarSize();
             var defaultAvatar = UiImageHelper.DefaultAvatar(avatarSize);
             SetAvatarImage(defaultAvatar);
+
+            if (UserAvatarControl != null)
+            {
+                UserAvatarControl.ProfileImage = null;
+                UserAvatarControl.Appearance = null;
+            }
         }
 
         private void RefreshProfileButtonAvatar()
@@ -121,11 +122,41 @@ namespace WPFTheWeakestRival
 
                 var profile = AppServices.Lobby.GetMyProfile(token);
 
+                // Botón pequeño
                 var avatarPath = profile?.ProfileImageUrl;
                 var avatarImage = UiImageHelper.TryCreateFromUrlOrPath(avatarPath)
                                   ?? UiImageHelper.DefaultAvatar(avatarSize);
-
                 SetAvatarImage(avatarImage);
+
+                // Avatar grande
+                if (UserAvatarControl != null)
+                {
+                    var faceImage = UiImageHelper.TryCreateFromUrlOrPath(profile?.ProfileImageUrl);
+                    UserAvatarControl.ProfileImage = faceImage;
+
+                    var appearanceDto = profile?.Avatar;
+                    if (appearanceDto != null)
+                    {
+                        var appearance = new AvatarAppearance
+                        {
+                            BodyColor = (int)appearanceDto.BodyColor,
+                            PantsColor = (int)appearanceDto.PantsColor,
+                            HatType = (int)appearanceDto.HatType,
+                            HatColor = (int)appearanceDto.HatColor,
+                            FaceType = (int)appearanceDto.FaceType,
+                            UseProfilePhotoAsFace = true // <-- fuerza uso de foto
+                        };
+
+                        UserAvatarControl.Appearance = appearance;
+                    }
+                    else
+                    {
+                        UserAvatarControl.Appearance = null;
+                    }
+
+                    // Por si acaso, asegúrate después de todo:
+                    UserAvatarControl.UseProfilePhotoAsFace = faceImage != null;
+                }
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
@@ -149,17 +180,15 @@ namespace WPFTheWeakestRival
             }
         }
 
+
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
-            // Settings button reserved for future implementation.
+            // Reservado
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Escape)
-            {
-                return;
-            }
+            if (e.Key != Key.Escape) return;
 
             if (friendsDrawerHost.Visibility == Visibility.Visible)
             {
@@ -173,17 +202,11 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void CloseOverlayClick(object sender, RoutedEventArgs e)
-        {
-            HideOverlay();
-        }
+        private void CloseOverlayClick(object sender, RoutedEventArgs e) => HideOverlay();
 
         private Brush GetOverlayBackgroundForPage(Page page)
         {
-            if (page == null)
-            {
-                return Brushes.Transparent;
-            }
+            if (page == null) return Brushes.Transparent;
 
             if (page is Pages.AddFriendPage
                 || page is Pages.FriendRequestsPage
@@ -210,8 +233,6 @@ namespace WPFTheWeakestRival
 
             return Brushes.Transparent;
         }
-
-
 
         private void ShowOverlay(Page page)
         {
@@ -396,36 +417,22 @@ namespace WPFTheWeakestRival
 
         private void OpenLobbyWindow(string lobbyName, Guid lobbyId, string accessCode)
         {
-            var window = new LobbyWindow
-            {
-                Owner = this
-            };
-
+            var window = new LobbyWindow { Owner = this };
             window.InitializeExistingLobby(lobbyId, accessCode, lobbyName);
             window.Show();
             Hide();
 
             window.Closed += (_, __) =>
             {
-                try
-                {
-                    Show();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("Error showing MainMenuWindow after LobbyWindow was closed.", ex);
-                }
+                try { Show(); }
+                catch (Exception ex) { Logger.Warn("Error showing MainMenuWindow after LobbyWindow was closed.", ex); }
             };
         }
 
         private void OnFriendsUpdated(System.Collections.Generic.IReadOnlyList<FriendItem> list, int pending)
         {
             friendItems.Clear();
-
-            foreach (var item in list)
-            {
-                friendItems.Add(item);
-            }
+            foreach (var item in list) friendItems.Add(item);
 
             pendingRequests = pending;
             UpdateFriendDrawerUi();
@@ -443,10 +450,7 @@ namespace WPFTheWeakestRival
 
         private async Task OpenFriendsDrawer()
         {
-            if (friendsDrawerHost.Visibility == Visibility.Visible)
-            {
-                return;
-            }
+            if (friendsDrawerHost.Visibility == Visibility.Visible) return;
 
             grdMainArea.Effect = overlayBlur;
 
@@ -471,10 +475,7 @@ namespace WPFTheWeakestRival
 
         private void CloseFriendsDrawer()
         {
-            if (friendsDrawerHost.Visibility != Visibility.Visible)
-            {
-                return;
-            }
+            if (friendsDrawerHost.Visibility != Visibility.Visible) return;
 
             if (FindResource("sbCloseFriendsDrawer") is Storyboard closeStoryboard)
             {
@@ -499,20 +500,11 @@ namespace WPFTheWeakestRival
                 });
         }
 
-        private void FriendsDimmerMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            CloseFriendsDrawer();
-        }
+        private void FriendsDimmerMouseDown(object sender, MouseButtonEventArgs e) => CloseFriendsDrawer();
 
-        private void BtnCloseFriendsClick(object sender, RoutedEventArgs e)
-        {
-            CloseFriendsDrawer();
-        }
+        private void BtnCloseFriendsClick(object sender, RoutedEventArgs e) => CloseFriendsDrawer();
 
-        private void BtnFriendsClick(object sender, RoutedEventArgs e)
-        {
-            _ = OpenFriendsDrawer();
-        }
+        private void BtnFriendsClick(object sender, RoutedEventArgs e) => _ = OpenFriendsDrawer();
 
         private void BtnSendFriendRequestClick(object sender, RoutedEventArgs e)
         {
@@ -524,15 +516,9 @@ namespace WPFTheWeakestRival
             }
 
             var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
-
-            page.CloseRequested += (_, __) =>
-            {
-                HideOverlay();
-            };
-
+            page.CloseRequested += (_, __) => { HideOverlay(); };
             ShowOverlay(page);
         }
-
 
         private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
         {
@@ -544,15 +530,9 @@ namespace WPFTheWeakestRival
             }
 
             var page = new Pages.FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
-
-            page.CloseRequested += (_, __) =>
-            {
-                HideOverlay();
-            };
-
+            page.CloseRequested += (_, __) => { HideOverlay(); };
             ShowOverlay(page);
         }
-
 
         private void BtnModifyProfileClick(object sender, RoutedEventArgs e)
         {
@@ -584,14 +564,8 @@ namespace WPFTheWeakestRival
 
         private void OnLoggedOut(object sender, EventArgs e)
         {
-            try
-            {
-                LoginWindow.AppSession.CurrentToken = null;
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error clearing current session token during logout.", ex);
-            }
+            try { LoginWindow.AppSession.CurrentToken = null; }
+            catch (Exception ex) { Logger.Warn("Error clearing current session token during logout.", ex); }
 
             HideOverlay();
 
@@ -600,6 +574,11 @@ namespace WPFTheWeakestRival
             loginWindow.Show();
 
             Close();
+        }
+
+        private void mainAvatar_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

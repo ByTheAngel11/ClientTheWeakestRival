@@ -7,7 +7,8 @@ namespace WPFTheWeakestRival.Helpers
 {
     public static class UiImageHelper
     {
-        public static ImageSource TryCreateFromUrlOrPath(string sourcePathOrUri, int decodeWidth = 24)
+        // Changed default decodeWidth to 0 (no forced downscale) so callers get full-resolution image
+        public static ImageSource TryCreateFromUrlOrPath(string sourcePathOrUri, int decodeWidth = 0)
         {
             if (string.IsNullOrWhiteSpace(sourcePathOrUri))
             {
@@ -55,12 +56,16 @@ namespace WPFTheWeakestRival.Helpers
 
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
+                // Keep pixel format and avoid aggressive create options for better quality
+                bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+
+                // Only apply decoding when a target width is explicitly requested (> 0)
                 if (decodeWidth > 0)
                 {
                     bitmap.DecodePixelWidth = decodeWidth;
                 }
+
                 bitmap.UriSource = resolvedUri;
                 bitmap.EndInit();
                 bitmap.Freeze();
@@ -93,7 +98,7 @@ namespace WPFTheWeakestRival.Helpers
             }
         }
 
-        public static ImageSource TryCreateFromBytes(byte[] imageBytes, int decodeWidth = 24)
+        public static ImageSource TryCreateFromBytes(byte[] imageBytes, int decodeWidth = 0)
         {
             if (imageBytes == null || imageBytes.Length == 0)
             {
@@ -104,10 +109,13 @@ namespace WPFTheWeakestRival.Helpers
             {
                 using (var memoryStream = new MemoryStream(imageBytes))
                 {
+                    // Ensure stream at beginning
+                    memoryStream.Position = 0;
+
                     var bitmap = new BitmapImage();
                     bitmap.BeginInit();
+                    bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
                     if (decodeWidth > 0)
                     {
                         bitmap.DecodePixelWidth = decodeWidth;
@@ -142,8 +150,8 @@ namespace WPFTheWeakestRival.Helpers
                 var avatarPackUri = new Uri("pack://application:,,,/Assets/Images/Avatars/default.png", UriKind.Absolute);
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
+                bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
                 if (decodeWidth > 0)
                 {
                     bitmap.DecodePixelWidth = decodeWidth;
