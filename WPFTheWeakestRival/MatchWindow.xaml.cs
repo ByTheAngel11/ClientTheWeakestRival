@@ -37,27 +37,23 @@ namespace WPFTheWeakestRival
 
         private void InitializeUi()
         {
+            // Título fijo
             if (txtMatchTitle != null)
             {
-                var title = string.IsNullOrWhiteSpace(_match.MatchCode)
-                    ? "Partida"
-                    : $"Partida {_match.MatchCode}";
-
-                txtMatchTitle.Text = title;
+                txtMatchTitle.Text = "Partida";
             }
 
-            if (txtMatchCode != null)
+            // Código pequeño arriba a la izquierda
+            if (txtMatchCodeSmall != null)
             {
-                txtMatchCode.Text = _match.MatchCode ?? string.Empty;
+                var code = string.IsNullOrWhiteSpace(_match.MatchCode)
+                    ? "Sin código"
+                    : _match.MatchCode;
+
+                txtMatchCodeSmall.Text = $"Código: {code}";
             }
 
-            if (txtMatchState != null)
-            {
-                txtMatchState.Text = string.IsNullOrWhiteSpace(_match.State)
-                    ? "Waiting"
-                    : _match.State;
-            }
-
+            // Jugadores
             if (lstPlayers != null)
             {
                 var players = _match.Players ?? Array.Empty<PlayerSummary>();
@@ -65,41 +61,14 @@ namespace WPFTheWeakestRival
 
                 if (txtPlayersSummary != null)
                 {
-                    txtPlayersSummary.Text = players.Length.ToString();
+                    txtPlayersSummary.Text = $"({players.Length})";
                 }
             }
 
-            var cfg = _match.Config;
-            if (cfg != null)
-            {
-                if (txtStartingScore != null)
-                    txtStartingScore.Text = cfg.StartingScore.ToString("0.##");
-
-                if (txtMaxScore != null)
-                    txtMaxScore.Text = cfg.MaxScore.ToString("0.##");
-
-                if (txtPointsCorrect != null)
-                    txtPointsCorrect.Text = cfg.PointsPerCorrect.ToString("0.##");
-
-                if (txtPointsWrong != null)
-                    txtPointsWrong.Text = cfg.PointsPerWrong.ToString("0.##");
-
-                if (txtPointsElimination != null)
-                    txtPointsElimination.Text = cfg.PointsPerEliminationGain.ToString("0.##");
-
-                if (txtCoinflip != null)
-                    txtCoinflip.Text = cfg.AllowTiebreakCoinflip ? "Sí" : "No";
-            }
-            else
-            {
-                if (txtStartingScore != null) txtStartingScore.Text = "-";
-                if (txtMaxScore != null) txtMaxScore.Text = "-";
-                if (txtPointsCorrect != null) txtPointsCorrect.Text = "-";
-                if (txtPointsWrong != null) txtPointsWrong.Text = "-";
-                if (txtPointsElimination != null) txtPointsElimination.Text = "-";
-                if (txtCoinflip != null) txtCoinflip.Text = "-";
-            }
+            // Ya no pintamos estado ("Waiting") ni configuración
         }
+
+
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
