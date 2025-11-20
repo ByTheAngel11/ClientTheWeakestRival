@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Navigation;
@@ -19,7 +20,6 @@ using WPFTheWeakestRival.Properties.Langs;
 using WPFTheWeakestRival.Pages;
 
 using LobbyContracts = WPFTheWeakestRival.LobbyService;
-using MatchContracts = WPFTheWeakestRival.MatchmakingService;
 
 namespace WPFTheWeakestRival
 {
@@ -28,30 +28,60 @@ namespace WPFTheWeakestRival
         private const int DRAWER_ANIM_IN_MS = 180;
         private const int DRAWER_ANIM_OUT_MS = 160;
 
+        private const double OVERLAY_BLUR_INITIAL_RADIUS = 0.0;
+        private const double OVERLAY_BLUR_TARGET_RADIUS = 3.0;
+
+        private const int FRIENDS_DRAWER_INITIAL_TRANSLATE_X = 340;
+
+        private const int RECENT_ECHO_WINDOW_SECONDS = 2;
+
+        private const int DEFAULT_AVATAR_SIZE = 80;
+        private const string DEFAULT_DISPLAY_NAME = "Yo";
+        private const string UNKNOWN_AUTHOR_DISPLAY_NAME = "?";
+        private const string CHAT_TIME_FORMAT = "HH:mm";
+
+        private const double SETTINGS_WINDOW_WIDTH = 480;
+        private const double SETTINGS_WINDOW_HEIGHT = 420;
+
+        private const double FRIEND_DIALOG_WINDOW_WIDTH = 600;
+        private const double FRIEND_DIALOG_WINDOW_HEIGHT = 420;
+
+        private const double PROFILE_WINDOW_WIDTH = 720;
+        private const double PROFILE_WINDOW_HEIGHT = 460;
+
+        private const string ERROR_COPY_CODE_NO_CODE = "No hay un código de lobby para copiar.";
+        private const string ERROR_COPY_CODE_GENERIC = "Ocurrió un error al copiar el código al portapapeles.";
+        private const string ERROR_START_MATCH_GENERIC = "Ocurrió un error al iniciar la partida.";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyWindow));
 
-        private readonly BlurEffect overlayBlur = new BlurEffect { Radius = 0 };
+        private readonly BlurEffect overlayBlur = new BlurEffect
+        {
+            Radius = OVERLAY_BLUR_INITIAL_RADIUS
+        };
+
+        private readonly ObservableCollection<LobbyPlayerItem> lobbyPlayers =
+            new ObservableCollection<LobbyPlayerItem>();
 
         private Guid? currentLobbyId;
         private string currentAccessCode;
-        private string myDisplayName = "Yo";
+        private string myDisplayName = DEFAULT_DISPLAY_NAME;
 
         private readonly ObservableCollection<ChatLine> chatLines = new ObservableCollection<ChatLine>();
         private string lastSentText = string.Empty;
         private DateTime lastSentUtc = DateTime.MinValue;
 
         private readonly ObservableCollection<FriendItem> friendItems = new ObservableCollection<FriendItem>();
-        private int pendingRequests;
+        private int pendingRequestsCount;
 
-        private bool _isPrivate = true;
-        private int _maxPlayers = 4;
-        private decimal _startingScore = 0m;
-        private decimal _maxScore = 100m;
-        private decimal _pointsCorrect = 10m;
-        private decimal _pointsWrong = -5m;
-        private decimal _pointsEliminationGain = 5m;
-        private bool _allowCoinflip = true;
-
+        private bool isPrivate = true;
+        private int maxPlayers = 4;
+        private decimal startingScore = 0m;
+        private decimal maxScore = 100m;
+        private decimal pointsCorrect = 10m;
+        private decimal pointsWrong = -5m;
+        private decimal pointsEliminationGain = 5m;
+        private bool isTiebreakCoinflipAllowed = true;
 
         private sealed class ChatLine
         {
@@ -60,37 +90,16 @@ namespace WPFTheWeakestRival
             public string Time { get; set; } = string.Empty;
         }
 
-        private sealed class MatchmakingClientCallback : MatchContracts.IMatchmakingServiceCallback
-        {
-            public void OnMatchCreated(MatchContracts.MatchInfo match)
-            {
-                // Por ahora no hacemos nada aquí; la creación se maneja en la respuesta del CreateMatchAsync.
-            }
-
-            public void OnMatchStarted(MatchContracts.MatchInfo match)
-            {
-                // Futuro: podrías avisar al usuario cuando el server arranque la match.
-            }
-
-            public void OnMatchPlayerJoined(Guid matchId, MatchContracts.PlayerSummary player)
-            {
-                // Futuro: actualizar UI cuando alguien se una a la match.
-            }
-
-            public void OnMatchPlayerLeft(Guid matchId, Guid playerId)
-            {
-                // Futuro: actualizar UI cuando alguien salga de la match.
-            }
-
-            public void OnMatchCancelled(Guid matchId, string reason)
-            {
-                // Futuro: avisar que la match fue cancelada.
-            }
-        }
-
         public LobbyWindow()
         {
             InitializeComponent();
+
+            RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
+
+            if (imgAvatar != null)
+            {
+                RenderOptions.SetBitmapScalingMode(imgAvatar, BitmapScalingMode.HighQuality);
+            }
 
             if (lstChatMessages != null)
             {
@@ -106,6 +115,11 @@ namespace WPFTheWeakestRival
             {
                 lstFriends.ItemsSource = friendItems;
                 UpdateFriendDrawerUi();
+            }
+
+            if (lstLobbyPlayers != null)
+            {
+                lstLobbyPlayers.ItemsSource = lobbyPlayers;
             }
 
             AppServices.Lobby.LobbyUpdated += OnLobbyUpdatedFromHub;
@@ -144,45 +158,46 @@ namespace WPFTheWeakestRival
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
             var page = new MatchSettingsPage(
-                _isPrivate,
-                _maxPlayers,
-                _startingScore,
-                _maxScore,
-                _pointsCorrect,
-                _pointsWrong,
-                _pointsEliminationGain,
-                _allowCoinflip);
+                isPrivate,
+                maxPlayers,
+                startingScore,
+                maxScore,
+                pointsCorrect,
+                pointsWrong,
+                pointsEliminationGain,
+                isTiebreakCoinflipAllowed);
 
-            var win = new Window
+            var settingsFrame = new Frame
+            {
+                Content = page,
+                NavigationUIVisibility = NavigationUIVisibility.Hidden
+            };
+
+            var settingsWindow = new Window
             {
                 Title = Lang.lblSettings,
-                Content = new Frame
-                {
-                    Content = page,
-                    NavigationUIVisibility = NavigationUIVisibility.Hidden
-                },
-                Width = 480,
-                Height = 420,
+                Content = settingsFrame,
+                Width = SETTINGS_WINDOW_WIDTH,
+                Height = SETTINGS_WINDOW_HEIGHT,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = this,
                 ResizeMode = ResizeMode.NoResize
             };
 
-            var result = win.ShowDialog();
-            if (result == true)
+            var dialogResult = settingsWindow.ShowDialog();
+            if (dialogResult == true)
             {
-                _isPrivate = page.IsPrivate;
-                _maxPlayers = page.MaxPlayers;
+                isPrivate = page.IsPrivate;
+                maxPlayers = page.MaxPlayers;
 
-                _startingScore = page.StartingScore;
-                _maxScore = page.MaxScore;
-                _pointsCorrect = page.PointsPerCorrect;
-                _pointsWrong = page.PointsPerWrong;
-                _pointsEliminationGain = page.PointsPerEliminationGain;
-                _allowCoinflip = page.AllowTiebreakCoinflip;
+                startingScore = page.StartingScore;
+                maxScore = page.MaxScore;
+                pointsCorrect = page.PointsPerCorrect;
+                pointsWrong = page.PointsPerWrong;
+                pointsEliminationGain = page.PointsPerEliminationGain;
+                isTiebreakCoinflipAllowed = page.AllowTiebreakCoinflip;
             }
         }
-
 
         private void BtnFriendsClick(object sender, RoutedEventArgs e)
         {
@@ -211,12 +226,15 @@ namespace WPFTheWeakestRival
                 grdMainArea.Effect = overlayBlur;
             }
 
-            overlayBlur.BeginAnimation(
-                BlurEffect.RadiusProperty,
-                new DoubleAnimation(overlayBlur.Radius, 3.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
-                {
-                    EasingFunction = new QuadraticEase()
-                });
+            var blurAnimation = new DoubleAnimation(
+                overlayBlur.Radius,
+                OVERLAY_BLUR_TARGET_RADIUS,
+                TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
+            {
+                EasingFunction = new QuadraticEase()
+            };
+
+            overlayBlur.BeginAnimation(BlurEffect.RadiusProperty, blurAnimation);
 
             try
             {
@@ -227,13 +245,13 @@ namespace WPFTheWeakestRival
                 Logger.Error("Error refreshing friends list while opening friends drawer.", ex);
             }
 
-            friendsDrawerTT.X = 340;
+            friendsDrawerTT.X = FRIENDS_DRAWER_INITIAL_TRANSLATE_X;
             friendsDrawerHost.Opacity = 0;
             friendsDrawerHost.Visibility = Visibility.Visible;
 
-            if (FindResource("sbOpenFriendsDrawer") is Storyboard open)
+            if (FindResource("sbOpenFriendsDrawer") is Storyboard storyboard)
             {
-                open.Begin(this, true);
+                storyboard.Begin(this, true);
             }
         }
 
@@ -244,9 +262,9 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            if (FindResource("sbCloseFriendsDrawer") is Storyboard close)
+            if (FindResource("sbCloseFriendsDrawer") is Storyboard storyboard)
             {
-                close.Completed += (_, __) =>
+                storyboard.Completed += (_, __) =>
                 {
                     friendsDrawerHost.Visibility = Visibility.Collapsed;
 
@@ -255,15 +273,19 @@ namespace WPFTheWeakestRival
                         grdMainArea.Effect = null;
                     }
                 };
-                close.Begin(this, true);
+
+                storyboard.Begin(this, true);
             }
 
-            overlayBlur.BeginAnimation(
-                BlurEffect.RadiusProperty,
-                new DoubleAnimation(overlayBlur.Radius, 0.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
-                {
-                    EasingFunction = new QuadraticEase()
-                });
+            var blurAnimation = new DoubleAnimation(
+                overlayBlur.Radius,
+                OVERLAY_BLUR_INITIAL_RADIUS,
+                TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
+            {
+                EasingFunction = new QuadraticEase()
+            };
+
+            overlayBlur.BeginAnimation(BlurEffect.RadiusProperty, blurAnimation);
         }
 
         private void BtnSendFriendRequestClick(object sender, RoutedEventArgs e)
@@ -277,26 +299,34 @@ namespace WPFTheWeakestRival
 
             try
             {
-                var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
-                var win = new Window
+                var page = new AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+
+                var friendFrame = new Frame
+                {
+                    Content = page,
+                    NavigationUIVisibility = NavigationUIVisibility.Hidden
+                };
+
+                var friendWindow = new Window
                 {
                     Title = Lang.btnSendRequests,
-                    Content = new Frame
-                    {
-                        Content = page,
-                        NavigationUIVisibility = NavigationUIVisibility.Hidden
-                    },
-                    Width = 600,
-                    Height = 420,
+                    Content = friendFrame,
+                    Width = FRIEND_DIALOG_WINDOW_WIDTH,
+                    Height = FRIEND_DIALOG_WINDOW_HEIGHT,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
                     Owner = this
                 };
-                win.ShowDialog();
+
+                friendWindow.ShowDialog();
             }
             catch (Exception ex)
             {
                 Logger.Error("Error opening AddFriendPage dialog from lobby.", ex);
-                MessageBox.Show(Lang.addFriendServiceError, Lang.addFriendTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    Lang.addFriendServiceError,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -311,26 +341,34 @@ namespace WPFTheWeakestRival
 
             try
             {
-                var page = new Pages.FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
-                var win = new Window
+                var page = new FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+
+                var friendRequestsFrame = new Frame
+                {
+                    Content = page,
+                    NavigationUIVisibility = NavigationUIVisibility.Hidden
+                };
+
+                var friendRequestsWindow = new Window
                 {
                     Title = Lang.btnRequests,
-                    Content = new Frame
-                    {
-                        Content = page,
-                        NavigationUIVisibility = NavigationUIVisibility.Hidden
-                    },
-                    Width = 600,
-                    Height = 420,
+                    Content = friendRequestsFrame,
+                    Width = FRIEND_DIALOG_WINDOW_WIDTH,
+                    Height = FRIEND_DIALOG_WINDOW_HEIGHT,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
                     Owner = this
                 };
-                win.ShowDialog();
+
+                friendRequestsWindow.ShowDialog();
             }
             catch (Exception ex)
             {
                 Logger.Error("Error opening FriendRequestsPage dialog from lobby.", ex);
-                MessageBox.Show(Lang.addFriendServiceError, Lang.btnRequests, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    Lang.addFriendServiceError,
+                    Lang.btnRequests,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -369,20 +407,23 @@ namespace WPFTheWeakestRival
                     Title = Lang.profileTitle
                 };
 
-                var win = new Window
+                var profileFrame = new Frame
+                {
+                    Content = page,
+                    NavigationUIVisibility = NavigationUIVisibility.Hidden
+                };
+
+                var profileWindow = new Window
                 {
                     Title = Lang.profileTitle,
-                    Content = new Frame
-                    {
-                        Content = page,
-                        NavigationUIVisibility = NavigationUIVisibility.Hidden
-                    },
-                    Width = 720,
-                    Height = 460,
+                    Content = profileFrame,
+                    Width = PROFILE_WINDOW_WIDTH,
+                    Height = PROFILE_WINDOW_HEIGHT,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
                     Owner = this
                 };
-                win.ShowDialog();
+
+                profileWindow.ShowDialog();
 
                 RefreshProfileButtonAvatar();
             }
@@ -415,6 +456,16 @@ namespace WPFTheWeakestRival
             }
         }
 
+        private void SetDefaultAvatar()
+        {
+            var defaultAvatar = UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
+
+            if (imgAvatar != null)
+            {
+                imgAvatar.Source = defaultAvatar;
+            }
+        }
+
         private void RefreshProfileButtonAvatar()
         {
             try
@@ -422,44 +473,39 @@ namespace WPFTheWeakestRival
                 var token = LoginWindow.AppSession.CurrentToken?.Token;
                 if (string.IsNullOrWhiteSpace(token))
                 {
+                    SetDefaultAvatar();
                     return;
                 }
 
                 var myProfile = AppServices.Lobby.GetMyProfile(token);
-                myDisplayName = string.IsNullOrWhiteSpace(myProfile?.DisplayName) ? "Yo" : myProfile.DisplayName;
 
-                var avatarSource =
+                myDisplayName = string.IsNullOrWhiteSpace(myProfile?.DisplayName)
+                    ? DEFAULT_DISPLAY_NAME
+                    : myProfile.DisplayName;
+
+                var avatarImageSource =
                     UiImageHelper.TryCreateFromUrlOrPath(myProfile?.ProfileImageUrl) ??
-                    UiImageHelper.DefaultAvatar(40);
+                    UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
 
                 if (imgAvatar != null)
                 {
-                    imgAvatar.Source = avatarSource;
+                    imgAvatar.Source = avatarImageSource;
                 }
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
                 Logger.Warn("Auth fault while refreshing profile button avatar in lobby.", ex);
-                if (imgAvatar != null)
-                {
-                    imgAvatar.Source = UiImageHelper.DefaultAvatar(40);
-                }
+                SetDefaultAvatar();
             }
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while refreshing profile button avatar in lobby.", ex);
-                if (imgAvatar != null)
-                {
-                    imgAvatar.Source = UiImageHelper.DefaultAvatar(40);
-                }
+                SetDefaultAvatar();
             }
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while refreshing profile button avatar in lobby.", ex);
-                if (imgAvatar != null)
-                {
-                    imgAvatar.Source = UiImageHelper.DefaultAvatar(40);
-                }
+                SetDefaultAvatar();
             }
         }
 
@@ -481,22 +527,9 @@ namespace WPFTheWeakestRival
             {
                 var client = AppServices.Lobby.RawClient;
 
-                var request = new LobbyService.StartLobbyMatchRequest
+                var request = new StartLobbyMatchRequest
                 {
-                    Token = token,
-                    MaxPlayers = _maxPlayers,      // lo que elegiste en MatchSettingsPage
-                    IsPrivate = _isPrivate,
-
-                    Config = new LobbyService.MatchConfigDto
-                    {
-                        StartingScore = _startingScore,
-                        MaxScore = _maxScore,
-                        PointsPerCorrect = _pointsCorrect,
-                        PointsPerWrong = _pointsWrong,
-                        PointsPerEliminationGain = _pointsEliminationGain,
-                        AllowTiebreakCoinflip = _allowCoinflip
-                    }
-
+                    Token = token
                 };
 
                 await Task.Run(() => client.StartLobbyMatch(request));
@@ -523,7 +556,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Error inesperado al iniciar partida desde Lobby.", ex);
                 MessageBox.Show(
-                    "Ocurrió un error al iniciar la partida." + Environment.NewLine + ex.Message,
+                    ERROR_START_MATCH_GENERIC + Environment.NewLine + ex.Message,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -537,12 +570,13 @@ namespace WPFTheWeakestRival
             }
         }
 
-
         private void UpdateLobbyHeader(string lobbyName, string accessCode)
         {
             if (txtLobbyHeader != null)
             {
-                txtLobbyHeader.Text = string.IsNullOrWhiteSpace(lobbyName) ? Lang.lobbyTitle : lobbyName;
+                txtLobbyHeader.Text = string.IsNullOrWhiteSpace(lobbyName)
+                    ? Lang.lobbyTitle
+                    : lobbyName;
             }
 
             if (txtAccessCode != null)
@@ -555,12 +589,13 @@ namespace WPFTheWeakestRival
 
         private void AppendLine(string author, string text)
         {
-            chatLines.Add(new ChatLine
-            {
-                Author = string.IsNullOrWhiteSpace(author) ? "?" : author,
-                Text = text ?? string.Empty,
-                Time = DateTime.Now.ToString("HH:mm")
-            });
+            chatLines.Add(
+                new ChatLine
+                {
+                    Author = string.IsNullOrWhiteSpace(author) ? UNKNOWN_AUTHOR_DISPLAY_NAME : author,
+                    Text = text ?? string.Empty,
+                    Time = DateTime.Now.ToString(CHAT_TIME_FORMAT)
+                });
 
             if (lstChatMessages != null && lstChatMessages.Items.Count > 0)
             {
@@ -635,6 +670,23 @@ namespace WPFTheWeakestRival
             }
         }
 
+        private LobbyPlayerItem MapPlayerToLobbyItem(LobbyContracts.AccountMini account)
+        {
+            var item = LobbyAvatarHelper.BuildFromAccountMini(account);
+            if (item == null)
+            {
+                return null;
+            }
+
+            var session = LoginWindow.AppSession.CurrentToken;
+            if (session != null && session.UserId == item.AccountId)
+            {
+                item.IsMe = true;
+            }
+
+            return item;
+        }
+
         private void OnLobbyUpdatedFromHub(LobbyInfo info)
         {
             try
@@ -651,7 +703,15 @@ namespace WPFTheWeakestRival
                 }
 
                 Dispatcher.Invoke(
-                    () => UpdateLobbyHeader(info.LobbyName, currentAccessCode));
+                    () =>
+                    {
+                        UpdateLobbyHeader(info.LobbyName, currentAccessCode);
+
+                        LobbyAvatarHelper.RebuildLobbyPlayers(
+                            lobbyPlayers,
+                            info.Players,
+                            MapPlayerToLobbyItem);
+                    });
             }
             catch (Exception ex)
             {
@@ -692,22 +752,23 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Dispatcher.Invoke(() =>
-                {
-                    var author = string.IsNullOrWhiteSpace(chat.FromPlayerName)
-                        ? Lang.player
-                        : chat.FromPlayerName;
-
-                    var isMyRecentEcho =
-                        string.Equals(author, myDisplayName, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals(chat.Message ?? string.Empty, lastSentText, StringComparison.Ordinal) &&
-                        (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(2);
-
-                    if (!isMyRecentEcho)
+                Dispatcher.Invoke(
+                    () =>
                     {
-                        AppendLine(author, chat.Message ?? string.Empty);
-                    }
-                });
+                        var author = string.IsNullOrWhiteSpace(chat.FromPlayerName)
+                            ? Lang.player
+                            : chat.FromPlayerName;
+
+                        var isMyRecentEcho =
+                            string.Equals(author, myDisplayName, StringComparison.OrdinalIgnoreCase) &&
+                            string.Equals(chat.Message ?? string.Empty, lastSentText, StringComparison.Ordinal) &&
+                            (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(RECENT_ECHO_WINDOW_SECONDS);
+
+                        if (!isMyRecentEcho)
+                        {
+                            AppendLine(author, chat.Message ?? string.Empty);
+                        }
+                    });
             }
             catch (Exception ex)
             {
@@ -719,12 +780,12 @@ namespace WPFTheWeakestRival
         {
             friendItems.Clear();
 
-            foreach (var f in list)
+            foreach (var friend in list)
             {
-                friendItems.Add(f);
+                friendItems.Add(friend);
             }
 
-            pendingRequests = pending;
+            pendingRequestsCount = pending;
             UpdateFriendDrawerUi();
         }
 
@@ -744,7 +805,7 @@ namespace WPFTheWeakestRival
 
             if (txtRequestsCount != null)
             {
-                txtRequestsCount.Text = pendingRequests.ToString();
+                txtRequestsCount.Text = pendingRequestsCount.ToString();
             }
         }
 
@@ -794,7 +855,7 @@ namespace WPFTheWeakestRival
                 if (string.IsNullOrWhiteSpace(currentAccessCode))
                 {
                     MessageBox.Show(
-                        "No hay un código de lobby para copiar.",
+                        ERROR_COPY_CODE_NO_CODE,
                         Lang.lobbyTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
@@ -807,7 +868,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Error copying lobby access code to clipboard.", ex);
                 MessageBox.Show(
-                    "Ocurrió un error al copiar el código al portapapeles.",
+                    ERROR_COPY_CODE_GENERIC,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -823,24 +884,44 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Dispatcher.Invoke(() =>
-                {
-                    var token = LoginWindow.AppSession.CurrentToken?.Token;
-                    var session = LoginWindow.AppSession.CurrentToken;
-                    var myUserId = session != null ? session.UserId : 0;
+                Dispatcher.Invoke(
+                    () =>
+                    {
+                        var token = LoginWindow.AppSession.CurrentToken?.Token;
+                        var session = LoginWindow.AppSession.CurrentToken;
+                        var myUserId = session != null ? session.UserId : 0;
 
-                    // Desde el hub normalmente eres invitado, así que marcamos isHost = false
-                    var isHost = false;
+                        var isHost = false;
 
-                    var win = new MatchWindow(match, token, myUserId, isHost, this);
-                    this.Hide();
-                    win.Show();
-                });
+                        var matchWindow = new MatchWindow(match, token, myUserId, isHost, this);
+                        Hide();
+                        matchWindow.Show();
+                    });
             }
             catch (Exception ex)
             {
                 Logger.Error("Error handling OnMatchStartedFromHub in LobbyWindow.", ex);
             }
+        }
+
+        public void InitializeExistingLobby(LobbyContracts.LobbyInfo info)
+        {
+            if (info == null)
+            {
+                return;
+            }
+
+            currentLobbyId = info.LobbyId;
+            currentAccessCode = string.IsNullOrWhiteSpace(info.AccessCode)
+                ? string.Empty
+                : info.AccessCode;
+
+            UpdateLobbyHeader(info.LobbyName, currentAccessCode);
+
+            LobbyAvatarHelper.RebuildLobbyPlayers(
+                lobbyPlayers,
+                info.Players,
+                MapPlayerToLobbyItem);
         }
     }
 }

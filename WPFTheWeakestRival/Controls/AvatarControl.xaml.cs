@@ -7,115 +7,153 @@ using WPFTheWeakestRival.Models;
 
 namespace WPFTheWeakestRival.Controls
 {
-    public enum HatType { None, Beanie, Baseball, TopHat }
-    public enum FaceType { Neutral, Happy, Angry }
+    public enum HatType
+    {
+        None,
+        Beanie,
+        Baseball,
+        TopHat
+    }
+
+    public enum FaceType
+    {
+        Neutral,
+        Happy,
+        Angry
+    }
 
     public partial class AvatarControl : System.Windows.Controls.UserControl, INotifyPropertyChanged
     {
-        // ===================== Dependency Properties =====================
+        private const double BODY_SHADE_INTENSITY = 0.14;
+        private const double PANTS_SHADE_INTENSITY = 0.18;
+        private const double HAT_SHADE_INTENSITY = 0.12;
+        private const double HAT_RIM_SHADE_INTENSITY = 0.06;
+
+        private const int BODY_COLOR_INDEX_RED = 0;
+        private const int BODY_COLOR_INDEX_BLUE = 1;
+        private const int BODY_COLOR_INDEX_GREEN = 2;
+        private const int BODY_COLOR_INDEX_ORANGE = 3;
+        private const int BODY_COLOR_INDEX_PURPLE = 4;
+        private const int BODY_COLOR_INDEX_GRAY = 5;
+
+        private const int PANTS_COLOR_INDEX_BLACK = 0;
+        private const int PANTS_COLOR_INDEX_DARK_GRAY = 1;
+        private const int PANTS_COLOR_INDEX_BLUE_JEANS = 2;
+
+        private const int HAT_COLOR_INDEX_DEFAULT = 0;
+        private const int HAT_COLOR_INDEX_RED = 1;
+        private const int HAT_COLOR_INDEX_BLUE = 2;
+        private const int HAT_COLOR_INDEX_BLACK = 3;
+
+        private const int HAT_TYPE_INDEX_NONE = 0;
+        private const int HAT_TYPE_INDEX_BASEBALL = 1;
+        private const int HAT_TYPE_INDEX_TOP_HAT = 2;
+        private const int HAT_TYPE_INDEX_BEANIE = 3;
+
+        private const int FACE_TYPE_INDEX_NEUTRAL = 0;
+        private const int FACE_TYPE_INDEX_ANGRY = 1;
+        private const int FACE_TYPE_INDEX_HAPPY = 2;
+        private const int FACE_TYPE_INDEX_NEUTRAL_ALT = 3;
+
+        private static readonly Color DEFAULT_BODY_COLOR = ColorFromHex("#FFED4C00");
+        private static readonly Color DEFAULT_PANTS_COLOR = ColorFromHex("#FF111111");
+        private static readonly Color DEFAULT_SKIN_COLOR = ColorFromHex("#FFEED8C8");
+        private static readonly Color DEFAULT_HAT_COLOR = ColorFromHex("#FF2F6AA3");
+
+        private static readonly Color BODY_COLOR_RED = ColorFromHex("#FFD32F2F");
+        private static readonly Color BODY_COLOR_BLUE = ColorFromHex("#FF2F6AA3");
+        private static readonly Color BODY_COLOR_GREEN = ColorFromHex("#FF4CAF50");
+        private static readonly Color BODY_COLOR_ORANGE = ColorFromHex("#FFED4C00");
+        private static readonly Color BODY_COLOR_PURPLE = ColorFromHex("#FF9C27B0");
+        private static readonly Color BODY_COLOR_GRAY = ColorFromHex("#FF9E9E9E");
+
+        private static readonly Color PANTS_COLOR_BLACK = ColorFromHex("#FF111111");
+        private static readonly Color PANTS_COLOR_DARK_GRAY = ColorFromHex("#FF444444");
+        private static readonly Color PANTS_COLOR_BLUE_JEANS = ColorFromHex("#FF3F51B5");
+
+        private static readonly Color HAT_COLOR_DEFAULT = ColorFromHex("#FF2F6AA3");
+        private static readonly Color HAT_COLOR_RED = ColorFromHex("#FFD32F2F");
+        private static readonly Color HAT_COLOR_BLUE = ColorFromHex("#FF2F6AA3");
+        private static readonly Color HAT_COLOR_BLACK = ColorFromHex("#FF111111");
+
         public static readonly DependencyProperty BodyColorProperty =
-            DependencyProperty.Register(nameof(BodyColor), typeof(Color), typeof(AvatarControl),
-                new PropertyMetadata(ColorFromHex("#FFED4C00"), OnDpChanged));
+            DependencyProperty.Register(
+                nameof(BodyColor),
+                typeof(Color),
+                typeof(AvatarControl),
+                new PropertyMetadata(DEFAULT_BODY_COLOR, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty PantsColorProperty =
-            DependencyProperty.Register(nameof(PantsColor), typeof(Color), typeof(AvatarControl),
-                new PropertyMetadata(ColorFromHex("#FF111111"), OnDpChanged));
+            DependencyProperty.Register(
+                nameof(PantsColor),
+                typeof(Color),
+                typeof(AvatarControl),
+                new PropertyMetadata(DEFAULT_PANTS_COLOR, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty SkinColorProperty =
-            DependencyProperty.Register(nameof(SkinColor), typeof(Color), typeof(AvatarControl),
-                new PropertyMetadata(ColorFromHex("#FFEED8C8"), OnDpChanged));
+            DependencyProperty.Register(
+                nameof(SkinColor),
+                typeof(Color),
+                typeof(AvatarControl),
+                new PropertyMetadata(DEFAULT_SKIN_COLOR, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty HatColorProperty =
-            DependencyProperty.Register(nameof(HatColor), typeof(Color), typeof(AvatarControl),
-                new PropertyMetadata(ColorFromHex("#FF2F6AA3"), OnDpChanged));
+            DependencyProperty.Register(
+                nameof(HatColor),
+                typeof(Color),
+                typeof(AvatarControl),
+                new PropertyMetadata(DEFAULT_HAT_COLOR, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty HatTypeProperty =
-            DependencyProperty.Register(nameof(HatType), typeof(HatType), typeof(AvatarControl),
-                new PropertyMetadata(HatType.None, OnDpChanged));
+            DependencyProperty.Register(
+                nameof(HatType),
+                typeof(HatType),
+                typeof(AvatarControl),
+                new PropertyMetadata(HatType.None, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty FaceTypeProperty =
-            DependencyProperty.Register(nameof(FaceType), typeof(FaceType), typeof(AvatarControl),
-                new PropertyMetadata(FaceType.Neutral, OnDpChanged));
+            DependencyProperty.Register(
+                nameof(FaceType),
+                typeof(FaceType),
+                typeof(AvatarControl),
+                new PropertyMetadata(FaceType.Neutral, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty UseProfilePhotoAsFaceProperty =
-            DependencyProperty.Register(nameof(UseProfilePhotoAsFace), typeof(bool), typeof(AvatarControl),
-                new PropertyMetadata(false, OnDpChanged));
+            DependencyProperty.Register(
+                nameof(UseProfilePhotoAsFace),
+                typeof(bool),
+                typeof(AvatarControl),
+                new PropertyMetadata(false, OnDependencyPropertyChanged));
 
         public static readonly DependencyProperty FacePhotoProperty =
-            DependencyProperty.Register(nameof(FacePhoto), typeof(ImageSource), typeof(AvatarControl),
-                new PropertyMetadata(null, OnDpChanged));
+            DependencyProperty.Register(
+                nameof(FacePhoto),
+                typeof(ImageSource),
+                typeof(AvatarControl),
+                new PropertyMetadata(null, OnDependencyPropertyChanged));
 
-        // ===================== .NET Properties =====================
-        public Color BodyColor { get => (Color)GetValue(BodyColorProperty); set => SetValue(BodyColorProperty, value); }
-        public Color PantsColor { get => (Color)GetValue(PantsColorProperty); set => SetValue(PantsColorProperty, value); }
-        public Color SkinColor { get => (Color)GetValue(SkinColorProperty); set => SetValue(SkinColorProperty, value); }
-        public Color HatColor { get => (Color)GetValue(HatColorProperty); set => SetValue(HatColorProperty, value); }
-        public HatType HatType { get => (HatType)GetValue(HatTypeProperty); set => SetValue(HatTypeProperty, value); }
-        public FaceType FaceType { get => (FaceType)GetValue(FaceTypeProperty); set => SetValue(FaceTypeProperty, value); }
-        public bool UseProfilePhotoAsFace { get => (bool)GetValue(UseProfilePhotoAsFaceProperty); set => SetValue(UseProfilePhotoAsFaceProperty, value); }
-        public ImageSource FacePhoto { get => (ImageSource)GetValue(FacePhotoProperty); set => SetValue(FacePhotoProperty, value); }
+        public static readonly DependencyProperty AppearanceProperty =
+            DependencyProperty.Register(
+                nameof(Appearance),
+                typeof(AvatarAppearance),
+                typeof(AvatarControl),
+                new PropertyMetadata(null, OnAppearanceChanged));
 
-        // New: expose a friendly ProfileImage property used by other windows
-        public ImageSource ProfileImage
-        {
-            get => FacePhoto;
-            set
-            {
-                FacePhoto = value;
-                // if an Appearance is already set, re-apply so UseProfilePhotoAsFace is respected
-                if (Appearance != null)
-                {
-                    ApplyAppearance(Appearance);
-                }
-            }
-        }
+        public static readonly DependencyProperty ProfileImageProperty =
+            DependencyProperty.Register(
+                nameof(ProfileImage),
+                typeof(ImageSource),
+                typeof(AvatarControl),
+                new PropertyMetadata(null, OnProfileImageChanged));
 
-        private AvatarAppearance appearance;
-        public AvatarAppearance Appearance
-        {
-            get => appearance;
-            set
-            {
-                appearance = value;
-                if (appearance == null)
-                {
-                    // Reset to defaults
-                    // keep current FacePhoto but disable photo use
-                    UseProfilePhotoAsFace = false;
-                    RebuildAll();
-                }
-                else
-                {
-                    ApplyAppearance(appearance);
-                }
-            }
-        }
-
-        // ===================== Brushes para XAML =====================
         private Brush skinBrush;
-        public Brush SkinBrush { get => skinBrush; private set { skinBrush = value; OnPropertyChanged(); } }
-
         private Brush torsoBrush;
-        public Brush TorsoBrush { get => torsoBrush; private set { torsoBrush = value; OnPropertyChanged(); } }
-
         private Brush pantsBrush;
-        public Brush PantsBrush { get => pantsBrush; private set { pantsBrush = value; OnPropertyChanged(); } }
-
         private Brush hatBrush;
-        public Brush HatBrush { get => hatBrush; private set { hatBrush = value; OnPropertyChanged(); } }
-
         private Brush hatRimBrush;
-        public Brush HatRimBrush { get => hatRimBrush; private set { hatRimBrush = value; OnPropertyChanged(); } }
-
         private Brush facePhotoBrush = Brushes.Transparent;
-        public Brush FacePhotoBrush { get => facePhotoBrush; private set { facePhotoBrush = value; OnPropertyChanged(); } }
-
-        // Estados derivados que se usan en bindings
-        private bool hatVisible;
-        public bool HatVisible { get => hatVisible; private set { hatVisible = value; OnPropertyChanged(); } }
-
-        private bool faceUsesPhoto;
-        public bool FaceUsesPhoto { get => faceUsesPhoto; private set { faceUsesPhoto = value; OnPropertyChanged(); } }
+        private bool isHatVisible;
+        private bool isFaceUsingPhoto;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -126,176 +164,446 @@ namespace WPFTheWeakestRival.Controls
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
         }
 
-        private static void OnDpChanged(DependencyObject d, DependencyPropertyChangedEventArgs _)
+        public Color BodyColor
         {
-            if (d is AvatarControl c) c.RebuildAll();
+            get => (Color)GetValue(BodyColorProperty);
+            set => SetValue(BodyColorProperty, value);
         }
 
-        private void RebuildAll()
+        public Color PantsColor
         {
-            // Brushes
-            SkinBrush = new SolidColorBrush(SkinColor);
-            TorsoBrush = BuildShaded(BodyColor, 0.14);
-            PantsBrush = BuildShaded(PantsColor, 0.18);
-            HatBrush = BuildShaded(HatColor, 0.12);
-            HatRimBrush = BuildShaded(HatColor, 0.06);
-
-            // Flags
-            HatVisible = HatType != HatType.None;
-            FaceUsesPhoto = UseProfilePhotoAsFace && FacePhoto != null;
-
-            // Foto
-            Brush faceBrush = FaceUsesPhoto && FacePhoto != null
-            ? (Brush)new ImageBrush(FacePhoto) { Stretch = Stretch.UniformToFill, AlignmentX = AlignmentX.Center, AlignmentY = AlignmentY.Center }
-            : (Brush)Brushes.Transparent;
-            FacePhotoBrush = faceBrush;
-
-
-            // Partes visibles según tipo de cara/sombrero
-            // Sombreros
-            var beanie = (System.Windows.Controls.Grid)FindName("HatBeanie");
-            var cap = (System.Windows.Controls.Grid)FindName("HatCap");
-            var top = (System.Windows.Controls.Grid)FindName("HatTop");
-            if (beanie != null) beanie.Opacity = HatType == HatType.Beanie ? 1 : 0;
-            if (cap != null) cap.Opacity = HatType == HatType.Baseball ? 1 : 0;
-            if (top != null) top.Opacity = HatType == HatType.TopHat ? 1 : 0;
-
-            // Boca/ojos
-            var mNeutral = (System.Windows.Shapes.Rectangle)FindName("MouthNeutral");
-            var mHappy = (System.Windows.Shapes.Path)FindName("MouthHappy");
-            var mAngry = (System.Windows.Shapes.Path)FindName("MouthAngry");
-            var eLN = (System.Windows.Shapes.Ellipse)FindName("EyeLeftNeutral");
-            var eRN = (System.Windows.Shapes.Ellipse)FindName("EyeRightNeutral");
-            var eLH = (System.Windows.Shapes.Ellipse)FindName("EyeLeftHappy");
-            var eRH = (System.Windows.Shapes.Ellipse)FindName("EyeRightHappy");
-
-            if (mNeutral != null) mNeutral.Opacity = FaceType == FaceType.Neutral ? 1 : 0;
-            if (mHappy != null) mHappy.Opacity = FaceType == FaceType.Happy ? 1 : 0;
-            if (mAngry != null) mAngry.Opacity = FaceType == FaceType.Angry ? 1 : 0;
-
-            if (eLN != null) eLN.Opacity = FaceType == FaceType.Neutral ? 1 : 0;
-            if (eRN != null) eRN.Opacity = FaceType == FaceType.Neutral ? 1 : 0;
-            if (eLH != null) eLH.Opacity = FaceType == FaceType.Happy ? 1 : 0;
-            if (eRH != null) eRH.Opacity = FaceType == FaceType.Happy ? 1 : 0;
+            get => (Color)GetValue(PantsColorProperty);
+            set => SetValue(PantsColorProperty, value);
         }
 
-        private static LinearGradientBrush BuildShaded(Color baseColor, double shade)
+        public Color SkinColor
         {
-            byte Dark(byte c) => (byte)Math.Max(0, c * (1 - shade));
-            var darker = Color.FromArgb(baseColor.A, Dark(baseColor.R), Dark(baseColor.G), Dark(baseColor.B));
-            return new LinearGradientBrush(
-                new GradientStopCollection {
-                    new GradientStop(darker, 0),
-                    new GradientStop(baseColor, 1)
-                },
-                new Point(0, 0), new Point(0, 1));
+            get => (Color)GetValue(SkinColorProperty);
+            set => SetValue(SkinColorProperty, value);
         }
 
-        private static Color ColorFromHex(string hex) => (Color)ColorConverter.ConvertFromString(hex);
-
-        private void OnPropertyChanged([CallerMemberName] string prop = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-
-        private void ApplyAppearance(AvatarAppearance a)
+        public Color HatColor
         {
-            if (a == null)
+            get => (Color)GetValue(HatColorProperty);
+            set => SetValue(HatColorProperty, value);
+        }
+
+        public HatType HatType
+        {
+            get => (HatType)GetValue(HatTypeProperty);
+            set => SetValue(HatTypeProperty, value);
+        }
+
+        public FaceType FaceType
+        {
+            get => (FaceType)GetValue(FaceTypeProperty);
+            set => SetValue(FaceTypeProperty, value);
+        }
+
+        public bool UseProfilePhotoAsFace
+        {
+            get => (bool)GetValue(UseProfilePhotoAsFaceProperty);
+            set => SetValue(UseProfilePhotoAsFaceProperty, value);
+        }
+
+        public ImageSource FacePhoto
+        {
+            get => (ImageSource)GetValue(FacePhotoProperty);
+            set => SetValue(FacePhotoProperty, value);
+        }
+
+        public ImageSource ProfileImage
+        {
+            get => (ImageSource)GetValue(ProfileImageProperty);
+            set => SetValue(ProfileImageProperty, value);
+        }
+
+        public AvatarAppearance Appearance
+        {
+            get => (AvatarAppearance)GetValue(AppearanceProperty);
+            set => SetValue(AppearanceProperty, value);
+        }
+
+        public Brush SkinBrush
+        {
+            get => skinBrush;
+            private set
+            {
+                skinBrush = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush TorsoBrush
+        {
+            get => torsoBrush;
+            private set
+            {
+                torsoBrush = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush PantsBrush
+        {
+            get => pantsBrush;
+            private set
+            {
+                pantsBrush = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush HatBrush
+        {
+            get => hatBrush;
+            private set
+            {
+                hatBrush = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush HatRimBrush
+        {
+            get => hatRimBrush;
+            private set
+            {
+                hatRimBrush = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Brush FacePhotoBrush
+        {
+            get => facePhotoBrush;
+            private set
+            {
+                facePhotoBrush = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsHatVisible
+        {
+            get => isHatVisible;
+            private set
+            {
+                isHatVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsFaceUsingPhoto
+        {
+            get => isFaceUsingPhoto;
+            private set
+            {
+                isFaceUsingPhoto = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private static void OnDependencyPropertyChanged(
+            DependencyObject dependencyObject,
+            DependencyPropertyChangedEventArgs eventArgs)
+        {
+            var control = dependencyObject as AvatarControl;
+            if (control == null)
             {
                 return;
             }
 
-            // Map body color index to an actual Color
-            Color MapBodyColor(int idx)
-            {
-                switch (idx)
-                {
-                    case 0: return (Color)ColorConverter.ConvertFromString("#FFD32F2F"); // Red
-                    case 1: return (Color)ColorConverter.ConvertFromString("#FF2F6AA3"); // Blue
-                    case 2: return (Color)ColorConverter.ConvertFromString("#FF4CAF50"); // Green
-                    case 3: return (Color)ColorConverter.ConvertFromString("#FFED4C00"); // Yellow/Orange
-                    case 4: return (Color)ColorConverter.ConvertFromString("#FF9C27B0"); // Purple
-                    case 5: return (Color)ColorConverter.ConvertFromString("#FF9E9E9E"); // Gray
-                    default: return BodyColor;
-                }
-            }
-
-            Color MapPantsColor(int idx)
-            {
-                switch (idx)
-                {
-                    case 0: return (Color)ColorConverter.ConvertFromString("#FF111111"); // Black
-                    case 1: return (Color)ColorConverter.ConvertFromString("#FF444444"); // DarkGray
-                    case 2: return (Color)ColorConverter.ConvertFromString("#FF3F51B5"); // BlueJeans
-                    default: return PantsColor;
-                }
-            }
-
-            Color MapHatColor(int idx)
-            {
-                switch (idx)
-                {
-                    case 0: return (Color)ColorConverter.ConvertFromString("#FF2F6AA3"); // Default (blue)
-                    case 1: return (Color)ColorConverter.ConvertFromString("#FFD32F2F"); // Red
-                    case 2: return (Color)ColorConverter.ConvertFromString("#FF2F6AA3"); // Blue
-                    case 3: return (Color)ColorConverter.ConvertFromString("#FF111111"); // Black
-                    default: return HatColor;
-                }
-            }
-
-            HatType MapHatType(int idx)
-            {
-                switch (idx)
-                {
-                    case 0: return HatType.None;
-                    case 1: return HatType.Baseball; // Cap
-                    case 2: return HatType.TopHat;
-                    case 3: return HatType.Beanie;
-                    default: return HatType.None;
-                }
-            }
-
-            FaceType MapFaceType(int idx)
-            {
-                switch (idx)
-                {
-                    case 0: return FaceType.Neutral; // Default
-                    case 1: return FaceType.Angry;
-                    case 2: return FaceType.Happy;
-                    case 3: return FaceType.Neutral; // Sleepy -> neutral fallback
-                    default: return FaceType.Neutral;
-                }
-            }
-
-            // Use current FacePhoto (ProfileImage) when applying
-            var faceImage = FacePhoto;
-            var usePhoto = a.UseProfilePhotoAsFace;
-
-            // Call existing helper to set values
-            SetAppearance(
-                SkinColor, // skin not present in model; keep current skin
-                MapBodyColor(a.BodyColor),
-                MapPantsColor(a.PantsColor),
-                MapHatType(a.HatType),
-                MapHatColor(a.HatColor),
-                MapFaceType(a.FaceType),
-                faceImage,
-                usePhoto);
+            control.RebuildAll();
         }
 
-        // API conveniente
-        public void SetAppearance(
-            Color skin, Color body, Color pants,
-            HatType hatType, Color hat,
-            FaceType face,
-            ImageSource facePhoto = null, bool usePhoto = false)
+        private static void OnAppearanceChanged(
+            DependencyObject dependencyObject,
+            DependencyPropertyChangedEventArgs eventArgs)
         {
-            SkinColor = skin;
-            BodyColor = body;
-            PantsColor = pants;
+            var control = dependencyObject as AvatarControl;
+            if (control == null)
+            {
+                return;
+            }
+
+            var appearance = eventArgs.NewValue as AvatarAppearance;
+            if (appearance == null)
+            {
+                control.UseProfilePhotoAsFace = false;
+                control.RebuildAll();
+                return;
+            }
+
+            control.ApplyAppearance(appearance);
+        }
+
+        private static void OnProfileImageChanged(
+            DependencyObject dependencyObject,
+            DependencyPropertyChangedEventArgs eventArgs)
+        {
+            var control = dependencyObject as AvatarControl;
+            if (control == null)
+            {
+                return;
+            }
+
+            var imageSource = eventArgs.NewValue as ImageSource;
+            control.FacePhoto = imageSource;
+            control.RebuildAll();
+        }
+
+        private void RebuildAll()
+        {
+            UpdateBrushes();
+            UpdateHatVisibility();
+            UpdateFaceBrush();
+            UpdateHatVariants();
+            UpdateFaceVariants();
+        }
+
+        private void UpdateBrushes()
+        {
+            SkinBrush = new SolidColorBrush(SkinColor);
+            TorsoBrush = BuildShaded(BodyColor, BODY_SHADE_INTENSITY);
+            PantsBrush = BuildShaded(PantsColor, PANTS_SHADE_INTENSITY);
+            HatBrush = BuildShaded(HatColor, HAT_SHADE_INTENSITY);
+            HatRimBrush = BuildShaded(HatColor, HAT_RIM_SHADE_INTENSITY);
+        }
+
+        private void UpdateHatVisibility()
+        {
+            IsHatVisible = HatType != HatType.None;
+        }
+
+        private void UpdateFaceBrush()
+        {
+            IsFaceUsingPhoto = UseProfilePhotoAsFace && FacePhoto != null;
+
+            Brush faceBrush = Brushes.Transparent;
+            if (IsFaceUsingPhoto && FacePhoto != null)
+            {
+                faceBrush = new ImageBrush(FacePhoto)
+                {
+                    Stretch = Stretch.UniformToFill,
+                    AlignmentX = AlignmentX.Center,
+                    AlignmentY = AlignmentY.Center
+                };
+            }
+
+            FacePhotoBrush = faceBrush;
+        }
+
+        private void UpdateHatVariants()
+        {
+            var beanie = (System.Windows.Controls.Grid)FindName("HatBeanie");
+            var cap = (System.Windows.Controls.Grid)FindName("HatCap");
+            var top = (System.Windows.Controls.Grid)FindName("HatTop");
+
+            SetElementOpacity(beanie, HatType == HatType.Beanie);
+            SetElementOpacity(cap, HatType == HatType.Baseball);
+            SetElementOpacity(top, HatType == HatType.TopHat);
+        }
+
+        private void UpdateFaceVariants()
+        {
+            var mouthNeutral = (System.Windows.Shapes.Rectangle)FindName("MouthNeutral");
+            var mouthHappy = (System.Windows.Shapes.Path)FindName("MouthHappy");
+            var mouthAngry = (System.Windows.Shapes.Path)FindName("MouthAngry");
+            var eyeLeftNeutral = (System.Windows.Shapes.Ellipse)FindName("EyeLeftNeutral");
+            var eyeRightNeutral = (System.Windows.Shapes.Ellipse)FindName("EyeRightNeutral");
+            var eyeLeftHappy = (System.Windows.Shapes.Ellipse)FindName("EyeLeftHappy");
+            var eyeRightHappy = (System.Windows.Shapes.Ellipse)FindName("EyeRightHappy");
+
+            var isNeutral = FaceType == FaceType.Neutral;
+            var isHappy = FaceType == FaceType.Happy;
+            var isAngry = FaceType == FaceType.Angry;
+
+            SetElementOpacity(mouthNeutral, isNeutral);
+            SetElementOpacity(mouthHappy, isHappy);
+            SetElementOpacity(mouthAngry, isAngry);
+
+            SetElementOpacity(eyeLeftNeutral, isNeutral);
+            SetElementOpacity(eyeRightNeutral, isNeutral);
+
+            SetElementOpacity(eyeLeftHappy, isHappy);
+            SetElementOpacity(eyeRightHappy, isHappy);
+        }
+
+        private static void SetElementOpacity(UIElement element, bool isVisible)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            element.Opacity = isVisible ? 1 : 0;
+        }
+
+        private static LinearGradientBrush BuildShaded(Color baseColor, double shade)
+        {
+            byte DarkenComponent(byte component)
+            {
+                return (byte)Math.Max(0, component * (1 - shade));
+            }
+
+            var darker = Color.FromArgb(
+                baseColor.A,
+                DarkenComponent(baseColor.R),
+                DarkenComponent(baseColor.G),
+                DarkenComponent(baseColor.B));
+
+            return new LinearGradientBrush(
+                new GradientStopCollection
+                {
+                    new GradientStop(darker, 0),
+                    new GradientStop(baseColor, 1)
+                },
+                new Point(0, 0),
+                new Point(0, 1));
+        }
+
+        private static Color ColorFromHex(string hexValue)
+        {
+            return (Color)ColorConverter.ConvertFromString(hexValue);
+        }
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler == null)
+            {
+                return;
+            }
+
+            handler.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void ApplyAppearance(AvatarAppearance avatar)
+        {
+            if (avatar == null)
+            {
+                return;
+            }
+
+            var shouldUsePhoto = avatar.UseProfilePhotoAsFace;
+            var faceImage = shouldUsePhoto ? FacePhoto : null;
+
+            SetAppearance(
+                SkinColor,
+                MapBodyColor(avatar.BodyColor),
+                MapPantsColor(avatar.PantsColor),
+                MapHatType(avatar.HatType),
+                MapHatColor(avatar.HatColor),
+                MapFaceType(avatar.FaceType),
+                faceImage);
+        }
+
+        private Color MapBodyColor(int index)
+        {
+            switch (index)
+            {
+                case BODY_COLOR_INDEX_RED:
+                    return BODY_COLOR_RED;
+                case BODY_COLOR_INDEX_BLUE:
+                    return BODY_COLOR_BLUE;
+                case BODY_COLOR_INDEX_GREEN:
+                    return BODY_COLOR_GREEN;
+                case BODY_COLOR_INDEX_ORANGE:
+                    return BODY_COLOR_ORANGE;
+                case BODY_COLOR_INDEX_PURPLE:
+                    return BODY_COLOR_PURPLE;
+                case BODY_COLOR_INDEX_GRAY:
+                    return BODY_COLOR_GRAY;
+                default:
+                    return BodyColor;
+            }
+        }
+
+        private Color MapPantsColor(int index)
+        {
+            switch (index)
+            {
+                case PANTS_COLOR_INDEX_BLACK:
+                    return PANTS_COLOR_BLACK;
+                case PANTS_COLOR_INDEX_DARK_GRAY:
+                    return PANTS_COLOR_DARK_GRAY;
+                case PANTS_COLOR_INDEX_BLUE_JEANS:
+                    return PANTS_COLOR_BLUE_JEANS;
+                default:
+                    return PantsColor;
+            }
+        }
+
+        private Color MapHatColor(int index)
+        {
+            switch (index)
+            {
+                case HAT_COLOR_INDEX_DEFAULT:
+                    return HAT_COLOR_DEFAULT;
+                case HAT_COLOR_INDEX_RED:
+                    return HAT_COLOR_RED;
+                case HAT_COLOR_INDEX_BLUE:
+                    return HAT_COLOR_BLUE;
+                case HAT_COLOR_INDEX_BLACK:
+                    return HAT_COLOR_BLACK;
+                default:
+                    return HatColor;
+            }
+        }
+
+        private HatType MapHatType(int index)
+        {
+            switch (index)
+            {
+                case HAT_TYPE_INDEX_NONE:
+                    return HatType.None;
+                case HAT_TYPE_INDEX_BASEBALL:
+                    return HatType.Baseball;
+                case HAT_TYPE_INDEX_TOP_HAT:
+                    return HatType.TopHat;
+                case HAT_TYPE_INDEX_BEANIE:
+                    return HatType.Beanie;
+                default:
+                    return HatType.None;
+            }
+        }
+
+        private FaceType MapFaceType(int index)
+        {
+            switch (index)
+            {
+                case FACE_TYPE_INDEX_NEUTRAL:
+                    return FaceType.Neutral;
+                case FACE_TYPE_INDEX_ANGRY:
+                    return FaceType.Angry;
+                case FACE_TYPE_INDEX_HAPPY:
+                    return FaceType.Happy;
+                case FACE_TYPE_INDEX_NEUTRAL_ALT:
+                    return FaceType.Neutral;
+                default:
+                    return FaceType.Neutral;
+            }
+        }
+
+        public void SetAppearance(
+            Color skinColor,
+            Color bodyColor,
+            Color pantsColor,
+            HatType hatType,
+            Color hatColor,
+            FaceType faceType,
+            ImageSource facePhoto = null)
+        {
+            SkinColor = skinColor;
+            BodyColor = bodyColor;
+            PantsColor = pantsColor;
             HatType = hatType;
-            HatColor = hat;
-            FaceType = face;
+            HatColor = hatColor;
+            FaceType = faceType;
+
             FacePhoto = facePhoto;
-            UseProfilePhotoAsFace = usePhoto && facePhoto != null;
+            UseProfilePhotoAsFace = facePhoto != null;
         }
     }
 }

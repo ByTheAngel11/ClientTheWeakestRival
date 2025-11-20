@@ -270,7 +270,8 @@
                             Height="51"
                             Width="57"
                             Margin="0,0,12,0"
-                            ToolTip="{loc:Loc btnPersonalization}">
+                            ToolTip="{loc:Loc btnPersonalization}"
+                            Click="BtnPersonalizationClick">
                         <Image Source="{StaticResource PersonalizationIcon}"
                                Width="52"
                                Height="51"
