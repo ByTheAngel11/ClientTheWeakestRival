@@ -21,27 +21,31 @@ namespace WPFTheWeakestRival.Windows
             InitializeFaceTypeCombo();
         }
 
-        public AvatarCustomizationWindow(AvatarControl sourceAvatar)
+        public AvatarCustomizationWindow(
+            Color bodyColor,
+            Color pantsColor,
+            Color skinColor,
+            Color hatColor,
+            HatType hatType,
+            FaceType faceType,
+            ImageSource facePhoto)
             : this()
         {
-            if (sourceAvatar == null)
-            {
-                throw new ArgumentNullException(nameof(sourceAvatar));
-            }
+            AvatarPreview.BodyColor = bodyColor;
+            AvatarPreview.PantsColor = pantsColor;
+            AvatarPreview.SkinColor = skinColor;
+            AvatarPreview.HatColor = hatColor;
+            AvatarPreview.HatType = hatType;
+            AvatarPreview.FaceType = faceType;
 
-            AvatarPreview.BodyColor = sourceAvatar.BodyColor;
-            AvatarPreview.PantsColor = sourceAvatar.PantsColor;
-            AvatarPreview.SkinColor = sourceAvatar.SkinColor;
-            AvatarPreview.HatColor = sourceAvatar.HatColor;
-            AvatarPreview.HatType = sourceAvatar.HatType;
-            AvatarPreview.FaceType = sourceAvatar.FaceType;
-            AvatarPreview.UseProfilePhotoAsFace = sourceAvatar.UseProfilePhotoAsFace;
-            AvatarPreview.FacePhoto = sourceAvatar.FacePhoto;
+            AvatarPreview.FacePhoto = facePhoto;
+            AvatarPreview.UseProfilePhotoAsFace = facePhoto != null;
         }
 
         private void InitializeFaceTypeCombo()
         {
             FaceTypeCombo.Items.Clear();
+
             foreach (FaceType value in Enum.GetValues(typeof(FaceType)))
             {
                 FaceTypeCombo.Items.Add(value);

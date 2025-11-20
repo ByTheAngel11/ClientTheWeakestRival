@@ -719,6 +719,7 @@ namespace WPFTheWeakestRival
             }
         }
 
+
         private void OnPlayerJoinedFromHub(LobbyContracts.PlayerSummary _)
         {
             try

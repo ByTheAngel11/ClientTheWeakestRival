@@ -586,8 +586,7 @@ namespace WPFTheWeakestRival
                 UserAvatarControl.HatColor,
                 UserAvatarControl.HatType,
                 UserAvatarControl.FaceType,
-                UserAvatarControl.UseProfilePhotoAsFace,
-                UserAvatarControl.FacePhoto)
+                UserAvatarControl.FacePhoto)   // <-- ya sin el bool
             {
                 Owner = this
             };
