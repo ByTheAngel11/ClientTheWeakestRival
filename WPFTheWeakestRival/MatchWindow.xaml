@@ -41,38 +41,87 @@
                    Foreground="White"
                    Margin="0,0,0,8"/>
 
-        <!-- Panel jugadores -->
-        <Border Grid.Row="4"
-                CornerRadius="16"
-                Padding="16"
-                Background="#0FFFFFFF"
-                BorderBrush="#33FFFFFF"
-                BorderThickness="1">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="8"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <!-- CONTENIDO: Jugadores + Comodín -->
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <DockPanel Grid.Row="0" LastChildFill="False">
-                    <TextBlock Text="Jugadores"
+            <!-- Panel jugadores -->
+            <Border Grid.Column="0"
+                    CornerRadius="16"
+                    Padding="16"
+                    Background="#0FFFFFFF"
+                    BorderBrush="#33FFFFFF"
+                    BorderThickness="1"
+                    Margin="0,0,16,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" LastChildFill="False">
+                        <TextBlock Text="Jugadores"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
+                        <TextBlock x:Name="txtPlayersSummary"
+                                   Margin="12,0,0,0"
+                                   Foreground="LightGray"/>
+                    </DockPanel>
+
+                    <Separator Grid.Row="1" Margin="0,4,0,4"/>
+
+                    <ListBox x:Name="lstPlayers"
+                             Grid.Row="2"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             Foreground="White"/>
+                </Grid>
+            </Border>
+
+            <!-- Panel comodín del jugador -->
+            <Border Grid.Column="1"
+                    CornerRadius="16"
+                    Padding="16"
+                    Background="#0FFFFFFF"
+                    BorderBrush="#33FFFFFF"
+                    BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Comodín"
+                               Grid.Row="0"
                                FontWeight="SemiBold"
                                Foreground="White"/>
-                    <TextBlock x:Name="txtPlayersSummary"
-                               Margin="12,0,0,0"
-                               Foreground="LightGray"/>
-                </DockPanel>
 
-                <Separator Grid.Row="1" Margin="0,4,0,4"/>
+                    <Separator Grid.Row="1" Margin="0,4,0,4"/>
 
-                <ListBox x:Name="lstPlayers"
-                         Grid.Row="2"
-                         BorderThickness="0"
-                         Background="Transparent"
-                         Foreground="White"/>
-            </Grid>
-        </Border>
+                    <!-- Nombre / código -->
+                    <TextBlock x:Name="txtWildcardName"
+                               Grid.Row="2"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="White"
+                               Text="Sin comodín"/>
+
+                    <!-- Descripción -->
+                    <TextBlock x:Name="txtWildcardDescription"
+                               Grid.Row="4"
+                               TextWrapping="Wrap"
+                               Foreground="LightGray"
+                               Margin="0,4,0,0"/>
+                </Grid>
+            </Border>
+        </Grid>
 
         <!-- Botón cerrar abajo derecha -->
         <StackPanel Grid.Row="6"

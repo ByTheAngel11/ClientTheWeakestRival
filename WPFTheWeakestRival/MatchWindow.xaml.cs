@@ -1,18 +1,28 @@
 ﻿using System;
+using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Windows;
+using log4net;
 using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.WildcardService;
+// Alias para desambiguar el ServiceFault de WildcardService
+using WildcardFault = WPFTheWeakestRival.WildcardService.ServiceFault;
 
 namespace WPFTheWeakestRival
 {
     public partial class MatchWindow : Window
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchWindow));
+
         private readonly MatchInfo _match;
         private readonly string _token;
         private readonly int _myUserId;
         private readonly bool _isHost;
-
-        // NUEVO: referencia directa al lobby
+        private readonly int _matchDbId;
         private readonly LobbyWindow _lobbyWindow;
+
+        // Comodín asignado a este jugador en esta partida
+        private PlayerWildcardDto _myWildcard;
 
         public MatchWindow(MatchInfo match, string token, int myUserId, bool isHost, LobbyWindow lobbyWindow)
         {
@@ -28,22 +38,23 @@ namespace WPFTheWeakestRival
             _myUserId = myUserId;
             _isHost = isHost;
             _lobbyWindow = lobbyWindow;
+            _matchDbId = match.MatchDbId;
 
-            // cuando se cierre la ventana de la partida, reabrimos el lobby
-            this.Closed += MatchWindow_Closed;
+            Closed += MatchWindow_Closed;
+            Loaded += MatchWindow_Loaded;
 
             InitializeUi();
         }
 
         private void InitializeUi()
         {
-            // Título fijo
+            // Título
             if (txtMatchTitle != null)
             {
                 txtMatchTitle.Text = "Partida";
             }
 
-            // Código pequeño arriba a la izquierda
+            // Código pequeño arriba
             if (txtMatchCodeSmall != null)
             {
                 var code = string.IsNullOrWhiteSpace(_match.MatchCode)
@@ -65,17 +76,103 @@ namespace WPFTheWeakestRival
                 }
             }
 
-            // Ya no pintamos estado ("Waiting") ni configuración
+            // Texto inicial del comodín
+            UpdateWildcardUi();
         }
 
+        private async void MatchWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadWildcardAsync();
+        }
 
+        private async Task LoadWildcardAsync()
+        {
+            if (string.IsNullOrWhiteSpace(_token) || _matchDbId <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                using (var client = new WildcardServiceClient("WSHttpBinding_IWildcardService"))
+                {
+                    var request = new GetPlayerWildcardsRequest
+                    {
+                        Token = _token,
+                        MatchId = _matchDbId
+                    };
+
+                    var response = await Task.Run(() => client.GetPlayerWildcards(request));
+
+                    var wildcard = response?.Wildcards != null && response.Wildcards.Length > 0
+                        ? response.Wildcards[0]
+                        : null;
+
+                    _myWildcard = wildcard;
+
+                    Dispatcher.Invoke(UpdateWildcardUi);
+                }
+            }
+            catch (FaultException<WildcardFault> ex)
+            {
+                Logger.Warn("Fault al obtener comodines del jugador en MatchWindow.", ex);
+                MessageBox.Show(
+                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    "Wildcards",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al obtener comodines en MatchWindow.", ex);
+                MessageBox.Show(
+                    "No se pudieron cargar los comodines." + Environment.NewLine + ex.Message,
+                    "Wildcards",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al obtener comodines en MatchWindow.", ex);
+                MessageBox.Show(
+                    "Ocurrió un error al cargar los comodines." + Environment.NewLine + ex.Message,
+                    "Wildcards",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateWildcardUi()
+        {
+            if (txtWildcardName == null || txtWildcardDescription == null)
+            {
+                return;
+            }
+
+            if (_myWildcard == null)
+            {
+                txtWildcardName.Text = "Sin comodín";
+                txtWildcardDescription.Text = string.Empty;
+                return;
+            }
+
+            var name = string.IsNullOrWhiteSpace(_myWildcard.Name)
+                ? _myWildcard.Code
+                : _myWildcard.Name;
+
+            txtWildcardName.Text = name ?? "Comodín";
+
+            txtWildcardDescription.Text =
+                string.IsNullOrWhiteSpace(_myWildcard.Description)
+                    ? _myWildcard.Code
+                    : _myWildcard.Description;
+        }
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        // NUEVO: reabrir el lobby correcto
         private void MatchWindow_Closed(object sender, EventArgs e)
         {
             if (_lobbyWindow != null)

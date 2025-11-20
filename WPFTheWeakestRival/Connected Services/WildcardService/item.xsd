@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ListWildcardTypesRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListWildcardTypesRequest" nillable="true" type="tns:ListWildcardTypesRequest" />
+  <xs:complexType name="ListWildcardTypesResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Types" nillable="true" type="tns:ArrayOfWildcardTypeDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ListWildcardTypesResponse" nillable="true" type="tns:ListWildcardTypesResponse" />
+  <xs:complexType name="ArrayOfWildcardTypeDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="WildcardTypeDto" nillable="true" type="tns:WildcardTypeDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfWildcardTypeDto" nillable="true" type="tns:ArrayOfWildcardTypeDto" />
+  <xs:complexType name="WildcardTypeDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Code" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MaxUsesPerMatch" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="WildcardTypeId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="WildcardTypeDto" nillable="true" type="tns:WildcardTypeDto" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+  <xs:complexType name="GetPlayerWildcardsRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="xs:int" />
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetPlayerWildcardsRequest" nillable="true" type="tns:GetPlayerWildcardsRequest" />
+  <xs:complexType name="GetPlayerWildcardsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Wildcards" nillable="true" type="tns:ArrayOfPlayerWildcardDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetPlayerWildcardsResponse" nillable="true" type="tns:GetPlayerWildcardsResponse" />
+  <xs:complexType name="ArrayOfPlayerWildcardDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerWildcardDto" nillable="true" type="tns:PlayerWildcardDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlayerWildcardDto" nillable="true" type="tns:ArrayOfPlayerWildcardDto" />
+  <xs:complexType name="PlayerWildcardDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Code" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ConsumedAt" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="ConsumedInRound" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="GrantedAt" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="MatchId" type="xs:int" />
+      <xs:element minOccurs="0" name="MaxUsesPerMatch" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PlayerWildcardId" type="xs:int" />
+      <xs:element minOccurs="0" name="UserId" type="xs:int" />
+      <xs:element minOccurs="0" name="WildcardTypeId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerWildcardDto" nillable="true" type="tns:PlayerWildcardDto" />
+  <xs:complexType name="UseWildcardRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="MatchId" type="xs:int" />
+      <xs:element minOccurs="0" name="PlayerWildcardId" type="xs:int" />
+      <xs:element minOccurs="0" name="RoundNumber" type="xs:int" />
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UseWildcardRequest" nillable="true" type="tns:UseWildcardRequest" />
+  <xs:complexType name="UseWildcardResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="IsConsumed" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Wildcard" nillable="true" type="tns:PlayerWildcardDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UseWildcardResponse" nillable="true" type="tns:UseWildcardResponse" />
+</xs:schema>

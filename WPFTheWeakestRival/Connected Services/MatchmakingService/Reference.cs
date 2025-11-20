@@ -287,6 +287,9 @@ namespace WPFTheWeakestRival.MatchmakingService {
         private string MatchCodeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int MatchDbIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.MatchmakingService.PlayerSummary[] PlayersField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -332,6 +335,19 @@ namespace WPFTheWeakestRival.MatchmakingService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public int MatchDbId {
+            get {
+                return this.MatchDbIdField;
+            }
+            set {
+                if ((this.MatchDbIdField.Equals(value) != true)) {
+                    this.MatchDbIdField = value;
+                    this.RaisePropertyChanged("MatchDbId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
         public WPFTheWeakestRival.MatchmakingService.PlayerSummary[] Players {
             get {
                 return this.PlayersField;
@@ -344,7 +360,7 @@ namespace WPFTheWeakestRival.MatchmakingService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
         public string State {
             get {
                 return this.StateField;
@@ -357,7 +373,7 @@ namespace WPFTheWeakestRival.MatchmakingService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
         public WPFTheWeakestRival.MatchmakingService.MatchConfigDto Config {
             get {
                 return this.ConfigField;

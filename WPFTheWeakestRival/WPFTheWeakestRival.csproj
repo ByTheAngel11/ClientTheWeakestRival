@@ -95,6 +95,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Connected Services\WildcardService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Converters\InverseBooleanToVisibilityConverter.cs" />
     <!-- AGREGADO -->
     <Compile Include="EmailVerificationWindow.xaml.cs">
@@ -409,6 +414,25 @@
     <None Include="Connected Services\StatsService\WPFTheWeakestRival.StatsService.GetPlayerStatsResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Connected Services\WildcardService\item.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\WildcardService\item1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\WildcardService\item2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\WildcardService\WildcardService.wsdl" />
+    <None Include="Connected Services\WildcardService\WPFTheWeakestRival.WildcardService.GetPlayerWildcardsResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\WildcardService\WPFTheWeakestRival.WildcardService.ListWildcardTypesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\WildcardService\WPFTheWeakestRival.WildcardService.UseWildcardResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -434,6 +458,7 @@
     <WCFMetadataStorage Include="Connected Services\LobbyService\" />
     <WCFMetadataStorage Include="Connected Services\MatchmakingService\" />
     <WCFMetadataStorage Include="Connected Services\StatsService\" />
+    <WCFMetadataStorage Include="Connected Services\WildcardService\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\AuthService\item.disco" />
@@ -571,6 +596,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Backgrounds\LobbyBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\WildcardService\item.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\WildcardService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\WildcardService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\WildcardService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

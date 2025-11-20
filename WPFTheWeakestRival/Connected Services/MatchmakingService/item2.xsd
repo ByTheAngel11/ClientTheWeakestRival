@@ -31,6 +31,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="MatchId" type="ser:guid" />
       <xs:element minOccurs="0" name="MatchCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MatchDbId" type="xs:int" />
       <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfPlayerSummary" />
       <xs:element minOccurs="0" name="State" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Config" nillable="true" type="tns:MatchConfigDto">
