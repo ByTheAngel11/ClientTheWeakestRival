@@ -135,7 +135,7 @@ namespace WPFTheWeakestRival.LobbyService {
         private int MaxPlayersField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.PlayerSummary[] PlayersField;
+        private WPFTheWeakestRival.LobbyService.AccountMini[] PlayersField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string AccessCodeField;
@@ -190,7 +190,7 @@ namespace WPFTheWeakestRival.LobbyService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public WPFTheWeakestRival.LobbyService.PlayerSummary[] Players {
+        public WPFTheWeakestRival.LobbyService.AccountMini[] Players {
             get {
                 return this.PlayersField;
             }
@@ -227,21 +227,27 @@ namespace WPFTheWeakestRival.LobbyService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="PlayerSummary", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AccountMini", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
-    public partial class PlayerSummary : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class AccountMini : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Guid PlayerIdField;
+        private int AccountIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string PlayerNameField;
+        private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool IsOnlineField;
+        private string EmailField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvatarUrlField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarAppearanceDto AvatarField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -254,40 +260,66 @@ namespace WPFTheWeakestRival.LobbyService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Guid PlayerId {
+        public int AccountId {
             get {
-                return this.PlayerIdField;
+                return this.AccountIdField;
             }
             set {
-                if ((this.PlayerIdField.Equals(value) != true)) {
-                    this.PlayerIdField = value;
-                    this.RaisePropertyChanged("PlayerId");
+                if ((this.AccountIdField.Equals(value) != true)) {
+                    this.AccountIdField = value;
+                    this.RaisePropertyChanged("AccountId");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string PlayerName {
+        public string DisplayName {
             get {
-                return this.PlayerNameField;
+                return this.DisplayNameField;
             }
             set {
-                if ((object.ReferenceEquals(this.PlayerNameField, value) != true)) {
-                    this.PlayerNameField = value;
-                    this.RaisePropertyChanged("PlayerName");
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public bool IsOnline {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Email {
             get {
-                return this.IsOnlineField;
+                return this.EmailField;
             }
             set {
-                if ((this.IsOnlineField.Equals(value) != true)) {
-                    this.IsOnlineField = value;
-                    this.RaisePropertyChanged("IsOnline");
+                if ((object.ReferenceEquals(this.EmailField, value) != true)) {
+                    this.EmailField = value;
+                    this.RaisePropertyChanged("Email");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public string AvatarUrl {
+            get {
+                return this.AvatarUrlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvatarUrlField, value) != true)) {
+                    this.AvatarUrlField = value;
+                    this.RaisePropertyChanged("AvatarUrl");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public WPFTheWeakestRival.LobbyService.AvatarAppearanceDto Avatar {
+            get {
+                return this.AvatarField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvatarField, value) != true)) {
+                    this.AvatarField = value;
+                    this.RaisePropertyChanged("Avatar");
                 }
             }
         }
@@ -300,6 +332,219 @@ namespace WPFTheWeakestRival.LobbyService {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarAppearanceDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class AvatarAppearanceDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarBodyColor BodyColorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarPantsColor PantsColorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarHatType HatTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarHatColor HatColorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarFaceType FaceTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool UseProfilePhotoAsFaceField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public WPFTheWeakestRival.LobbyService.AvatarBodyColor BodyColor {
+            get {
+                return this.BodyColorField;
+            }
+            set {
+                if ((this.BodyColorField.Equals(value) != true)) {
+                    this.BodyColorField = value;
+                    this.RaisePropertyChanged("BodyColor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public WPFTheWeakestRival.LobbyService.AvatarPantsColor PantsColor {
+            get {
+                return this.PantsColorField;
+            }
+            set {
+                if ((this.PantsColorField.Equals(value) != true)) {
+                    this.PantsColorField = value;
+                    this.RaisePropertyChanged("PantsColor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public WPFTheWeakestRival.LobbyService.AvatarHatType HatType {
+            get {
+                return this.HatTypeField;
+            }
+            set {
+                if ((this.HatTypeField.Equals(value) != true)) {
+                    this.HatTypeField = value;
+                    this.RaisePropertyChanged("HatType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public WPFTheWeakestRival.LobbyService.AvatarHatColor HatColor {
+            get {
+                return this.HatColorField;
+            }
+            set {
+                if ((this.HatColorField.Equals(value) != true)) {
+                    this.HatColorField = value;
+                    this.RaisePropertyChanged("HatColor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public WPFTheWeakestRival.LobbyService.AvatarFaceType FaceType {
+            get {
+                return this.FaceTypeField;
+            }
+            set {
+                if ((this.FaceTypeField.Equals(value) != true)) {
+                    this.FaceTypeField = value;
+                    this.RaisePropertyChanged("FaceType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public bool UseProfilePhotoAsFace {
+            get {
+                return this.UseProfilePhotoAsFaceField;
+            }
+            set {
+                if ((this.UseProfilePhotoAsFaceField.Equals(value) != true)) {
+                    this.UseProfilePhotoAsFaceField = value;
+                    this.RaisePropertyChanged("UseProfilePhotoAsFace");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarBodyColor", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    public enum AvatarBodyColor : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Red = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Blue = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Green = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Yellow = 3,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Purple = 4,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Gray = 5,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarPantsColor", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    public enum AvatarPantsColor : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Black = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        DarkGray = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        BlueJeans = 2,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarHatType", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    public enum AvatarHatType : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        None = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Cap = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        TopHat = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Beanie = 3,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarHatColor", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    public enum AvatarHatColor : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Default = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Red = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Blue = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Black = 3,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarFaceType", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    public enum AvatarFaceType : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Default = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Angry = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Happy = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Sleepy = 3,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -723,219 +968,6 @@ namespace WPFTheWeakestRival.LobbyService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarAppearanceDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    [System.SerializableAttribute()]
-    public partial class AvatarAppearanceDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.AvatarBodyColor BodyColorField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.AvatarPantsColor PantsColorField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.AvatarHatType HatTypeField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.AvatarHatColor HatColorField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.AvatarFaceType FaceTypeField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool UseProfilePhotoAsFaceField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public WPFTheWeakestRival.LobbyService.AvatarBodyColor BodyColor {
-            get {
-                return this.BodyColorField;
-            }
-            set {
-                if ((this.BodyColorField.Equals(value) != true)) {
-                    this.BodyColorField = value;
-                    this.RaisePropertyChanged("BodyColor");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public WPFTheWeakestRival.LobbyService.AvatarPantsColor PantsColor {
-            get {
-                return this.PantsColorField;
-            }
-            set {
-                if ((this.PantsColorField.Equals(value) != true)) {
-                    this.PantsColorField = value;
-                    this.RaisePropertyChanged("PantsColor");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public WPFTheWeakestRival.LobbyService.AvatarHatType HatType {
-            get {
-                return this.HatTypeField;
-            }
-            set {
-                if ((this.HatTypeField.Equals(value) != true)) {
-                    this.HatTypeField = value;
-                    this.RaisePropertyChanged("HatType");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public WPFTheWeakestRival.LobbyService.AvatarHatColor HatColor {
-            get {
-                return this.HatColorField;
-            }
-            set {
-                if ((this.HatColorField.Equals(value) != true)) {
-                    this.HatColorField = value;
-                    this.RaisePropertyChanged("HatColor");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public WPFTheWeakestRival.LobbyService.AvatarFaceType FaceType {
-            get {
-                return this.FaceTypeField;
-            }
-            set {
-                if ((this.FaceTypeField.Equals(value) != true)) {
-                    this.FaceTypeField = value;
-                    this.RaisePropertyChanged("FaceType");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-        public bool UseProfilePhotoAsFace {
-            get {
-                return this.UseProfilePhotoAsFaceField;
-            }
-            set {
-                if ((this.UseProfilePhotoAsFaceField.Equals(value) != true)) {
-                    this.UseProfilePhotoAsFaceField = value;
-                    this.RaisePropertyChanged("UseProfilePhotoAsFace");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarBodyColor", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    public enum AvatarBodyColor : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Red = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Blue = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Green = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Yellow = 3,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Purple = 4,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Gray = 5,
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarPantsColor", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    public enum AvatarPantsColor : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Black = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        DarkGray = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        BlueJeans = 2,
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarHatType", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    public enum AvatarHatType : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        None = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Cap = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        TopHat = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Beanie = 3,
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarHatColor", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    public enum AvatarHatColor : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Default = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Red = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Blue = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Black = 3,
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AvatarFaceType", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    public enum AvatarFaceType : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Default = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Angry = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Happy = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Sleepy = 3,
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="UpdateAccountRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class UpdateAccountRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1260,15 +1292,6 @@ namespace WPFTheWeakestRival.LobbyService {
         
         private string TokenField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int MaxPlayersField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool IsPrivateField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private WPFTheWeakestRival.LobbyService.MatchConfigDto ConfigField;
-        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -1288,170 +1311,6 @@ namespace WPFTheWeakestRival.LobbyService {
                 if ((object.ReferenceEquals(this.TokenField, value) != true)) {
                     this.TokenField = value;
                     this.RaisePropertyChanged("Token");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
-        public int MaxPlayers {
-            get {
-                return this.MaxPlayersField;
-            }
-            set {
-                if ((this.MaxPlayersField.Equals(value) != true)) {
-                    this.MaxPlayersField = value;
-                    this.RaisePropertyChanged("MaxPlayers");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public bool IsPrivate {
-            get {
-                return this.IsPrivateField;
-            }
-            set {
-                if ((this.IsPrivateField.Equals(value) != true)) {
-                    this.IsPrivateField = value;
-                    this.RaisePropertyChanged("IsPrivate");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public WPFTheWeakestRival.LobbyService.MatchConfigDto Config {
-            get {
-                return this.ConfigField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ConfigField, value) != true)) {
-                    this.ConfigField = value;
-                    this.RaisePropertyChanged("Config");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="MatchConfigDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
-    [System.SerializableAttribute()]
-    public partial class MatchConfigDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal StartingScoreField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal MaxScoreField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal PointsPerCorrectField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal PointsPerWrongField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal PointsPerEliminationGainField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool AllowTiebreakCoinflipField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public decimal StartingScore {
-            get {
-                return this.StartingScoreField;
-            }
-            set {
-                if ((this.StartingScoreField.Equals(value) != true)) {
-                    this.StartingScoreField = value;
-                    this.RaisePropertyChanged("StartingScore");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
-        public decimal MaxScore {
-            get {
-                return this.MaxScoreField;
-            }
-            set {
-                if ((this.MaxScoreField.Equals(value) != true)) {
-                    this.MaxScoreField = value;
-                    this.RaisePropertyChanged("MaxScore");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public decimal PointsPerCorrect {
-            get {
-                return this.PointsPerCorrectField;
-            }
-            set {
-                if ((this.PointsPerCorrectField.Equals(value) != true)) {
-                    this.PointsPerCorrectField = value;
-                    this.RaisePropertyChanged("PointsPerCorrect");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public decimal PointsPerWrong {
-            get {
-                return this.PointsPerWrongField;
-            }
-            set {
-                if ((this.PointsPerWrongField.Equals(value) != true)) {
-                    this.PointsPerWrongField = value;
-                    this.RaisePropertyChanged("PointsPerWrong");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public decimal PointsPerEliminationGain {
-            get {
-                return this.PointsPerEliminationGainField;
-            }
-            set {
-                if ((this.PointsPerEliminationGainField.Equals(value) != true)) {
-                    this.PointsPerEliminationGainField = value;
-                    this.RaisePropertyChanged("PointsPerEliminationGain");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-        public bool AllowTiebreakCoinflip {
-            get {
-                return this.AllowTiebreakCoinflipField;
-            }
-            set {
-                if ((this.AllowTiebreakCoinflipField.Equals(value) != true)) {
-                    this.AllowTiebreakCoinflipField = value;
-                    this.RaisePropertyChanged("AllowTiebreakCoinflip");
                 }
             }
         }
@@ -1637,6 +1496,349 @@ namespace WPFTheWeakestRival.LobbyService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="MatchConfigDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class MatchConfigDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal StartingScoreField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal MaxScoreField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerCorrectField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerWrongField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private decimal PointsPerEliminationGainField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool AllowTiebreakCoinflipField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public decimal StartingScore {
+            get {
+                return this.StartingScoreField;
+            }
+            set {
+                if ((this.StartingScoreField.Equals(value) != true)) {
+                    this.StartingScoreField = value;
+                    this.RaisePropertyChanged("StartingScore");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public decimal MaxScore {
+            get {
+                return this.MaxScoreField;
+            }
+            set {
+                if ((this.MaxScoreField.Equals(value) != true)) {
+                    this.MaxScoreField = value;
+                    this.RaisePropertyChanged("MaxScore");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public decimal PointsPerCorrect {
+            get {
+                return this.PointsPerCorrectField;
+            }
+            set {
+                if ((this.PointsPerCorrectField.Equals(value) != true)) {
+                    this.PointsPerCorrectField = value;
+                    this.RaisePropertyChanged("PointsPerCorrect");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public decimal PointsPerWrong {
+            get {
+                return this.PointsPerWrongField;
+            }
+            set {
+                if ((this.PointsPerWrongField.Equals(value) != true)) {
+                    this.PointsPerWrongField = value;
+                    this.RaisePropertyChanged("PointsPerWrong");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public decimal PointsPerEliminationGain {
+            get {
+                return this.PointsPerEliminationGainField;
+            }
+            set {
+                if ((this.PointsPerEliminationGainField.Equals(value) != true)) {
+                    this.PointsPerEliminationGainField = value;
+                    this.RaisePropertyChanged("PointsPerEliminationGain");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public bool AllowTiebreakCoinflip {
+            get {
+                return this.AllowTiebreakCoinflipField;
+            }
+            set {
+                if ((this.AllowTiebreakCoinflipField.Equals(value) != true)) {
+                    this.AllowTiebreakCoinflipField = value;
+                    this.RaisePropertyChanged("AllowTiebreakCoinflip");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PlayerSummary", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class PlayerSummary : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Guid PlayerIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string PlayerNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsOnlineField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Guid PlayerId {
+            get {
+                return this.PlayerIdField;
+            }
+            set {
+                if ((this.PlayerIdField.Equals(value) != true)) {
+                    this.PlayerIdField = value;
+                    this.RaisePropertyChanged("PlayerId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string PlayerName {
+            get {
+                return this.PlayerNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PlayerNameField, value) != true)) {
+                    this.PlayerNameField = value;
+                    this.RaisePropertyChanged("PlayerName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public bool IsOnline {
+            get {
+                return this.IsOnlineField;
+            }
+            set {
+                if ((this.IsOnlineField.Equals(value) != true)) {
+                    this.IsOnlineField = value;
+                    this.RaisePropertyChanged("IsOnline");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="UpdateAvatarRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class UpdateAvatarRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte BodyColorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte FaceTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte HatColorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte HatTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte PantsColorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TokenField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool UseProfilePhotoAsFaceField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte BodyColor {
+            get {
+                return this.BodyColorField;
+            }
+            set {
+                if ((this.BodyColorField.Equals(value) != true)) {
+                    this.BodyColorField = value;
+                    this.RaisePropertyChanged("BodyColor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte FaceType {
+            get {
+                return this.FaceTypeField;
+            }
+            set {
+                if ((this.FaceTypeField.Equals(value) != true)) {
+                    this.FaceTypeField = value;
+                    this.RaisePropertyChanged("FaceType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte HatColor {
+            get {
+                return this.HatColorField;
+            }
+            set {
+                if ((this.HatColorField.Equals(value) != true)) {
+                    this.HatColorField = value;
+                    this.RaisePropertyChanged("HatColor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte HatType {
+            get {
+                return this.HatTypeField;
+            }
+            set {
+                if ((this.HatTypeField.Equals(value) != true)) {
+                    this.HatTypeField = value;
+                    this.RaisePropertyChanged("HatType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte PantsColor {
+            get {
+                return this.PantsColorField;
+            }
+            set {
+                if ((this.PantsColorField.Equals(value) != true)) {
+                    this.PantsColorField = value;
+                    this.RaisePropertyChanged("PantsColor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool UseProfilePhotoAsFace {
+            get {
+                return this.UseProfilePhotoAsFaceField;
+            }
+            set {
+                if ((this.UseProfilePhotoAsFaceField.Equals(value) != true)) {
+                    this.UseProfilePhotoAsFaceField = value;
+                    this.RaisePropertyChanged("UseProfilePhotoAsFace");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="ChatMessage", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class ChatMessage : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1792,6 +1994,12 @@ namespace WPFTheWeakestRival.LobbyService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/StartLobbyMatch", ReplyAction="http://tempuri.org/ILobbyService/StartLobbyMatchResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse> StartLobbyMatchAsync(WPFTheWeakestRival.LobbyService.StartLobbyMatchRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/UpdateAvatar", ReplyAction="http://tempuri.org/ILobbyService/UpdateAvatarResponse")]
+        void UpdateAvatar(WPFTheWeakestRival.LobbyService.UpdateAvatarRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/UpdateAvatar", ReplyAction="http://tempuri.org/ILobbyService/UpdateAvatarResponse")]
+        System.Threading.Tasks.Task UpdateAvatarAsync(WPFTheWeakestRival.LobbyService.UpdateAvatarRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1911,6 +2119,14 @@ namespace WPFTheWeakestRival.LobbyService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.StartLobbyMatchResponse> StartLobbyMatchAsync(WPFTheWeakestRival.LobbyService.StartLobbyMatchRequest request) {
             return base.Channel.StartLobbyMatchAsync(request);
+        }
+        
+        public void UpdateAvatar(WPFTheWeakestRival.LobbyService.UpdateAvatarRequest request) {
+            base.Channel.UpdateAvatar(request);
+        }
+        
+        public System.Threading.Tasks.Task UpdateAvatarAsync(WPFTheWeakestRival.LobbyService.UpdateAvatarRequest request) {
+            return base.Channel.UpdateAvatarAsync(request);
         }
     }
 }

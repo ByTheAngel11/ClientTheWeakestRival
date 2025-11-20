@@ -10,13 +10,20 @@ namespace WPFTheWeakestRival.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var b = value is bool v && v;
-            return b ? Visibility.Collapsed : Visibility.Visible;
+            var isTrue = value is bool booleanValue && booleanValue;
+
+            return isTrue
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Visibility v) return v != Visibility.Visible;
+            if (value is Visibility visibility)
+            {
+                return visibility != Visibility.Visible;
+            }
+
             return true;
         }
     }

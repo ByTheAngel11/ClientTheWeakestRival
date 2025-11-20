@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
+        xmlns:controls="clr-namespace:WPFTheWeakestRival.Controls"
         Title="{loc:Loc lobbyTitle}"
         Height="540" Width="1100"
         MinWidth="1024" MinHeight="600"
@@ -289,7 +290,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Izquierda: solo Settings (lo que comparten) -->
+                <!-- Izquierda: solo Settings -->
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center">
@@ -309,7 +310,7 @@
                     </Button>
                 </StackPanel>
 
-                <!-- Derecha: Amigos + Avatar, igual estilo -->
+                <!-- Derecha: Amigos + Avatar -->
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
@@ -350,13 +351,91 @@
                     <ColumnDefinition Width="380"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Izquierda: imagen + botón INICIAR con estilo pizarrón -->
+                <!-- Izquierda: avatar local + lista de jugadores + botón INICIAR -->
                 <Grid Grid.Column="0" Margin="8">
-                    <Image Width="200"
-                           Height="240"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Lista de jugadores del lobby -->
+                    <ListBox x:Name="lstLobbyPlayers"
+         Grid.Row="0"
+         Margin="0,4,0,4"
+         BorderThickness="0"
+         Background="Transparent"
+         ScrollViewer.VerticalScrollBarVisibility="Auto"
+         VirtualizingPanel.IsVirtualizing="True"
+         VirtualizingPanel.ScrollUnit="Pixel">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Avatar: ahora escalado, sin recortarse -->
+                                    <Border Grid.Column="0"
+                        Width="96"
+                        Height="96"
+                        CornerRadius="16"
+                        Background="Transparent"
+                        VerticalAlignment="Center">
+                                        <Grid>
+                                            <!-- AvatarControl -->
+                                            <Viewbox Stretch="Uniform"
+                                 StretchDirection="DownOnly"
+                                 SnapsToDevicePixels="True"
+                                 UseLayoutRounding="True"
+                                 Visibility="Visible">
+                                                <controls:AvatarControl x:Name="playerAvatar"
+                                                   Appearance="{Binding AvatarAppearance}"
+                                                   ProfileImage="{Binding Avatar}"
+                                                   SnapsToDevicePixels="True"
+                                                   UseLayoutRounding="True"/>
+                                            </Viewbox>
+
+                                            <!-- Fallback a imagen si no hay Appearance -->
+                                            <Viewbox Stretch="Uniform"
+                                 StretchDirection="DownOnly"
+                                 SnapsToDevicePixels="True"
+                                 UseLayoutRounding="True">
+                                                <Image Source="{Binding Avatar}"
+                                   SnapsToDevicePixels="True"
+                                   RenderOptions.BitmapScalingMode="HighQuality">
+                                                    <Image.Style>
+                                                        <Style TargetType="Image">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding AvatarAppearance}" Value="{x:Null}">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Image.Style>
+                                                </Image>
+                                            </Viewbox>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Nombre del jugador -->
+                                    <TextBlock Grid.Column="1"
+                           Text="{Binding DisplayName}"
+                           Margin="12,0,0,0"
+                           VerticalAlignment="Center"
+                           Foreground="White"
+                           FontWeight="SemiBold"
+                           FontSize="14" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+
+                    <!-- Botón INICIAR -->
                     <Button x:Name="btnStart"
+                            Grid.Row="1"
                             Style="{StaticResource ChalkBoardButtonStyle}"
                             Content="{loc:Loc startMatch}"
                             Width="180"
@@ -367,7 +446,7 @@
                             Click="BtnStartMatchClick"/>
                 </Grid>
 
-                <!-- Derecha: Chat (manteniendo lo que sólo existe aquí) -->
+                <!-- Derecha: Chat -->
                 <Border Grid.Column="1"
                         Margin="8"
                         Background="Transparent"
@@ -389,35 +468,37 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0"
-                                x:Name="txtLobbyHeader"
-                                Text="{loc:Loc lobbyTitle}"
-                                FontSize="16"
-                                FontWeight="SemiBold"
-                                Margin="0,0,0,6"
-                                Foreground="White"/>
+                                       x:Name="txtLobbyHeader"
+                                       Text="{loc:Loc lobbyTitle}"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,6"
+                                       Foreground="White"/>
                             <StackPanel Grid.Row="1"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center">
                                 <TextBlock x:Name="txtAccessCode"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Margin="0,0,8,0"
-                                   Foreground="White"
-                                   Opacity="0.95"/>
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Margin="0,0,8,0"
+                                           Foreground="White"
+                                           Opacity="0.95"/>
                                 <Button x:Name="btnCopyCode"
-                                    Width="26"
-                                    Height="26"
-                                    Padding="0"
-                                    Margin="0,0,0,0"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    ToolTip="Copiar código"
-                                    Click="BtnCopyCodeClick">
-                                    <TextBlock
-                                       FontSize="14"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"><Run Text="⧉"/><Run Language="es-mx"/></TextBlock>
+                                        Width="26"
+                                        Height="26"
+                                        Padding="0"
+                                        Margin="0,0,0,0"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Cursor="Hand"
+                                        ToolTip="Copiar código"
+                                        Click="BtnCopyCodeClick">
+                                    <TextBlock FontSize="14"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center">
+                                        <Run Text="⧉"/>
+                                        <Run Language="es-mx"/>
+                                    </TextBlock>
                                 </Button>
                             </StackPanel>
                         </Grid>

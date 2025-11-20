@@ -19,25 +19,84 @@
       <xs:element minOccurs="0" name="LobbyId" type="ser:guid" />
       <xs:element minOccurs="0" name="LobbyName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="MaxPlayers" type="xs:int" />
-      <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfPlayerSummary" />
+      <xs:element minOccurs="0" name="Players" nillable="true" type="tns:ArrayOfAccountMini" />
       <xs:element minOccurs="0" name="AccessCode" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LobbyInfo" nillable="true" type="tns:LobbyInfo" />
-  <xs:complexType name="ArrayOfPlayerSummary">
+  <xs:complexType name="ArrayOfAccountMini">
     <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AccountMini" nillable="true" type="tns:AccountMini" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ArrayOfPlayerSummary" nillable="true" type="tns:ArrayOfPlayerSummary" />
-  <xs:complexType name="PlayerSummary">
+  <xs:element name="ArrayOfAccountMini" nillable="true" type="tns:ArrayOfAccountMini" />
+  <xs:complexType name="AccountMini">
     <xs:sequence>
-      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
-      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Avatar" nillable="true" type="tns:AvatarAppearanceDto" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+  <xs:element name="AccountMini" nillable="true" type="tns:AccountMini" />
+  <xs:complexType name="AvatarAppearanceDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BodyColor" type="tns:AvatarBodyColor" />
+      <xs:element minOccurs="0" name="PantsColor" type="tns:AvatarPantsColor" />
+      <xs:element minOccurs="0" name="HatType" type="tns:AvatarHatType" />
+      <xs:element minOccurs="0" name="HatColor" type="tns:AvatarHatColor" />
+      <xs:element minOccurs="0" name="FaceType" type="tns:AvatarFaceType" />
+      <xs:element minOccurs="0" name="UseProfilePhotoAsFace" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AvatarAppearanceDto" nillable="true" type="tns:AvatarAppearanceDto" />
+  <xs:simpleType name="AvatarBodyColor">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Red" />
+      <xs:enumeration value="Blue" />
+      <xs:enumeration value="Green" />
+      <xs:enumeration value="Yellow" />
+      <xs:enumeration value="Purple" />
+      <xs:enumeration value="Gray" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarBodyColor" nillable="true" type="tns:AvatarBodyColor" />
+  <xs:simpleType name="AvatarPantsColor">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Black" />
+      <xs:enumeration value="DarkGray" />
+      <xs:enumeration value="BlueJeans" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarPantsColor" nillable="true" type="tns:AvatarPantsColor" />
+  <xs:simpleType name="AvatarHatType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Cap" />
+      <xs:enumeration value="TopHat" />
+      <xs:enumeration value="Beanie" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarHatType" nillable="true" type="tns:AvatarHatType" />
+  <xs:simpleType name="AvatarHatColor">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default" />
+      <xs:enumeration value="Red" />
+      <xs:enumeration value="Blue" />
+      <xs:enumeration value="Black" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarHatColor" nillable="true" type="tns:AvatarHatColor" />
+  <xs:simpleType name="AvatarFaceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default" />
+      <xs:enumeration value="Angry" />
+      <xs:enumeration value="Happy" />
+      <xs:enumeration value="Sleepy" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="AvatarFaceType" nillable="true" type="tns:AvatarFaceType" />
   <xs:complexType name="ServiceFault">
     <xs:sequence>
       <xs:element name="Code" nillable="true" type="xs:string" />
@@ -96,63 +155,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="UpdateAccountResponse" nillable="true" type="tns:UpdateAccountResponse" />
-  <xs:complexType name="AvatarAppearanceDto">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="BodyColor" type="tns:AvatarBodyColor" />
-      <xs:element minOccurs="0" name="PantsColor" type="tns:AvatarPantsColor" />
-      <xs:element minOccurs="0" name="HatType" type="tns:AvatarHatType" />
-      <xs:element minOccurs="0" name="HatColor" type="tns:AvatarHatColor" />
-      <xs:element minOccurs="0" name="FaceType" type="tns:AvatarFaceType" />
-      <xs:element minOccurs="0" name="UseProfilePhotoAsFace" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="AvatarAppearanceDto" nillable="true" type="tns:AvatarAppearanceDto" />
-  <xs:simpleType name="AvatarBodyColor">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Red" />
-      <xs:enumeration value="Blue" />
-      <xs:enumeration value="Green" />
-      <xs:enumeration value="Yellow" />
-      <xs:enumeration value="Purple" />
-      <xs:enumeration value="Gray" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="AvatarBodyColor" nillable="true" type="tns:AvatarBodyColor" />
-  <xs:simpleType name="AvatarPantsColor">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Black" />
-      <xs:enumeration value="DarkGray" />
-      <xs:enumeration value="BlueJeans" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="AvatarPantsColor" nillable="true" type="tns:AvatarPantsColor" />
-  <xs:simpleType name="AvatarHatType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="None" />
-      <xs:enumeration value="Cap" />
-      <xs:enumeration value="TopHat" />
-      <xs:enumeration value="Beanie" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="AvatarHatType" nillable="true" type="tns:AvatarHatType" />
-  <xs:simpleType name="AvatarHatColor">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Default" />
-      <xs:enumeration value="Red" />
-      <xs:enumeration value="Blue" />
-      <xs:enumeration value="Black" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="AvatarHatColor" nillable="true" type="tns:AvatarHatColor" />
-  <xs:simpleType name="AvatarFaceType">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Default" />
-      <xs:enumeration value="Angry" />
-      <xs:enumeration value="Happy" />
-      <xs:enumeration value="Sleepy" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="AvatarFaceType" nillable="true" type="tns:AvatarFaceType" />
   <xs:complexType name="UpdateAccountRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
@@ -192,23 +194,9 @@
   <xs:complexType name="StartLobbyMatchRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="MaxPlayers" type="xs:int" />
-      <xs:element minOccurs="0" name="IsPrivate" type="xs:boolean" />
-      <xs:element minOccurs="0" name="Config" nillable="true" type="tns:MatchConfigDto" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="StartLobbyMatchRequest" nillable="true" type="tns:StartLobbyMatchRequest" />
-  <xs:complexType name="MatchConfigDto">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="StartingScore" type="xs:decimal" />
-      <xs:element minOccurs="0" name="MaxScore" type="xs:decimal" />
-      <xs:element minOccurs="0" name="PointsPerCorrect" type="xs:decimal" />
-      <xs:element minOccurs="0" name="PointsPerWrong" type="xs:decimal" />
-      <xs:element minOccurs="0" name="PointsPerEliminationGain" type="xs:decimal" />
-      <xs:element minOccurs="0" name="AllowTiebreakCoinflip" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="MatchConfigDto" nillable="true" type="tns:MatchConfigDto" />
   <xs:complexType name="StartLobbyMatchResponse">
     <xs:sequence>
       <xs:element name="Match" nillable="true" type="tns:MatchInfo" />
@@ -232,6 +220,43 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="MatchInfo" nillable="true" type="tns:MatchInfo" />
+  <xs:complexType name="ArrayOfPlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPlayerSummary" nillable="true" type="tns:ArrayOfPlayerSummary" />
+  <xs:complexType name="PlayerSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
+      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
+  <xs:complexType name="MatchConfigDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="StartingScore" type="xs:decimal" />
+      <xs:element minOccurs="0" name="MaxScore" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PointsPerCorrect" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PointsPerWrong" type="xs:decimal" />
+      <xs:element minOccurs="0" name="PointsPerEliminationGain" type="xs:decimal" />
+      <xs:element minOccurs="0" name="AllowTiebreakCoinflip" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="MatchConfigDto" nillable="true" type="tns:MatchConfigDto" />
+  <xs:complexType name="UpdateAvatarRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BodyColor" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="FaceType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="HatColor" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="HatType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="PantsColor" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UseProfilePhotoAsFace" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UpdateAvatarRequest" nillable="true" type="tns:UpdateAvatarRequest" />
   <xs:complexType name="ChatMessage">
     <xs:sequence>
       <xs:element minOccurs="0" name="FromPlayerId" type="ser:guid" />

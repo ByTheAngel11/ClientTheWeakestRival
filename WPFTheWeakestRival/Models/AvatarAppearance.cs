@@ -1,4 +1,6 @@
-﻿namespace WPFTheWeakestRival.Models
+﻿using System.Windows.Media;
+
+namespace WPFTheWeakestRival.Models
 {
     public sealed class AvatarAppearance
     {
@@ -8,5 +10,6 @@
         public int HatColor { get; set; }
         public int FaceType { get; set; }
         public bool UseProfilePhotoAsFace { get; set; }
+        public ImageSource ProfileImage { get; set; }
     }
 }

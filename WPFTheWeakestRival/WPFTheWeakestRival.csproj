@@ -62,6 +62,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AvatarCustomizationWindow.xaml.cs">
+      <DependentUpon>AvatarCustomizationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BlackjackWindow.xaml.cs">
       <DependentUpon>BlackjackWindow.xaml</DependentUpon>
     </Compile>
@@ -111,6 +114,7 @@
     <Compile Include="Globalization\LocalizationManager.cs" />
     <Compile Include="Globalization\LocExtension.cs" />
     <Compile Include="Helpers\AvatarMapper.cs" />
+    <Compile Include="Helpers\LobbyAvatarHelper.cs" />
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
     <Compile Include="Infraestructure\AppServices.cs" />
@@ -133,6 +137,7 @@
     </Compile>
     <Compile Include="Models\AvatarAppearance.cs" />
     <Compile Include="Models\FriendItem.cs" />
+    <Compile Include="Models\LobbyPlayerItem.cs" />
     <Compile Include="Pages\MatchSettingsPage.xaml.cs">
       <DependentUpon>MatchSettingsPage.xaml</DependentUpon>
     </Compile>
@@ -159,6 +164,10 @@
     <Compile Include="Controls\AvatarControl.xaml.cs">
       <DependentUpon>AvatarControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="AvatarCustomizationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="BlackjackWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
