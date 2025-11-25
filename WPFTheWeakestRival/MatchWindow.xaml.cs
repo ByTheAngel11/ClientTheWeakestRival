@@ -175,10 +175,6 @@ namespace WPFTheWeakestRival
             UpdateWildcardIcon();
         }
 
-        /// <summary>
-        /// Carga la imagen representativa del comodín según su Code.
-        /// Convención: Assets/Wildcards/{Code}.png como Resource.
-        /// </summary>
         private void UpdateWildcardIcon()
         {
             if (imgWildcardIcon == null)
@@ -210,7 +206,6 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                // Si no existe la imagen o hay error, simplemente ocultamos el icono.
                 Logger.Warn($"No se pudo cargar la imagen del comodín '{_myWildcard.Code}'.", ex);
                 imgWildcardIcon.Visibility = Visibility.Collapsed;
                 imgWildcardIcon.Source = null;
