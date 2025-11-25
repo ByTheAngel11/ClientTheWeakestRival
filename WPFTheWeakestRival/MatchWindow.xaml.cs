@@ -2,10 +2,10 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.WildcardService;
-// Alias para desambiguar el ServiceFault de WildcardService
 using WildcardFault = WPFTheWeakestRival.WildcardService.ServiceFault;
 
 namespace WPFTheWeakestRival
@@ -20,8 +20,6 @@ namespace WPFTheWeakestRival
         private readonly bool _isHost;
         private readonly int _matchDbId;
         private readonly LobbyWindow _lobbyWindow;
-
-        // Comodín asignado a este jugador en esta partida
         private PlayerWildcardDto _myWildcard;
 
         public MatchWindow(MatchInfo match, string token, int myUserId, bool isHost, LobbyWindow lobbyWindow)
@@ -153,6 +151,13 @@ namespace WPFTheWeakestRival
             {
                 txtWildcardName.Text = "Sin comodín";
                 txtWildcardDescription.Text = string.Empty;
+
+                if (imgWildcardIcon != null)
+                {
+                    imgWildcardIcon.Visibility = Visibility.Collapsed;
+                    imgWildcardIcon.Source = null;
+                }
+
                 return;
             }
 
@@ -166,6 +171,50 @@ namespace WPFTheWeakestRival
                 string.IsNullOrWhiteSpace(_myWildcard.Description)
                     ? _myWildcard.Code
                     : _myWildcard.Description;
+
+            UpdateWildcardIcon();
+        }
+
+        /// <summary>
+        /// Carga la imagen representativa del comodín según su Code.
+        /// Convención: Assets/Wildcards/{Code}.png como Resource.
+        /// </summary>
+        private void UpdateWildcardIcon()
+        {
+            if (imgWildcardIcon == null)
+            {
+                return;
+            }
+
+            if (_myWildcard == null || string.IsNullOrWhiteSpace(_myWildcard.Code))
+            {
+                imgWildcardIcon.Visibility = Visibility.Collapsed;
+                imgWildcardIcon.Source = null;
+                return;
+            }
+
+            try
+            {
+                var code = _myWildcard.Code.Trim();
+                var uriString = $"pack://application:,,,/Assets/Wildcards/{code}.png";
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(uriString, UriKind.Absolute);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                imgWildcardIcon.Source = bitmap;
+                imgWildcardIcon.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                // Si no existe la imagen o hay error, simplemente ocultamos el icono.
+                Logger.Warn($"No se pudo cargar la imagen del comodín '{_myWildcard.Code}'.", ex);
+                imgWildcardIcon.Visibility = Visibility.Collapsed;
+                imgWildcardIcon.Source = null;
+            }
         }
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)

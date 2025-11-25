@@ -92,12 +92,20 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <!-- título -->
+                        <RowDefinition Height="8"/>
+                        <!-- separador -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- imagen -->
                         <RowDefinition Height="8"/>
                         <RowDefinition Height="Auto"/>
+                        <!-- nombre -->
                         <RowDefinition Height="8"/>
                         <RowDefinition Height="*"/>
+                        <!-- descripción -->
                     </Grid.RowDefinitions>
 
+                    <!-- Título -->
                     <TextBlock Text="Comodín"
                                Grid.Row="0"
                                FontWeight="SemiBold"
@@ -105,20 +113,35 @@
 
                     <Separator Grid.Row="1" Margin="0,4,0,4"/>
 
+                    <!-- Imagen del comodín -->
+                    <Image x:Name="imgWildcardIcon"
+                           Grid.Row="2"
+                           Width="96"
+                           Height="96"
+                           Margin="0,4,0,0"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"/>
+
                     <!-- Nombre / código -->
                     <TextBlock x:Name="txtWildcardName"
-                               Grid.Row="2"
+                               Grid.Row="4"
                                FontSize="16"
                                FontWeight="SemiBold"
                                Foreground="White"
-                               Text="Sin comodín"/>
+                               Text="Sin comodín"
+                               TextAlignment="Center"
+                               Margin="0,4,0,0"/>
 
                     <!-- Descripción -->
                     <TextBlock x:Name="txtWildcardDescription"
-                               Grid.Row="4"
+                               Grid.Row="6"
                                TextWrapping="Wrap"
                                Foreground="LightGray"
-                               Margin="0,4,0,0"/>
+                               Margin="0,4,0,0"
+                               TextAlignment="Center"
+                               MaxWidth="260"/>
                 </Grid>
             </Border>
         </Grid>

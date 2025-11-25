@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="4c783180-9c99-471e-b1d5-00943aba20f7" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="aa07b02a-f942-4e51-9405-2f25de029696" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,11 +22,11 @@
     <MetadataSource Address="http://localhost:8082/stats/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="51dd3b0d-ee24-4e9e-b411-73003f93e59a" SourceId="1" SourceUrl="http://localhost:8082/stats/?xsd=xsd0" />
-    <MetadataFile FileName="StatsService.wsdl" MetadataType="Wsdl" ID="d29a7b16-47d9-4d33-a6a9-a1bdcaaeacec" SourceId="1" SourceUrl="http://localhost:8082/stats/?wsdl" />
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="ac129a6e-16b1-4154-b594-cd447383818f" SourceId="1" SourceUrl="http://localhost:8082/stats/?disco" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="cd5bf7d0-1598-46da-81fb-047be06a7317" SourceId="1" SourceUrl="http://localhost:8082/stats/?xsd=xsd1" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="af153146-6bb9-49b4-8c4a-a3fc1b25d8b6" SourceId="1" SourceUrl="http://localhost:8082/stats/?xsd=xsd2" />
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="2f83e42c-4b65-4346-a804-4a955cf77db2" SourceId="1" SourceUrl="http://localhost:8082/stats/?xsd=xsd0" />
+    <MetadataFile FileName="StatsService.wsdl" MetadataType="Wsdl" ID="6ecaab1a-2460-48dd-8657-72770a1f9743" SourceId="1" SourceUrl="http://localhost:8082/stats/?wsdl" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="ff5f831a-217b-46fb-b9c1-172d83af9bf3" SourceId="1" SourceUrl="http://localhost:8082/stats/?disco" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="03bf4751-e8e3-483f-a1ad-6b9a622493f3" SourceId="1" SourceUrl="http://localhost:8082/stats/?xsd=xsd1" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="7622cdb9-57d7-431b-a1e3-2d78acf943fd" SourceId="1" SourceUrl="http://localhost:8082/stats/?xsd=xsd2" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

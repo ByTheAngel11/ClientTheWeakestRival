@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="4b1e5e2c-437a-4d37-9b52-d279a6458be4" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="e781ce37-4bd2-4a6b-bd72-68dfaac78bc7" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,11 +22,11 @@
     <MetadataSource Address="http://localhost:8082/wildcards/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="bf66684e-c3d1-4304-8bdf-59ba7da17b87" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?xsd=xsd2" />
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="402958bc-dc31-457e-8e4c-dc8a93cd9676" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?disco" />
-    <MetadataFile FileName="WildcardService.wsdl" MetadataType="Wsdl" ID="28643aca-649d-4cb3-baf5-1ad4c817cbef" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?wsdl" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="b705976a-8785-4c06-951d-6c3049663e79" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?xsd=xsd1" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="fa9c3129-0348-493f-b7d3-7f8ee7563ed2" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?xsd=xsd0" />
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="6f176ccc-b9a0-442b-9131-f6c5840486df" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?xsd=xsd2" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="c3b24638-4e75-4aaa-be4f-efd0e1d1d2d9" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?disco" />
+    <MetadataFile FileName="WildcardService.wsdl" MetadataType="Wsdl" ID="00ba2b12-2ac7-43be-9bf3-4b7d4862d463" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?wsdl" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="f7cc310d-f50f-4a96-b27d-d3b5ac63963d" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?xsd=xsd1" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="5fb6c943-ba20-4533-a228-c48322eb5cd0" SourceId="1" SourceUrl="http://localhost:8082/wildcards/?xsd=xsd0" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

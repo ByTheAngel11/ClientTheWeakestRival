@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="9e163170-af37-429d-9b02-2220bbc259cc" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="443965ba-5e4a-4e0b-a6b6-ed56bbb22981" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,11 +22,11 @@
     <MetadataSource Address="http://localhost:8082/gameplay/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="GameplayService.wsdl" MetadataType="Wsdl" ID="831211e5-6c08-499d-b108-add9fc9d99e4" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?wsdl" />
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="d2827474-a627-4341-b9a3-802c16b1885c" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?xsd=xsd1" />
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="e0ce7bf0-8bfc-4d88-8ee3-15232aa1780e" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?disco" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="5525148e-78bb-450e-a17b-3eb371a9e099" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?xsd=xsd2" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="6d826eaf-559d-4293-83bb-0d98c288ad35" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?xsd=xsd0" />
+    <MetadataFile FileName="GameplayService.wsdl" MetadataType="Wsdl" ID="3e2a6d8f-18cc-49d6-bee1-ed6806f80c18" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?wsdl" />
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="270c20ca-5bb5-49e3-8646-9223471f050c" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?xsd=xsd1" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="fb4cef87-06be-459c-bd41-3351c51f63ed" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?disco" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="a584e238-ab05-4101-8b86-9cac812d7d22" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?xsd=xsd2" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="5429108d-5725-47ed-8d5d-2a85fe0dbf93" SourceId="1" SourceUrl="http://localhost:8082/gameplay/?xsd=xsd0" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

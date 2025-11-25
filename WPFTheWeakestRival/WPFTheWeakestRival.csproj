@@ -164,6 +164,8 @@
     <Compile Include="Controls\AvatarControl.xaml.cs">
       <DependentUpon>AvatarControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Wildcards\IWildcardActionContext.cs" />
+    <Compile Include="Wildcards\WildcardActionManager.cs" />
     <Page Include="AvatarCustomizationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -278,11 +280,9 @@
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.BeginPasswordResetResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <!-- AGREGADO -->
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.BeginRegisterResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <!-- /AGREGADO -->
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.LoginResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -442,6 +442,8 @@
     <None Include="Connected Services\WildcardService\WPFTheWeakestRival.WildcardService.UseWildcardResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <!-- AGREGADO -->
+    <!-- /AGREGADO -->
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -459,6 +461,53 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Icons\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Icons\friends.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Properties\Images\logo_fr.png" />
+    <Resource Include="Properties\Images\logo_it.png" />
+    <Resource Include="Properties\Images\logo_pt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\ChalkboardGreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\BackgroundListFriends.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LoginBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LoginBackground.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LoginBackgroundWall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\RegistrationBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Icons\personalization.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Icons\scoreboard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\ModifyProfileBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\AddFriendBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\VerificationCodeBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Backgrounds\LobbyBackground.png" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Connected Services\AuthService\" />
@@ -560,53 +609,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\Icons\settings.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Icons\friends.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Properties\Images\logo_fr.png" />
-    <Resource Include="Properties\Images\logo_it.png" />
-    <Resource Include="Properties\Images\logo_pt.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\ChalkboardGreen.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\BackgroundListFriends.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\LoginBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\LoginBackground.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\LoginBackgroundWall.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\RegistrationBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Icons\personalization.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Icons\scoreboard.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\ModifyProfileBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\AddFriendBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\VerificationCodeBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Backgrounds\LobbyBackground.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Connected Services\WildcardService\item.disco" />
   </ItemGroup>
   <ItemGroup>
@@ -620,6 +622,34 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\BLOCK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\CHANGE_Q.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\DOUBLE.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\EXTRA_TIME.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\FORCED_BANK.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\PASS_Q.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\SABOTAGE.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\SHIELD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\SWAP.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
