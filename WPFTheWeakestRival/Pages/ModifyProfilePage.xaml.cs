@@ -149,7 +149,7 @@ namespace WPFTheWeakestRival
             var dialog = new OpenFileDialog
             {
                 Title = Lang.profileSelectAvatarTitle,
-                Filter = Lang.profileImageFilter,
+                Filter = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All files (*.*)|*.*",
                 Multiselect = false
             };
 
@@ -160,6 +160,7 @@ namespace WPFTheWeakestRival
                 txtAvatarUrl.Text = new Uri(dialog.FileName, UriKind.Absolute).AbsoluteUri;
             }
         }
+
 
         private void BtnClearImageClick(object sender, RoutedEventArgs e)
         {

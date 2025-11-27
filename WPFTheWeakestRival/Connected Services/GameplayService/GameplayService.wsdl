@@ -149,29 +149,6 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
-  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_SubmitAnswer_ServiceFaultFault_Fault">
-    <wsp:ExactlyOne>
-      <wsp:All>
-        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
-          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
-        </sp:SignedParts>
-        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-        </sp:EncryptedParts>
-      </wsp:All>
-    </wsp:ExactlyOne>
-  </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_Bank_Input_policy">
     <wsp:ExactlyOne>
       <wsp:All>
@@ -196,29 +173,6 @@
     </wsp:ExactlyOne>
   </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_Bank_output_policy">
-    <wsp:ExactlyOne>
-      <wsp:All>
-        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
-          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
-        </sp:SignedParts>
-        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-        </sp:EncryptedParts>
-      </wsp:All>
-    </wsp:ExactlyOne>
-  </wsp:Policy>
-  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_Bank_ServiceFaultFault_Fault">
     <wsp:ExactlyOne>
       <wsp:All>
         <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
@@ -287,29 +241,6 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
-  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_UseLifeline_ServiceFaultFault_Fault">
-    <wsp:ExactlyOne>
-      <wsp:All>
-        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
-          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
-        </sp:SignedParts>
-        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-        </sp:EncryptedParts>
-      </wsp:All>
-    </wsp:ExactlyOne>
-  </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_CastVote_Input_policy">
     <wsp:ExactlyOne>
       <wsp:All>
@@ -334,29 +265,6 @@
     </wsp:ExactlyOne>
   </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_CastVote_output_policy">
-    <wsp:ExactlyOne>
-      <wsp:All>
-        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
-          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
-        </sp:SignedParts>
-        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-        </sp:EncryptedParts>
-      </wsp:All>
-    </wsp:ExactlyOne>
-  </wsp:Policy>
-  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_CastVote_ServiceFaultFault_Fault">
     <wsp:ExactlyOne>
       <wsp:All>
         <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
@@ -425,29 +333,6 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
-  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_AckEventSeen_ServiceFaultFault_Fault">
-    <wsp:ExactlyOne>
-      <wsp:All>
-        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
-          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
-          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
-          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
-        </sp:SignedParts>
-        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <sp:Body />
-        </sp:EncryptedParts>
-      </wsp:All>
-    </wsp:ExactlyOne>
-  </wsp:Policy>
   <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_GetQuestions_Input_policy">
     <wsp:ExactlyOne>
       <wsp:All>
@@ -494,7 +379,76 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
-  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_GetQuestions_ServiceFaultFault_Fault">
+  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_JoinMatch_Input_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_JoinMatch_output_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_StartMatch_Input_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+          <sp:Header Name="Sequence" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="SequenceAcknowledgement" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="AckRequested" Namespace="http://schemas.xmlsoap.org/ws/2005/02/rm" />
+          <sp:Header Name="ChannelInstance" Namespace="http://schemas.microsoft.com/ws/2005/02/duplex" />
+          <sp:Header Name="To" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="From" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="FaultTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="ReplyTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="MessageID" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="RelatesTo" Namespace="http://www.w3.org/2005/08/addressing" />
+          <sp:Header Name="Action" Namespace="http://www.w3.org/2005/08/addressing" />
+        </sp:SignedParts>
+        <sp:EncryptedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <sp:Body />
+        </sp:EncryptedParts>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="WSDualHttpBinding_IGameplayService_StartMatch_output_policy">
     <wsp:ExactlyOne>
       <wsp:All>
         <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
@@ -658,8 +612,8 @@
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
       <xsd:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd0" namespace="http://tempuri.org/" />
-      <xsd:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
       <xsd:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IGameplayService_SubmitAnswer_InputMessage">
@@ -668,17 +622,11 @@
   <wsdl:message name="IGameplayService_SubmitAnswer_OutputMessage">
     <wsdl:part name="parameters" element="tns:SubmitAnswerResponse" />
   </wsdl:message>
-  <wsdl:message name="IGameplayService_SubmitAnswer_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q1:ServiceFault" />
-  </wsdl:message>
   <wsdl:message name="IGameplayService_Bank_InputMessage">
     <wsdl:part name="parameters" element="tns:Bank" />
   </wsdl:message>
   <wsdl:message name="IGameplayService_Bank_OutputMessage">
     <wsdl:part name="parameters" element="tns:BankResponse" />
-  </wsdl:message>
-  <wsdl:message name="IGameplayService_Bank_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q2:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="IGameplayService_UseLifeline_InputMessage">
     <wsdl:part name="parameters" element="tns:UseLifeline" />
@@ -686,17 +634,11 @@
   <wsdl:message name="IGameplayService_UseLifeline_OutputMessage">
     <wsdl:part name="parameters" element="tns:UseLifelineResponse" />
   </wsdl:message>
-  <wsdl:message name="IGameplayService_UseLifeline_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q3:ServiceFault" />
-  </wsdl:message>
   <wsdl:message name="IGameplayService_CastVote_InputMessage">
     <wsdl:part name="parameters" element="tns:CastVote" />
   </wsdl:message>
   <wsdl:message name="IGameplayService_CastVote_OutputMessage">
     <wsdl:part name="parameters" element="tns:CastVoteResponse" />
-  </wsdl:message>
-  <wsdl:message name="IGameplayService_CastVote_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q4:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="IGameplayService_AckEventSeen_InputMessage">
     <wsdl:part name="parameters" element="tns:AckEventSeen" />
@@ -704,17 +646,23 @@
   <wsdl:message name="IGameplayService_AckEventSeen_OutputMessage">
     <wsdl:part name="parameters" element="tns:AckEventSeenResponse" />
   </wsdl:message>
-  <wsdl:message name="IGameplayService_AckEventSeen_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q5:ServiceFault" />
-  </wsdl:message>
   <wsdl:message name="IGameplayService_GetQuestions_InputMessage">
     <wsdl:part name="parameters" element="tns:GetQuestions" />
   </wsdl:message>
   <wsdl:message name="IGameplayService_GetQuestions_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetQuestionsResponse" />
   </wsdl:message>
-  <wsdl:message name="IGameplayService_GetQuestions_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q6:ServiceFault" />
+  <wsdl:message name="IGameplayService_JoinMatch_InputMessage">
+    <wsdl:part name="parameters" element="tns:JoinMatch" />
+  </wsdl:message>
+  <wsdl:message name="IGameplayService_JoinMatch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:JoinMatchResponse" />
+  </wsdl:message>
+  <wsdl:message name="IGameplayService_StartMatch_InputMessage">
+    <wsdl:part name="parameters" element="tns:StartMatch" />
+  </wsdl:message>
+  <wsdl:message name="IGameplayService_StartMatch_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartMatchResponse" />
   </wsdl:message>
   <wsdl:message name="IGameplayService_OnNextQuestion_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnNextQuestion" />
@@ -738,32 +686,34 @@
     <wsdl:operation name="SubmitAnswer">
       <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/SubmitAnswer" message="tns:IGameplayService_SubmitAnswer_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/SubmitAnswerResponse" message="tns:IGameplayService_SubmitAnswer_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/IGameplayService/SubmitAnswerServiceFaultFault" name="ServiceFaultFault" message="tns:IGameplayService_SubmitAnswer_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="Bank">
       <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/Bank" message="tns:IGameplayService_Bank_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/BankResponse" message="tns:IGameplayService_Bank_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/IGameplayService/BankServiceFaultFault" name="ServiceFaultFault" message="tns:IGameplayService_Bank_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="UseLifeline">
       <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/UseLifeline" message="tns:IGameplayService_UseLifeline_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/UseLifelineResponse" message="tns:IGameplayService_UseLifeline_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/IGameplayService/UseLifelineServiceFaultFault" name="ServiceFaultFault" message="tns:IGameplayService_UseLifeline_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="CastVote">
       <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/CastVote" message="tns:IGameplayService_CastVote_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/CastVoteResponse" message="tns:IGameplayService_CastVote_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/IGameplayService/CastVoteServiceFaultFault" name="ServiceFaultFault" message="tns:IGameplayService_CastVote_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="AckEventSeen">
       <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/AckEventSeen" message="tns:IGameplayService_AckEventSeen_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/AckEventSeenResponse" message="tns:IGameplayService_AckEventSeen_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/IGameplayService/AckEventSeenServiceFaultFault" name="ServiceFaultFault" message="tns:IGameplayService_AckEventSeen_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetQuestions">
       <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/GetQuestions" message="tns:IGameplayService_GetQuestions_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/GetQuestionsResponse" message="tns:IGameplayService_GetQuestions_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/IGameplayService/GetQuestionsServiceFaultFault" name="ServiceFaultFault" message="tns:IGameplayService_GetQuestions_ServiceFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="JoinMatch">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/JoinMatch" message="tns:IGameplayService_JoinMatch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/JoinMatchResponse" message="tns:IGameplayService_JoinMatch_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StartMatch">
+      <wsdl:input wsaw:Action="http://tempuri.org/IGameplayService/StartMatch" message="tns:IGameplayService_StartMatch_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/StartMatchResponse" message="tns:IGameplayService_StartMatch_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="OnNextQuestion">
       <wsdl:output wsaw:Action="http://tempuri.org/IGameplayService/OnNextQuestion" message="tns:IGameplayService_OnNextQuestion_OutputCallbackMessage" />
@@ -797,10 +747,6 @@
         <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_SubmitAnswer_output_policy" />
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceFaultFault">
-        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_SubmitAnswer_ServiceFaultFault_Fault" />
-        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="Bank">
       <soap12:operation soapAction="http://tempuri.org/IGameplayService/Bank" style="document" />
@@ -812,10 +758,6 @@
         <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_Bank_output_policy" />
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceFaultFault">
-        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_Bank_ServiceFaultFault_Fault" />
-        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="UseLifeline">
       <soap12:operation soapAction="http://tempuri.org/IGameplayService/UseLifeline" style="document" />
@@ -827,10 +769,6 @@
         <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_UseLifeline_output_policy" />
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceFaultFault">
-        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_UseLifeline_ServiceFaultFault_Fault" />
-        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="CastVote">
       <soap12:operation soapAction="http://tempuri.org/IGameplayService/CastVote" style="document" />
@@ -842,10 +780,6 @@
         <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_CastVote_output_policy" />
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceFaultFault">
-        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_CastVote_ServiceFaultFault_Fault" />
-        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="AckEventSeen">
       <soap12:operation soapAction="http://tempuri.org/IGameplayService/AckEventSeen" style="document" />
@@ -857,10 +791,6 @@
         <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_AckEventSeen_output_policy" />
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceFaultFault">
-        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_AckEventSeen_ServiceFaultFault_Fault" />
-        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="GetQuestions">
       <soap12:operation soapAction="http://tempuri.org/IGameplayService/GetQuestions" style="document" />
@@ -872,10 +802,28 @@
         <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_GetQuestions_output_policy" />
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceFaultFault">
-        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_GetQuestions_ServiceFaultFault_Fault" />
-        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
-      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="JoinMatch">
+      <soap12:operation soapAction="http://tempuri.org/IGameplayService/JoinMatch" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_JoinMatch_Input_policy" />
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_JoinMatch_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="StartMatch">
+      <soap12:operation soapAction="http://tempuri.org/IGameplayService/StartMatch" style="document" />
+      <wsdl:input>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_StartMatch_Input_policy" />
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <wsp:PolicyReference URI="#WSDualHttpBinding_IGameplayService_StartMatch_output_policy" />
+        <soap12:body use="literal" />
+      </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="OnNextQuestion">
       <soap12:operation soapAction="http://tempuri.org/IGameplayService/OnNextQuestion" style="document" />
@@ -926,7 +874,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>http://localhost:8082/gameplay/</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>ANGEL\Angel</Upn>
+          <Upn>LAP-MANUGOD\manit</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

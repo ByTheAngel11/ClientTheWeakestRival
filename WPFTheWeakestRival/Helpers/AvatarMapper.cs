@@ -2,6 +2,8 @@
 using WPFTheWeakestRival.Controls;
 using WPFTheWeakestRival.Models;
 using LobbyAvatarDto = WPFTheWeakestRival.LobbyService.AvatarAppearanceDto;
+using GameplayAvatarDto = WPFTheWeakestRival.GameplayService.AvatarAppearanceDto;
+
 
 namespace WPFTheWeakestRival.Helpers
 {
@@ -24,6 +26,25 @@ namespace WPFTheWeakestRival.Helpers
                 UseProfilePhotoAsFace = dto.UseProfilePhotoAsFace
             };
         }
+
+        public static AvatarAppearance FromGameplayDto(GameplayAvatarDto dto)
+        {
+            if (dto == null)
+            {
+                return null;
+            }
+
+            return new AvatarAppearance
+            {
+                BodyColor = (int)dto.BodyColor,
+                PantsColor = (int)dto.PantsColor,
+                HatType = (int)dto.HatType,
+                HatColor = (int)dto.HatColor,
+                FaceType = (int)dto.FaceType,
+                UseProfilePhotoAsFace = dto.UseProfilePhotoAsFace
+            };
+        }
+
 
         private static readonly Color BODY_RED = (Color)ColorConverter.ConvertFromString("#FFD32F2F");
         private static readonly Color BODY_BLUE = (Color)ColorConverter.ConvertFromString("#FF2F6AA3");

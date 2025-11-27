@@ -36,12 +36,9 @@ namespace WPFTheWeakestRival.Helpers
             playerItem.Avatar = profileImageSource
                                 ?? UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
 
-            if (account.Avatar != null)
-            {
-                playerItem.AvatarAppearance = MapAvatarAppearance(
-                    account.Avatar,
-                    profileImageSource);
-            }
+            playerItem.AvatarAppearance = MapAvatarAppearance(
+                account.Avatar,
+                playerItem.Avatar);
 
             return playerItem;
         }
@@ -123,16 +120,19 @@ namespace WPFTheWeakestRival.Helpers
                 return null;
             }
 
-            return new AvatarAppearance
+            var appearance = new AvatarAppearance
             {
                 BodyColor = (int)dto.BodyColor,
                 PantsColor = (int)dto.PantsColor,
                 HatType = (int)dto.HatType,
                 HatColor = (int)dto.HatColor,
                 FaceType = (int)dto.FaceType,
-                UseProfilePhotoAsFace = dto.UseProfilePhotoAsFace && profileImage != null,
                 ProfileImage = profileImage
             };
+
+            appearance.UseProfilePhotoAsFace = profileImage != null;
+
+            return appearance;
         }
     }
 }

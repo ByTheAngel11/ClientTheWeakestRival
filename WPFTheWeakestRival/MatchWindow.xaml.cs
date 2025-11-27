@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.WildcardService;
+using WPFTheWeakestRival.Controls;
+using WPFTheWeakestRival.Helpers;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 using WildcardFault = WPFTheWeakestRival.WildcardService.ServiceFault;
-using GameplayFault = WPFTheWeakestRival.GameplayService.ServiceFault;
 
 namespace WPFTheWeakestRival
 {
@@ -23,6 +23,9 @@ namespace WPFTheWeakestRival
         private const string DEFAULT_LOCALE = "es-MX";
         private const int MAX_QUESTIONS = 40;
 
+        private const int QUESTION_TIME_SECONDS = 30;
+        private const string TIMER_FORMAT = @"mm\:ss";
+
         private readonly MatchInfo match;
         private readonly string token;
         private readonly int myUserId;
@@ -32,12 +35,20 @@ namespace WPFTheWeakestRival
 
         private PlayerWildcardDto myWildcard;
 
-        private readonly List<GameplayServiceProxy.QuestionWithAnswersDto> questionBuffer =
-            new List<GameplayServiceProxy.QuestionWithAnswersDto>();
+        private GameplayServiceProxy.GameplayServiceClient gameplayClient;
 
-        private int currentQuestionIndex = -1;
+        private bool isMyTurn;
+        private GameplayServiceProxy.QuestionWithAnswersDto currentQuestion;
 
-        public MatchWindow(MatchInfo match, string token, int myUserId, bool isHost, LobbyWindow lobbyWindow)
+        private readonly DispatcherTimer questionTimer;
+        private int remainingSeconds;
+
+        public MatchWindow(
+            MatchInfo match,
+            string token,
+            int myUserId,
+            bool isHost,
+            LobbyWindow lobbyWindow)
         {
             this.match = match ?? throw new ArgumentNullException(nameof(match));
             this.token = token;
@@ -48,21 +59,20 @@ namespace WPFTheWeakestRival
 
             InitializeComponent();
 
+            questionTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1)
+            };
+            questionTimer.Tick += QuestionTimerTick;
+
             Closed += MatchWindowClosed;
             Loaded += MatchWindowLoaded;
 
             InitializeUi();
         }
 
-        #region Inicialización básica
-
         private void InitializeUi()
         {
-            if (txtMatchTitle != null)
-            {
-                txtMatchTitle.Text = "Partida";
-            }
-
             if (txtMatchCodeSmall != null)
             {
                 var code = string.IsNullOrWhiteSpace(match.MatchCode)
@@ -74,7 +84,6 @@ namespace WPFTheWeakestRival
 
             if (lstPlayers != null)
             {
-                // Players viene como PlayerSummary[]
                 var players = match.Players ?? Array.Empty<PlayerSummary>();
                 lstPlayers.ItemsSource = players;
 
@@ -84,12 +93,46 @@ namespace WPFTheWeakestRival
                 }
             }
 
+            txtChain.Text = "0.00";
+            txtBanked.Text = "0.00";
+
+            txtTurnPlayerName.Text = "Jugador";
+            txtTurnLabel.Text = "Esperando inicio de partida...";
+
+            if (txtTimer != null)
+            {
+                txtTimer.Text = "--:--";
+            }
+
             UpdateWildcardUi();
             InitializeQuestionUiEmpty();
         }
 
         private void MatchWindowClosed(object sender, EventArgs e)
         {
+            try
+            {
+                if (questionTimer != null && questionTimer.IsEnabled)
+                {
+                    questionTimer.Stop();
+                }
+
+                if (gameplayClient != null)
+                {
+                    if (gameplayClient.State == CommunicationState.Faulted)
+                    {
+                        gameplayClient.Abort();
+                    }
+                    else
+                    {
+                        gameplayClient.Close();
+                    }
+                }
+            }
+            catch
+            {
+            }
+
             if (lobbyWindow != null)
             {
                 lobbyWindow.Show();
@@ -102,20 +145,119 @@ namespace WPFTheWeakestRival
             Close();
         }
 
-        #endregion
-
-        #region Loaded: comodín + preguntas
-
         private async void MatchWindowLoaded(object sender, RoutedEventArgs e)
         {
             await LoadWildcardAsync();
-            await LoadQuestionsAsync();
-            ShowCurrentQuestion();
+            await InitializeGameplayAsync();
+            await JoinMatchAsync();
+            await StartMatchAsync();
         }
 
-        #endregion
+        private async Task InitializeGameplayAsync()
+        {
+            var callback = new GameplayCallbackStub(this);
+            var instanceContext = new InstanceContext(callback);
+            gameplayClient = new GameplayServiceProxy.GameplayServiceClient(
+                instanceContext,
+                "WSDualHttpBinding_IGameplayService");
 
-        #region Comodín
+            await Task.CompletedTask;
+        }
+
+        private async Task JoinMatchAsync()
+        {
+            if (gameplayClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var request = new GameplayServiceProxy.GameplayJoinMatchRequest
+                {
+                    Token = token,
+                    MatchId = match.MatchId
+                };
+
+                await Task.Run(() => gameplayClient.JoinMatch(request));
+            }
+            catch (FaultException<WildcardFault> ex)
+            {
+                Logger.Warn("Fault al unirse a la partida en MatchWindow.", ex);
+                MessageBox.Show(
+                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al unirse a la partida en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al unirse a la partida en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private async Task StartMatchAsync()
+        {
+            if (gameplayClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var request = new GameplayServiceProxy.GameplayStartMatchRequest
+                {
+                    Token = token,
+                    MatchId = match.MatchId,
+                    Difficulty = MapDifficultyToByte(match.Config?.DifficultyCode),
+                    LocaleCode = DEFAULT_LOCALE,
+                    MaxQuestions = MAX_QUESTIONS
+                };
+
+                await Task.Run(() => gameplayClient.StartMatch(request));
+            }
+            catch (FaultException<WildcardFault> ex)
+            {
+                Logger.Warn("Fault al iniciar la partida en MatchWindow.", ex);
+                MessageBox.Show(
+                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al iniciar la partida en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al iniciar la partida en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
 
         private async Task LoadWildcardAsync()
         {
@@ -246,124 +388,6 @@ namespace WPFTheWeakestRival
             }
         }
 
-        #endregion
-
-        #region Preguntas: carga desde GameplayService
-
-        private async Task LoadQuestionsAsync()
-        {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            var difficultyByte = MapDifficultyToByte(match.Config?.DifficultyCode);
-
-            try
-            {
-                var callback = new InstanceContext(new GameplayCallbackStub());
-                using (var client = new GameplayServiceProxy.GameplayServiceClient(
-                           callback,
-                           "WSDualHttpBinding_IGameplayService"))
-                {
-                    var request = new GameplayServiceProxy.GetQuestionsRequest
-                    {
-                        Token = token,
-                        Difficulty = difficultyByte,
-                        LocaleCode = DEFAULT_LOCALE,
-                        MaxQuestions = MAX_QUESTIONS,
-                        CategoryId = null
-                    };
-
-                    var response = await Task.Run(() => client.GetQuestions(request));
-
-                    questionBuffer.Clear();
-                    if (response?.Questions != null)
-                    {
-                        questionBuffer.AddRange(response.Questions);
-                    }
-                }
-
-                Logger.InfoFormat(
-                    "Preguntas cargadas para la partida {0}. Dificultad={1}, Count={2}",
-                    match.MatchId,
-                    difficultyByte,
-                    questionBuffer.Count);
-
-                currentQuestionIndex = questionBuffer.Count > 0 ? 0 : -1;
-            }
-            catch (FaultException<GameplayFault> ex)
-            {
-                Logger.Warn("Fault al obtener preguntas.", ex);
-                MessageBox.Show(
-                    $"{ex.Detail.Code}: {ex.Detail.Message}",
-                    "Preguntas",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Error de comunicación al obtener preguntas.", ex);
-                MessageBox.Show(
-                    "No se pudieron cargar las preguntas." + Environment.NewLine + ex.Message,
-                    "Preguntas",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error inesperado al obtener preguntas.", ex);
-                MessageBox.Show(
-                    "Ocurrió un error al cargar las preguntas." + Environment.NewLine + ex.Message,
-                    "Preguntas",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-        }
-
-        private static byte MapDifficultyToByte(string difficultyCode)
-        {
-            if (string.IsNullOrWhiteSpace(difficultyCode))
-            {
-                return 1;
-            }
-
-            var code = difficultyCode.Trim().ToUpperInvariant();
-
-            switch (code)
-            {
-                case "EASY":
-                case "E":
-                    return 1;
-                case "NORMAL":
-                case "MEDIUM":
-                case "M":
-                    return 2;
-                case "HARD":
-                case "H":
-                    return 3;
-                default:
-                    return 1;
-            }
-        }
-
-        #endregion
-
-        #region Preguntas: UI
-
-        private GameplayServiceProxy.QuestionWithAnswersDto CurrentQuestion
-        {
-            get
-            {
-                if (currentQuestionIndex < 0 || currentQuestionIndex >= questionBuffer.Count)
-                {
-                    return null;
-                }
-
-                return questionBuffer[currentQuestionIndex];
-            }
-        }
-
         private void InitializeQuestionUiEmpty()
         {
             if (txtQuestion != null)
@@ -379,39 +403,26 @@ namespace WPFTheWeakestRival
             ResetAnswerButtons();
         }
 
-        private void ShowCurrentQuestion()
+        private void ResetAnswerButtons()
         {
-            var question = CurrentQuestion;
+            ResetAnswerButton(btnAnswer1);
+            ResetAnswerButton(btnAnswer2);
+            ResetAnswerButton(btnAnswer3);
+            ResetAnswerButton(btnAnswer4);
+        }
 
-            if (question == null)
+        private static void ResetAnswerButton(Button button)
+        {
+            if (button == null)
             {
-                if (txtQuestion != null)
-                {
-                    txtQuestion.Text = "No hay preguntas disponibles para esta dificultad.";
-                }
-
-                ResetAnswerButtons();
                 return;
             }
 
-            if (txtQuestion != null)
-            {
-                txtQuestion.Text = question.Body;
-            }
-
-            // Answers viene como AnswerDto[]
-            var answers = question.Answers ?? Array.Empty<GameplayServiceProxy.AnswerDto>();
-
-            SetAnswerButtonContent(btnAnswer1, answers, 0);
-            SetAnswerButtonContent(btnAnswer2, answers, 1);
-            SetAnswerButtonContent(btnAnswer3, answers, 2);
-            SetAnswerButtonContent(btnAnswer4, answers, 3);
-
-            if (txtAnswerFeedback != null)
-            {
-                txtAnswerFeedback.Text = "Selecciona una respuesta.";
-                txtAnswerFeedback.Foreground = Brushes.LightGray;
-            }
+            button.Content = string.Empty;
+            button.Tag = null;
+            button.IsEnabled = false;
+            button.Visibility = Visibility.Visible;
+            button.Background = Brushes.Transparent;
         }
 
         private static void SetAnswerButtonContent(
@@ -441,30 +452,13 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void ResetAnswerButtons()
+        private async void AnswerButtonClick(object sender, RoutedEventArgs e)
         {
-            ResetAnswerButton(btnAnswer1);
-            ResetAnswerButton(btnAnswer2);
-            ResetAnswerButton(btnAnswer3);
-            ResetAnswerButton(btnAnswer4);
-        }
-
-        private static void ResetAnswerButton(Button button)
-        {
-            if (button == null)
+            if (!isMyTurn)
             {
                 return;
             }
 
-            button.Content = string.Empty;
-            button.Tag = null;
-            button.IsEnabled = false;
-            button.Visibility = Visibility.Visible;
-            button.Background = Brushes.Transparent;
-        }
-
-        private void AnswerButtonClick(object sender, RoutedEventArgs e)
-        {
             var button = sender as Button;
             if (button == null)
             {
@@ -476,8 +470,7 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var question = CurrentQuestion;
-            if (question == null)
+            if (gameplayClient == null)
             {
                 return;
             }
@@ -487,22 +480,330 @@ namespace WPFTheWeakestRival
             btnAnswer3.IsEnabled = false;
             btnAnswer4.IsEnabled = false;
 
-            var isCorrect = answer.IsCorrect;
+            questionTimer.Stop();
 
-            button.Background = isCorrect ? Brushes.DarkSeaGreen : Brushes.IndianRed;
+            try
+            {
+                var request = new GameplayServiceProxy.SubmitAnswerRequest
+                {
+                    Token = token,
+                    MatchId = match.MatchId,
+                    QuestionId = Guid.Empty,
+                    AnswerText = answer.Text,
+                    ResponseTime = TimeSpan.Zero
+                };
+
+                await Task.Run(() => gameplayClient.SubmitAnswer(request));
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn("Fault al enviar respuesta en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al enviar respuesta en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al enviar respuesta en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnBankClick(object sender, RoutedEventArgs e)
+        {
+            if (!isMyTurn || gameplayClient == null)
+            {
+                return;
+            }
+
+            btnBank.IsEnabled = false;
+            questionTimer.Stop();
+
+            try
+            {
+                var request = new GameplayServiceProxy.BankRequest
+                {
+                    Token = token,
+                    MatchId = match.MatchId
+                };
+
+                var response = await Task.Run(() => gameplayClient.Bank(request));
+
+                if (response != null)
+                {
+                    OnServerBankUpdated(response.Bank);
+                }
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn("Fault al bancar en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al bancar en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al bancar en MatchWindow.", ex);
+                MessageBox.Show(
+                    ex.Message,
+                    "Juego",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                btnBank.IsEnabled = true;
+            }
+        }
+
+        internal void OnServerNextQuestion(
+            GameplayServiceProxy.PlayerSummary targetPlayer,
+            GameplayServiceProxy.QuestionWithAnswersDto question,
+            decimal currentChain,
+            decimal banked)
+        {
+            isMyTurn = targetPlayer != null && targetPlayer.UserId == myUserId;
+            currentQuestion = question;
+
+            txtChain.Text = currentChain.ToString("0.00");
+            txtBanked.Text = banked.ToString("0.00");
+
+            var appearance = AvatarMapper.FromGameplayDto(targetPlayer?.Avatar);
+            TurnAvatar.Appearance = appearance;
+
+            txtTurnPlayerName.Text = !string.IsNullOrWhiteSpace(targetPlayer?.DisplayName)
+                ? targetPlayer.DisplayName
+                : "Jugador";
+
+            if (isMyTurn)
+            {
+                txtTurnLabel.Text = "Tu turno";
+                TurnBannerBackground.Background =
+                    (Brush)FindResource("Brush.Turn.MyTurn");
+
+                remainingSeconds = QUESTION_TIME_SECONDS;
+                UpdateTimerText();
+                questionTimer.Start();
+            }
+            else
+            {
+                txtTurnLabel.Text = "Turno de otro jugador";
+                TurnBannerBackground.Background =
+                    (Brush)FindResource("Brush.Turn.OtherTurn");
+
+                questionTimer.Stop();
+                if (txtTimer != null)
+                {
+                    txtTimer.Text = "--:--";
+                }
+            }
+
+            if (!isMyTurn)
+            {
+                InitializeQuestionUiEmpty();
+                if (txtQuestion != null)
+                {
+                    txtQuestion.Text = "Esperando tu turno...";
+                }
+
+                return;
+            }
+
+            if (txtQuestion != null)
+            {
+                txtQuestion.Text = question.Body;
+            }
+
+            SetAnswerButtonContent(btnAnswer1, question.Answers, 0);
+            SetAnswerButtonContent(btnAnswer2, question.Answers, 1);
+            SetAnswerButtonContent(btnAnswer3, question.Answers, 2);
+            SetAnswerButtonContent(btnAnswer4, question.Answers, 3);
 
             if (txtAnswerFeedback != null)
             {
-                txtAnswerFeedback.Text = isCorrect ? "¡Correcto!" : "Respuesta incorrecta.";
-                txtAnswerFeedback.Foreground = isCorrect ? Brushes.LawnGreen : Brushes.OrangeRed;
+                txtAnswerFeedback.Text = "Selecciona una respuesta.";
+                txtAnswerFeedback.Foreground = Brushes.LightGray;
             }
 
-            // Aquí luego mandaremos SubmitAnswer al GameplayService.
+            btnAnswer1.IsEnabled = true;
+            btnAnswer2.IsEnabled = true;
+            btnAnswer3.IsEnabled = true;
+            btnAnswer4.IsEnabled = true;
         }
 
-        #endregion
+        internal void OnServerAnswerEvaluated(
+            GameplayServiceProxy.PlayerSummary player,
+            GameplayServiceProxy.AnswerResult result)
+        {
+            if (txtAnswerFeedback == null)
+            {
+                return;
+            }
 
-        #region Intro video (stub)
+            bool isMyPlayer = player != null && player.UserId == myUserId;
+
+            if (isMyPlayer)
+            {
+                txtAnswerFeedback.Text = result.IsCorrect ? "¡Correcto!" : "Respuesta incorrecta.";
+                txtAnswerFeedback.Foreground = result.IsCorrect ? Brushes.LawnGreen : Brushes.OrangeRed;
+            }
+            else
+            {
+                var name = string.IsNullOrWhiteSpace(player?.DisplayName) ? "Otro jugador" : player.DisplayName;
+                txtAnswerFeedback.Text = result.IsCorrect
+                    ? $"{name} respondió correcto."
+                    : $"{name} respondió incorrecto.";
+                txtAnswerFeedback.Foreground = Brushes.LightGray;
+            }
+        }
+
+        internal void OnServerBankUpdated(GameplayServiceProxy.BankState bank)
+        {
+            if (bank == null)
+            {
+                return;
+            }
+
+            txtChain.Text = bank.CurrentChain.ToString("0.00");
+            txtBanked.Text = bank.BankedPoints.ToString("0.00");
+        }
+
+        private async void QuestionTimerTick(object sender, EventArgs e)
+        {
+            if (!isMyTurn)
+            {
+                questionTimer.Stop();
+                return;
+            }
+
+            if (remainingSeconds > 0)
+            {
+                remainingSeconds--;
+                UpdateTimerText();
+            }
+
+            if (remainingSeconds <= 0)
+            {
+                questionTimer.Stop();
+
+                btnAnswer1.IsEnabled = false;
+                btnAnswer2.IsEnabled = false;
+                btnAnswer3.IsEnabled = false;
+                btnAnswer4.IsEnabled = false;
+                btnBank.IsEnabled = false;
+
+                if (txtAnswerFeedback != null)
+                {
+                    txtAnswerFeedback.Text = "Tiempo agotado.";
+                    txtAnswerFeedback.Foreground = Brushes.OrangeRed;
+                }
+
+                await SendTimeoutAnswerAsync();
+            }
+        }
+
+        private async Task SendTimeoutAnswerAsync()
+        {
+            if (!isMyTurn || gameplayClient == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var request = new GameplayServiceProxy.SubmitAnswerRequest
+                {
+                    Token = token,
+                    MatchId = match.MatchId,
+                    QuestionId = Guid.Empty,
+                    AnswerText = string.Empty,
+                    ResponseTime = TimeSpan.FromSeconds(QUESTION_TIME_SECONDS)
+                };
+
+                await Task.Run(() => gameplayClient.SubmitAnswer(request));
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn("Fault al procesar timeout en MatchWindow.", ex);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al procesar timeout en MatchWindow.", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al procesar timeout en MatchWindow.", ex);
+            }
+        }
+
+        private void UpdateTimerText()
+        {
+            if (txtTimer == null)
+            {
+                return;
+            }
+
+            if (remainingSeconds < 0)
+            {
+                txtTimer.Text = "--:--";
+                return;
+            }
+
+            var time = TimeSpan.FromSeconds(remainingSeconds);
+            txtTimer.Text = time.ToString(TIMER_FORMAT);
+        }
+
+        private static byte MapDifficultyToByte(string difficultyCode)
+        {
+            if (string.IsNullOrWhiteSpace(difficultyCode))
+            {
+                return 1;
+            }
+
+            var code = difficultyCode.Trim().ToUpperInvariant();
+
+            switch (code)
+            {
+                case "EASY":
+                case "E":
+                    return 1;
+                case "NORMAL":
+                case "MEDIUM":
+                case "M":
+                    return 2;
+                case "HARD":
+                case "H":
+                    return 3;
+                default:
+                    return 1;
+            }
+        }
 
         private void IntroVideo_MediaEnded(object sender, RoutedEventArgs e)
         {
@@ -521,19 +822,24 @@ namespace WPFTheWeakestRival
             }
         }
 
-        #endregion
-
-        #region Callback stub para GameplayService
-
         private sealed class GameplayCallbackStub : GameplayServiceProxy.IGameplayServiceCallback
         {
+            private readonly MatchWindow matchWindow;
+
+            public GameplayCallbackStub(MatchWindow matchWindow)
+            {
+                this.matchWindow = matchWindow ?? throw new ArgumentNullException(nameof(matchWindow));
+            }
+
             public void OnNextQuestion(
                 Guid matchId,
                 GameplayServiceProxy.PlayerSummary targetPlayer,
-                GameplayServiceProxy.QuestionDto question,
+                GameplayServiceProxy.QuestionWithAnswersDto question,
                 decimal currentChain,
                 decimal banked)
             {
+                matchWindow.Dispatcher.Invoke(
+                    () => matchWindow.OnServerNextQuestion(targetPlayer, question, currentChain, banked));
             }
 
             public void OnAnswerEvaluated(
@@ -541,10 +847,14 @@ namespace WPFTheWeakestRival
                 GameplayServiceProxy.PlayerSummary player,
                 GameplayServiceProxy.AnswerResult result)
             {
+                matchWindow.Dispatcher.Invoke(
+                    () => matchWindow.OnServerAnswerEvaluated(player, result));
             }
 
             public void OnBankUpdated(Guid matchId, GameplayServiceProxy.BankState bank)
             {
+                matchWindow.Dispatcher.Invoke(
+                    () => matchWindow.OnServerBankUpdated(bank));
             }
 
             public void OnVotePhaseStarted(Guid matchId, TimeSpan timeLimit)
@@ -561,7 +871,5 @@ namespace WPFTheWeakestRival
             {
             }
         }
-
-        #endregion
     }
 }

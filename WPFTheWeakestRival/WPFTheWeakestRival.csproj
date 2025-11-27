@@ -351,6 +351,12 @@
     <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.CastVoteResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.GameplayJoinMatchResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.GameplayStartMatchResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.GetQuestionsResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
