@@ -41,11 +41,11 @@
                    Foreground="White"
                    Margin="0,0,0,8"/>
 
-        <!-- CONTENIDO: Jugadores + Comodín -->
+        <!-- CONTENIDO: Jugadores + Comodín + Pregunta -->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Panel jugadores -->
@@ -82,68 +82,177 @@
                 </Grid>
             </Border>
 
-            <!-- Panel comodín del jugador -->
-            <Border Grid.Column="1"
-                    CornerRadius="16"
-                    Padding="16"
-                    Background="#0FFFFFFF"
-                    BorderBrush="#33FFFFFF"
-                    BorderThickness="1">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <!-- título -->
-                        <RowDefinition Height="8"/>
-                        <!-- separador -->
-                        <RowDefinition Height="Auto"/>
-                        <!-- imagen -->
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <!-- nombre -->
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="*"/>
-                        <!-- descripción -->
-                    </Grid.RowDefinitions>
+            <!-- Columna derecha: Comodín + Pregunta -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                    <!-- Título -->
-                    <TextBlock Text="Comodín"
-                               Grid.Row="0"
-                               FontWeight="SemiBold"
-                               Foreground="White"/>
+                <!-- Panel comodín del jugador -->
+                <Border Grid.Row="0"
+                        CornerRadius="16"
+                        Padding="16"
+                        Background="#0FFFFFFF"
+                        BorderBrush="#33FFFFFF"
+                        BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <!-- título -->
+                            <RowDefinition Height="8"/>
+                            <!-- separador -->
+                            <RowDefinition Height="Auto"/>
+                            <!-- imagen -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- nombre -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                            <!-- descripción -->
+                        </Grid.RowDefinitions>
 
-                    <Separator Grid.Row="1" Margin="0,4,0,4"/>
+                        <!-- Título -->
+                        <TextBlock Text="Comodín"
+                                   Grid.Row="0"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
 
-                    <!-- Imagen del comodín -->
-                    <Image x:Name="imgWildcardIcon"
-                           Grid.Row="2"
-                           Width="96"
-                           Height="96"
-                           Margin="0,4,0,0"
-                           Stretch="Uniform"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Visibility="Collapsed"/>
+                        <Separator Grid.Row="1" Margin="0,4,0,4"/>
 
-                    <!-- Nombre / código -->
-                    <TextBlock x:Name="txtWildcardName"
-                               Grid.Row="4"
-                               FontSize="16"
-                               FontWeight="SemiBold"
-                               Foreground="White"
-                               Text="Sin comodín"
-                               TextAlignment="Center"
-                               Margin="0,4,0,0"/>
-
-                    <!-- Descripción -->
-                    <TextBlock x:Name="txtWildcardDescription"
-                               Grid.Row="6"
-                               TextWrapping="Wrap"
-                               Foreground="LightGray"
+                        <!-- Imagen del comodín -->
+                        <Image x:Name="imgWildcardIcon"
+                               Grid.Row="2"
+                               Width="96"
+                               Height="96"
                                Margin="0,4,0,0"
-                               TextAlignment="Center"
-                               MaxWidth="260"/>
-                </Grid>
-            </Border>
+                               Stretch="Uniform"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Visibility="Collapsed"/>
+
+                        <!-- Nombre / código -->
+                        <TextBlock x:Name="txtWildcardName"
+                                   Grid.Row="4"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"
+                                   Text="Sin comodín"
+                                   TextAlignment="Center"
+                                   Margin="0,4,0,0"/>
+
+                        <!-- Descripción -->
+                        <TextBlock x:Name="txtWildcardDescription"
+                                   Grid.Row="6"
+                                   TextWrapping="Wrap"
+                                   Foreground="LightGray"
+                                   Margin="0,4,0,0"
+                                   TextAlignment="Center"
+                                   MaxWidth="260"/>
+                    </Grid>
+                </Border>
+
+                <!-- Panel de pregunta y respuestas -->
+                <Border Grid.Row="2"
+                        CornerRadius="16"
+                        Padding="16"
+                        Background="#0FFFFFFF"
+                        BorderBrush="#33FFFFFF"
+                        BorderThickness="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <!-- título -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- pregunta -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- respuesta 1 -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- respuesta 2 -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- respuesta 3 -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="Auto"/>
+                            <!-- respuesta 4 -->
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="*"/>
+                            <!-- feedback -->
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Pregunta"
+                                   Grid.Row="0"
+                                   FontWeight="SemiBold"
+                                   Foreground="White"/>
+
+                        <Separator Grid.Row="1"
+                                   Margin="0,4,0,4"/>
+
+                        <!-- Texto de la pregunta -->
+                        <TextBlock x:Name="txtQuestion"
+                                   Grid.Row="2"
+                                   Text="(esperando pregunta...)"
+                                   TextWrapping="Wrap"
+                                   Foreground="White"
+                                   FontSize="16"
+                                   Margin="0,0,0,4"/>
+
+                        <!-- Respuestas -->
+                        <Button x:Name="btnAnswer1"
+                                Grid.Row="4"
+                                Margin="0,2,0,2"
+                                Click="AnswerButtonClick"/>
+
+                        <Button x:Name="btnAnswer2"
+                                Grid.Row="6"
+                                Margin="0,2,0,2"
+                                Click="AnswerButtonClick"/>
+
+                        <Button x:Name="btnAnswer3"
+                                Grid.Row="8"
+                                Margin="0,2,0,2"
+                                Click="AnswerButtonClick"/>
+
+                        <Button x:Name="btnAnswer4"
+                                Grid.Row="10"
+                                Margin="0,2,0,2"
+                                Click="AnswerButtonClick"/>
+
+                        <!-- Feedback -->
+                        <TextBlock x:Name="txtAnswerFeedback"
+                                   Grid.Row="12"
+                                   Margin="0,6,0,0"
+                                   TextAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Foreground="LightGray"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Overlay de video de introducción -->
+        <Grid x:Name="IntroOverlay"
+              Grid.Row="4"
+              Background="#CC000000"
+              Visibility="Collapsed">
+            <Grid>
+                <MediaElement x:Name="introVideo"
+                              LoadedBehavior="Manual"
+                              UnloadedBehavior="Stop"
+                              MediaEnded="IntroVideo_MediaEnded"
+                              Stretch="Uniform"/>
+                <Button Content="Saltar"
+                        Width="80"
+                        Height="30"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="8"
+                        Click="BtnSkipIntroClick"/>
+            </Grid>
         </Grid>
 
         <!-- Botón cerrar abajo derecha -->

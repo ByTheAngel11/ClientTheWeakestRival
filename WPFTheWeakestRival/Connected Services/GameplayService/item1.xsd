@@ -105,6 +105,54 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="AckEventSeenResponse" nillable="true" type="tns:AckEventSeenResponse" />
+  <xs:complexType name="GetQuestionsRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="Difficulty" type="xs:unsignedByte" />
+      <xs:element name="LocaleCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MaxQuestions" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="CategoryId" nillable="true" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetQuestionsRequest" nillable="true" type="tns:GetQuestionsRequest" />
+  <xs:complexType name="GetQuestionsResponse">
+    <xs:sequence>
+      <xs:element name="Questions" nillable="true" type="tns:ArrayOfQuestionWithAnswersDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetQuestionsResponse" nillable="true" type="tns:GetQuestionsResponse" />
+  <xs:complexType name="ArrayOfQuestionWithAnswersDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="QuestionWithAnswersDto" nillable="true" type="tns:QuestionWithAnswersDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfQuestionWithAnswersDto" nillable="true" type="tns:ArrayOfQuestionWithAnswersDto" />
+  <xs:complexType name="QuestionWithAnswersDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="QuestionId" type="xs:int" />
+      <xs:element minOccurs="0" name="CategoryId" type="xs:int" />
+      <xs:element minOccurs="0" name="Difficulty" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="LocaleCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Body" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Answers" nillable="true" type="tns:ArrayOfAnswerDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="QuestionWithAnswersDto" nillable="true" type="tns:QuestionWithAnswersDto" />
+  <xs:complexType name="ArrayOfAnswerDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AnswerDto" nillable="true" type="tns:AnswerDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAnswerDto" nillable="true" type="tns:ArrayOfAnswerDto" />
+  <xs:complexType name="AnswerDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AnswerId" type="xs:int" />
+      <xs:element minOccurs="0" name="Text" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsCorrect" type="xs:boolean" />
+      <xs:element minOccurs="0" name="DisplayOrder" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AnswerDto" nillable="true" type="tns:AnswerDto" />
   <xs:complexType name="PlayerSummary">
     <xs:sequence>
       <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
@@ -113,7 +161,7 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />
-  <xs:complexType name="Question">
+  <xs:complexType name="QuestionDto">
     <xs:sequence>
       <xs:element name="QuestionId" type="ser:guid" />
       <xs:element name="Text" nillable="true" type="xs:string" />
@@ -126,5 +174,5 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="Question" nillable="true" type="tns:Question" />
+  <xs:element name="QuestionDto" nillable="true" type="tns:QuestionDto" />
 </xs:schema>

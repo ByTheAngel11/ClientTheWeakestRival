@@ -1400,6 +1400,12 @@ namespace WPFTheWeakestRival.LobbyService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool AllowTiebreakCoinflipField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DifficultyCodeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string CharacterCodeField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -1484,6 +1490,32 @@ namespace WPFTheWeakestRival.LobbyService {
                 if ((this.AllowTiebreakCoinflipField.Equals(value) != true)) {
                     this.AllowTiebreakCoinflipField = value;
                     this.RaisePropertyChanged("AllowTiebreakCoinflip");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+        public string DifficultyCode {
+            get {
+                return this.DifficultyCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DifficultyCodeField, value) != true)) {
+                    this.DifficultyCodeField = value;
+                    this.RaisePropertyChanged("DifficultyCode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+        public string CharacterCode {
+            get {
+                return this.CharacterCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CharacterCodeField, value) != true)) {
+                    this.CharacterCodeField = value;
+                    this.RaisePropertyChanged("CharacterCode");
                 }
             }
         }

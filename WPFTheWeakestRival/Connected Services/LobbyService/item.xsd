@@ -208,6 +208,8 @@
       <xs:element minOccurs="0" name="PointsPerWrong" type="xs:decimal" />
       <xs:element minOccurs="0" name="PointsPerEliminationGain" type="xs:decimal" />
       <xs:element minOccurs="0" name="AllowTiebreakCoinflip" type="xs:boolean" />
+      <xs:element minOccurs="0" name="DifficultyCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CharacterCode" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="MatchConfigDto" nillable="true" type="tns:MatchConfigDto" />
