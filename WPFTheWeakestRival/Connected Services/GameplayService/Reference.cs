@@ -26,7 +26,7 @@ namespace WPFTheWeakestRival.GameplayService {
         
         private System.Guid MatchIdField;
         
-        private System.Guid QuestionIdField;
+        private int QuestionIdField;
         
         private string AnswerTextField;
         
@@ -70,7 +70,7 @@ namespace WPFTheWeakestRival.GameplayService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
-        public System.Guid QuestionId {
+        public int QuestionId {
             get {
                 return this.QuestionIdField;
             }
@@ -172,7 +172,7 @@ namespace WPFTheWeakestRival.GameplayService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Guid QuestionIdField;
+        private int QuestionIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsCorrectField;
@@ -197,7 +197,7 @@ namespace WPFTheWeakestRival.GameplayService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Guid QuestionId {
+        public int QuestionId {
             get {
                 return this.QuestionIdField;
             }
@@ -599,7 +599,8 @@ namespace WPFTheWeakestRival.GameplayService {
         
         private System.Guid MatchIdField;
         
-        private System.Guid ToPlayerIdField;
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<int> TargetUserIdField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -637,15 +638,15 @@ namespace WPFTheWeakestRival.GameplayService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
-        public System.Guid ToPlayerId {
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public System.Nullable<int> TargetUserId {
             get {
-                return this.ToPlayerIdField;
+                return this.TargetUserIdField;
             }
             set {
-                if ((this.ToPlayerIdField.Equals(value) != true)) {
-                    this.ToPlayerIdField = value;
-                    this.RaisePropertyChanged("ToPlayerId");
+                if ((this.TargetUserIdField.Equals(value) != true)) {
+                    this.TargetUserIdField = value;
+                    this.RaisePropertyChanged("TargetUserId");
                 }
             }
         }
@@ -1308,12 +1309,17 @@ namespace WPFTheWeakestRival.GameplayService {
         
         private System.Guid MatchIdField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private byte DifficultyField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string LocaleCodeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<int> MaxQuestionsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int MatchDbIdField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1351,7 +1357,7 @@ namespace WPFTheWeakestRival.GameplayService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
         public byte Difficulty {
             get {
                 return this.DifficultyField;
@@ -1364,7 +1370,7 @@ namespace WPFTheWeakestRival.GameplayService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
         public string LocaleCode {
             get {
                 return this.LocaleCodeField;
@@ -1386,6 +1392,19 @@ namespace WPFTheWeakestRival.GameplayService {
                 if ((this.MaxQuestionsField.Equals(value) != true)) {
                     this.MaxQuestionsField = value;
                     this.RaisePropertyChanged("MaxQuestions");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public int MatchDbId {
+            get {
+                return this.MatchDbIdField;
+            }
+            set {
+                if ((this.MatchDbIdField.Equals(value) != true)) {
+                    this.MatchDbIdField = value;
+                    this.RaisePropertyChanged("MatchDbId");
                 }
             }
         }
@@ -1430,6 +1449,144 @@ namespace WPFTheWeakestRival.GameplayService {
                 if ((this.StartedField.Equals(value) != true)) {
                     this.StartedField = value;
                     this.RaisePropertyChanged("Started");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ChooseDuelOpponentRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class ChooseDuelOpponentRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int MatchIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TargetUserIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TokenField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int MatchId {
+            get {
+                return this.MatchIdField;
+            }
+            set {
+                if ((this.MatchIdField.Equals(value) != true)) {
+                    this.MatchIdField = value;
+                    this.RaisePropertyChanged("MatchId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TargetUserId {
+            get {
+                return this.TargetUserIdField;
+            }
+            set {
+                if ((this.TargetUserIdField.Equals(value) != true)) {
+                    this.TargetUserIdField = value;
+                    this.RaisePropertyChanged("TargetUserId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ChooseDuelOpponentResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class ChooseDuelOpponentResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool AcceptedField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TargetUserIdField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Accepted {
+            get {
+                return this.AcceptedField;
+            }
+            set {
+                if ((this.AcceptedField.Equals(value) != true)) {
+                    this.AcceptedField = value;
+                    this.RaisePropertyChanged("Accepted");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TargetUserId {
+            get {
+                return this.TargetUserIdField;
+            }
+            set {
+                if ((this.TargetUserIdField.Equals(value) != true)) {
+                    this.TargetUserIdField = value;
+                    this.RaisePropertyChanged("TargetUserId");
                 }
             }
         }
@@ -1750,6 +1907,251 @@ namespace WPFTheWeakestRival.GameplayService {
         Sleepy = 3,
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CoinFlipResolvedDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class CoinFlipResolvedDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.GameplayService.CoinFlipResultType ResultField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int RoundIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool ShouldEnableDuelField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int WeakestRivalPlayerIdField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public WPFTheWeakestRival.GameplayService.CoinFlipResultType Result {
+            get {
+                return this.ResultField;
+            }
+            set {
+                if ((this.ResultField.Equals(value) != true)) {
+                    this.ResultField = value;
+                    this.RaisePropertyChanged("Result");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int RoundId {
+            get {
+                return this.RoundIdField;
+            }
+            set {
+                if ((this.RoundIdField.Equals(value) != true)) {
+                    this.RoundIdField = value;
+                    this.RaisePropertyChanged("RoundId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool ShouldEnableDuel {
+            get {
+                return this.ShouldEnableDuelField;
+            }
+            set {
+                if ((this.ShouldEnableDuelField.Equals(value) != true)) {
+                    this.ShouldEnableDuelField = value;
+                    this.RaisePropertyChanged("ShouldEnableDuel");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int WeakestRivalPlayerId {
+            get {
+                return this.WeakestRivalPlayerIdField;
+            }
+            set {
+                if ((this.WeakestRivalPlayerIdField.Equals(value) != true)) {
+                    this.WeakestRivalPlayerIdField = value;
+                    this.RaisePropertyChanged("WeakestRivalPlayerId");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CoinFlipResultType", Namespace="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums")]
+    public enum CoinFlipResultType : byte {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Unknown = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Heads = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Tails = 2,
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DuelCandidatesDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class DuelCandidatesDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.GameplayService.DuelCandidateDto[] CandidatesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int WeakestRivalUserIdField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public WPFTheWeakestRival.GameplayService.DuelCandidateDto[] Candidates {
+            get {
+                return this.CandidatesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CandidatesField, value) != true)) {
+                    this.CandidatesField = value;
+                    this.RaisePropertyChanged("Candidates");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int WeakestRivalUserId {
+            get {
+                return this.WeakestRivalUserIdField;
+            }
+            set {
+                if ((this.WeakestRivalUserIdField.Equals(value) != true)) {
+                    this.WeakestRivalUserIdField = value;
+                    this.RaisePropertyChanged("WeakestRivalUserId");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DuelCandidateDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class DuelCandidateDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.GameplayService.AvatarAppearanceDto AvatarField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DisplayNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int UserIdField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public WPFTheWeakestRival.GameplayService.AvatarAppearanceDto Avatar {
+            get {
+                return this.AvatarField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvatarField, value) != true)) {
+                    this.AvatarField = value;
+                    this.RaisePropertyChanged("Avatar");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string DisplayName {
+            get {
+                return this.DisplayNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int UserId {
+            get {
+                return this.UserIdField;
+            }
+            set {
+                if ((this.UserIdField.Equals(value) != true)) {
+                    this.UserIdField = value;
+                    this.RaisePropertyChanged("UserId");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="GameplayService.IGameplayService", CallbackContract=typeof(WPFTheWeakestRival.GameplayService.IGameplayServiceCallback))]
     public interface IGameplayService {
@@ -1801,6 +2203,12 @@ namespace WPFTheWeakestRival.GameplayService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IGameplayService/StartMatch", ReplyAction="http://tempuri.org/IGameplayService/StartMatchResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.GameplayService.GameplayStartMatchResponse> StartMatchAsync(WPFTheWeakestRival.GameplayService.GameplayStartMatchRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IGameplayService/ChooseDuelOpponent", ReplyAction="http://tempuri.org/IGameplayService/ChooseDuelOpponentResponse")]
+        WPFTheWeakestRival.GameplayService.ChooseDuelOpponentResponse ChooseDuelOpponent(WPFTheWeakestRival.GameplayService.ChooseDuelOpponentRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IGameplayService/ChooseDuelOpponent", ReplyAction="http://tempuri.org/IGameplayService/ChooseDuelOpponentResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.GameplayService.ChooseDuelOpponentResponse> ChooseDuelOpponentAsync(WPFTheWeakestRival.GameplayService.ChooseDuelOpponentRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1823,6 +2231,24 @@ namespace WPFTheWeakestRival.GameplayService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnSpecialEvent")]
         void OnSpecialEvent(System.Guid matchId, string eventName, string description);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnCoinFlipResolved")]
+        void OnCoinFlipResolved(System.Guid matchId, WPFTheWeakestRival.GameplayService.CoinFlipResolvedDto coinFlip);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnDuelCandidates")]
+        void OnDuelCandidates(System.Guid matchId, WPFTheWeakestRival.GameplayService.DuelCandidatesDto duelCandidates);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnMatchFinished")]
+        void OnMatchFinished(System.Guid matchId, WPFTheWeakestRival.GameplayService.PlayerSummary winner);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnLightningChallengeStarted")]
+        void OnLightningChallengeStarted(System.Guid matchId, System.Guid roundId, WPFTheWeakestRival.GameplayService.PlayerSummary targetPlayer, int totalQuestions, int totalTimeSeconds);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnLightningChallengeQuestion")]
+        void OnLightningChallengeQuestion(System.Guid matchId, System.Guid roundId, int questionIndex, WPFTheWeakestRival.GameplayService.QuestionWithAnswersDto question);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnLightningChallengeFinished")]
+        void OnLightningChallengeFinished(System.Guid matchId, System.Guid roundId, int correctAnswers, bool isSuccess);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1915,6 +2341,14 @@ namespace WPFTheWeakestRival.GameplayService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.GameplayService.GameplayStartMatchResponse> StartMatchAsync(WPFTheWeakestRival.GameplayService.GameplayStartMatchRequest request) {
             return base.Channel.StartMatchAsync(request);
+        }
+        
+        public WPFTheWeakestRival.GameplayService.ChooseDuelOpponentResponse ChooseDuelOpponent(WPFTheWeakestRival.GameplayService.ChooseDuelOpponentRequest request) {
+            return base.Channel.ChooseDuelOpponent(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.GameplayService.ChooseDuelOpponentResponse> ChooseDuelOpponentAsync(WPFTheWeakestRival.GameplayService.ChooseDuelOpponentRequest request) {
+            return base.Channel.ChooseDuelOpponentAsync(request);
         }
     }
 }

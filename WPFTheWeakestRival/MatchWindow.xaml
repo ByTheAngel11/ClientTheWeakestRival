@@ -10,30 +10,35 @@
         Background="#FFEFEFEF">
 
     <Window.Resources>
-        <!-- Colores de turno -->
         <SolidColorBrush x:Key="Brush.Turn.MyTurn" Color="#FF27AE60"/>
-        <!-- Verde -->
         <SolidColorBrush x:Key="Brush.Turn.OtherTurn" Color="#FF2C3E50"/>
-        <!-- Azul oscuro -->
+
+        <Storyboard x:Key="CoinFlipStoryboard">
+            <DoubleAnimation Storyboard.TargetName="CoinFlipRotateTransform"
+                             Storyboard.TargetProperty="Angle"
+                             From="0"
+                             To="720"
+                             Duration="0:0:1.5"
+                             FillBehavior="Stop"/>
+        </Storyboard>
     </Window.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- barra superior -->
             <RowDefinition Height="*"/>
-            <!-- contenido principal -->
             <RowDefinition Height="Auto"/>
-            <!-- parte inferior -->
         </Grid.RowDefinitions>
 
-        <!-- BARRA SUPERIOR: código y tiempo -->
+        <!-- BARRA SUPERIOR -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="220"/>
             </Grid.ColumnDefinitions>
 
+            <!-- Código de la partida -->
             <TextBlock x:Name="txtMatchCodeSmall"
                        Grid.Column="0"
                        Margin="4,0"
@@ -42,8 +47,19 @@
                        FontSize="12"
                        Text="Código:"/>
 
-            <!-- Caja TIEMPO (placeholder, luego lo llenamos desde código) -->
-            <Border Grid.Column="1"
+            <!-- Fase actual -->
+            <TextBlock x:Name="txtPhase"
+                       Grid.Column="1"
+                       Margin="0,0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="#222"
+                       Text="Fase: Ronda 1"/>
+
+            <!-- Timer -->
+            <Border Grid.Column="2"
                     HorizontalAlignment="Right"
                     Width="200"
                     Height="70"
@@ -66,7 +82,7 @@
             </Border>
         </Grid>
 
-        <!-- CONTENIDO PRINCIPAL: columnas izquierda / centro / derecha -->
+        <!-- CONTENIDO PRINCIPAL -->
         <Grid Grid.Row="1" Margin="0,8,0,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180"/>
@@ -74,22 +90,16 @@
                 <ColumnDefinition Width="220"/>
             </Grid.ColumnDefinitions>
 
-            <!-- COLUMNA IZQUIERDA: escalera de cadena + banco + jugadores -->
+            <!-- COLUMNA IZQUIERDA -->
             <Grid Grid.Column="0" Margin="4,0,12,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <!-- cadena -->
                     <RowDefinition Height="Auto"/>
-                    <!-- escalera -->
                     <RowDefinition Height="*"/>
-                    <!-- espacio -->
                     <RowDefinition Height="Auto"/>
-                    <!-- banco -->
                     <RowDefinition Height="Auto"/>
-                    <!-- jugadores -->
                 </Grid.RowDefinitions>
 
-                <!-- Texto cadena actual -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,8">
                     <TextBlock Text="CADENA ACTUAL"
                                FontSize="12"
@@ -102,7 +112,6 @@
                                HorizontalAlignment="Center"/>
                 </StackPanel>
 
-                <!-- Escalera de valores -->
                 <StackPanel Grid.Row="1" Margin="0,0,0,12">
                     <Border Height="40"
                             Margin="0,4"
@@ -156,7 +165,6 @@
                     </Border>
                 </StackPanel>
 
-                <!-- BANCO -->
                 <StackPanel Grid.Row="3" Margin="0,0,0,8">
                     <Border Height="30"
                             Background="White"
@@ -184,7 +192,6 @@
                     </Border>
                 </StackPanel>
 
-                <!-- Lista de jugadores (pequeña abajo, opcional) -->
                 <StackPanel Grid.Row="4" Margin="0,8,0,0">
                     <TextBlock Text="Jugadores"
                                FontSize="12"
@@ -204,20 +211,15 @@
                 </StackPanel>
             </Grid>
 
-            <!-- COLUMNA CENTRAL: avatar + pregunta + respuestas -->
+            <!-- COLUMNA CENTRAL -->
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <!-- avatar -->
                     <RowDefinition Height="Auto"/>
-                    <!-- barra de pregunta -->
                     <RowDefinition Height="Auto"/>
-                    <!-- respuestas -->
                     <RowDefinition Height="Auto"/>
-                    <!-- feedback -->
                 </Grid.RowDefinitions>
 
-                <!-- Avatar grande + nombre (banner de turno) -->
                 <Grid Grid.Row="0" Margin="0,0,0,12">
                     <Border x:Name="TurnBannerBackground"
                             CornerRadius="40"
@@ -252,7 +254,6 @@
                     </Border>
                 </Grid>
 
-                <!-- Barra de pregunta -->
                 <Border Grid.Row="1"
                         Margin="0,0,0,8"
                         Background="#FFBFBFBF"
@@ -265,7 +266,6 @@
                                TextWrapping="Wrap"/>
                 </Border>
 
-                <!-- Respuestas (2 x 2) -->
                 <Grid Grid.Row="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80"/>
@@ -309,7 +309,6 @@
                             Content="OPCION 4"/>
                 </Grid>
 
-                <!-- Feedback -->
                 <TextBlock x:Name="txtAnswerFeedback"
                            Grid.Row="3"
                            Margin="0,8,0,0"
@@ -318,7 +317,7 @@
                            Foreground="Gray"/>
             </Grid>
 
-            <!-- COLUMNA DERECHA: guardar en banco + comodín -->
+            <!-- COLUMNA DERECHA -->
             <Grid Grid.Column="2" Margin="12,0,4,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -326,7 +325,6 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Botón GUARDAR EN BANCO -->
                 <Button x:Name="btnBank"
                         Grid.Row="0"
                         Width="180"
@@ -343,7 +341,6 @@
                                FontWeight="SemiBold"/>
                 </Button>
 
-                <!-- COMODÍN (estilo píldora) -->
                 <Border Grid.Row="1"
                         Margin="0,40,0,0"
                         Width="140"
@@ -370,7 +367,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Descripción comodín abajo (pequeña) -->
                 <TextBlock x:Name="txtWildcardDescription"
                            Grid.Row="2"
                            Margin="8,8,8,0"
@@ -381,7 +377,7 @@
             </Grid>
         </Grid>
 
-        <!-- OVERLAY INTRO VIDEO (si lo usas) -->
+        <!-- OVERLAY INTRO VIDEO -->
         <Grid x:Name="IntroOverlay"
               Grid.Row="1"
               Background="#CC000000"
@@ -400,6 +396,42 @@
                         Margin="8"
                         Click="BtnSkipIntroClick"/>
             </Grid>
+        </Grid>
+
+        <!-- OVERLAY DEL VOLADO -->
+        <Grid x:Name="CoinFlipOverlay"
+              Grid.RowSpan="3"
+              Background="#AA000000"
+              Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Image Grid.Row="1"
+                   Width="160"
+                   Height="160"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Source="/Assets/coin.png">
+                <Image.RenderTransform>
+                    <RotateTransform x:Name="CoinFlipRotateTransform"
+                                     CenterX="80"
+                                     CenterY="80"/>
+                </Image.RenderTransform>
+            </Image>
+
+            <TextBlock x:Name="CoinFlipResultText"
+                       Grid.Row="2"
+                       Margin="0,16,0,0"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Top"
+                       Text="Volado..."
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Foreground="White"/>
         </Grid>
 
         <!-- BOTÓN CERRAR -->

@@ -132,12 +132,21 @@
     <Compile Include="MainMenuWindow.xaml.cs">
       <DependentUpon>MainMenuWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MatchResultWindow.xaml.cs">
+      <DependentUpon>MatchResultWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MatchWindow.xaml.cs">
       <DependentUpon>MatchWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AvatarAppearance.cs" />
+    <Compile Include="Models\DuelCandidateItem.cs" />
+    <Compile Include="Models\DuelSelectionCompletedEventArgs.cs" />
     <Compile Include="Models\FriendItem.cs" />
     <Compile Include="Models\LobbyPlayerItem.cs" />
+    <Compile Include="Models\PlayerVoteItem.cs" />
+    <Compile Include="Pages\DuelSelectionPage.xaml.cs">
+      <DependentUpon>DuelSelectionPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\MatchSettingsPage.xaml.cs">
       <DependentUpon>MatchSettingsPage.xaml</DependentUpon>
     </Compile>
@@ -152,6 +161,9 @@
     </Compile>
     <Compile Include="Pages\PlayOptionsPage.xaml.cs">
       <DependentUpon>PlayOptionsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\VotePage.xaml.cs">
+      <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\Langs\Lang.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -208,7 +220,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MatchResultWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MatchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DuelSelectionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -229,6 +249,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\PlayOptionsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\VotePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -342,6 +366,9 @@
     <None Include="Connected Services\GameplayService\item2.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Connected Services\GameplayService\item3.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.AckEventSeenResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -349,6 +376,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.CastVoteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.ChooseDuelOpponentResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.GameplayJoinMatchResponse.datasource">
@@ -632,7 +662,9 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\Icons\coin.png" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Wildcards\BLOCK.png" />
   </ItemGroup>

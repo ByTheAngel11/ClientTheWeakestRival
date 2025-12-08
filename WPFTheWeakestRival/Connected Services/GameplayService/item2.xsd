@@ -114,12 +114,26 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="ChooseDuelOpponent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q17:ChooseDuelOpponentRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChooseDuelOpponentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="ChooseDuelOpponentResult" nillable="true" type="q18:ChooseDuelOpponentResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="OnNextQuestion">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q17="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q17:guid" />
-        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="targetPlayer" nillable="true" type="q18:PlayerSummary" />
-        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="question" nillable="true" type="q19:QuestionWithAnswersDto" />
+        <xs:element xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q19:guid" />
+        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="targetPlayer" nillable="true" type="q20:PlayerSummary" />
+        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="question" nillable="true" type="q21:QuestionWithAnswersDto" />
         <xs:element minOccurs="0" name="currentChain" type="xs:decimal" />
         <xs:element minOccurs="0" name="banked" type="xs:decimal" />
       </xs:sequence>
@@ -128,42 +142,97 @@
   <xs:element name="OnAnswerEvaluated">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q20="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q20:guid" />
-        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="player" nillable="true" type="q21:PlayerSummary" />
-        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="result" nillable="true" type="q22:AnswerResult" />
+        <xs:element xmlns:q22="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q22:guid" />
+        <xs:element xmlns:q23="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="player" nillable="true" type="q23:PlayerSummary" />
+        <xs:element xmlns:q24="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="result" nillable="true" type="q24:AnswerResult" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnBankUpdated">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q23="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q23:guid" />
-        <xs:element xmlns:q24="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="bank" nillable="true" type="q24:BankState" />
+        <xs:element xmlns:q25="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q25:guid" />
+        <xs:element xmlns:q26="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="bank" nillable="true" type="q26:BankState" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnVotePhaseStarted">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q25="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q25:guid" />
-        <xs:element xmlns:q26="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="timeLimit" type="q26:duration" />
+        <xs:element xmlns:q27="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q27:guid" />
+        <xs:element xmlns:q28="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="timeLimit" type="q28:duration" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnElimination">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q27="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q27:guid" />
-        <xs:element xmlns:q28="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="eliminatedPlayer" nillable="true" type="q28:PlayerSummary" />
+        <xs:element xmlns:q29="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q29:guid" />
+        <xs:element xmlns:q30="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="eliminatedPlayer" nillable="true" type="q30:PlayerSummary" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnSpecialEvent">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q29="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q29:guid" />
+        <xs:element xmlns:q31="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q31:guid" />
         <xs:element minOccurs="0" name="eventName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="description" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnCoinFlipResolved">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q32="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q32:guid" />
+        <xs:element xmlns:q33="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="coinFlip" nillable="true" type="q33:CoinFlipResolvedDto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDuelCandidates">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q34="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q34:guid" />
+        <xs:element xmlns:q35="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="duelCandidates" nillable="true" type="q35:DuelCandidatesDto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnMatchFinished">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q36="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q36:guid" />
+        <xs:element xmlns:q37="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="winner" nillable="true" type="q37:PlayerSummary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnLightningChallengeStarted">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q38="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q38:guid" />
+        <xs:element xmlns:q39="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="roundId" type="q39:guid" />
+        <xs:element xmlns:q40="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="targetPlayer" nillable="true" type="q40:PlayerSummary" />
+        <xs:element minOccurs="0" name="totalQuestions" type="xs:int" />
+        <xs:element minOccurs="0" name="totalTimeSeconds" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnLightningChallengeQuestion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q41="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q41:guid" />
+        <xs:element xmlns:q42="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="roundId" type="q42:guid" />
+        <xs:element minOccurs="0" name="questionIndex" type="xs:int" />
+        <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="question" nillable="true" type="q43:QuestionWithAnswersDto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnLightningChallengeFinished">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q44="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q44:guid" />
+        <xs:element xmlns:q45="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="roundId" type="q45:guid" />
+        <xs:element minOccurs="0" name="correctAnswers" type="xs:int" />
+        <xs:element minOccurs="0" name="isSuccess" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

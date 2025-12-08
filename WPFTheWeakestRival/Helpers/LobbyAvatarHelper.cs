@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
-using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Models;
 using LobbyAccountMini = WPFTheWeakestRival.LobbyService.AccountMini;
 using LobbyAvatarDto = WPFTheWeakestRival.LobbyService.AvatarAppearanceDto;
@@ -58,56 +56,20 @@ namespace WPFTheWeakestRival.Helpers
                 throw new ArgumentNullException(nameof(mapper));
             }
 
+            collection.Clear();
+
             if (players == null || players.Length == 0)
             {
-                collection.Clear();
                 return;
             }
 
-            var existingById = new Dictionary<int, int>(collection.Count);
-            for (var i = 0; i < collection.Count; i++)
+            foreach (var player in players)
             {
-                existingById[collection[i].AccountId] = i;
-            }
-
-            var newItemsById = new Dictionary<int, LobbyPlayerItem>(players.Length);
-            for (var i = 0; i < players.Length; i++)
-            {
-                var mappedItem = mapper(players[i]);
-                if (mappedItem != null)
+                var item = mapper(player);
+                if (item != null)
                 {
-                    newItemsById[mappedItem.AccountId] = mappedItem;
+                    collection.Add(item);
                 }
-            }
-
-            for (var i = collection.Count - 1; i >= 0; i--)
-            {
-                var accountId = collection[i].AccountId;
-                if (!newItemsById.ContainsKey(accountId))
-                {
-                    collection.RemoveAt(i);
-                }
-            }
-
-            var insertIndex = 0;
-            foreach (var pair in newItemsById)
-            {
-                var accountId = pair.Key;
-                var playerItem = pair.Value;
-
-                if (existingById.TryGetValue(accountId, out var existingIndex))
-                {
-                    var existingItem = collection[existingIndex];
-                    existingItem.DisplayName = playerItem.DisplayName;
-                    existingItem.Avatar = playerItem.Avatar;
-                    existingItem.AvatarAppearance = playerItem.AvatarAppearance;
-                }
-                else
-                {
-                    collection.Insert(insertIndex, playerItem);
-                }
-
-                insertIndex++;
             }
         }
 
@@ -127,10 +89,9 @@ namespace WPFTheWeakestRival.Helpers
                 HatType = (int)dto.HatType,
                 HatColor = (int)dto.HatColor,
                 FaceType = (int)dto.FaceType,
-                ProfileImage = profileImage
+                ProfileImage = profileImage,
+                UseProfilePhotoAsFace = profileImage != null
             };
-
-            appearance.UseProfilePhotoAsFace = profileImage != null;
 
             return appearance;
         }

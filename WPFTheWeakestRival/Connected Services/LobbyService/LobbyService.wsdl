@@ -1158,7 +1158,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>http://localhost:8082/lobby/</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>ANGEL\Angel</Upn>
+          <Upn>LAP-MANUGOD\manit</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

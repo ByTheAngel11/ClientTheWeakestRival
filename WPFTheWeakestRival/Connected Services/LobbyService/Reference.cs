@@ -1709,13 +1709,16 @@ namespace WPFTheWeakestRival.LobbyService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Guid PlayerIdField;
+        private int UserIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string PlayerNameField;
+        private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsOnlineField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private WPFTheWeakestRival.LobbyService.AvatarAppearanceDto AvatarField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1728,27 +1731,27 @@ namespace WPFTheWeakestRival.LobbyService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Guid PlayerId {
+        public int UserId {
             get {
-                return this.PlayerIdField;
+                return this.UserIdField;
             }
             set {
-                if ((this.PlayerIdField.Equals(value) != true)) {
-                    this.PlayerIdField = value;
-                    this.RaisePropertyChanged("PlayerId");
+                if ((this.UserIdField.Equals(value) != true)) {
+                    this.UserIdField = value;
+                    this.RaisePropertyChanged("UserId");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string PlayerName {
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public string DisplayName {
             get {
-                return this.PlayerNameField;
+                return this.DisplayNameField;
             }
             set {
-                if ((object.ReferenceEquals(this.PlayerNameField, value) != true)) {
-                    this.PlayerNameField = value;
-                    this.RaisePropertyChanged("PlayerName");
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
                 }
             }
         }
@@ -1762,6 +1765,19 @@ namespace WPFTheWeakestRival.LobbyService {
                 if ((this.IsOnlineField.Equals(value) != true)) {
                     this.IsOnlineField = value;
                     this.RaisePropertyChanged("IsOnline");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public WPFTheWeakestRival.LobbyService.AvatarAppearanceDto Avatar {
+            get {
+                return this.AvatarField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvatarField, value) != true)) {
+                    this.AvatarField = value;
+                    this.RaisePropertyChanged("Avatar");
                 }
             }
         }

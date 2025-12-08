@@ -244,9 +244,16 @@
   <xs:element name="ArrayOfPlayerSummary" nillable="true" type="tns:ArrayOfPlayerSummary" />
   <xs:complexType name="PlayerSummary">
     <xs:sequence>
-      <xs:element minOccurs="0" name="PlayerId" type="ser:guid" />
-      <xs:element minOccurs="0" name="PlayerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UserId" type="xs:int" />
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Avatar" nillable="true" type="tns:AvatarAppearanceDto">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PlayerSummary" nillable="true" type="tns:PlayerSummary" />

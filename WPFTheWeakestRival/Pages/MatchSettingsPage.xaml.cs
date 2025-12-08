@@ -7,7 +7,6 @@ namespace WPFTheWeakestRival.Pages
 {
     public partial class MatchSettingsPage : Page
     {
-        // Propiedades que el Lobby leerá después del dialog
         public bool IsPrivate { get; private set; }
         public int MaxPlayers { get; private set; }
 
@@ -30,7 +29,6 @@ namespace WPFTheWeakestRival.Pages
         {
             InitializeComponent();
 
-            // Cargamos valores iniciales a los controles
             chkPrivate.IsChecked = isPrivate;
             txtMaxPlayers.Text = maxPlayers.ToString(CultureInfo.InvariantCulture);
 
@@ -44,7 +42,6 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            // Validaciones rápidas y asignación de propiedades
             if (!int.TryParse(txtMaxPlayers.Text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var maxPlayers) ||
                 maxPlayers <= 0 || maxPlayers > 16)
             {
@@ -94,7 +91,6 @@ namespace WPFTheWeakestRival.Pages
                 return;
             }
 
-            // Si todo va bien: guardamos en las propiedades públicas
             IsPrivate = chkPrivate.IsChecked == true;
             MaxPlayers = maxPlayers;
             StartingScore = startingScore;
@@ -104,7 +100,6 @@ namespace WPFTheWeakestRival.Pages
             PointsPerEliminationGain = pointsElimination;
             AllowTiebreakCoinflip = chkCoinflip.IsChecked == true;
 
-            // Cerramos el diálogo padre
             var win = Window.GetWindow(this);
             if (win != null)
             {

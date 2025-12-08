@@ -1,0 +1,195 @@
+﻿<Window x:Class="WPFTheWeakestRival.MatchResultWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:WPFTheWeakestRival.Controls"
+        Title="Resultado de la partida"
+        Width="900"
+        Height="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="White">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <!-- Barra gris superior -->
+        <Border Grid.Row="0"
+                Background="#FFBFBFBF"
+                CornerRadius="4"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Height="60">
+            <TextBlock x:Name="txtMainResult"
+                       Text="RESULTADO"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Zona central -->
+        <Grid Grid.Row="1"
+              Margin="0,24,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="280"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LISTA -->
+            <Border Grid.Column="0"
+                    BorderBrush="Black"
+                    BorderThickness="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0"
+                            Background="#FFBFBFBF">
+                        <TextBlock Text="LISTA DE CALIFICACIONES"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <ListBox x:Name="lstResults"
+                             Grid.Row="1"
+                             BorderThickness="0"
+                             ItemContainerStyle="{x:Null}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Black"
+                                        BorderThickness="1"
+                                        Margin="4,2">
+                                    <Grid Margin="4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Columna izquierda: posición -->
+                                        <Border Grid.Column="0"
+                                                Background="#FFEFEFEF"
+                                                BorderBrush="Black"
+                                                BorderThickness="1"
+                                                Margin="0,0,4,0">
+                                            <TextBlock Text="{Binding Position, StringFormat={}{0}°}"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontWeight="Bold"
+                                                       FontSize="14"/>
+                                        </Border>
+
+                                        <!-- Columna derecha: nombre -->
+                                        <StackPanel Grid.Column="1"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       FontWeight="Bold"
+                                                       FontSize="12"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- AVATAR GRANDE -->
+            <StackPanel Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+
+                <Border Width="251"
+                        Height="288"
+                        Background="Transparent"
+                        >
+                    <controls:AvatarControl x:Name="ResultAvatar"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Height="130"
+                                            Width="98" Margin="0,41,0,0"/>
+                </Border>
+
+                <TextBlock x:Name="txtPlayerName"
+                           Margin="0,12,0,0"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock x:Name="txtPosition"
+                           FontSize="14"
+                           Foreground="Gray"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- RATIO -->
+            <StackPanel Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <TextBlock Text="RATIO PREGUNTAS BUENAS POR"
+                           FontWeight="Bold"
+                           FontSize="13"
+                           TextAlignment="Center"/>
+                <TextBlock Text="PREGUNTAS TOTALES"
+                           FontWeight="Bold"
+                           FontSize="13"
+                           Margin="0,0,0,12"
+                           TextAlignment="Center"/>
+
+                <Grid Width="180"
+                      Height="180">
+                    <Ellipse Fill="#FFB4B4B4"/>
+
+                    <Path Fill="#FF7D7D7D">
+                        <Path.Data>
+                            <PathGeometry>
+                                <PathFigure StartPoint="90,90">
+                                    <LineSegment Point="90,0"/>
+                                    <ArcSegment Point="175,90"
+                                                Size="90,90"
+                                                SweepDirection="Clockwise"/>
+                                </PathFigure>
+                            </PathGeometry>
+                        </Path.Data>
+                    </Path>
+
+                    <TextBlock x:Name="txtPercentage"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Grid>
+
+                <TextBlock x:Name="txtAnswers"
+                           Margin="0,8,0,0"
+                           FontSize="13"
+                           TextAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- BOTÓN -->
+        <Grid Grid.Row="2">
+            <Button x:Name="btnClose"
+                    Content="REGRESAR AL LOBBY"
+                    Width="180"
+                    Height="36"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Margin="0,0,16,0"
+                    Click="BtnCloseClick"
+                    Background="White"
+                    BorderBrush="Black"
+                    BorderThickness="2"
+                    FontWeight="Bold"/>
+        </Grid>
+    </Grid>
+</Window>

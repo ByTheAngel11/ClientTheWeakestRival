@@ -14,7 +14,6 @@ namespace WPFTheWeakestRival.Wildcards
         private const int SABOTAGE_SECONDS_LOST = 5;
         private const int EXTRA_TIME_SECONDS = 5;
 
-        // Códigos tal como están en la tabla/BD
         private const string CODE_CHANGE_QUESTION = "CHANGE_QUESTION";
         private const string CODE_PASS_QUESTION = "PASS_QUESTION";
         private const string CODE_SHIELD = "SHIELD";
