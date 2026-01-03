@@ -236,4 +236,21 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="OnTurnOrderInitialized">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q46="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q46:guid" />
+        <xs:element xmlns:q47="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="turnOrder" nillable="true" type="q47:TurnOrderDto" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnTurnOrderChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q48="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="matchId" type="q48:guid" />
+        <xs:element xmlns:q49="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="turnOrder" nillable="true" type="q49:TurnOrderDto" />
+        <xs:element minOccurs="0" name="reasonCode" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

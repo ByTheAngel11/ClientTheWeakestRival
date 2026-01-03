@@ -342,29 +342,57 @@
                 </Button>
 
                 <Border Grid.Row="1"
-                        Margin="0,40,0,0"
-                        Width="140"
-                        Height="160"
-                        HorizontalAlignment="Center"
-                        CornerRadius="40"
-                        Background="#FFAAAAAA"
-                        BorderBrush="Black"
-                        BorderThickness="2">
-                    <StackPanel Margin="8">
-                        <Image x:Name="imgWildcardIcon"
-                               Width="80"
-                               Height="80"
-                               Margin="0,8,0,4"
-                               HorizontalAlignment="Center"
-                               Stretch="Uniform"
-                               Visibility="Collapsed"/>
+        Margin="0,40,0,0"
+        Width="180"
+        Height="180"
+        HorizontalAlignment="Center"
+        CornerRadius="40"
+        Background="#FFAAAAAA"
+        BorderBrush="Black"
+        BorderThickness="2">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <TextBlock x:Name="txtWildcardName"
-                                   Text="COMODÍN"
-                                   HorizontalAlignment="Center"
-                                   FontWeight="Bold"
-                                   Margin="0,4,0,0"/>
-                    </StackPanel>
+                        <Button x:Name="btnWildcardPrev"
+                Grid.Column="0"
+                Width="24"
+                Height="24"
+                Margin="0,40,4,0"
+                VerticalAlignment="Center"
+                Content="◀"
+                Click="BtnWildcardPrevClick"
+                Visibility="Collapsed"/>
+
+                        <StackPanel Grid.Column="1">
+                            <Image x:Name="imgWildcardIcon"
+                   Width="80"
+                   Height="80"
+                   Margin="0,8,0,4"
+                   HorizontalAlignment="Center"
+                   Stretch="Uniform"
+                   Visibility="Collapsed"/>
+
+                            <TextBlock x:Name="txtWildcardName"
+                       Text="COMODÍN"
+                       HorizontalAlignment="Center"
+                       FontWeight="Bold"
+                       Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <Button x:Name="btnWildcardNext"
+                Grid.Column="2"
+                Width="24"
+                Height="24"
+                Margin="4,40,0,0"
+                VerticalAlignment="Center"
+                Content="▶"
+                Click="BtnWildcardNextClick"
+                Visibility="Collapsed"/>
+                    </Grid>
                 </Border>
 
                 <TextBlock x:Name="txtWildcardDescription"
@@ -432,6 +460,43 @@
                        FontSize="22"
                        FontWeight="Bold"
                        Foreground="White"/>
+        </Grid>
+
+        <!-- OVERLAY EVENTO ESPECIAL -->
+        <Grid x:Name="SpecialEventOverlay"
+              Grid.RowSpan="3"
+              Background="#AA000000"
+              Visibility="Collapsed">
+            <Border Width="420"
+                    Padding="16"
+                    CornerRadius="12"
+                    Background="#FF222222"
+                    BorderBrush="White"
+                    BorderThickness="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock x:Name="SpecialEventTitleText"
+                               Text="Evento especial"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               TextAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock x:Name="SpecialEventDescriptionText"
+                               Text="Descripción del evento."
+                               FontSize="14"
+                               Foreground="White"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Margin="0,0,0,12"/>
+                    <Button Content="Aceptar"
+                            Width="100"
+                            Height="30"
+                            HorizontalAlignment="Center"
+                            Click="SpecialEventCloseButtonClick"/>
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- BOTÓN CERRAR -->

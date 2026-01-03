@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-  <xs:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums" />
+  <xs:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:8082/gameplay/?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums" />
   <xs:complexType name="SubmitAnswerRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
@@ -155,12 +156,13 @@
   <xs:element name="GameplayJoinMatchResponse" nillable="true" type="tns:GameplayJoinMatchResponse" />
   <xs:complexType name="GameplayStartMatchRequest">
     <xs:sequence>
-      <xs:element name="Token" nillable="true" type="xs:string" />
-      <xs:element name="MatchId" type="ser:guid" />
+      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="MatchId" type="ser:guid" />
       <xs:element minOccurs="0" name="Difficulty" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="LocaleCode" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="MaxQuestions" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="MatchDbId" type="xs:int" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="ExpectedPlayerUserIds" nillable="true" type="q1:ArrayOfint" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GameplayStartMatchRequest" nillable="true" type="tns:GameplayStartMatchRequest" />
@@ -259,7 +261,7 @@
   <xs:element name="AvatarFaceType" nillable="true" type="tns:AvatarFaceType" />
   <xs:complexType name="CoinFlipResolvedDto">
     <xs:sequence>
-      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums" minOccurs="0" name="Result" type="q1:CoinFlipResultType" />
+      <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums" minOccurs="0" name="Result" type="q2:CoinFlipResultType" />
       <xs:element minOccurs="0" name="RoundId" type="xs:int" />
       <xs:element minOccurs="0" name="ShouldEnableDuel" type="xs:boolean" />
       <xs:element minOccurs="0" name="WeakestRivalPlayerId" type="xs:int" />
@@ -287,4 +289,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DuelCandidateDto" nillable="true" type="tns:DuelCandidateDto" />
+  <xs:complexType name="TurnOrderDto">
+    <xs:sequence>
+      <xs:element xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="OrderedAliveUserIds" nillable="true" type="q3:ArrayOfint" />
+      <xs:element minOccurs="0" name="CurrentTurnUserId" type="xs:int" />
+      <xs:element minOccurs="0" name="ServerUtcTicks" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TurnOrderDto" nillable="true" type="tns:TurnOrderDto" />
 </xs:schema>

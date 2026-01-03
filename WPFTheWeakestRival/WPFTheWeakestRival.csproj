@@ -120,6 +120,20 @@
     <Compile Include="Infraestructure\AppServices.cs" />
     <Compile Include="Infraestructure\FriendManager.cs" />
     <Compile Include="Infraestructure\FriendsDrawer.cs" />
+    <Compile Include="Infraestructure\Gameplay\GameplayCallbackBridge.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\DifficultyMapper.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\GameplayClientProxy.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchConstants.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchDialogController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchSessionCoordinator.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchSessionState.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchWindowUiRefs.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\OverlayController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\QuestionController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\TurnOrderController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\WildcardController.cs" />
+    <Compile Include="Infraestructure\Gameplay\QuestionTimerController.cs" />
+    <Compile Include="Infraestructure\Gameplay\TurnOrderAdapter.cs" />
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
     <Compile Include="LobbyCallback.cs" />
@@ -367,6 +381,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\GameplayService\item3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\GameplayService\item4.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\GameplayService\WPFTheWeakestRival.GameplayService.AckEventSeenResponse.datasource">

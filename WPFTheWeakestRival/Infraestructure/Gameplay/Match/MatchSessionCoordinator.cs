@@ -1,0 +1,684 @@
+﻿using log4net;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.ServiceModel;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.Models;
+using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
+using WildcardFault = WPFTheWeakestRival.WildcardService.ServiceFault;
+
+namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
+{
+    internal sealed class MatchSessionCoordinator : IDisposable
+    {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchSessionCoordinator));
+
+        private readonly MatchWindowUiRefs ui;
+        private readonly MatchSessionState state;
+
+        private readonly OverlayController overlay;
+        private readonly WildcardController wildcards;
+        private readonly TurnOrderController turns;
+
+        private readonly QuestionTimerController timer;
+
+        private GameplayClientProxy gameplay;
+        private GameplayCallbackBridge callbackBridge;
+
+        private QuestionController questions;
+        private MatchDialogController dialogs;
+
+        public MatchSessionCoordinator(MatchWindowUiRefs ui, MatchSessionState state)
+        {
+            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.state = state ?? throw new ArgumentNullException(nameof(state));
+
+            overlay = new OverlayController(this.ui);
+            wildcards = new WildcardController(this.ui, this.state);
+            turns = new TurnOrderController(this.ui, this.state);
+
+            timer = new QuestionTimerController(TimeSpan.FromSeconds(MatchConstants.TIMER_INTERVAL_SECONDS));
+        }
+
+        public async Task InitializeAsync()
+        {
+            InitializeUi();
+
+            await wildcards.LoadAsync();
+
+            InitializeGameplayClient();
+
+            await JoinMatchAsync();
+            await EnsureMatchStartedAsync();
+        }
+
+        private void InitializeUi()
+        {
+            if (ui.TxtMatchCodeSmall != null)
+            {
+                string code = string.IsNullOrWhiteSpace(state.Match.MatchCode)
+                    ? MatchConstants.DEFAULT_MATCH_CODE_TEXT
+                    : state.Match.MatchCode;
+
+                ui.TxtMatchCodeSmall.Text = MatchConstants.DEFAULT_MATCH_CODE_PREFIX + code;
+            }
+
+            turns.InitializePlayers();
+
+            if (ui.TxtChain != null)
+            {
+                ui.TxtChain.Text = MatchConstants.DEFAULT_CHAIN_INITIAL_VALUE;
+            }
+
+            if (ui.TxtBanked != null)
+            {
+                ui.TxtBanked.Text = MatchConstants.DEFAULT_BANKED_INITIAL_VALUE;
+            }
+
+            if (ui.TxtTurnPlayerName != null)
+            {
+                ui.TxtTurnPlayerName.Text = MatchConstants.DEFAULT_PLAYER_NAME;
+            }
+
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = MatchConstants.DEFAULT_WAITING_MATCH_TEXT;
+            }
+
+            if (ui.TxtTimer != null)
+            {
+                ui.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
+            }
+
+            wildcards.InitializeEmpty();
+
+            UpdatePhaseLabel();
+        }
+
+        private void InitializeGameplayClient()
+        {
+            callbackBridge = new GameplayCallbackBridge(ui.Window.Dispatcher);
+
+            callbackBridge.NextQuestion += (matchId, targetPlayer, question, chain, banked) =>
+                HandleNextQuestion(targetPlayer, question, chain, banked);
+
+            callbackBridge.AnswerEvaluated += (matchId, player, result) =>
+                questions.OnAnswerEvaluated(player, result);
+
+            callbackBridge.BankUpdated += (matchId, bank) =>
+                questions.OnBankUpdated(bank);
+
+            callbackBridge.VotePhaseStarted += async (matchId, timeLimit) =>
+                await HandleVotePhaseStartedAsync(matchId, timeLimit);
+
+            callbackBridge.Elimination += (matchId, eliminated) =>
+                HandleElimination(eliminated);
+
+            callbackBridge.SpecialEvent += async (matchId, name, description) =>
+                await HandleSpecialEventAsync(matchId, name, description);
+
+            callbackBridge.CoinFlipResolved += (matchId, coinFlip) =>
+                HandleCoinFlip(coinFlip);
+
+            callbackBridge.DuelCandidates += async (matchId, duelCandidates) =>
+                await HandleDuelCandidatesAsync(duelCandidates);
+
+            callbackBridge.MatchFinished += (matchId, winner) =>
+                HandleMatchFinished(winner);
+
+            callbackBridge.LightningChallengeStarted += (m, r, tp, tq, ts) =>
+                HandleLightningChallengeStarted(tp);
+
+            callbackBridge.LightningChallengeQuestion += (m, r, qi, qq) =>
+                HandleLightningChallengeQuestion(qq);
+
+            callbackBridge.LightningChallengeFinished += async (m, r, ca, ok) =>
+                await HandleLightningChallengeFinishedAsync(ca, ok);
+
+            callbackBridge.TurnOrderInitialized += async (matchId, turnOrder) =>
+                await HandleTurnOrderInitializedAsync(turnOrder);
+
+            callbackBridge.TurnOrderChanged += async (matchId, turnOrder, reason) =>
+                await HandleTurnOrderChangedAsync(turnOrder, reason);
+
+            var instanceContext = new InstanceContext(callbackBridge);
+
+            var client = new GameplayServiceProxy.GameplayServiceClient(
+                instanceContext,
+                "WSDualHttpBinding_IGameplayService");
+
+            gameplay = new GameplayClientProxy(client);
+
+            questions = new QuestionController(ui, state, gameplay, timer);
+            questions.InitializeEmptyUi();
+
+            dialogs = new MatchDialogController(ui, state, gameplay);
+        }
+
+        private async Task JoinMatchAsync()
+        {
+            try
+            {
+                var request = new GameplayServiceProxy.GameplayJoinMatchRequest
+                {
+                    Token = state.Token,
+                    MatchId = state.Match.MatchId
+                };
+
+                await gameplay.JoinMatchAsync(request);
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn("Fault al unirse a la partida.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al unirse a la partida.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al unirse a la partida.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private async Task EnsureMatchStartedAsync()
+        {
+            try
+            {
+                var request = new GameplayServiceProxy.GameplayStartMatchRequest
+                {
+                    Token = state.Token,
+                    MatchId = state.Match.MatchId,
+                    Difficulty = DifficultyMapper.MapDifficultyToByte(state.Match.Config != null ? state.Match.Config.DifficultyCode : null),
+                    LocaleCode = MatchConstants.DEFAULT_LOCALE,
+                    MaxQuestions = MatchConstants.MAX_QUESTIONS,
+                    MatchDbId = state.MatchDbId,
+                    ExpectedPlayerUserIds = BuildExpectedPlayerIds()
+                };
+
+                await gameplay.StartMatchAsync(request);
+            }
+            catch (FaultException<WildcardFault> ex)
+            {
+                if (ex.Detail != null &&
+                    string.Equals(ex.Detail.Code, MatchConstants.FAULT_CODE_MATCH_ALREADY_STARTED, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+
+                Logger.Warn("Fault(StartMatch).", ex);
+
+                MessageBox.Show(
+                    ex.Detail != null ? ex.Detail.Message : ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn("Fault(StartMatch).", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación(StartMatch).", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado(StartMatch).", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private int[] BuildExpectedPlayerIds()
+        {
+            PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
+
+            return lobbyPlayers
+                .Where(p => p != null && p.UserId > 0)
+                .Select(p => p.UserId)
+                .Distinct()
+                .ToArray();
+        }
+
+        private void HandleNextQuestion(
+            GameplayServiceProxy.PlayerSummary targetPlayer,
+            GameplayServiceProxy.QuestionWithAnswersDto question,
+            decimal chain,
+            decimal banked)
+        {
+            state.CurrentPhase = state.IsSurpriseExamActive ? MatchPhase.SpecialEvent : MatchPhase.NormalRound;
+            UpdatePhaseLabel();
+
+            questions.OnNextQuestion(
+                targetPlayer,
+                question,
+                chain,
+                banked,
+                userId => turns.TryHighlightPlayerInList(userId));
+        }
+
+        private async Task HandleVotePhaseStartedAsync(Guid matchId, TimeSpan timeLimit)
+        {
+            Logger.InfoFormat(
+                "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}",
+                matchId,
+                timeLimit.TotalSeconds);
+
+            await dialogs.ShowVoteAndSendAsync();
+        }
+
+        private void HandleElimination(GameplayServiceProxy.PlayerSummary eliminated)
+        {
+            if (eliminated == null)
+            {
+                return;
+            }
+
+            state.AddEliminated(eliminated.UserId);
+
+            bool isMe = eliminated.UserId == state.MyUserId;
+
+            dialogs.ShowEliminationMessage(eliminated);
+            questions.OnEliminated(isMe);
+        }
+
+        private async Task HandleSpecialEventAsync(Guid matchId, string eventName, string description)
+        {
+            state.CurrentPhase = MatchPhase.SpecialEvent;
+            UpdatePhaseLabel();
+
+            overlay.ShowSpecialEvent(
+                string.IsNullOrWhiteSpace(eventName) ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT : eventName,
+                string.IsNullOrWhiteSpace(description) ? string.Empty : description);
+
+            if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE, StringComparison.OrdinalIgnoreCase))
+            {
+                questions.SetSurpriseExamActive(true);
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                return;
+            }
+
+            if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE, StringComparison.OrdinalIgnoreCase))
+            {
+                questions.SetSurpriseExamActive(false);
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                return;
+            }
+
+            if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE, StringComparison.OrdinalIgnoreCase))
+            {
+                questions.SetBombQuestionUi(true);
+                return;
+            }
+
+            if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE, StringComparison.OrdinalIgnoreCase))
+            {
+                questions.SetBombQuestionUi(false);
+                return;
+            }
+
+            if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(eventName, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase))
+            {
+                await wildcards.LoadAsync();
+            }
+        }
+
+        private void HandleCoinFlip(GameplayServiceProxy.CoinFlipResolvedDto coinFlip)
+        {
+            if (coinFlip == null)
+            {
+                return;
+            }
+
+            Logger.InfoFormat(
+                "OnServerCoinFlipResolved. MatchId={0}, RoundId={1}, WeakestRivalUserId={2}, Result={3}, ShouldEnableDuel={4}",
+                state.Match.MatchId,
+                coinFlip.RoundId,
+                coinFlip.WeakestRivalPlayerId,
+                coinFlip.Result,
+                coinFlip.ShouldEnableDuel);
+
+            state.CurrentRoundNumber++;
+            state.CurrentPhase = coinFlip.ShouldEnableDuel ? MatchPhase.Duel : MatchPhase.NormalRound;
+            UpdatePhaseLabel();
+
+            overlay.ShowCoinFlip(coinFlip);
+        }
+
+        private async Task HandleDuelCandidatesAsync(GameplayServiceProxy.DuelCandidatesDto duelCandidates)
+        {
+            if (duelCandidates == null || duelCandidates.Candidates == null || duelCandidates.Candidates.Length == 0)
+            {
+                Logger.Warn("OnServerDuelCandidates: sin candidatos.");
+                return;
+            }
+
+            int weakestRivalUserId = duelCandidates.WeakestRivalUserId;
+
+            var items = new List<DuelCandidateItem>();
+
+            foreach (var candidate in duelCandidates.Candidates)
+            {
+                if (candidate == null)
+                {
+                    continue;
+                }
+
+                items.Add(
+                    new DuelCandidateItem
+                    {
+                        UserId = candidate.UserId,
+                        DisplayName = string.IsNullOrWhiteSpace(candidate.DisplayName)
+                            ? MatchConstants.DEFAULT_PLAYER_NAME
+                            : candidate.DisplayName
+                    });
+            }
+
+            if (state.MyUserId != weakestRivalUserId)
+            {
+                Logger.InfoFormat(
+                    "OnServerDuelCandidates: usuario {0} no es weakest rival ({1}), no muestra diálogo.",
+                    state.MyUserId,
+                    weakestRivalUserId);
+
+                return;
+            }
+
+            state.CurrentPhase = MatchPhase.Duel;
+            UpdatePhaseLabel();
+
+            await dialogs.ShowDuelSelectionAndSendAsync(weakestRivalUserId, items);
+        }
+
+        private void HandleMatchFinished(GameplayServiceProxy.PlayerSummary winner)
+        {
+            state.IsMatchFinished = true;
+            state.FinalWinner = winner;
+
+            state.IsMyTurn = false;
+            timer.Stop();
+
+            if (ui.BtnBank != null) ui.BtnBank.IsEnabled = false;
+            if (ui.BtnAnswer1 != null) ui.BtnAnswer1.IsEnabled = false;
+            if (ui.BtnAnswer2 != null) ui.BtnAnswer2.IsEnabled = false;
+            if (ui.BtnAnswer3 != null) ui.BtnAnswer3.IsEnabled = false;
+            if (ui.BtnAnswer4 != null) ui.BtnAnswer4.IsEnabled = false;
+
+            dialogs.ShowMatchFinishedMessage(winner);
+
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = "Partida finalizada";
+            }
+
+            state.CurrentPhase = MatchPhase.Finished;
+            UpdatePhaseLabel();
+        }
+
+        private void HandleLightningChallengeStarted(GameplayServiceProxy.PlayerSummary targetPlayer)
+        {
+            state.CurrentPhase = MatchPhase.SpecialEvent;
+            UpdatePhaseLabel();
+
+            int targetUserId = targetPlayer != null ? targetPlayer.UserId : 0;
+            bool isTargetMe = targetUserId == state.MyUserId && !state.IsEliminated(state.MyUserId);
+
+            state.IsMyTurn = isTargetMe;
+
+            if (ui.BtnBank != null)
+            {
+                ui.BtnBank.IsEnabled = false;
+            }
+
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = state.IsMyTurn ? "Reto relámpago: tu turno" : "Reto relámpago en curso";
+            }
+
+            if (ui.TurnBannerBackground != null)
+            {
+                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource(state.IsMyTurn ? "Brush.Turn.MyTurn" : "Brush.Turn.OtherTurn");
+            }
+        }
+
+        private void HandleLightningChallengeQuestion(GameplayServiceProxy.QuestionWithAnswersDto question)
+        {
+            state.CurrentPhase = MatchPhase.SpecialEvent;
+            UpdatePhaseLabel();
+
+            if (!state.IsMyTurn)
+            {
+                return;
+            }
+
+            state.CurrentQuestion = question;
+        }
+
+        private async Task HandleLightningChallengeFinishedAsync(int correctAnswers, bool isSuccess)
+        {
+            try
+            {
+                timer.Stop();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("HandleLightningChallengeFinishedAsync timer stop error.", ex);
+            }
+
+            state.IsMyTurn = false;
+
+            string message = isSuccess
+                ? string.Format(CultureInfo.CurrentCulture, "¡Has completado el reto relámpago! Respuestas correctas: {0}.", correctAnswers)
+                : string.Format(CultureInfo.CurrentCulture, "Reto relámpago finalizado. Respuestas correctas: {0}.", correctAnswers);
+
+            MessageBox.Show(
+                message,
+                MatchConstants.GAME_MESSAGE_TITLE,
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            if (isSuccess)
+            {
+                await wildcards.LoadAsync();
+            }
+
+            state.CurrentPhase = MatchPhase.NormalRound;
+            UpdatePhaseLabel();
+        }
+
+        private async Task HandleTurnOrderInitializedAsync(object turnOrder)
+        {
+            turns.ApplyTurnOrder(turnOrder);
+
+            await turns.PlayTurnIntroAsync(
+                turnOrder,
+                (t, d) => overlay.ShowSpecialEvent(t, d),
+                () => overlay.HideSpecialEvent());
+        }
+
+        private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
+        {
+            turns.ApplyTurnOrder(turnOrder);
+
+            overlay.ShowSpecialEvent(
+                MatchConstants.TURN_ORDER_CHANGED_TITLE,
+                string.IsNullOrWhiteSpace(reasonCode) ? string.Empty : reasonCode);
+
+            await Task.Delay(MatchConstants.TURN_INTRO_FINAL_DELAY_MS);
+
+            overlay.HideSpecialEvent();
+        }
+
+        public async Task OnAnswerButtonClickAsync(System.Windows.Controls.Button button)
+        {
+            await questions.SubmitAnswerFromButtonAsync(button);
+        }
+
+        public async Task OnBankClickAsync()
+        {
+            await questions.BankAsync();
+        }
+
+        public void OnWildcardPrev()
+        {
+            wildcards.SelectPrev();
+        }
+
+        public void OnWildcardNext()
+        {
+            wildcards.SelectNext();
+        }
+
+        public void OnIntroEnded()
+        {
+            overlay.HideIntro();
+        }
+
+        public void OnSkipIntro()
+        {
+            overlay.HideIntro();
+            overlay.StopIntroVideoSafe();
+        }
+
+        public void OnCloseSpecialEvent()
+        {
+            overlay.HideSpecialEvent();
+
+            if (!state.IsMatchFinished)
+            {
+                state.CurrentPhase = MatchPhase.NormalRound;
+                UpdatePhaseLabel();
+            }
+        }
+
+        public void OnCloseRequested(Action closeWindow, Action showResultAndClose)
+        {
+            if (!state.IsMatchFinished)
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "La partida aún no ha terminado. ¿Deseas salir al lobby?",
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+
+                closeWindow?.Invoke();
+                return;
+            }
+
+            showResultAndClose?.Invoke();
+        }
+
+        public void ShowResultAndClose(Action closeWindow)
+        {
+            dialogs.ShowMatchResultAndClose(closeWindow);
+        }
+
+        private void UpdatePhaseLabel()
+        {
+            if (ui.TxtPhase == null)
+            {
+                return;
+            }
+
+            string phaseDetail;
+
+            switch (state.CurrentPhase)
+            {
+                case MatchPhase.NormalRound:
+                    phaseDetail = string.Format(CultureInfo.CurrentCulture, MatchConstants.PHASE_ROUND_FORMAT, state.CurrentRoundNumber);
+                    break;
+
+                case MatchPhase.Duel:
+                    phaseDetail = MatchConstants.PHASE_DUEL_TEXT;
+                    break;
+
+                case MatchPhase.SpecialEvent:
+                    phaseDetail = MatchConstants.PHASE_SPECIAL_EVENT_TEXT;
+                    break;
+
+                case MatchPhase.Finished:
+                    phaseDetail = MatchConstants.PHASE_FINISHED_TEXT;
+                    break;
+
+                default:
+                    phaseDetail = string.Empty;
+                    break;
+            }
+
+            ui.TxtPhase.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                "{0}: {1}",
+                MatchConstants.PHASE_TITLE,
+                phaseDetail);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                turns.CancelIntro();
+
+                if (timer != null && timer.IsRunning)
+                {
+                    timer.Stop();
+                }
+
+                if (gameplay != null)
+                {
+                    gameplay.CloseSafely();
+                    gameplay = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("MatchSessionCoordinator.Dispose error.", ex);
+            }
+        }
+    }
+}
