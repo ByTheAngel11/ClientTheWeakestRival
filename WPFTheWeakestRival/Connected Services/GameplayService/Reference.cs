@@ -1305,8 +1305,10 @@ namespace WPFTheWeakestRival.GameplayService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string TokenField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Guid MatchIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -1321,6 +1323,9 @@ namespace WPFTheWeakestRival.GameplayService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int MatchDbIdField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int[] ExpectedPlayerUserIdsField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -1331,7 +1336,7 @@ namespace WPFTheWeakestRival.GameplayService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string Token {
             get {
                 return this.TokenField;
@@ -1344,7 +1349,7 @@ namespace WPFTheWeakestRival.GameplayService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
         public System.Guid MatchId {
             get {
                 return this.MatchIdField;
@@ -1405,6 +1410,19 @@ namespace WPFTheWeakestRival.GameplayService {
                 if ((this.MatchDbIdField.Equals(value) != true)) {
                     this.MatchDbIdField = value;
                     this.RaisePropertyChanged("MatchDbId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+        public int[] ExpectedPlayerUserIds {
+            get {
+                return this.ExpectedPlayerUserIdsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ExpectedPlayerUserIdsField, value) != true)) {
+                    this.ExpectedPlayerUserIdsField = value;
+                    this.RaisePropertyChanged("ExpectedPlayerUserIds");
                 }
             }
         }
@@ -2152,6 +2170,83 @@ namespace WPFTheWeakestRival.GameplayService {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="TurnOrderDto", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class TurnOrderDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int[] OrderedAliveUserIdsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CurrentTurnUserIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private long ServerUtcTicksField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int[] OrderedAliveUserIds {
+            get {
+                return this.OrderedAliveUserIdsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.OrderedAliveUserIdsField, value) != true)) {
+                    this.OrderedAliveUserIdsField = value;
+                    this.RaisePropertyChanged("OrderedAliveUserIds");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public int CurrentTurnUserId {
+            get {
+                return this.CurrentTurnUserIdField;
+            }
+            set {
+                if ((this.CurrentTurnUserIdField.Equals(value) != true)) {
+                    this.CurrentTurnUserIdField = value;
+                    this.RaisePropertyChanged("CurrentTurnUserId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public long ServerUtcTicks {
+            get {
+                return this.ServerUtcTicksField;
+            }
+            set {
+                if ((this.ServerUtcTicksField.Equals(value) != true)) {
+                    this.ServerUtcTicksField = value;
+                    this.RaisePropertyChanged("ServerUtcTicks");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="GameplayService.IGameplayService", CallbackContract=typeof(WPFTheWeakestRival.GameplayService.IGameplayServiceCallback))]
     public interface IGameplayService {
@@ -2249,6 +2344,12 @@ namespace WPFTheWeakestRival.GameplayService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnLightningChallengeFinished")]
         void OnLightningChallengeFinished(System.Guid matchId, System.Guid roundId, int correctAnswers, bool isSuccess);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnTurnOrderInitialized")]
+        void OnTurnOrderInitialized(System.Guid matchId, WPFTheWeakestRival.GameplayService.TurnOrderDto turnOrder);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IGameplayService/OnTurnOrderChanged")]
+        void OnTurnOrderChanged(System.Guid matchId, WPFTheWeakestRival.GameplayService.TurnOrderDto turnOrder, string reasonCode);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

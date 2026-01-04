@@ -81,6 +81,15 @@ namespace WPFTheWeakestRival
         private const string PHASE_SPECIAL_EVENT_TEXT = "Evento especial";
         private const string PHASE_FINISHED_TEXT = "Finalizada";
 
+        private const int TURN_USER_ID_NONE = 0;
+        private const int ONE_BASED_INDEX_OFFSET = 1;
+
+        private const string DARK_MODE_STARTED_REASON = "DARK_MODE_STARTED";
+        private const string DARK_MODE_ENDED_REASON = "DARK_MODE_ENDED";
+
+        private const string DARK_MODE_PLAYER_NAME_TEMPLATE = "Jugador {0}";
+        private const string NORMAL_MODE_FALLBACK_NAME_TEMPLATE = "Jugador {0}";
+
         private enum MatchPhase
         {
             NormalRound,
@@ -229,6 +238,205 @@ namespace WPFTheWeakestRival
 
             txtPhase.Text = $"{PHASE_TITLE}: {phaseDetail}";
         }
+
+        private static readonly string[] PlayersControlNames =
+{
+    "lstPlayers",
+    "playersList",
+    "PlayersList",
+    "PlayersItemsControl",
+    "icPlayers"
+};
+
+        private static readonly string[] CurrentTurnControlNames =
+        {
+    "lblCurrentTurn",
+    "txtCurrentTurn",
+    "lblTurn"
+};
+
+        private readonly object turnOrderSyncRoot = new object();
+
+        private int currentTurnUserId = TURN_USER_ID_NONE;
+        private int[] orderedAliveUserIds = new int[0];
+
+        private bool isDarkModeActive;
+
+        private readonly Dictionary<int, GameplayServiceProxy.PlayerSummary> knownPlayersByUserId =
+            new Dictionary<int, GameplayServiceProxy.PlayerSummary>();
+
+        internal void OnServerTurnOrderInitialized(Guid matchId, GameplayServiceProxy.TurnOrderDto turnOrder)
+        {
+            ApplyTurnOrder(turnOrder, string.Empty);
+        }
+
+        internal void OnServerTurnOrderChanged(Guid matchId, GameplayServiceProxy.TurnOrderDto turnOrder, string reason)
+        {
+            ApplyTurnOrder(turnOrder, reason ?? string.Empty);
+        }
+
+        private void ApplyTurnOrder(GameplayServiceProxy.TurnOrderDto turnOrder, string reason)
+        {
+            if (turnOrder == null)
+            {
+                return;
+            }
+
+            int[] order = turnOrder.OrderedAliveUserIds ?? new int[0];
+            int turnUserId = turnOrder.CurrentTurnUserId;
+
+            lock (turnOrderSyncRoot)
+            {
+                orderedAliveUserIds = order;
+                currentTurnUserId = turnUserId;
+
+                if (string.Equals(reason, DARK_MODE_STARTED_REASON, StringComparison.OrdinalIgnoreCase))
+                {
+                    isDarkModeActive = true;
+                }
+                else if (string.Equals(reason, DARK_MODE_ENDED_REASON, StringComparison.OrdinalIgnoreCase))
+                {
+                    isDarkModeActive = false;
+                }
+            }
+
+            List<GameplayServiceProxy.PlayerSummary> displayList = BuildDisplayPlayers(order);
+
+            ApplyPlayersListToUi(displayList, turnUserId);
+            ApplyCurrentTurnTextToUi(displayList, turnUserId);
+        }
+
+        private List<GameplayServiceProxy.PlayerSummary> BuildDisplayPlayers(int[] orderedUserIds)
+        {
+            List<GameplayServiceProxy.PlayerSummary> list = new List<GameplayServiceProxy.PlayerSummary>();
+
+            if (orderedUserIds == null || orderedUserIds.Length == 0)
+            {
+                return list;
+            }
+
+            for (int i = 0; i < orderedUserIds.Length; i++)
+            {
+                int userId = orderedUserIds[i];
+                if (userId <= 0)
+                {
+                    continue;
+                }
+
+                GameplayServiceProxy.PlayerSummary basePlayer;
+                if (!knownPlayersByUserId.TryGetValue(userId, out basePlayer) || basePlayer == null)
+                {
+                    basePlayer = new GameplayServiceProxy.PlayerSummary
+                    {
+                        UserId = userId,
+                        DisplayName = string.Format(NORMAL_MODE_FALLBACK_NAME_TEMPLATE, userId),
+                        IsOnline = true
+                    };
+                }
+
+                if (isDarkModeActive)
+                {
+                    int displayIndex = i + ONE_BASED_INDEX_OFFSET;
+
+                    list.Add(new GameplayServiceProxy.PlayerSummary
+                    {
+                        UserId = basePlayer.UserId,
+                        DisplayName = string.Format(DARK_MODE_PLAYER_NAME_TEMPLATE, displayIndex),
+                        IsOnline = basePlayer.IsOnline,
+                        Avatar = null
+                    });
+
+                    continue;
+                }
+
+                list.Add(basePlayer);
+            }
+
+            return list;
+        }
+
+        private void ApplyPlayersListToUi(List<GameplayServiceProxy.PlayerSummary> displayList, int turnUserId)
+        {
+            FrameworkElement playersControl = FindFirstNamedElement(PlayersControlNames);
+            if (playersControl == null)
+            {
+                return;
+            }
+
+            ItemsControl itemsControl = playersControl as ItemsControl;
+            if (itemsControl == null)
+            {
+                return;
+            }
+
+            itemsControl.ItemsSource = displayList;
+
+            ListBox listBox = itemsControl as ListBox;
+            if (listBox != null)
+            {
+                int selectedIndex = displayList.FindIndex(p => p != null && p.UserId == turnUserId);
+                listBox.SelectedIndex = selectedIndex;
+            }
+        }
+
+        private void ApplyCurrentTurnTextToUi(List<GameplayServiceProxy.PlayerSummary> displayList, int turnUserId)
+        {
+            FrameworkElement turnControl = FindFirstNamedElement(CurrentTurnControlNames);
+            if (turnControl == null)
+            {
+                return;
+            }
+
+            string text = BuildCurrentTurnText(displayList, turnUserId);
+
+            Label label = turnControl as Label;
+            if (label != null)
+            {
+                label.Content = text;
+                return;
+            }
+
+            TextBlock textBlock = turnControl as TextBlock;
+            if (textBlock != null)
+            {
+                textBlock.Text = text;
+            }
+        }
+
+        private static string BuildCurrentTurnText(List<GameplayServiceProxy.PlayerSummary> displayList, int turnUserId)
+        {
+            if (turnUserId <= 0)
+            {
+                return string.Empty;
+            }
+
+            GameplayServiceProxy.PlayerSummary current = displayList
+                .FirstOrDefault(p => p != null && p.UserId == turnUserId);
+
+            return current != null ? current.DisplayName : string.Empty;
+        }
+
+        private FrameworkElement FindFirstNamedElement(string[] names)
+        {
+            if (names == null || names.Length == 0)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                object found = FindName(names[i]);
+                FrameworkElement element = found as FrameworkElement;
+                if (element != null)
+                {
+                    return element;
+                }
+            }
+
+            return null;
+        }
+
+        //TODO CHECAR ESTA PARTE MANU PORQUE SOLO LO REPARE PARA QUE COMPILARA
 
         private void MatchWindowClosed(object sender, EventArgs e)
         {
@@ -1914,6 +2122,33 @@ namespace WPFTheWeakestRival
                             isSuccess));
                 }
             }
+
+            public void OnTurnOrderInitialized(Guid matchId, GameplayServiceProxy.TurnOrderDto turnOrder)
+            {
+                if (matchWindow.Dispatcher.CheckAccess())
+                {
+                    matchWindow.OnServerTurnOrderInitialized(matchId, turnOrder);
+                }
+                else
+                {
+                    matchWindow.Dispatcher.Invoke(
+                        () => matchWindow.OnServerTurnOrderInitialized(matchId, turnOrder));
+                }
+            }
+
+            public void OnTurnOrderChanged(Guid matchId, GameplayServiceProxy.TurnOrderDto turnOrder, string reason)
+            {
+                if (matchWindow.Dispatcher.CheckAccess())
+                {
+                    matchWindow.OnServerTurnOrderChanged(matchId, turnOrder, reason);
+                }
+                else
+                {
+                    matchWindow.Dispatcher.Invoke(
+                        () => matchWindow.OnServerTurnOrderChanged(matchId, turnOrder, reason));
+                }
+            }
+
         }
     }
 }

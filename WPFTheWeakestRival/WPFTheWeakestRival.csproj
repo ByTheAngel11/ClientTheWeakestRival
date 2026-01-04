@@ -141,6 +141,7 @@
     <Compile Include="Infraestructure\Gameplay\Match\WildcardController.cs" />
     <Compile Include="Infraestructure\Gameplay\QuestionTimerController.cs" />
     <Compile Include="Infraestructure\Gameplay\TurnOrderAdapter.cs" />
+    <Compile Include="Infraestructure\IStoppable.cs" />
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
     <Compile Include="LobbyCallback.cs" />

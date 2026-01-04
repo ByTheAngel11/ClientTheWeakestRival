@@ -64,7 +64,8 @@ namespace WPFTheWeakestRival.Infraestructure
 
                 try
                 {
-                    AppServices.DisposeAll();
+                    AppServices.StopAll();
+                    AppServices.ResetAll();
                 }
                 catch (Exception ex)
                 {

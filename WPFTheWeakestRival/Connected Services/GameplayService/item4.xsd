@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/TheWeakestRival.Contracts.Enums" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="CoinFlipResultType">
+    <xs:annotation>
+      <xs:appinfo>
+        <ActualType Name="unsignedByte" Namespace="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Unknown" />
+      <xs:enumeration value="Heads" />
+      <xs:enumeration value="Tails" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="CoinFlipResultType" nillable="true" type="tns:CoinFlipResultType" />
+</xs:schema>
