@@ -1,4 +1,5 @@
-﻿using System;
+﻿// MatchSessionState.cs
+using System;
 using System.Collections.Generic;
 using WPFTheWeakestRival.LobbyService;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
@@ -40,6 +41,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public bool IsBombQuestionActive { get; set; }
         public bool IsSurpriseExamActive { get; set; }
+
+        public bool IsDarknessActive { get; set; }
+        public int? PendingDarknessVotedUserId { get; set; }
 
         public int CurrentRoundNumber { get; set; } = 1;
         public MatchPhase CurrentPhase { get; set; } = MatchPhase.NormalRound;

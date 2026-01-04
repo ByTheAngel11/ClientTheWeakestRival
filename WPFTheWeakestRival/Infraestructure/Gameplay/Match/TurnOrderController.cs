@@ -1,4 +1,5 @@
-﻿using System;
+﻿// TurnOrderController.cs
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -12,6 +13,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     internal sealed class TurnOrderController
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TurnOrderController));
+
+        private const string DarknessAliasFormat = "Concursante {0}";
+        private const string DarknessFallbackName = "???";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -43,15 +47,74 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
         }
 
+        public void EnableDarknessMode(int seed)
+        {
+            try
+            {
+                PlayerSummary[] basePlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
+
+                var alive = basePlayers
+                    .Where(p => p != null && p.UserId > 0 && !state.IsEliminated(p.UserId))
+                    .Select(p => p)
+                    .ToList();
+
+                Shuffle(alive, seed);
+
+                var anonymized = new List<PlayerSummary>(alive.Count);
+
+                int index = 1;
+                foreach (PlayerSummary p in alive)
+                {
+                    anonymized.Add(
+                        new PlayerSummary
+                        {
+                            UserId = p.UserId,
+                            DisplayName = string.Format(CultureInfo.CurrentCulture, DarknessAliasFormat, index),
+                            Avatar = null,
+                            IsOnline = p.IsOnline
+                        });
+
+                    index++;
+                }
+
+                playersForUi = anonymized.ToArray();
+
+                if (ui.LstPlayers != null)
+                {
+                    ui.LstPlayers.ItemsSource = playersForUi;
+                }
+
+                if (ui.TxtPlayersSummary != null)
+                {
+                    ui.TxtPlayersSummary.Text = string.Format(CultureInfo.CurrentCulture, "({0})", playersForUi.Length);
+                }
+
+                TryHighlightPlayerInList(state.CurrentTurnUserId);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("TurnOrderController.EnableDarknessMode error.", ex);
+            }
+        }
+
+        public void DisableDarknessMode()
+        {
+            InitializePlayers();
+            TryHighlightPlayerInList(state.CurrentTurnUserId);
+        }
+
         public void ApplyTurnOrder(object turnOrderDto)
         {
             TurnOrderSnapshot snapshot = TurnOrderAdapter.ToSnapshot(turnOrderDto);
 
             state.CurrentTurnUserId = snapshot.CurrentTurnUserId;
 
-            if (snapshot.OrderedAliveUserIds.Length > 0)
+            if (!state.IsDarknessActive)
             {
-                RebuildPlayersForUi(snapshot.OrderedAliveUserIds);
+                if (snapshot.OrderedAliveUserIds.Length > 0)
+                {
+                    RebuildPlayersForUi(snapshot.OrderedAliveUserIds);
+                }
             }
 
             TryHighlightPlayerInList(state.CurrentTurnUserId);
@@ -248,20 +311,49 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private string GetDisplayNameByUserIdSafe(int userId)
         {
+            if (state.IsDarknessActive)
+            {
+                PlayerSummary p = playersForUi.FirstOrDefault(x => x != null && x.UserId == userId);
+                if (p != null && !string.IsNullOrWhiteSpace(p.DisplayName))
+                {
+                    return p.DisplayName;
+                }
+
+                return DarknessFallbackName;
+            }
+
             if (userId <= 0)
             {
                 return MatchConstants.DEFAULT_PLAYER_NAME;
             }
 
             PlayerSummary[] basePlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
-            PlayerSummary p = basePlayers.FirstOrDefault(x => x != null && x.UserId == userId);
+            PlayerSummary real = basePlayers.FirstOrDefault(x => x != null && x.UserId == userId);
 
-            if (p != null && !string.IsNullOrWhiteSpace(p.DisplayName))
+            if (real != null && !string.IsNullOrWhiteSpace(real.DisplayName))
             {
-                return p.DisplayName;
+                return real.DisplayName;
             }
 
             return string.Format(CultureInfo.CurrentCulture, "Jugador {0}", userId);
+        }
+
+        private static void Shuffle(List<PlayerSummary> list, int seed)
+        {
+            if (list == null || list.Count <= 1)
+            {
+                return;
+            }
+
+            var random = new Random(seed);
+
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                PlayerSummary temp = list[i];
+                list[i] = list[j];
+                list[j] = temp;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿// MatchDialogController.cs
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     internal sealed class MatchDialogController
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchDialogController));
+
+        private const string DarknessAliasFormat = "Concursante {0}";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -163,12 +166,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
+            if (state.IsDarknessActive)
+            {
+                state.PendingDarknessVotedUserId = selectedTargetUserId;
+            }
+
             await SendVoteAsync(selectedTargetUserId);
         }
 
         private IEnumerable<PlayerVoteItem> BuildVotePlayers()
         {
             PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
+
+            int anonIndex = 1;
 
             foreach (PlayerSummary p in lobbyPlayers)
             {
@@ -182,12 +192,24 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     continue;
                 }
 
+                string displayName;
+
+                if (state.IsDarknessActive)
+                {
+                    displayName = string.Format(CultureInfo.CurrentCulture, DarknessAliasFormat, anonIndex);
+                    anonIndex++;
+                }
+                else
+                {
+                    displayName = string.IsNullOrWhiteSpace(p.DisplayName)
+                        ? MatchConstants.DEFAULT_PLAYER_NAME
+                        : p.DisplayName;
+                }
+
                 yield return new PlayerVoteItem
                 {
                     UserId = p.UserId,
-                    DisplayName = string.IsNullOrWhiteSpace(p.DisplayName)
-                        ? MatchConstants.DEFAULT_PLAYER_NAME
-                        : p.DisplayName,
+                    DisplayName = displayName,
                     BankedPoints = 0m,
                     CorrectAnswers = 0,
                     WrongAnswers = 0

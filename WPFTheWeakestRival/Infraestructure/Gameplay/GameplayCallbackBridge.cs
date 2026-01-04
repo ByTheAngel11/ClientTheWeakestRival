@@ -20,7 +20,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 ?? throw new ArgumentNullException(nameof(dispatcher));
         }
 
-        // Eventos que tu MatchSessionCoordinator está intentando usar:
         public event Action<Guid, GameplayServiceProxy.PlayerSummary, GameplayServiceProxy.QuestionWithAnswersDto, decimal, decimal> NextQuestion;
         public event Action<Guid, GameplayServiceProxy.PlayerSummary, GameplayServiceProxy.AnswerResult> AnswerEvaluated;
         public event Action<Guid, GameplayServiceProxy.BankState> BankUpdated;

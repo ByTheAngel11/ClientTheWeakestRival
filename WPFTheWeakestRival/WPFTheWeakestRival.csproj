@@ -124,6 +124,7 @@
     <Compile Include="Infraestructure\Gameplay\Match\DifficultyMapper.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\GameplayClientProxy.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchConstants.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchDarknessConstants.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchDialogController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSessionCoordinator.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSessionState.cs" />

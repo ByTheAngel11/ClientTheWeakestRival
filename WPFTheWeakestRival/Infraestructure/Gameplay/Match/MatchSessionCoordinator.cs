@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿// MatchSessionCoordinator.cs
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,6 +18,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     internal sealed class MatchSessionCoordinator : IDisposable
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchSessionCoordinator));
+
+        private const string DarknessStartCode = "DARKNESS_STARTED";
+        private const string DarknessEndCode = "DARKNESS_ENDED";
+        private const string DarknessKeywordEs = "oscuras";
+
+        private const string DarknessUnknownName = "???";
+        private const string DarknessTurnLabel = "A oscuras";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -70,30 +78,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             turns.InitializePlayers();
 
-            if (ui.TxtChain != null)
-            {
-                ui.TxtChain.Text = MatchConstants.DEFAULT_CHAIN_INITIAL_VALUE;
-            }
+            if (ui.TxtChain != null) ui.TxtChain.Text = MatchConstants.DEFAULT_CHAIN_INITIAL_VALUE;
+            if (ui.TxtBanked != null) ui.TxtBanked.Text = MatchConstants.DEFAULT_BANKED_INITIAL_VALUE;
 
-            if (ui.TxtBanked != null)
-            {
-                ui.TxtBanked.Text = MatchConstants.DEFAULT_BANKED_INITIAL_VALUE;
-            }
+            if (ui.TxtTurnPlayerName != null) ui.TxtTurnPlayerName.Text = MatchConstants.DEFAULT_PLAYER_NAME;
+            if (ui.TxtTurnLabel != null) ui.TxtTurnLabel.Text = MatchConstants.DEFAULT_WAITING_MATCH_TEXT;
 
-            if (ui.TxtTurnPlayerName != null)
-            {
-                ui.TxtTurnPlayerName.Text = MatchConstants.DEFAULT_PLAYER_NAME;
-            }
-
-            if (ui.TxtTurnLabel != null)
-            {
-                ui.TxtTurnLabel.Text = MatchConstants.DEFAULT_WAITING_MATCH_TEXT;
-            }
-
-            if (ui.TxtTimer != null)
-            {
-                ui.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
-            }
+            if (ui.TxtTimer != null) ui.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
 
             wildcards.InitializeEmpty();
 
@@ -172,35 +163,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 await gameplay.JoinMatchAsync(request);
             }
-            catch (FaultException ex)
+            catch (Exception ex)
             {
-                Logger.Warn("Fault al unirse a la partida.", ex);
+                Logger.Warn("JoinMatchAsync error.", ex);
 
                 MessageBox.Show(
                     ex.Message,
                     MatchConstants.GAME_MESSAGE_TITLE,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Error de comunicación al unirse a la partida.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error inesperado al unirse a la partida.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
             }
         }
 
@@ -229,7 +200,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     return;
                 }
 
-                Logger.Warn("Fault(StartMatch).", ex);
+                Logger.Warn("EnsureMatchStartedAsync Fault.", ex);
 
                 MessageBox.Show(
                     ex.Detail != null ? ex.Detail.Message : ex.Message,
@@ -237,35 +208,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
-            catch (FaultException ex)
+            catch (Exception ex)
             {
-                Logger.Warn("Fault(StartMatch).", ex);
+                Logger.Warn("EnsureMatchStartedAsync error.", ex);
 
                 MessageBox.Show(
                     ex.Message,
                     MatchConstants.GAME_MESSAGE_TITLE,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Error de comunicación(StartMatch).", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error inesperado(StartMatch).", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
             }
         }
 
@@ -286,7 +237,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             decimal chain,
             decimal banked)
         {
-            state.CurrentPhase = state.IsSurpriseExamActive ? MatchPhase.SpecialEvent : MatchPhase.NormalRound;
+            state.CurrentPhase = state.IsSurpriseExamActive || state.IsDarknessActive
+                ? MatchPhase.SpecialEvent
+                : MatchPhase.NormalRound;
+
             UpdatePhaseLabel();
 
             questions.OnNextQuestion(
@@ -316,6 +270,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.AddEliminated(eliminated.UserId);
 
+            if (state.IsDarknessActive)
+            {
+                EndDarknessMode(revealVote: true);
+            }
+
             bool isMe = eliminated.UserId == state.MyUserId;
 
             dialogs.ShowEliminationMessage(eliminated);
@@ -324,12 +283,34 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleSpecialEventAsync(Guid matchId, string eventName, string description)
         {
+            Logger.InfoFormat(
+                "OnSpecialEvent. MatchId={0}, Name='{1}', Desc='{2}'",
+                matchId,
+                eventName ?? string.Empty,
+                description ?? string.Empty);
+
             state.CurrentPhase = MatchPhase.SpecialEvent;
             UpdatePhaseLabel();
 
             overlay.ShowSpecialEvent(
                 string.IsNullOrWhiteSpace(eventName) ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT : eventName,
                 string.IsNullOrWhiteSpace(description) ? string.Empty : description);
+
+            if (IsDarknessStartEvent(eventName, description))
+            {
+                BeginDarknessMode();
+
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                return;
+            }
+
+            if (IsDarknessEndEvent(eventName, description))
+            {
+                EndDarknessMode(revealVote: true);
+
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                return;
+            }
 
             if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE, StringComparison.OrdinalIgnoreCase))
             {
@@ -364,20 +345,157 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
         }
 
+        private static bool IsDarknessStartEvent(string eventName, string description)
+        {
+            if (ContainsDarknessToken(eventName))
+            {
+                return true;
+            }
+
+            if (ContainsDarknessToken(description))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsDarknessEndEvent(string eventName, string description)
+        {
+            if (string.Equals(eventName, DarknessEndCode, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (string.Equals(description, DarknessEndCode, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool ContainsDarknessToken(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            if (string.Equals(text, DarknessStartCode, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return text.IndexOf(DarknessKeywordEs, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void BeginDarknessMode()
+        {
+            if (state.IsDarknessActive)
+            {
+                return;
+            }
+
+            state.IsDarknessActive = true;
+
+            int seed = BuildDarknessSeed(state.Match.MatchId, state.CurrentRoundNumber);
+
+            turns.EnableDarknessMode(seed);
+            questions.SetDarknessActive(true);
+
+            ApplyDarknessUiImmediate();
+        }
+
+        private void ApplyDarknessUiImmediate()
+        {
+            if (ui.TurnAvatar != null)
+            {
+                ui.TurnAvatar.Visibility = Visibility.Collapsed;
+            }
+
+            if (ui.TxtTurnPlayerName != null)
+            {
+                ui.TxtTurnPlayerName.Text = DarknessUnknownName;
+            }
+
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = DarknessTurnLabel;
+            }
+
+            if (ui.TurnBannerBackground != null)
+            {
+                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
+            }
+        }
+
+        private void EndDarknessMode(bool revealVote)
+        {
+            if (!state.IsDarknessActive)
+            {
+                return;
+            }
+
+            state.IsDarknessActive = false;
+
+            turns.DisableDarknessMode();
+            questions.SetDarknessActive(false);
+
+            if (revealVote)
+            {
+                TryRevealDarknessVote();
+            }
+
+            if (!state.IsMatchFinished)
+            {
+                state.CurrentPhase = MatchPhase.NormalRound;
+                UpdatePhaseLabel();
+            }
+        }
+
+        private void TryRevealDarknessVote()
+        {
+            int? votedUserId = state.PendingDarknessVotedUserId;
+            state.PendingDarknessVotedUserId = null;
+
+            if (!votedUserId.HasValue || votedUserId.Value <= 0)
+            {
+                return;
+            }
+
+            try
+            {
+                PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
+                PlayerSummary voted = lobbyPlayers.FirstOrDefault(p => p != null && p.UserId == votedUserId.Value);
+
+                string name = voted != null && !string.IsNullOrWhiteSpace(voted.DisplayName)
+                    ? voted.DisplayName
+                    : string.Format(CultureInfo.CurrentCulture, "Jugador {0}", votedUserId.Value);
+
+                MessageBox.Show(
+                    string.Format(CultureInfo.CurrentCulture, "Votaste por: {0}", name),
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("TryRevealDarknessVote error.", ex);
+            }
+        }
+
+        private static int BuildDarknessSeed(Guid matchId, int roundNumber)
+        {
+            return matchId.GetHashCode() ^ roundNumber;
+        }
+
         private void HandleCoinFlip(GameplayServiceProxy.CoinFlipResolvedDto coinFlip)
         {
             if (coinFlip == null)
             {
                 return;
             }
-
-            Logger.InfoFormat(
-                "OnServerCoinFlipResolved. MatchId={0}, RoundId={1}, WeakestRivalUserId={2}, Result={3}, ShouldEnableDuel={4}",
-                state.Match.MatchId,
-                coinFlip.RoundId,
-                coinFlip.WeakestRivalPlayerId,
-                coinFlip.Result,
-                coinFlip.ShouldEnableDuel);
 
             state.CurrentRoundNumber++;
             state.CurrentPhase = coinFlip.ShouldEnableDuel ? MatchPhase.Duel : MatchPhase.NormalRound;
@@ -398,7 +516,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             var items = new List<DuelCandidateItem>();
 
-            foreach (var candidate in duelCandidates.Candidates)
+            foreach (GameplayServiceProxy.DuelCandidateDto candidate in duelCandidates.Candidates)
             {
                 if (candidate == null)
                 {
@@ -417,11 +535,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (state.MyUserId != weakestRivalUserId)
             {
-                Logger.InfoFormat(
-                    "OnServerDuelCandidates: usuario {0} no es weakest rival ({1}), no muestra diálogo.",
-                    state.MyUserId,
-                    weakestRivalUserId);
-
                 return;
             }
 
@@ -433,6 +546,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void HandleMatchFinished(GameplayServiceProxy.PlayerSummary winner)
         {
+            if (state.IsDarknessActive)
+            {
+                EndDarknessMode(revealVote: false);
+            }
+
             state.IsMatchFinished = true;
             state.FinalWinner = winner;
 
@@ -478,7 +596,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (ui.TurnBannerBackground != null)
             {
-                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource(state.IsMyTurn ? "Brush.Turn.MyTurn" : "Brush.Turn.OtherTurn");
+                ui.TurnBannerBackground.Background =
+                    (Brush)ui.Window.FindResource(state.IsMyTurn ? "Brush.Turn.MyTurn" : "Brush.Turn.OtherTurn");
             }
         }
 
@@ -531,6 +650,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             turns.ApplyTurnOrder(turnOrder);
 
+            if (state.IsDarknessActive)
+            {
+                return;
+            }
+
             await turns.PlayTurnIntroAsync(
                 turnOrder,
                 (t, d) => overlay.ShowSpecialEvent(t, d),
@@ -540,6 +664,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
         {
             turns.ApplyTurnOrder(turnOrder);
+
+            if (state.IsDarknessActive)
+            {
+                return;
+            }
 
             overlay.ShowSpecialEvent(
                 MatchConstants.TURN_ORDER_CHANGED_TITLE,
