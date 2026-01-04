@@ -52,6 +52,14 @@ namespace WPFTheWeakestRival
         private const string ERROR_COPY_CODE_NO_CODE = "No hay un código de lobby para copiar.";
         private const string ERROR_COPY_CODE_GENERIC = "Ocurrió un error al copiar el código al portapapeles.";
         private const string ERROR_START_MATCH_GENERIC = "Ocurrió un error al iniciar la partida.";
+        private const string FAULT_REPORT_COOLDOWN = "REPORT_COOLDOWN";
+
+        private const byte ACCOUNT_STATUS_SUSPENDED = 3;
+        private const byte ACCOUNT_STATUS_BANNED = 4;
+
+        private const string SANCTION_END_TIME_FORMAT = "g";
+
+
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyWindow));
 
@@ -127,7 +135,7 @@ namespace WPFTheWeakestRival
             AppServices.Lobby.PlayerLeft += OnPlayerLeftFromHub;
             AppServices.Lobby.ChatMessageReceived += OnChatMessageReceivedFromHub;
             AppServices.Lobby.MatchStarted += OnMatchStartedFromHub;
-
+            AppServices.Lobby.ForcedLogout += OnForcedLogoutFromHub;
             AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
             AppServices.Friends.Start();
 
@@ -819,6 +827,7 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.PlayerLeft -= OnPlayerLeftFromHub;
                 AppServices.Lobby.ChatMessageReceived -= OnChatMessageReceivedFromHub;
                 AppServices.Lobby.MatchStarted -= OnMatchStartedFromHub;
+                AppServices.Lobby.ForcedLogout -= OnForcedLogoutFromHub;
                 AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
             }
             catch (Exception ex)
@@ -924,5 +933,174 @@ namespace WPFTheWeakestRival
                 info.Players,
                 MapPlayerToLobbyItem);
         }
+
+        private async void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var menuItem = sender as MenuItem;
+                if (menuItem == null)
+                {
+                    return;
+                }
+
+                var targetPlayer = menuItem.CommandParameter as LobbyPlayerItem;
+                if (targetPlayer == null || targetPlayer.IsMe)
+                {
+                    return;
+                }
+
+                var session = LoginWindow.AppSession.CurrentToken;
+                string token = session != null ? session.Token : null;
+
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    MessageBox.Show(Lang.noValidSessionCode);
+                    return;
+                }
+
+                var dialog = new WPFTheWeakestRival.Windows.ReportPlayerWindow(targetPlayer.DisplayName)
+                {
+                    Owner = this
+                };
+
+                bool? dialogResult = dialog.ShowDialog();
+                if (dialogResult != true)
+                {
+                    return;
+                }
+
+                var client = new ReportService.ReportServiceClient("WSHttpBinding_IReportService");
+                try
+                {
+                    var request = new ReportService.SubmitPlayerReportRequest
+                    {
+                        Token = token,
+                        ReportedAccountId = targetPlayer.AccountId,
+                        LobbyId = currentLobbyId,
+                        ReasonCode = (ReportService.ReportReasonCode)dialog.SelectedReasonCode,
+                        Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? null : dialog.Comment
+                    };
+
+                    ReportService.SubmitPlayerReportResponse response =
+                        await Task.Run(() => client.SubmitPlayerReport(request));
+
+                    if (response != null && response.SanctionApplied)
+                    {
+                        if (response.SanctionType == ACCOUNT_STATUS_SUSPENDED && response.SanctionEndAtUtc.HasValue)
+                        {
+                            string localEnd = response.SanctionEndAtUtc.Value
+                                .ToLocalTime()
+                                .ToString(SANCTION_END_TIME_FORMAT);
+
+                            MessageBox.Show(
+                                string.Format(Lang.reportSanctionTemporary, localEnd),
+                                Lang.reportPlayer,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
+
+                            return;
+                        }
+
+                        if (response.SanctionType == ACCOUNT_STATUS_BANNED)
+                        {
+                            MessageBox.Show(
+                                Lang.reportSanctionPermanent,
+                                Lang.reportPlayer,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+
+                            return;
+                        }
+                    }
+
+                    MessageBox.Show(
+                        Lang.reportSent,
+                        Lang.reportPlayer,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+                finally
+                {
+                    try { client.Close(); }
+                    catch { client.Abort(); }
+                }
+            }
+            catch (FaultException<ReportService.ServiceFault> ex)
+            {
+                if (ex.Detail != null && string.Equals(ex.Detail.Code, FAULT_REPORT_COOLDOWN, StringComparison.Ordinal))
+                {
+                    MessageBox.Show(
+                        Lang.reportCooldown,
+                        Lang.reportPlayer,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    return;
+                }
+
+                Logger.Warn("Report fault in lobby.", ex);
+
+                MessageBox.Show(
+                    Lang.reportFailed,
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Communication error while submitting report.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while submitting report.", ex);
+
+                MessageBox.Show(
+                    Lang.reportUnexpectedError,
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+
+
+        private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            try
+            {
+                var element = sender as FrameworkElement;
+                if (element == null)
+                {
+                    return;
+                }
+
+                var player = element.DataContext as LobbyPlayerItem;
+                if (player != null && player.IsMe)
+                {
+                    e.Handled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error while opening lobby player context menu.", ex);
+                e.Handled = true;
+            }
+        }
+
+        private void OnForcedLogoutFromHub(ForcedLogoutNotification notification)
+        {
+            Infraestructure.ForcedLogoutCoordinator.Handle(notification);
+        }
+
+        
     }
+
+
 }

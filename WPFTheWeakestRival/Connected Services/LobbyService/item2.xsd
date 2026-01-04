@@ -166,4 +166,11 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="ForcedLogout">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="notification" nillable="true" type="q22:ForcedLogoutNotification" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

@@ -457,4 +457,43 @@
   <data name="matchTitle" xml:space="preserve">
     <value>Partida</value>
   </data>
+  <data name="mnuLobbyReportPlayer" xml:space="preserve">
+    <value>Relatório</value>
+  </data>
+  <data name="reportPlayer" xml:space="preserve">
+    <value>Relatório</value>
+  </data>
+  <data name="reportReasonHarassment" xml:space="preserve">
+    <value>Assédio/insultos</value>
+  </data>
+  <data name="reportReasonCheating" xml:space="preserve">
+    <value>Armadilhas</value>
+  </data>
+  <data name="reportReasonSpam" xml:space="preserve">
+    <value>Spam</value>
+  </data>
+  <data name="reportReasonInappropriateName" xml:space="preserve">
+    <value>nome impróprio</value>
+  </data>
+  <data name="reportReasonOther" xml:space="preserve">
+    <value>Outro</value>
+  </data>
+  <data name="reportSent" xml:space="preserve">
+    <value>Relatório enviado.</value>
+  </data>
+  <data name="reportCooldown" xml:space="preserve">
+    <value>Você deve esperar 30 minutos para denunciar esse jogador novamente.</value>
+  </data>
+  <data name="reportFailed" xml:space="preserve">
+    <value>Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="reportUnexpectedError" xml:space="preserve">
+    <value>Ocorreu um erro ao enviar o relatório.</value>
+  </data>
+  <data name="reportSanctionTemporary" xml:space="preserve">
+    <value>Relatório enviado. Sanção temporária aplicada até: {0}.</value>
+  </data>
+  <data name="reportSanctionPermanent" xml:space="preserve">
+    <value>Relatório enviado. Foi aplicada sanção permanente.</value>
+  </data>
 </root>

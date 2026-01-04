@@ -278,4 +278,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ChatMessage" nillable="true" type="tns:ChatMessage" />
+  <xs:complexType name="ForcedLogoutNotification">
+    <xs:sequence>
+      <xs:element name="SanctionType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="SanctionEndAtUtc" nillable="true" type="xs:dateTime" />
+      <xs:element name="Code" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ForcedLogoutNotification" nillable="true" type="tns:ForcedLogoutNotification" />
 </xs:schema>

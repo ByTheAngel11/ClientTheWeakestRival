@@ -8,7 +8,7 @@ using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
-    public sealed class FriendManager : IDisposable
+    public sealed class FriendManager : IDisposable, IStoppable
     {
         private const int HEARTBEAT_SECONDS = 30;
         private const int REFRESH_SECONDS = 45;
@@ -64,9 +64,44 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public void Stop()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
             heartbeatTimer.Stop();
             refreshTimer.Stop();
+
+            CloseClientSafe();
         }
+
+        private void CloseClientSafe()
+        {
+            var local = client;
+            client = null;
+
+            if (local == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (local.State == CommunicationState.Faulted)
+                {
+                    local.Abort();
+                }
+                else
+                {
+                    local.Close();
+                }
+            }
+            catch
+            {
+                try { local.Abort(); } catch { }
+            }
+        }
+
 
         public Task ManualRefreshAsync()
         {

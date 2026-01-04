@@ -93,6 +93,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Connected Services\ReportService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Connected Services\StatsService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -118,8 +123,10 @@
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
     <Compile Include="Infraestructure\AppServices.cs" />
+    <Compile Include="Infraestructure\ForcedLogoutCoordinator.cs" />
     <Compile Include="Infraestructure\FriendManager.cs" />
     <Compile Include="Infraestructure\FriendsDrawer.cs" />
+    <Compile Include="Infraestructure\IStoppable.cs" />
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
     <Compile Include="LobbyCallback.cs" />
@@ -175,6 +182,9 @@
     </Compile>
     <Compile Include="Controls\AvatarControl.xaml.cs">
       <DependentUpon>AvatarControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ReportPlayerWindow.xaml.cs">
+      <DependentUpon>ReportPlayerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Wildcards\IWildcardActionContext.cs" />
     <Compile Include="Wildcards\WildcardActionManager.cs" />
@@ -261,6 +271,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\AvatarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ReportPlayerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -446,6 +460,22 @@
     <None Include="Connected Services\MatchmakingService\WPFTheWeakestRival.MatchmakingService.StartMatchResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Connected Services\ReportService\item.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\ReportService\item1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\ReportService\item2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\ReportService\item3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\ReportService\ReportService.wsdl" />
+    <None Include="Connected Services\ReportService\WPFTheWeakestRival.ReportService.SubmitPlayerReportResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Connected Services\StatsService\item.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -554,6 +584,7 @@
     <WCFMetadataStorage Include="Connected Services\GameplayService\" />
     <WCFMetadataStorage Include="Connected Services\LobbyService\" />
     <WCFMetadataStorage Include="Connected Services\MatchmakingService\" />
+    <WCFMetadataStorage Include="Connected Services\ReportService\" />
     <WCFMetadataStorage Include="Connected Services\StatsService\" />
     <WCFMetadataStorage Include="Connected Services\WildcardService\" />
   </ItemGroup>
@@ -691,6 +722,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Wildcards\SWAP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\ReportService\item.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\ReportService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\ReportService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\ReportService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

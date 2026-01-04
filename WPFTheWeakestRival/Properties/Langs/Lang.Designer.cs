@@ -709,6 +709,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Report.
+        /// </summary>
+        public static string mnuLobbyReportPlayer {
+            get {
+                return ResourceManager.GetString("mnuLobbyReportPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Modify Profile.
         /// </summary>
         public static string modifyProfileTitle {
@@ -930,6 +939,114 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string registSucces {
             get {
                 return ResourceManager.GetString("registSucces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You must wait 30 minutes to report that player again..
+        /// </summary>
+        public static string reportCooldown {
+            get {
+                return ResourceManager.GetString("reportCooldown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The report could not be sent..
+        /// </summary>
+        public static string reportFailed {
+            get {
+                return ResourceManager.GetString("reportFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Report.
+        /// </summary>
+        public static string reportPlayer {
+            get {
+                return ResourceManager.GetString("reportPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Traps.
+        /// </summary>
+        public static string reportReasonCheating {
+            get {
+                return ResourceManager.GetString("reportReasonCheating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Harassment/insults.
+        /// </summary>
+        public static string reportReasonHarassment {
+            get {
+                return ResourceManager.GetString("reportReasonHarassment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a inappropriate name.
+        /// </summary>
+        public static string reportReasonInappropriateName {
+            get {
+                return ResourceManager.GetString("reportReasonInappropriateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Other.
+        /// </summary>
+        public static string reportReasonOther {
+            get {
+                return ResourceManager.GetString("reportReasonOther", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Spam.
+        /// </summary>
+        public static string reportReasonSpam {
+            get {
+                return ResourceManager.GetString("reportReasonSpam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Report sent. Permanent sanction was applied..
+        /// </summary>
+        public static string reportSanctionPermanent {
+            get {
+                return ResourceManager.GetString("reportSanctionPermanent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Report sent. Temporary sanction applied until: {0}..
+        /// </summary>
+        public static string reportSanctionTemporary {
+            get {
+                return ResourceManager.GetString("reportSanctionTemporary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Report sent..
+        /// </summary>
+        public static string reportSent {
+            get {
+                return ResourceManager.GetString("reportSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while sending the report..
+        /// </summary>
+        public static string reportUnexpectedError {
+            get {
+                return ResourceManager.GetString("reportUnexpectedError", resourceCulture);
             }
         }
         

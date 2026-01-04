@@ -7,14 +7,14 @@ using WPFTheWeakestRival.LobbyService;
 namespace WPFTheWeakestRival.Infrastructure
 {
     [CallbackBehavior(UseSynchronizationContext = true, ConcurrencyMode = ConcurrencyMode.Reentrant)]
-    public sealed class LobbyHub : ILobbyServiceCallback, IDisposable
+    public sealed class LobbyHub : ILobbyServiceCallback, IDisposable, IStoppable
     {
         private const byte DEFAULT_MAX_PLAYERS = 8;
         private const byte MIN_ALLOWED_MAX_PLAYERS = 1;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyHub));
 
-        private readonly LobbyServiceClient client;
+        private readonly LobbyServiceClient _client;
 
         public Guid? CurrentLobbyId { get; private set; }
         public string CurrentAccessCode { get; private set; }
@@ -24,14 +24,15 @@ namespace WPFTheWeakestRival.Infrastructure
         public event Action<Guid> PlayerLeft;
         public event Action<ChatMessage> ChatMessageReceived;
         public event Action<MatchInfo> MatchStarted;
+        public event Action<ForcedLogoutNotification> ForcedLogout;
 
         public LobbyHub(string endpointName)
         {
             var instanceContext = new InstanceContext(this);
-            client = new LobbyServiceClient(instanceContext, endpointName);
+            _client = new LobbyServiceClient(instanceContext, endpointName);
         }
 
-        public LobbyServiceClient RawClient => client;
+        public LobbyServiceClient RawClient => _client;
 
         public async Task<CreateLobbyResponse> CreateLobbyAsync(
             string token,
@@ -45,7 +46,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 MaxPlayers = NormalizeMaxPlayers(maxPlayers)
             };
 
-            var response = await Task.Run(() => client.CreateLobby(request)).ConfigureAwait(false);
+            var response = await Task.Run(() => _client.CreateLobby(request)).ConfigureAwait(false);
             if (response?.Lobby != null)
             {
                 CurrentLobbyId = response.Lobby.LobbyId;
@@ -65,7 +66,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 AccessCode = normalizedCode
             };
 
-            var response = await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
+            var response = await Task.Run(() => _client.JoinByCode(request)).ConfigureAwait(false);
             if (response?.Lobby != null)
             {
                 CurrentLobbyId = response.Lobby.LobbyId;
@@ -86,7 +87,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             try
             {
-                if (client.State == CommunicationState.Faulted)
+                if (_client.State == CommunicationState.Faulted)
                 {
                     return;
                 }
@@ -97,7 +98,7 @@ namespace WPFTheWeakestRival.Infrastructure
                     LobbyId = CurrentLobbyId.Value
                 };
 
-                await Task.Run(() => client.LeaveLobby(request)).ConfigureAwait(false);
+                await Task.Run(() => _client.LeaveLobby(request)).ConfigureAwait(false);
             }
             catch (CommunicationObjectFaultedException ex)
             {
@@ -140,12 +141,12 @@ namespace WPFTheWeakestRival.Infrastructure
                 Message = message
             };
 
-            return Task.Run(() => client.SendChatMessage(request));
+            return Task.Run(() => _client.SendChatMessage(request));
         }
 
         public UpdateAccountResponse GetMyProfile(string token)
         {
-            return client.GetMyProfile(token);
+            return _client.GetMyProfile(token);
         }
 
         public Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
@@ -160,7 +161,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 Token = token
             };
 
-            return Task.Run(() => client.StartLobbyMatch(request));
+            return Task.Run(() => _client.StartLobbyMatch(request));
         }
 
         void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
@@ -198,17 +199,35 @@ namespace WPFTheWeakestRival.Infrastructure
             MatchStarted?.Invoke(match);
         }
 
+        void ILobbyServiceCallback.ForcedLogout(ForcedLogoutNotification notification)
+        {
+            try
+            {
+                Logger.InfoFormat(
+                    "ForcedLogout received. SanctionType={0}, EndAtUtc={1}, Code={2}",
+                    notification != null ? notification.SanctionType : (byte)0,
+                    notification != null ? (object)notification.SanctionEndAtUtc : null,
+                    notification != null ? notification.Code : null);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Error logging ForcedLogout notification.", ex);
+            }
+
+            ForcedLogout?.Invoke(notification);
+        }
+
         public void Dispose()
         {
             try
             {
-                if (client.State == CommunicationState.Faulted)
+                if (_client.State == CommunicationState.Faulted)
                 {
-                    client.Abort();
+                    _client.Abort();
                 }
                 else
                 {
-                    client.Close();
+                    _client.Close();
                 }
             }
             catch (CommunicationException ex)
@@ -232,7 +251,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             try
             {
-                client.Abort();
+                _client.Abort();
             }
             catch (Exception ex)
             {
@@ -266,5 +285,19 @@ namespace WPFTheWeakestRival.Infrastructure
                 .Trim()
                 .ToUpperInvariant();
         }
+
+        public void Stop()
+        {
+            try
+            {
+                SafeAbort();
+            }
+            finally
+            {
+                CurrentLobbyId = null;
+                CurrentAccessCode = null;
+            }
+        }
+
     }
 }

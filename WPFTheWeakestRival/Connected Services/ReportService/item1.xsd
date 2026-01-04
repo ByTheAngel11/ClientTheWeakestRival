@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8082/reports/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:import schemaLocation="http://localhost:8082/reports/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Enums" />
+  <xs:complexType name="SubmitPlayerReportRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="ReportedAccountId" type="xs:int" />
+      <xs:element minOccurs="0" name="LobbyId" nillable="true" type="ser:guid" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Enums" name="ReasonCode" type="q1:ReportReasonCode" />
+      <xs:element minOccurs="0" name="Comment" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SubmitPlayerReportRequest" nillable="true" type="tns:SubmitPlayerReportRequest" />
+  <xs:complexType name="SubmitPlayerReportResponse">
+    <xs:sequence>
+      <xs:element name="ReportId" type="xs:long" />
+      <xs:element name="SanctionApplied" type="xs:boolean" />
+      <xs:element name="SanctionType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="SanctionEndAtUtc" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SubmitPlayerReportResponse" nillable="true" type="tns:SubmitPlayerReportResponse" />
+  <xs:complexType name="ServiceFault">
+    <xs:sequence>
+      <xs:element name="Code" nillable="true" type="xs:string" />
+      <xs:element name="Message" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Details" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceFault" nillable="true" type="tns:ServiceFault" />
+</xs:schema>
