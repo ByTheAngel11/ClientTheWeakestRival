@@ -159,7 +159,7 @@ namespace WPFTheWeakestRival
                 AppSession.CurrentToken = token;
 
                 try
-                {
+                {   
                     
                     AppServices.ResetAll();
 

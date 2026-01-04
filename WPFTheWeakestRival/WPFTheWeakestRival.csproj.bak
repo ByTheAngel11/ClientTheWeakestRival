@@ -126,6 +126,9 @@
     <Compile Include="Infraestructure\ForcedLogoutCoordinator.cs" />
     <Compile Include="Infraestructure\FriendManager.cs" />
     <Compile Include="Infraestructure\FriendsDrawer.cs" />
+<<<<<<< HEAD
+    <Compile Include="Infraestructure\IStoppable.cs" />
+=======
     <Compile Include="Infraestructure\Gameplay\GameplayCallbackBridge.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\DifficultyMapper.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\GameplayClientProxy.cs" />
@@ -141,6 +144,7 @@
     <Compile Include="Infraestructure\Gameplay\Match\WildcardController.cs" />
     <Compile Include="Infraestructure\Gameplay\QuestionTimerController.cs" />
     <Compile Include="Infraestructure\Gameplay\TurnOrderAdapter.cs" />
+>>>>>>> c5a6ba125992627d2abe6525dad58dceb8907d77
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
     <Compile Include="LobbyCallback.cs" />

@@ -34,11 +34,19 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public LobbyServiceClient RawClient => _client;
 
-        public async Task<CreateLobbyResponse> CreateLobbyAsync(
-            string token,
-            string lobbyName,
-            byte maxPlayers = DEFAULT_MAX_PLAYERS)
+        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token,string lobbyName,byte maxPlayers = DEFAULT_MAX_PLAYERS)
         {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException("Token requerido.", nameof(token));
+            }
+
+            if (client.State == CommunicationState.Faulted)
+            {
+                Logger.Warn("CreateLobbyAsync llamado con el canal en estado Faulted.");
+                return null;
+            }
+
             var request = new CreateLobbyRequest
             {
                 Token = token,
@@ -46,6 +54,17 @@ namespace WPFTheWeakestRival.Infrastructure
                 MaxPlayers = NormalizeMaxPlayers(maxPlayers)
             };
 
+            try
+            {
+                var response = await Task
+                    .Run(() => client.CreateLobby(request))
+                    .ConfigureAwait(false);
+
+                if (response?.Lobby != null)
+                {
+                    CurrentLobbyId = response.Lobby.LobbyId;
+                    CurrentAccessCode = response.Lobby.AccessCode;
+                }
             var response = await Task.Run(() => _client.CreateLobby(request)).ConfigureAwait(false);
             if (response?.Lobby != null)
             {
@@ -53,12 +72,52 @@ namespace WPFTheWeakestRival.Infrastructure
                 CurrentAccessCode = response.Lobby.AccessCode;
             }
 
-            return response;
+                return response;
+            }
+            catch (FaultException<ServiceFault> fault)
+            {
+                Logger.WarnFormat(
+                    "CreateLobbyAsync fault. Code={0}, Message={1}",
+                    fault.Detail.Code,
+                    fault.Detail.Message);
+                return null;
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("CreateLobbyAsync communication error.", ex);
+                return null;
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("CreateLobbyAsync timeout.", ex);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("CreateLobbyAsync unexpected error.", ex);
+                return null;
+            }
         }
+
 
         public async Task<JoinByCodeResponse> JoinByCodeAsync(string token, string accessCode)
         {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException("Token requerido.", nameof(token));
+            }
+
             var normalizedCode = NormalizeAccessCode(accessCode);
+            if (string.IsNullOrWhiteSpace(normalizedCode))
+            {
+                throw new ArgumentException("Código de acceso requerido.", nameof(accessCode));
+            }
+
+            if (client.State == CommunicationState.Faulted)
+            {
+                Logger.Warn("JoinByCodeAsync llamado con el canal en estado Faulted.");
+                return null;
+            }
 
             var request = new JoinByCodeRequest
             {
@@ -66,6 +125,19 @@ namespace WPFTheWeakestRival.Infrastructure
                 AccessCode = normalizedCode
             };
 
+            try
+            {
+                var response = await Task
+                    .Run(() => client.JoinByCode(request))
+                    .ConfigureAwait(false);
+
+                if (response?.Lobby != null)
+                {
+                    CurrentLobbyId = response.Lobby.LobbyId;
+                    CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
+                        ? normalizedCode
+                        : response.Lobby.AccessCode;
+                }
             var response = await Task.Run(() => _client.JoinByCode(request)).ConfigureAwait(false);
             if (response?.Lobby != null)
             {
@@ -75,8 +147,33 @@ namespace WPFTheWeakestRival.Infrastructure
                     : response.Lobby.AccessCode;
             }
 
-            return response;
+                return response;
+            }
+            catch (FaultException<ServiceFault> fault)
+            {
+                Logger.WarnFormat(
+                    "JoinByCodeAsync fault. Code={0}, Message={1}",
+                    fault.Detail.Code,
+                    fault.Detail.Message);
+                return null;
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("JoinByCodeAsync communication error.", ex);
+                return null;
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("JoinByCodeAsync timeout.", ex);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("JoinByCodeAsync unexpected error.", ex);
+                return null;
+            }
         }
+
 
         public async Task LeaveLobbyAsync(string token)
         {
@@ -149,11 +246,17 @@ namespace WPFTheWeakestRival.Infrastructure
             return _client.GetMyProfile(token);
         }
 
-        public Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
+        public async Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
                 throw new ArgumentException("Token requerido.", nameof(token));
+            }
+
+            if (client.State == CommunicationState.Faulted)
+            {
+                Logger.Warn("StartLobbyMatchAsync llamado con el canal en estado Faulted.");
+                return null;
             }
 
             var request = new StartLobbyMatchRequest
@@ -161,8 +264,40 @@ namespace WPFTheWeakestRival.Infrastructure
                 Token = token
             };
 
+            try
+            {
+                var response = await Task
+                    .Run(() => client.StartLobbyMatch(request))
+                    .ConfigureAwait(false);
+
+                return response;
+            }
+            catch (FaultException<ServiceFault> fault)
+            {
+                Logger.WarnFormat(
+                    "StartLobbyMatchAsync fault. Code={0}, Message={1}",
+                    fault.Detail.Code,
+                    fault.Detail.Message);
+                return null;
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("StartLobbyMatchAsync communication error.", ex);
+                return null;
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("StartLobbyMatchAsync timeout.", ex);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("StartLobbyMatchAsync unexpected error.", ex);
+                return null;
+            }
             return Task.Run(() => _client.StartLobbyMatch(request));
         }
+
 
         void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
         {
