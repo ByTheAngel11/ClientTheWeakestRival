@@ -14,7 +14,8 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyHub));
 
-        private readonly LobbyServiceClient _client;
+        private readonly LobbyServiceClient client;
+        private bool isStoppedOrDisposed;
 
         public Guid? CurrentLobbyId { get; private set; }
         public string CurrentAccessCode { get; private set; }
@@ -28,25 +29,22 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public LobbyHub(string endpointName)
         {
+            if (string.IsNullOrWhiteSpace(endpointName))
+            {
+                throw new ArgumentException("Endpoint name cannot be null or whitespace.", nameof(endpointName));
+            }
+
             var instanceContext = new InstanceContext(this);
-            _client = new LobbyServiceClient(instanceContext, endpointName);
+            client = new LobbyServiceClient(instanceContext, endpointName);
         }
 
-        public LobbyServiceClient RawClient => _client;
+        public LobbyServiceClient RawClient => client;
 
-        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token,string lobbyName,byte maxPlayers = DEFAULT_MAX_PLAYERS)
+        public async Task<CreateLobbyResponse> CreateLobbyAsync(
+            string token,
+            string lobbyName,
+            byte maxPlayers = DEFAULT_MAX_PLAYERS)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                throw new ArgumentException("Token requerido.", nameof(token));
-            }
-
-            if (client.State == CommunicationState.Faulted)
-            {
-                Logger.Warn("CreateLobbyAsync llamado con el canal en estado Faulted.");
-                return null;
-            }
-
             var request = new CreateLobbyRequest
             {
                 Token = token,
@@ -54,70 +52,25 @@ namespace WPFTheWeakestRival.Infrastructure
                 MaxPlayers = NormalizeMaxPlayers(maxPlayers)
             };
 
-            try
-            {
-                var response = await Task
-                    .Run(() => client.CreateLobby(request))
-                    .ConfigureAwait(false);
+            CreateLobbyResponse createResponse =
+                await Task.Run(() => client.CreateLobby(request)).ConfigureAwait(false);
 
-                if (response?.Lobby != null)
+            if (createResponse?.Lobby != null)
+            {
+                CurrentLobbyId = createResponse.Lobby.LobbyId;
+
+                if (!string.IsNullOrWhiteSpace(createResponse.Lobby.AccessCode))
                 {
-                    CurrentLobbyId = response.Lobby.LobbyId;
-                    CurrentAccessCode = response.Lobby.AccessCode;
+                    CurrentAccessCode = createResponse.Lobby.AccessCode;
                 }
-            var response = await Task.Run(() => _client.CreateLobby(request)).ConfigureAwait(false);
-            if (response?.Lobby != null)
-            {
-                CurrentLobbyId = response.Lobby.LobbyId;
-                CurrentAccessCode = response.Lobby.AccessCode;
             }
 
-                return response;
-            }
-            catch (FaultException<ServiceFault> fault)
-            {
-                Logger.WarnFormat(
-                    "CreateLobbyAsync fault. Code={0}, Message={1}",
-                    fault.Detail.Code,
-                    fault.Detail.Message);
-                return null;
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Warn("CreateLobbyAsync communication error.", ex);
-                return null;
-            }
-            catch (TimeoutException ex)
-            {
-                Logger.Warn("CreateLobbyAsync timeout.", ex);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("CreateLobbyAsync unexpected error.", ex);
-                return null;
-            }
+            return createResponse;
         }
-
 
         public async Task<JoinByCodeResponse> JoinByCodeAsync(string token, string accessCode)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                throw new ArgumentException("Token requerido.", nameof(token));
-            }
-
-            var normalizedCode = NormalizeAccessCode(accessCode);
-            if (string.IsNullOrWhiteSpace(normalizedCode))
-            {
-                throw new ArgumentException("Código de acceso requerido.", nameof(accessCode));
-            }
-
-            if (client.State == CommunicationState.Faulted)
-            {
-                Logger.Warn("JoinByCodeAsync llamado con el canal en estado Faulted.");
-                return null;
-            }
+            string normalizedCode = NormalizeAccessCode(accessCode);
 
             var request = new JoinByCodeRequest
             {
@@ -125,66 +78,39 @@ namespace WPFTheWeakestRival.Infrastructure
                 AccessCode = normalizedCode
             };
 
-            try
-            {
-                var response = await Task
-                    .Run(() => client.JoinByCode(request))
-                    .ConfigureAwait(false);
+            JoinByCodeResponse joinResponse =
+                await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
 
-                if (response?.Lobby != null)
-                {
-                    CurrentLobbyId = response.Lobby.LobbyId;
-                    CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
-                        ? normalizedCode
-                        : response.Lobby.AccessCode;
-                }
-            var response = await Task.Run(() => _client.JoinByCode(request)).ConfigureAwait(false);
-            if (response?.Lobby != null)
+            if (joinResponse?.Lobby != null)
             {
-                CurrentLobbyId = response.Lobby.LobbyId;
-                CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
+                CurrentLobbyId = joinResponse.Lobby.LobbyId;
+                CurrentAccessCode = string.IsNullOrWhiteSpace(joinResponse.Lobby.AccessCode)
                     ? normalizedCode
-                    : response.Lobby.AccessCode;
+                    : joinResponse.Lobby.AccessCode;
             }
 
-                return response;
-            }
-            catch (FaultException<ServiceFault> fault)
-            {
-                Logger.WarnFormat(
-                    "JoinByCodeAsync fault. Code={0}, Message={1}",
-                    fault.Detail.Code,
-                    fault.Detail.Message);
-                return null;
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Warn("JoinByCodeAsync communication error.", ex);
-                return null;
-            }
-            catch (TimeoutException ex)
-            {
-                Logger.Warn("JoinByCodeAsync timeout.", ex);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("JoinByCodeAsync unexpected error.", ex);
-                return null;
-            }
+            return joinResponse;
         }
-
 
         public async Task LeaveLobbyAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token) || !CurrentLobbyId.HasValue)
             {
+                CurrentLobbyId = null;
+                CurrentAccessCode = null;
+                return;
+            }
+
+            if (isStoppedOrDisposed)
+            {
+                CurrentLobbyId = null;
+                CurrentAccessCode = null;
                 return;
             }
 
             try
             {
-                if (_client.State == CommunicationState.Faulted)
+                if (client.State == CommunicationState.Faulted)
                 {
                     return;
                 }
@@ -195,7 +121,7 @@ namespace WPFTheWeakestRival.Infrastructure
                     LobbyId = CurrentLobbyId.Value
                 };
 
-                await Task.Run(() => _client.LeaveLobby(request)).ConfigureAwait(false);
+                await Task.Run(() => client.LeaveLobby(request)).ConfigureAwait(false);
             }
             catch (CommunicationObjectFaultedException ex)
             {
@@ -222,11 +148,11 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public Task SendMessageAsync(string token, Guid lobbyId, string message)
         {
-            var hasValidToken = !string.IsNullOrWhiteSpace(token);
-            var hasValidLobbyId = lobbyId != Guid.Empty;
-            var hasValidMessage = !string.IsNullOrWhiteSpace(message);
+            bool hasValidToken = !string.IsNullOrWhiteSpace(token);
+            bool hasValidLobbyId = lobbyId != Guid.Empty;
+            bool hasValidMessage = !string.IsNullOrWhiteSpace(message);
 
-            if (!hasValidToken || !hasValidLobbyId || !hasValidMessage)
+            if (!hasValidToken || !hasValidLobbyId || !hasValidMessage || isStoppedOrDisposed)
             {
                 return Task.CompletedTask;
             }
@@ -238,12 +164,17 @@ namespace WPFTheWeakestRival.Infrastructure
                 Message = message
             };
 
-            return Task.Run(() => _client.SendChatMessage(request));
+            return Task.Run(() => client.SendChatMessage(request));
         }
 
         public UpdateAccountResponse GetMyProfile(string token)
         {
-            return _client.GetMyProfile(token);
+            if (isStoppedOrDisposed)
+            {
+                return new UpdateAccountResponse();
+            }
+
+            return client.GetMyProfile(token);
         }
 
         public async Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
@@ -253,10 +184,9 @@ namespace WPFTheWeakestRival.Infrastructure
                 throw new ArgumentException("Token requerido.", nameof(token));
             }
 
-            if (client.State == CommunicationState.Faulted)
+            if (isStoppedOrDisposed)
             {
-                Logger.Warn("StartLobbyMatchAsync llamado con el canal en estado Faulted.");
-                return null;
+                return new StartLobbyMatchResponse();
             }
 
             var request = new StartLobbyMatchRequest
@@ -264,40 +194,11 @@ namespace WPFTheWeakestRival.Infrastructure
                 Token = token
             };
 
-            try
-            {
-                var response = await Task
-                    .Run(() => client.StartLobbyMatch(request))
-                    .ConfigureAwait(false);
+            StartLobbyMatchResponse startResponse =
+                await Task.Run(() => client.StartLobbyMatch(request)).ConfigureAwait(false);
 
-                return response;
-            }
-            catch (FaultException<ServiceFault> fault)
-            {
-                Logger.WarnFormat(
-                    "StartLobbyMatchAsync fault. Code={0}, Message={1}",
-                    fault.Detail.Code,
-                    fault.Detail.Message);
-                return null;
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Warn("StartLobbyMatchAsync communication error.", ex);
-                return null;
-            }
-            catch (TimeoutException ex)
-            {
-                Logger.Warn("StartLobbyMatchAsync timeout.", ex);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("StartLobbyMatchAsync unexpected error.", ex);
-                return null;
-            }
-            return Task.Run(() => _client.StartLobbyMatch(request));
+            return startResponse;
         }
-
 
         void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
         {
@@ -352,41 +253,58 @@ namespace WPFTheWeakestRival.Infrastructure
             ForcedLogout?.Invoke(notification);
         }
 
-        public void Dispose()
+        public void Stop()
         {
+            if (isStoppedOrDisposed)
+            {
+                return;
+            }
+
+            isStoppedOrDisposed = true;
+
             try
             {
-                if (_client.State == CommunicationState.Faulted)
+                if (client.State == CommunicationState.Faulted)
                 {
-                    _client.Abort();
+                    client.Abort();
                 }
                 else
                 {
-                    _client.Close();
+                    client.Close();
                 }
             }
             catch (CommunicationException ex)
             {
-                Logger.Warn("CommunicationException while disposing LobbyHub client. Aborting.", ex);
+                Logger.Warn("CommunicationException while stopping LobbyHub. Aborting.", ex);
                 SafeAbort();
             }
             catch (TimeoutException ex)
             {
-                Logger.Warn("TimeoutException while disposing LobbyHub client. Aborting.", ex);
+                Logger.Warn("TimeoutException while stopping LobbyHub. Aborting.", ex);
                 SafeAbort();
             }
             catch (Exception ex)
             {
-                Logger.Warn("Unexpected error while disposing LobbyHub client. Aborting.", ex);
+                Logger.Warn("Unexpected error while stopping LobbyHub. Aborting.", ex);
                 SafeAbort();
             }
+            finally
+            {
+                CurrentLobbyId = null;
+                CurrentAccessCode = null;
+            }
+        }
+
+        public void Dispose()
+        {
+            Stop();
         }
 
         private void SafeAbort()
         {
             try
             {
-                _client.Abort();
+                client.Abort();
             }
             catch (Exception ex)
             {
@@ -420,19 +338,5 @@ namespace WPFTheWeakestRival.Infrastructure
                 .Trim()
                 .ToUpperInvariant();
         }
-
-        public void Stop()
-        {
-            try
-            {
-                SafeAbort();
-            }
-            finally
-            {
-                CurrentLobbyId = null;
-                CurrentAccessCode = null;
-            }
-        }
-
     }
 }
