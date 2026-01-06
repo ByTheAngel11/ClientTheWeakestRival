@@ -58,6 +58,13 @@ namespace WPFTheWeakestRival
         private const byte ACCOUNT_STATUS_BANNED = 4;
 
         private const string SANCTION_END_TIME_FORMAT = "g";
+        private const string FRIEND_ENDPOINT_CONFIGURATION_NAME = "WSHttpBinding_IFriendService";
+
+        private const string INVITE_MENU_HEADER = "Invitar al lobby";
+
+        private const string ERROR_INVITE_NO_CODE = "No hay un código de lobby disponible para invitar.";
+        private const string ERROR_INVITE_GENERIC = "Ocurrió un error al enviar la invitación.";
+        private const string INFO_INVITE_SENT = "Invitación enviada.";
 
 
 
@@ -122,6 +129,9 @@ namespace WPFTheWeakestRival
             if (lstFriends != null)
             {
                 lstFriends.ItemsSource = friendItems;
+                lstFriends.PreviewMouseRightButtonDown += LstFriendsPreviewMouseRightButtonDown;
+                lstFriends.ContextMenuOpening += LstFriendsContextMenuOpening;
+
                 UpdateFriendDrawerUi();
             }
 
@@ -828,13 +838,21 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.ChatMessageReceived -= OnChatMessageReceivedFromHub;
                 AppServices.Lobby.MatchStarted -= OnMatchStartedFromHub;
                 AppServices.Lobby.ForcedLogout -= OnForcedLogoutFromHub;
+
                 AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
+
+                if (lstFriends != null)
+                {
+                    lstFriends.PreviewMouseRightButtonDown -= LstFriendsPreviewMouseRightButtonDown;
+                    lstFriends.ContextMenuOpening -= LstFriendsContextMenuOpening;
+                }
             }
             catch (Exception ex)
             {
                 Logger.Warn("Error detaching lobby and friends event handlers on window unload.", ex);
             }
         }
+
 
         protected override async void OnClosed(EventArgs e)
         {
@@ -1099,7 +1117,303 @@ namespace WPFTheWeakestRival
             Infraestructure.ForcedLogoutCoordinator.Handle(notification);
         }
 
-        
+        private void LstFriendsPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                if (lstFriends == null)
+                {
+                    return;
+                }
+
+                var origin = e.OriginalSource as DependencyObject;
+                var container = FindAncestor<ListBoxItem>(origin);
+                if (container == null)
+                {
+                    return;
+                }
+
+                lstFriends.SelectedItem = container.DataContext;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error selecting friend item on right click.", ex);
+            }
+        }
+
+        private void LstFriendsContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            try
+            {
+                if (lstFriends == null)
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                var friend = lstFriends.SelectedItem as FriendItem;
+                if (friend == null)
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                if (!currentLobbyId.HasValue || string.IsNullOrWhiteSpace(currentAccessCode))
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                var menu = new ContextMenu();
+
+                var inviteItem = new MenuItem
+                {
+                    Header = INVITE_MENU_HEADER,
+                    CommandParameter = friend
+                };
+
+                inviteItem.Click += MenuItemInviteToLobbyClick;
+
+                menu.Items.Add(inviteItem);
+
+                lstFriends.ContextMenu = menu;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error building friends context menu.", ex);
+                e.Handled = true;
+            }
+        }
+
+        private async void MenuItemInviteToLobbyClick(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var friend = menuItem?.CommandParameter as FriendItem;
+
+            if (friend == null)
+            {
+                return;
+            }
+
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            if (!currentLobbyId.HasValue || string.IsNullOrWhiteSpace(currentAccessCode))
+            {
+                MessageBox.Show(ERROR_INVITE_NO_CODE, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var client = new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME);
+
+            try
+            {
+                var request = new SendLobbyInviteEmailRequest
+                {
+                    Token = token,
+                    TargetAccountId = friend.AccountId,
+                    LobbyCode = currentAccessCode
+                };
+
+                await Task.Run(() => client.SendLobbyInviteEmail(request));
+
+                MessageBox.Show(INFO_INVITE_SENT, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (FaultException<FriendService.ServiceFault> ex)
+            {
+                Logger.Warn("Friend fault while sending lobby invite email.", ex);
+
+                MessageBox.Show(
+                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : ERROR_INVITE_GENERIC,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Communication error while sending lobby invite email.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while sending lobby invite email.", ex);
+
+                MessageBox.Show(ERROR_INVITE_GENERIC, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                try
+                {
+                    if (client.State == CommunicationState.Faulted)
+                    {
+                        client.Abort();
+                    }
+                    else
+                    {
+                        client.Close();
+                    }
+                }
+                catch
+                {
+                    try { client.Abort(); } catch { }
+                }
+            }
+        }
+
+        private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            while (current != null)
+            {
+                if (current is T match)
+                {
+                    return match;
+                }
+
+                current = VisualTreeHelper.GetParent(current);
+            }
+
+            return null;
+        }
+
+        private void FriendItemContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            try
+            {
+                var element = sender as FrameworkElement;
+                var friend = element?.DataContext as FriendItem;
+
+                if (friend == null)
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                if (element.ContextMenu == null)
+                {
+                    element.ContextMenu = new ContextMenu();
+                }
+
+                element.ContextMenu.Items.Clear();
+
+                var inviteItem = new MenuItem
+                {
+                    Header = INVITE_MENU_HEADER,
+                    CommandParameter = friend,
+                    IsEnabled =
+                        !string.IsNullOrWhiteSpace(currentAccessCode) &&
+                        friend.AccountId > 0
+                };
+
+                inviteItem.Click += MenuItemInviteLobbyByEmailClick;
+
+                element.ContextMenu.Items.Add(inviteItem);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error opening friend context menu.", ex);
+                e.Handled = true;
+            }
+        }
+
+        private async void MenuItemInviteLobbyByEmailClick(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var friend = menuItem?.CommandParameter as FriendItem;
+
+            if (friend == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(currentAccessCode))
+            {
+                MessageBox.Show(
+                    ERROR_INVITE_NO_CODE,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            if (friend.AccountId <= 0)
+            {
+                MessageBox.Show(
+                    ERROR_INVITE_GENERIC,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            var client = new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME);
+            try
+            {
+                var request = new SendLobbyInviteEmailRequest
+                {
+                    Token = token,
+                    TargetAccountId = friend.AccountId,
+                    LobbyCode = currentAccessCode
+                };
+
+                var response = await Task.Run(() => client.SendLobbyInviteEmail(request));
+
+                MessageBox.Show(
+                    response != null && response.Sent ? INFO_INVITE_SENT : ERROR_INVITE_GENERIC,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (FaultException<FriendService.ServiceFault> ex)
+            {
+                Logger.Warn("Friend invite fault.", ex);
+                MessageBox.Show(
+                    ex.Detail != null ? ex.Detail.Message : ERROR_INVITE_GENERIC,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Communication error sending lobby invite.", ex);
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error sending lobby invite.", ex);
+                MessageBox.Show(
+                    ERROR_INVITE_GENERIC,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                try { client.Close(); }
+                catch { client.Abort(); }
+            }
+        }
+
+
     }
 
 

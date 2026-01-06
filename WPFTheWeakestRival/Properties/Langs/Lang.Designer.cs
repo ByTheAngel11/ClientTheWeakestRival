@@ -709,6 +709,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Invite Lobby By Email.
+        /// </summary>
+        public static string mnuInviteLobbyByEmail {
+            get {
+                return ResourceManager.GetString("mnuInviteLobbyByEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Report.
         /// </summary>
         public static string mnuLobbyReportPlayer {

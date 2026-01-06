@@ -658,14 +658,14 @@
                                 </StackPanel>
 
                                 <ListBox x:Name="lstFriends"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         ItemTemplate="{StaticResource FriendItemTemplate}"
-                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                         VirtualizingPanel.IsVirtualizing="True"
-                                         VirtualizingPanel.ScrollUnit="Pixel"
-                                         Margin="4"/>
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ItemTemplate="{StaticResource FriendItemTemplate}"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.ScrollUnit="Pixel"
+                                     Margin="4"/>
                             </Grid>
                         </Border>
                     </Grid>

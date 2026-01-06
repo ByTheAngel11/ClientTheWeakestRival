@@ -496,4 +496,7 @@
   <data name="reportSanctionPermanent" xml:space="preserve">
     <value>Rapporto inviato. È stata applicata la sanzione permanente.</value>
   </data>
+  <data name="mnuInviteLobbyByEmail" xml:space="preserve">
+    <value>Invita lobby tramite e-mail</value>
+  </data>
 </root>

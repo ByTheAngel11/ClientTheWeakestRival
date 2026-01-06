@@ -214,14 +214,16 @@ namespace WPFTheWeakestRival.Infrastructure
 
                     items.Add(new Models.FriendItem
                     {
+                        AccountId = friend.AccountId,
                         DisplayName = displayName ?? string.Empty,
                         StatusText = friend.IsOnline
-                            ? Properties.Langs.Lang.statusAvailable
-                            : Properties.Langs.Lang.statusOffline,
+                        ? Properties.Langs.Lang.statusAvailable
+                        : Properties.Langs.Lang.statusOffline,
                         Presence = friend.IsOnline ? "Online" : "Offline",
                         Avatar = avatarImage,
                         IsOnline = friend.IsOnline
                     });
+
                 }
 
                 var pendingCount = Math.Max(0, response.PendingIncoming?.Length ?? 0);

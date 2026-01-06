@@ -1961,6 +1961,125 @@ namespace WPFTheWeakestRival.FriendService {
         Sleepy = 3,
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SendLobbyInviteEmailRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class SendLobbyInviteEmailRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        private int TargetAccountIdField;
+        
+        private string LobbyCodeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public int TargetAccountId {
+            get {
+                return this.TargetAccountIdField;
+            }
+            set {
+                if ((this.TargetAccountIdField.Equals(value) != true)) {
+                    this.TargetAccountIdField = value;
+                    this.RaisePropertyChanged("TargetAccountId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public string LobbyCode {
+            get {
+                return this.LobbyCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LobbyCodeField, value) != true)) {
+                    this.LobbyCodeField = value;
+                    this.RaisePropertyChanged("LobbyCode");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SendLobbyInviteEmailResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class SendLobbyInviteEmailResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool SentField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool Sent {
+            get {
+                return this.SentField;
+            }
+            set {
+                if ((this.SentField.Equals(value) != true)) {
+                    this.SentField = value;
+                    this.RaisePropertyChanged("Sent");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="FriendService.IFriendService")]
     public interface IFriendService {
@@ -2027,6 +2146,13 @@ namespace WPFTheWeakestRival.FriendService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetAccountsByIds", ReplyAction="http://tempuri.org/IFriendService/GetAccountsByIdsResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse> GetAccountsByIdsAsync(WPFTheWeakestRival.FriendService.GetAccountsByIdsRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/SendLobbyInviteEmail", ReplyAction="http://tempuri.org/IFriendService/SendLobbyInviteEmailResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.FriendService.ServiceFault), Action="http://tempuri.org/IFriendService/SendLobbyInviteEmailServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse SendLobbyInviteEmail(WPFTheWeakestRival.FriendService.SendLobbyInviteEmailRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/SendLobbyInviteEmail", ReplyAction="http://tempuri.org/IFriendService/SendLobbyInviteEmailResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse> SendLobbyInviteEmailAsync(WPFTheWeakestRival.FriendService.SendLobbyInviteEmailRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -2126,6 +2252,14 @@ namespace WPFTheWeakestRival.FriendService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse> GetAccountsByIdsAsync(WPFTheWeakestRival.FriendService.GetAccountsByIdsRequest request) {
             return base.Channel.GetAccountsByIdsAsync(request);
+        }
+        
+        public WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse SendLobbyInviteEmail(WPFTheWeakestRival.FriendService.SendLobbyInviteEmailRequest request) {
+            return base.Channel.SendLobbyInviteEmail(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse> SendLobbyInviteEmailAsync(WPFTheWeakestRival.FriendService.SendLobbyInviteEmailRequest request) {
+            return base.Channel.SendLobbyInviteEmailAsync(request);
         }
     }
 }

@@ -385,6 +385,9 @@
     <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.SendFriendRequestResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Connected Services\GameplayService\GameplayService.wsdl" />
     <None Include="Connected Services\GameplayService\item.xsd">
       <SubType>Designer</SubType>
