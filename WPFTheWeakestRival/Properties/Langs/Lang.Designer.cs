@@ -457,6 +457,141 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a The database took too long when sending a friend request. Please try again..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql__2 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.-2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database concurrency error when sending a friend request: Deadlock detected. try again.
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_1205 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.1205", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Failed to authenticate database access when sending a friend request (invalid credentials)..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_18456 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.18456", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database configuration error when sending a friend request: a required column is missing..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_207 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.207", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database configuration error when sending a friend request: The required table or view was not found..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_208 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.208", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You do not have sufficient permissions on the database to send a friend request..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_229 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.229", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database duplicity error when sending a friend request: An attempt was made to insert a duplicate record.
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_2601 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.2601", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database duplicity error when sending a friend request: An attempt was made to insert a record that already exists..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_2627 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.2627", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database configuration error when sending a friend request: A required stored procedure was not found..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_2812 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.2812", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a It was not possible to open a connection to the database when sending a friend request..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_40 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.40", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The database could not be accessed when sending a friend request: the database does not exist or you do not have permissions to use it.
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_4060 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.4060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Failed to connect to the database server when sending a friend request: the server is unavailable or the connection was refused..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_53 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.53", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Referential integrity error in the database when sending a friend request: the target player does not exist or is invalid.
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_547 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.547", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The database could not be accessed when sending a friend request: the indicated database does not exist or is not available..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_911 {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.911", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An unexpected database error occurred while sending a friend request..
+        /// </summary>
+        public static string Friends_SendFriendRequest_Sql_Unknown {
+            get {
+                return ResourceManager.GetString("Friends.SendFriendRequest.Sql.Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Error on the registration.
         /// </summary>
         public static string generalRegistError {
@@ -498,6 +633,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string lblEmail {
             get {
                 return ResourceManager.GetString("lblEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string lblFriendRequestsConnectionError {
+            get {
+                return ResourceManager.GetString("lblFriendRequestsConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string lblFriendRequestsTitle {
+            get {
+                return ResourceManager.GetString("lblFriendRequestsTitle", resourceCulture);
             }
         }
         
@@ -1182,6 +1335,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string txtPassword {
             get {
                 return ResourceManager.GetString("txtPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An unexpected error occurred. Please try again..
+        /// </summary>
+        public static string UiGenericError {
+            get {
+                return ResourceManager.GetString("UiGenericError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Warning.
+        /// </summary>
+        public static string UiTitleWarning {
+            get {
+                return ResourceManager.GetString("UiTitleWarning", resourceCulture);
             }
         }
     }

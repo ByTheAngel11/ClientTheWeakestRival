@@ -499,4 +499,73 @@
   <data name="mnuInviteLobbyByEmail" xml:space="preserve">
     <value>Invita lobby tramite e-mail</value>
   </data>
+  <data name="Friends.SendFriendRequest.Sql.2627" xml:space="preserve">
+    <value>Errore di duplicità del database durante l'invio di una richiesta di amicizia: è stato effettuato un tentativo di inserire un record già esistente.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2601" xml:space="preserve">
+    <value>Errore di duplicità del database durante l'invio di una richiesta di amicizia: è stato effettuato un tentativo di inserire un record duplicato</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.547" xml:space="preserve">
+    <value>Errore di integrità referenziale nel database durante l'invio di una richiesta di amicizia: il giocatore target non esiste o non è valido</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.1205" xml:space="preserve">
+    <value>Errore di concorrenza del database durante l'invio di una richiesta di amicizia: rilevato un deadlock. riprova</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.-2" xml:space="preserve">
+    <value>Il database ha impiegato troppo tempo durante l'invio di una richiesta di amicizia. Per favore riprova.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.4060" xml:space="preserve">
+    <value>Non è stato possibile accedere al database quando invii una richiesta di amicizia: il database non esiste o non hai i permessi per utilizzarlo</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.911" xml:space="preserve">
+    <value>Non è stato possibile accedere al database quando si invia una richiesta di amicizia: il database indicato non esiste o non è disponibile.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.18456" xml:space="preserve">
+    <value>Impossibile autenticare l'accesso al database durante l'invio di una richiesta di amicizia (credenziali non valide).</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.229" xml:space="preserve">
+    <value>Non disponi di permessi sufficienti sul database per inviare una richiesta di amicizia.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.208" xml:space="preserve">
+    <value>Errore di configurazione del database durante l'invio di una richiesta di amicizia: la tabella o la vista richiesta non è stata trovata.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.207" xml:space="preserve">
+    <value>Errore di configurazione del database durante l'invio di una richiesta di amicizia: manca una colonna obbligatoria.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2812" xml:space="preserve">
+    <value>Errore di configurazione del database durante l'invio di una richiesta di amicizia: non è stata trovata la procedura memorizzata richiesta.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.53" xml:space="preserve">
+    <value>Impossibile connettersi al server del database durante l'invio di una richiesta di amicizia: il server non è disponibile o la connessione è stata rifiutata.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
+    <value>Non è stato possibile aprire una connessione al database durante l'invio di una richiesta di amicizia.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>Si è verificato un errore imprevisto del database durante l'invio di una richiesta di amicizia.</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>Si è verificato un errore imprevisto. Per favore riprova.</value>
+  </data>
+  <data name="UiTitleWarning" xml:space="preserve">
+    <value>Avvertimento</value>
+  </data>
+  <data name="lblFriendRequestsTitle" xml:space="preserve">
+    <value>Richieste di amicizia</value>
+  </data>
+  <data name="lblFriendRequestsConnectionError" xml:space="preserve">
+    <value>Impossibile connettersi al servizio. Controlla la connessione e riprova.</value>
+  </data>
+  <data name="btnFriendRequestsAccept" xml:space="preserve">
+    <value>Accetta la richiesta</value>
+  </data>
+  <data name="btnFriendRequestsReject" xml:space="preserve">
+    <value>Rifiuta la richiesta</value>
+  </data>
+  <data name="btnFriendRequestsCancel" xml:space="preserve">
+    <value>Annulla richiesta</value>
+  </data>
+  <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
+    <value>La richiesta è già stata risolta.</value>
+  </data>
 </root>
