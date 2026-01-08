@@ -46,7 +46,8 @@
       <xs:element name="Code" nillable="true" type="xs:string" />
       <xs:element name="Password" nillable="true" type="xs:string" />
       <xs:element name="DisplayName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProfileImageBytes" nillable="true" type="xs:base64Binary" />
+      <xs:element minOccurs="0" name="ProfileImageContentType" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CompleteRegisterRequest" nillable="true" type="tns:CompleteRegisterRequest" />
@@ -70,7 +71,8 @@
       <xs:element name="Email" nillable="true" type="xs:string" />
       <xs:element name="Password" nillable="true" type="xs:string" />
       <xs:element name="DisplayName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ProfileImageUrl" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProfileImageBytes" nillable="true" type="xs:base64Binary" />
+      <xs:element minOccurs="0" name="ProfileImageContentType" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="RegisterRequest" nillable="true" type="tns:RegisterRequest" />
@@ -114,4 +116,33 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CompletePasswordResetRequest" nillable="true" type="tns:CompletePasswordResetRequest" />
+  <xs:complexType name="GetProfileImageRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="UserId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetProfileImageRequest" nillable="true" type="tns:GetProfileImageRequest" />
+  <xs:complexType name="GetProfileImageResponse">
+    <xs:sequence>
+      <xs:element name="UserId" type="xs:int" />
+      <xs:element name="HasImage" type="xs:boolean" />
+      <xs:element minOccurs="0" name="ImageBytes" nillable="true" type="xs:base64Binary">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="ContentType" nillable="true" type="xs:string">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="UpdatedAtUtc" nillable="true" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetProfileImageResponse" nillable="true" type="tns:GetProfileImageResponse" />
 </xs:schema>

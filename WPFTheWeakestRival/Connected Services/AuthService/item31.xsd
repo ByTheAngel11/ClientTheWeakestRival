@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8082/auth/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
+  <xs:import schemaLocation="http://10.11.2.232:8082/auth/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
   <xs:element name="Ping">
     <xs:complexType>
       <xs:sequence>
@@ -107,6 +107,20 @@
   <xs:element name="CompletePasswordResetResponse">
     <xs:complexType>
       <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetProfileImage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q15:GetProfileImageRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetProfileImageResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetProfileImageResult" nillable="true" type="q16:GetProfileImageResponse" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 </xs:schema>

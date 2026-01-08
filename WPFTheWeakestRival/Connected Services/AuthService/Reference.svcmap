@@ -22,11 +22,11 @@
     <MetadataSource Address="http://localhost:8082/auth/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="dadce89d-1000-4343-8ab9-03075cf8d91f" SourceId="1" SourceUrl="http://localhost:8082/auth/?disco" />
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="32850d9a-742d-4e18-ac84-1c849fed10a8" SourceId="1" SourceUrl="http://localhost:8082/auth/?xsd=xsd2" />
-    <MetadataFile FileName="AuthService.wsdl" MetadataType="Wsdl" ID="eaf7d75a-1495-4d33-bf86-a692848cd314" SourceId="1" SourceUrl="http://localhost:8082/auth/?wsdl" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="ca49a9be-1f3c-4ac5-b2cf-a65e18a77034" SourceId="1" SourceUrl="http://localhost:8082/auth/?xsd=xsd1" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="7e7539cb-fcf5-433b-81c9-3e6b5a680b06" SourceId="1" SourceUrl="http://localhost:8082/auth/?xsd=xsd0" />
+    <MetadataFile FileName="item3.xsd" MetadataType="Schema" ID="7cccdae5-b0fb-4d9f-8623-e0ca4d0dccf7" SourceId="1" SourceUrl="http://10.11.2.232:8082/auth/?xsd=xsd2" />
+    <MetadataFile FileName="item31.xsd" MetadataType="Schema" ID="f59c27fe-1869-449c-ab93-ba1ee1b5c056" SourceId="1" SourceUrl="http://10.11.2.232:8082/auth/?xsd=xsd0" />
+    <MetadataFile FileName="item1.disco" MetadataType="Disco" ID="ef3957a0-8ce0-4cc1-9510-692eec4c3a88" SourceId="1" SourceUrl="http://10.11.2.232:8082/auth/?disco" />
+    <MetadataFile FileName="AuthService1.wsdl" MetadataType="Wsdl" ID="ea773360-00e5-4677-a78a-72523d4ab30e" SourceId="1" SourceUrl="http://10.11.2.232:8082/auth/?wsdl" />
+    <MetadataFile FileName="item32.xsd" MetadataType="Schema" ID="a1e8866c-603f-43b6-a3ee-b1a2e172b252" SourceId="1" SourceUrl="http://10.11.2.232:8082/auth/?xsd=xsd1" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

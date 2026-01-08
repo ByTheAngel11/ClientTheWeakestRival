@@ -9,9 +9,9 @@
   </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
-      <xsd:import schemaLocation="http://localhost:8082/auth/?xsd=xsd0" namespace="http://tempuri.org/" />
-      <xsd:import schemaLocation="http://localhost:8082/auth/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-      <xsd:import schemaLocation="http://localhost:8082/auth/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
+      <xsd:import schemaLocation="http://10.11.2.232:8082/auth/?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://10.11.2.232:8082/auth/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://10.11.2.232:8082/auth/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IAuthService_Ping_InputMessage">
@@ -74,6 +74,15 @@
   <wsdl:message name="IAuthService_CompletePasswordReset_OutputMessage">
     <wsdl:part name="parameters" element="tns:CompletePasswordResetResponse" />
   </wsdl:message>
+  <wsdl:message name="IAuthService_GetProfileImage_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetProfileImage" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_GetProfileImage_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetProfileImageResponse" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_GetProfileImage_ServiceFaultFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q5:ServiceFault" />
+  </wsdl:message>
   <wsdl:portType name="IAuthService">
     <wsdl:operation name="Ping">
       <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/Ping" message="tns:IAuthService_Ping_InputMessage" />
@@ -110,6 +119,11 @@
     <wsdl:operation name="CompletePasswordReset">
       <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/CompletePasswordReset" message="tns:IAuthService_CompletePasswordReset_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/CompletePasswordResetResponse" message="tns:IAuthService_CompletePasswordReset_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetProfileImage">
+      <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/GetProfileImage" message="tns:IAuthService_GetProfileImage_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/GetProfileImageResponse" message="tns:IAuthService_GetProfileImage_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IAuthService/GetProfileImageServiceFaultFault" name="ServiceFaultFault" message="tns:IAuthService_GetProfileImage_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WSHttpBinding_IAuthService" type="tns:IAuthService">
@@ -199,12 +213,24 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetProfileImage">
+      <soap12:operation soapAction="http://tempuri.org/IAuthService/GetProfileImage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceFaultFault">
+        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="AuthService">
     <wsdl:port name="WSHttpBinding_IAuthService" binding="tns:WSHttpBinding_IAuthService">
-      <soap12:address location="http://localhost:8082/auth/" />
+      <soap12:address location="http://10.11.2.232:8082/auth/" />
       <wsa10:EndpointReference>
-        <wsa10:Address>http://localhost:8082/auth/</wsa10:Address>
+        <wsa10:Address>http://10.11.2.232:8082/auth/</wsa10:Address>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>

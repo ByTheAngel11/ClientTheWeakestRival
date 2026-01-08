@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using log4net;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Linq;
@@ -15,8 +16,17 @@ namespace WPFTheWeakestRival
 {
     public partial class RegistrationWindow : Window
     {
-        private string selectedImagePath;
-        private string copiedImagePath;
+        private const int ONE_KILOBYTE_BYTES = 1024;
+        private const int PROFILE_IMAGE_MAX_KB = 512;
+        private const int PROFILE_IMAGE_MAX_BYTES = PROFILE_IMAGE_MAX_KB * ONE_KILOBYTE_BYTES;
+
+        private const string CONTENT_TYPE_PNG = "image/png";
+        private const string CONTENT_TYPE_JPEG = "image/jpeg";
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(RegistrationWindow));
+
+        private byte[] selectedProfileImageBytes;
+        private string selectedProfileImageContentType;
 
         public RegistrationWindow()
         {
@@ -51,7 +61,6 @@ namespace WPFTheWeakestRival
             if (cmbLanguage.SelectedItem is ComboBoxItem item)
             {
                 var code = (item.Tag as string) ?? "es";
-
                 LocalizationManager.Current.SetCulture(code);
             }
         }
@@ -61,47 +70,142 @@ namespace WPFTheWeakestRival
             var dialog = new OpenFileDialog
             {
                 Title = Lang.btnChooseImage,
-                Filter = "Images|*.png;*.jpg;*.jpeg;*.bmp;*.gif",
+                Filter = "Images|*.png;*.jpg;*.jpeg",
                 Multiselect = false,
                 CheckFileExists = true
             };
 
-            if (dialog.ShowDialog() == true)
+            if (dialog.ShowDialog() != true)
             {
-                selectedImagePath = dialog.FileName;
+                return;
+            }
 
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.UriSource = new Uri(selectedImagePath, UriKind.Absolute);
-                bitmap.EndInit();
-                bitmap.Freeze();
+            try
+            {
+                string filePath = dialog.FileName;
 
-                imgPreview.Source = bitmap;
-                txtImgName.Text = Path.GetFileName(selectedImagePath);
+                byte[] bytes = File.ReadAllBytes(filePath);
+                string contentType = DetectContentTypeOrEmpty(filePath, bytes);
+
+                ValidateProfileImageOrThrow(bytes, contentType);
+
+                selectedProfileImageBytes = bytes;
+                selectedProfileImageContentType = contentType;
+
+                imgPreview.Source = CreateBitmapFromBytes(bytes);
+                txtImgName.Text = Path.GetFileName(filePath);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("RegistrationWindow.ChooseImageClick: invalid image.", ex);
+
+                selectedProfileImageBytes = null;
+                selectedProfileImageContentType = null;
+                imgPreview.Source = null;
+                txtImgName.Text = string.Empty;
+
+                MessageBox.Show(
+                    "Only PNG/JPG images up to 512 KB are allowed.",
+                    Lang.registerTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
-        private static string SaveProfileImageCopy(string sourcePath)
+        private static BitmapImage CreateBitmapFromBytes(byte[] bytes)
         {
-            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
+            var bitmap = new BitmapImage();
+            using (var ms = new MemoryStream(bytes))
             {
-                return null;
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = ms;
+                bitmap.EndInit();
+                bitmap.Freeze();
             }
 
-            var destinationDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "TheWeakestRival",
-                "ProfileImages");
+            return bitmap;
+        }
 
-            Directory.CreateDirectory(destinationDirectory);
+        private static void ValidateProfileImageOrThrow(byte[] bytes, string contentType)
+        {
+            if (bytes == null || bytes.Length == 0)
+            {
+                return;
+            }
 
-            var extension = Path.GetExtension(sourcePath);
-            var fileName = Guid.NewGuid().ToString("N") + extension;
-            var destinationPath = Path.Combine(destinationDirectory, fileName);
+            if (bytes.Length > PROFILE_IMAGE_MAX_BYTES)
+            {
+                throw new InvalidOperationException("Image too large.");
+            }
 
-            File.Copy(sourcePath, destinationPath, overwrite: false);
-            return destinationPath;
+            bool isAllowed =
+                string.Equals(contentType, CONTENT_TYPE_PNG, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(contentType, CONTENT_TYPE_JPEG, StringComparison.OrdinalIgnoreCase);
+
+            if (!isAllowed)
+            {
+                throw new InvalidOperationException("Invalid content type.");
+            }
+
+            if (!MatchesSignature(bytes, contentType))
+            {
+                throw new InvalidOperationException("Signature mismatch.");
+            }
+        }
+
+        private static bool MatchesSignature(byte[] bytes, string contentType)
+        {
+            if (bytes == null || bytes.Length < 8)
+            {
+                return false;
+            }
+
+            if (string.Equals(contentType, CONTENT_TYPE_PNG, StringComparison.OrdinalIgnoreCase))
+            {
+                return bytes[0] == 0x89 &&
+                       bytes[1] == 0x50 &&
+                       bytes[2] == 0x4E &&
+                       bytes[3] == 0x47 &&
+                       bytes[4] == 0x0D &&
+                       bytes[5] == 0x0A &&
+                       bytes[6] == 0x1A &&
+                       bytes[7] == 0x0A;
+            }
+
+            if (string.Equals(contentType, CONTENT_TYPE_JPEG, StringComparison.OrdinalIgnoreCase))
+            {
+                return bytes[0] == 0xFF && bytes[1] == 0xD8;
+            }
+
+            return false;
+        }
+
+        private static string DetectContentTypeOrEmpty(string filePath, byte[] bytes)
+        {
+            string ext = (Path.GetExtension(filePath) ?? string.Empty).ToLowerInvariant();
+            if (ext == ".png")
+            {
+                return CONTENT_TYPE_PNG;
+            }
+
+            if (ext == ".jpg" || ext == ".jpeg")
+            {
+                return CONTENT_TYPE_JPEG;
+            }
+
+            // fallback por firma
+            if (MatchesSignature(bytes, CONTENT_TYPE_PNG))
+            {
+                return CONTENT_TYPE_PNG;
+            }
+
+            if (MatchesSignature(bytes, CONTENT_TYPE_JPEG))
+            {
+                return CONTENT_TYPE_JPEG;
+            }
+
+            return string.Empty;
         }
 
         private static bool IsValidEmail(string email)
@@ -134,9 +238,9 @@ namespace WPFTheWeakestRival
                 return false;
             }
 
-            var hasUpper = password.Any(char.IsUpper);
-            var hasLower = password.Any(char.IsLower);
-            var hasDigit = password.Any(char.IsDigit);
+            bool hasUpper = password.Any(char.IsUpper);
+            bool hasLower = password.Any(char.IsLower);
+            bool hasDigit = password.Any(char.IsDigit);
 
             return hasUpper && hasLower && hasDigit;
         }
@@ -157,80 +261,49 @@ namespace WPFTheWeakestRival
 
             try
             {
-                var displayName = txtUsername.Text?.Trim();
-                var email = txtEmail.Text?.Trim();
-                var password = pstPassword.Password ?? string.Empty;
-                var confirmPassword = pstConfirmPassword.Password ?? string.Empty;
+                string displayName = txtUsername.Text?.Trim();
+                string email = txtEmail.Text?.Trim();
+                string password = pstPassword.Password ?? string.Empty;
+                string confirmPassword = pstConfirmPassword.Password ?? string.Empty;
 
                 if (!UsernameHasNoSpaces(displayName))
                 {
-                    MessageBox.Show(
-                        Lang.errorUsernameWithoutSpaces,
-                        Lang.registerTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    MessageBox.Show(Lang.errorUsernameWithoutSpaces, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!IsValidEmail(email))
                 {
-                    MessageBox.Show(
-                        Lang.errorInvalidEmail,
-                        Lang.registerTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    MessageBox.Show(Lang.errorInvalidEmail, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!PasswordMeetsRequirements(password))
                 {
-                    MessageBox.Show(
-                        Lang.errorPasswordStructure,
-                        Lang.registerTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    MessageBox.Show(Lang.errorPasswordStructure, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 if (!string.Equals(password, confirmPassword, StringComparison.Ordinal))
                 {
-                    MessageBox.Show(
-                        Lang.errorMatchingPasswords,
-                        Lang.registerTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    MessageBox.Show(Lang.errorMatchingPasswords, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                string profilePath = null;
-                if (!string.IsNullOrWhiteSpace(selectedImagePath))
-                {
-                    profilePath = SaveProfileImageCopy(selectedImagePath);
-                    copiedImagePath = profilePath;
-                }
-
                 var authClient = new AuthServiceClient();
+
                 try
                 {
-                    var beginResponse = await authClient.BeginRegisterAsync(new BeginRegisterRequest
-                    {
-                        Email = email
-                    });
+                    var beginResponse = await authClient.BeginRegisterAsync(new BeginRegisterRequest { Email = email });
 
-                    if (authClient.State != CommunicationState.Faulted)
-                    {
-                        authClient.Close();
-                    }
-                    else
-                    {
-                        authClient.Abort();
-                    }
+                    SafeClose(authClient);
 
                     var verificationWindow = new EmailVerificationWindow(
                         email: email,
                         displayName: displayName,
                         password: password,
-                        profileImagePath: profilePath,
+                        profileImageBytes: selectedProfileImageBytes,
+                        profileImageContentType: selectedProfileImageContentType,
                         resendCooldownSeconds: beginResponse.ResendAfterSeconds)
                     {
                         Owner = this
@@ -242,25 +315,64 @@ namespace WPFTheWeakestRival
                 catch (FaultException<ServiceFault> fx)
                 {
                     authClient.Abort();
-                    MessageBox.Show(
-                        $"{fx.Detail.Code}: {fx.Detail.Message}",
-                        "Auth",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
+                    MessageBox.Show(fx.Detail.Message, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (EndpointNotFoundException ex)
+                {
+                    authClient.Abort();
+                    Logger.Error("RegistrationWindow.RegisterClick: endpoint not found.", ex);
+
+                    MessageBox.Show("Service is unavailable. Please try again later.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (CommunicationException ex)
+                {
+                    authClient.Abort();
+                    Logger.Error("RegistrationWindow.RegisterClick: communication error.", ex);
+
+                    MessageBox.Show("Network error. Please try again later.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                catch (TimeoutException ex)
+                {
+                    authClient.Abort();
+                    Logger.Error("RegistrationWindow.RegisterClick: timeout.", ex);
+
+                    MessageBox.Show("Request timed out. Please try again.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 catch (Exception ex)
                 {
                     authClient.Abort();
-                    MessageBox.Show(
-                        "Error de red/servicio: " + ex.Message,
-                        "Auth",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    Logger.Error("RegistrationWindow.RegisterClick: unexpected error.", ex);
+
+                    MessageBox.Show("Unexpected error. Please try again later.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             finally
             {
                 btnRegister.IsEnabled = true;
+            }
+        }
+
+        private static void SafeClose(ICommunicationObject obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (obj.State != CommunicationState.Faulted)
+                {
+                    obj.Close();
+                }
+                else
+                {
+                    obj.Abort();
+                }
+            }
+            catch
+            {
+                obj.Abort();
             }
         }
 

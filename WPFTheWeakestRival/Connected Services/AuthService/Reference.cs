@@ -313,7 +313,10 @@ namespace WPFTheWeakestRival.AuthService {
         private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ProfileImageUrlField;
+        private byte[] ProfileImageBytesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageContentTypeField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -378,14 +381,27 @@ namespace WPFTheWeakestRival.AuthService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public string ProfileImageUrl {
+        public byte[] ProfileImageBytes {
             get {
-                return this.ProfileImageUrlField;
+                return this.ProfileImageBytesField;
             }
             set {
-                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
-                    this.ProfileImageUrlField = value;
-                    this.RaisePropertyChanged("ProfileImageUrl");
+                if ((object.ReferenceEquals(this.ProfileImageBytesField, value) != true)) {
+                    this.ProfileImageBytesField = value;
+                    this.RaisePropertyChanged("ProfileImageBytes");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public string ProfileImageContentType {
+            get {
+                return this.ProfileImageContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageContentTypeField, value) != true)) {
+                    this.ProfileImageContentTypeField = value;
+                    this.RaisePropertyChanged("ProfileImageContentType");
                 }
             }
         }
@@ -549,7 +565,10 @@ namespace WPFTheWeakestRival.AuthService {
         private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ProfileImageUrlField;
+        private byte[] ProfileImageBytesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageContentTypeField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -601,14 +620,27 @@ namespace WPFTheWeakestRival.AuthService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public string ProfileImageUrl {
+        public byte[] ProfileImageBytes {
             get {
-                return this.ProfileImageUrlField;
+                return this.ProfileImageBytesField;
             }
             set {
-                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
-                    this.ProfileImageUrlField = value;
-                    this.RaisePropertyChanged("ProfileImageUrl");
+                if ((object.ReferenceEquals(this.ProfileImageBytesField, value) != true)) {
+                    this.ProfileImageBytesField = value;
+                    this.RaisePropertyChanged("ProfileImageBytes");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public string ProfileImageContentType {
+            get {
+                return this.ProfileImageContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageContentTypeField, value) != true)) {
+                    this.ProfileImageContentTypeField = value;
+                    this.RaisePropertyChanged("ProfileImageContentType");
                 }
             }
         }
@@ -953,6 +985,172 @@ namespace WPFTheWeakestRival.AuthService {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GetProfileImageRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GetProfileImageRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        private int UserIdField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int UserId {
+            get {
+                return this.UserIdField;
+            }
+            set {
+                if ((this.UserIdField.Equals(value) != true)) {
+                    this.UserIdField = value;
+                    this.RaisePropertyChanged("UserId");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GetProfileImageResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GetProfileImageResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private int UserIdField;
+        
+        private bool HasImageField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte[] ImageBytesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ContentTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<System.DateTime> UpdatedAtUtcField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public int UserId {
+            get {
+                return this.UserIdField;
+            }
+            set {
+                if ((this.UserIdField.Equals(value) != true)) {
+                    this.UserIdField = value;
+                    this.RaisePropertyChanged("UserId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public bool HasImage {
+            get {
+                return this.HasImageField;
+            }
+            set {
+                if ((this.HasImageField.Equals(value) != true)) {
+                    this.HasImageField = value;
+                    this.RaisePropertyChanged("HasImage");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public byte[] ImageBytes {
+            get {
+                return this.ImageBytesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ImageBytesField, value) != true)) {
+                    this.ImageBytesField = value;
+                    this.RaisePropertyChanged("ImageBytes");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string ContentType {
+            get {
+                return this.ContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ContentTypeField, value) != true)) {
+                    this.ContentTypeField = value;
+                    this.RaisePropertyChanged("ContentType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public System.Nullable<System.DateTime> UpdatedAtUtc {
+            get {
+                return this.UpdatedAtUtcField;
+            }
+            set {
+                if ((this.UpdatedAtUtcField.Equals(value) != true)) {
+                    this.UpdatedAtUtcField = value;
+                    this.RaisePropertyChanged("UpdatedAtUtc");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="AuthService.IAuthService")]
     public interface IAuthService {
@@ -1008,6 +1206,13 @@ namespace WPFTheWeakestRival.AuthService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/CompletePasswordReset", ReplyAction="http://tempuri.org/IAuthService/CompletePasswordResetResponse")]
         System.Threading.Tasks.Task CompletePasswordResetAsync(WPFTheWeakestRival.AuthService.CompletePasswordResetRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/GetProfileImage", ReplyAction="http://tempuri.org/IAuthService/GetProfileImageResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.AuthService.ServiceFault), Action="http://tempuri.org/IAuthService/GetProfileImageServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.AuthService.GetProfileImageResponse GetProfileImage(WPFTheWeakestRival.AuthService.GetProfileImageRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/GetProfileImage", ReplyAction="http://tempuri.org/IAuthService/GetProfileImageResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.GetProfileImageResponse> GetProfileImageAsync(WPFTheWeakestRival.AuthService.GetProfileImageRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1099,6 +1304,14 @@ namespace WPFTheWeakestRival.AuthService {
         
         public System.Threading.Tasks.Task CompletePasswordResetAsync(WPFTheWeakestRival.AuthService.CompletePasswordResetRequest request) {
             return base.Channel.CompletePasswordResetAsync(request);
+        }
+        
+        public WPFTheWeakestRival.AuthService.GetProfileImageResponse GetProfileImage(WPFTheWeakestRival.AuthService.GetProfileImageRequest request) {
+            return base.Channel.GetProfileImage(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.GetProfileImageResponse> GetProfileImageAsync(WPFTheWeakestRival.AuthService.GetProfileImageRequest request) {
+            return base.Channel.GetProfileImageAsync(request);
         }
     }
 }

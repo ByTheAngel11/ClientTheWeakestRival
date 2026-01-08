@@ -321,20 +321,23 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Connected Services\AuthService\AuthService.wsdl" />
-    <None Include="Connected Services\AuthService\item.xsd">
+    <None Include="Connected Services\AuthService\AuthService1.wsdl" />
+    <None Include="Connected Services\AuthService\item3.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\AuthService\item1.xsd">
+    <None Include="Connected Services\AuthService\item31.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\AuthService\item2.xsd">
+    <None Include="Connected Services\AuthService\item32.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.BeginPasswordResetResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.BeginRegisterResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.GetProfileImageResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.LoginResponse.datasource">
@@ -611,9 +614,6 @@
     <WCFMetadataStorage Include="Connected Services\WildcardService\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Connected Services\AuthService\item.disco" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Connected Services\AuthService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
@@ -759,6 +759,9 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\AuthService\item1.disco" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
