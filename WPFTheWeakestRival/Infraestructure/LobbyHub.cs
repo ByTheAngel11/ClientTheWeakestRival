@@ -8,19 +8,28 @@ using WPFTheWeakestRival.LobbyService;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
-    [CallbackBehavior(UseSynchronizationContext = true, ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public sealed class LobbyHub : ILobbyServiceCallback, IDisposable, IStoppable
     {
         private const byte DEFAULT_MAX_PLAYERS = 8;
         private const byte MIN_ALLOWED_MAX_PLAYERS = 1;
 
+        private const string ERROR_TOKEN_REQUIRED = "Token requerido.";
+        private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
+        private const string LOG_UI_ERROR = "LobbyHub.Ui error.";
+        private const string LOG_CHANNEL_FAULTED_CREATE = "CreateLobbyAsync called with channel Faulted.";
+        private const string LOG_CHANNEL_FAULTED_JOIN = "JoinByCodeAsync called with channel Faulted.";
+        private const string LOG_CHANNEL_FAULTED_START = "StartLobbyMatchAsync called with channel Faulted.";
+
+        private static readonly DispatcherPriority UiDispatcherPriority = DispatcherPriority.Send;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyHub));
 
         private readonly LobbyServiceClient client;
+        private readonly Dispatcher dispatcher;
         private bool isStoppedOrDisposed;
 
         public Guid? CurrentLobbyId { get; private set; }
-        public string CurrentAccessCode { get; private set; }
+        public string CurrentAccessCode { get; private set; } = string.Empty;
 
         public event Action<LobbyInfo> LobbyUpdated;
         public event Action<PlayerSummary> PlayerJoined;
@@ -33,8 +42,10 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(endpointName))
             {
-                throw new ArgumentException("Endpoint name cannot be null or whitespace.", nameof(endpointName));
+                throw new ArgumentException(ERROR_ENDPOINT_REQUIRED, nameof(endpointName));
             }
+
+            dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
 
             var instanceContext = new InstanceContext(this);
             client = new LobbyServiceClient(instanceContext, endpointName);
@@ -47,6 +58,22 @@ namespace WPFTheWeakestRival.Infrastructure
             string lobbyName,
             byte maxPlayers = DEFAULT_MAX_PLAYERS)
         {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
+            }
+
+            if (isStoppedOrDisposed)
+            {
+                return new CreateLobbyResponse();
+            }
+
+            if (client.State == CommunicationState.Faulted)
+            {
+                Logger.Warn(LOG_CHANNEL_FAULTED_CREATE);
+                return new CreateLobbyResponse();
+            }
+
             var request = new CreateLobbyRequest
             {
                 Token = token,
@@ -54,25 +81,68 @@ namespace WPFTheWeakestRival.Infrastructure
                 MaxPlayers = NormalizeMaxPlayers(maxPlayers)
             };
 
-            CreateLobbyResponse createResponse =
-                await Task.Run(() => client.CreateLobby(request)).ConfigureAwait(false);
-
-            if (createResponse?.Lobby != null)
+            try
             {
-                CurrentLobbyId = createResponse.Lobby.LobbyId;
+                CreateLobbyResponse response =
+                    await Task.Run(() => client.CreateLobby(request)).ConfigureAwait(false);
 
-                if (!string.IsNullOrWhiteSpace(createResponse.Lobby.AccessCode))
+                if (response != null && response.Lobby != null)
                 {
-                    CurrentAccessCode = createResponse.Lobby.AccessCode;
+                    CurrentLobbyId = response.Lobby.LobbyId;
+                    CurrentAccessCode = response.Lobby.AccessCode ?? string.Empty;
                 }
-            }
 
-            return createResponse;
+                return response ?? new CreateLobbyResponse();
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                Logger.WarnFormat(
+                    "CreateLobbyAsync fault. Code={0}, Message={1}",
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
+                return new CreateLobbyResponse();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("CreateLobbyAsync communication error.", ex);
+                return new CreateLobbyResponse();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("CreateLobbyAsync timeout.", ex);
+                return new CreateLobbyResponse();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("CreateLobbyAsync unexpected error.", ex);
+                return new CreateLobbyResponse();
+            }
         }
 
         public async Task<JoinByCodeResponse> JoinByCodeAsync(string token, string accessCode)
         {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
+            }
+
+            if (isStoppedOrDisposed)
+            {
+                return new JoinByCodeResponse();
+            }
+
             string normalizedCode = NormalizeAccessCode(accessCode);
+            if (string.IsNullOrWhiteSpace(normalizedCode))
+            {
+                return new JoinByCodeResponse();
+            }
+
+            if (client.State == CommunicationState.Faulted)
+            {
+                Logger.Warn(LOG_CHANNEL_FAULTED_JOIN);
+                return new JoinByCodeResponse();
+            }
 
             var request = new JoinByCodeRequest
             {
@@ -80,33 +150,58 @@ namespace WPFTheWeakestRival.Infrastructure
                 AccessCode = normalizedCode
             };
 
-            JoinByCodeResponse joinResponse =
-                await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
-
-            if (joinResponse?.Lobby != null)
+            try
             {
-                CurrentLobbyId = joinResponse.Lobby.LobbyId;
-                CurrentAccessCode = string.IsNullOrWhiteSpace(joinResponse.Lobby.AccessCode)
-                    ? normalizedCode
-                    : joinResponse.Lobby.AccessCode;
-            }
+                JoinByCodeResponse response =
+                    await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
 
-            return joinResponse;
+                if (response != null && response.Lobby != null)
+                {
+                    CurrentLobbyId = response.Lobby.LobbyId;
+                    CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
+                        ? normalizedCode
+                        : response.Lobby.AccessCode;
+                }
+
+                return response ?? new JoinByCodeResponse();
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                Logger.WarnFormat(
+                    "JoinByCodeAsync fault. Code={0}, Message={1}",
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
+                return new JoinByCodeResponse();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("JoinByCodeAsync communication error.", ex);
+                return new JoinByCodeResponse();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("JoinByCodeAsync timeout.", ex);
+                return new JoinByCodeResponse();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("JoinByCodeAsync unexpected error.", ex);
+                return new JoinByCodeResponse();
+            }
         }
 
         public async Task LeaveLobbyAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token) || !CurrentLobbyId.HasValue)
             {
-                CurrentLobbyId = null;
-                CurrentAccessCode = null;
+                ResetLobbyContext();
                 return;
             }
 
             if (isStoppedOrDisposed)
             {
-                CurrentLobbyId = null;
-                CurrentAccessCode = null;
+                ResetLobbyContext();
                 return;
             }
 
@@ -114,6 +209,7 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 if (client.State == CommunicationState.Faulted)
                 {
+                    ResetLobbyContext();
                     return;
                 }
 
@@ -143,8 +239,7 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             finally
             {
-                CurrentLobbyId = null;
-                CurrentAccessCode = null;
+                ResetLobbyContext();
             }
         }
 
@@ -166,28 +261,66 @@ namespace WPFTheWeakestRival.Infrastructure
                 Message = message
             };
 
-            return Task.Run(() => client.SendChatMessage(request));
+            return Task.Run(() => SendChatMessageInternal(request));
         }
 
         public UpdateAccountResponse GetMyProfile(string token)
         {
-            if (isStoppedOrDisposed)
+            if (isStoppedOrDisposed || string.IsNullOrWhiteSpace(token))
             {
                 return new UpdateAccountResponse();
             }
 
-            return client.GetMyProfile(token);
+            try
+            {
+                if (client.State == CommunicationState.Faulted)
+                {
+                    return new UpdateAccountResponse();
+                }
+
+                return client.GetMyProfile(token) ?? new UpdateAccountResponse();
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                Logger.WarnFormat(
+                    "GetMyProfile fault. Code={0}, Message={1}",
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
+                return new UpdateAccountResponse();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("GetMyProfile communication error.", ex);
+                return new UpdateAccountResponse();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("GetMyProfile timeout.", ex);
+                return new UpdateAccountResponse();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("GetMyProfile unexpected error.", ex);
+                return new UpdateAccountResponse();
+            }
         }
 
         public async Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentException("Token requerido.", nameof(token));
+                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
             }
 
             if (isStoppedOrDisposed)
             {
+                return new StartLobbyMatchResponse();
+            }
+
+            if (client.State == CommunicationState.Faulted)
+            {
+                Logger.Warn(LOG_CHANNEL_FAULTED_START);
                 return new StartLobbyMatchResponse();
             }
 
@@ -196,99 +329,82 @@ namespace WPFTheWeakestRival.Infrastructure
                 Token = token
             };
 
-            StartLobbyMatchResponse startResponse =
-                await Task.Run(() => client.StartLobbyMatch(request)).ConfigureAwait(false);
+            try
+            {
+                StartLobbyMatchResponse response =
+                    await Task.Run(() => client.StartLobbyMatch(request)).ConfigureAwait(false);
 
-            return startResponse;
+                return response ?? new StartLobbyMatchResponse();
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                Logger.WarnFormat(
+                    "StartLobbyMatchAsync fault. Code={0}, Message={1}",
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
+                return new StartLobbyMatchResponse();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("StartLobbyMatchAsync communication error.", ex);
+                return new StartLobbyMatchResponse();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("StartLobbyMatchAsync timeout.", ex);
+                return new StartLobbyMatchResponse();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("StartLobbyMatchAsync unexpected error.", ex);
+                return new StartLobbyMatchResponse();
+            }
         }
 
         void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
         {
             Ui(() =>
             {
-                try
+                if (lobby != null)
                 {
-                    if (lobby != null)
+                    CurrentLobbyId = lobby.LobbyId;
+
+                    if (!string.IsNullOrWhiteSpace(lobby.AccessCode))
                     {
-                        CurrentLobbyId = lobby.LobbyId;
-
-                        if (!string.IsNullOrWhiteSpace(lobby.AccessCode))
-                        {
-                            CurrentAccessCode = lobby.AccessCode;
-                        }
+                        CurrentAccessCode = lobby.AccessCode;
                     }
+                }
 
-                    LobbyUpdated?.Invoke(lobby);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("OnLobbyUpdated handler error.", ex);
-                }
+                LobbyUpdated?.Invoke(lobby);
             });
         }
 
         void ILobbyServiceCallback.OnPlayerJoined(PlayerSummary player)
         {
-            Ui(() =>
-            {
-                try
-                {
-                    PlayerJoined?.Invoke(player);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("OnPlayerJoined handler error.", ex);
-                }
-            });
+            Ui(() => PlayerJoined?.Invoke(player));
         }
 
         void ILobbyServiceCallback.OnPlayerLeft(Guid playerId)
         {
-            Ui(() =>
-            {
-                try
-                {
-                    PlayerLeft?.Invoke(playerId);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("OnPlayerLeft handler error.", ex);
-                }
-            });
+            Ui(() => PlayerLeft?.Invoke(playerId));
         }
 
         void ILobbyServiceCallback.OnChatMessageReceived(ChatMessage message)
         {
-            Ui(() =>
-            {
-                try
-                {
-                    ChatMessageReceived?.Invoke(message);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("OnChatMessageReceived handler error.", ex);
-                }
-            });
+            Ui(() => ChatMessageReceived?.Invoke(message));
         }
 
         void ILobbyServiceCallback.OnMatchStarted(MatchInfo match)
         {
             Ui(() =>
             {
-                try
-                {
-                    Logger.InfoFormat(
-                        "OnMatchStarted received. MatchId={0}, PlayersCount={1}",
-                        match != null ? match.MatchId : Guid.Empty,
-                        match != null && match.Players != null ? match.Players.Length : 0);
+                Logger.InfoFormat(
+                    "OnMatchStarted received. MatchId={0}, PlayersCount={1}",
+                    match != null ? match.MatchId : Guid.Empty,
+                    match != null && match.Players != null ? match.Players.Length : 0);
 
-                    MatchStarted?.Invoke(match);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("OnMatchStarted handler error.", ex);
-                }
+                MatchStarted?.Invoke(match);
             });
         }
 
@@ -307,7 +423,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 Logger.Warn("Error logging ForcedLogout notification.", ex);
             }
 
-            ForcedLogout?.Invoke(notification);
+            Ui(() => ForcedLogout?.Invoke(notification));
         }
 
         public void Stop()
@@ -347,14 +463,36 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             finally
             {
-                CurrentLobbyId = null;
-                CurrentAccessCode = null;
+                ResetLobbyContext();
             }
         }
 
         public void Dispose()
         {
             Stop();
+        }
+
+        private void Ui(Action action)
+        {
+            if (action == null || isStoppedOrDisposed)
+            {
+                return;
+            }
+
+            try
+            {
+                if (dispatcher.CheckAccess())
+                {
+                    action();
+                    return;
+                }
+
+                dispatcher.BeginInvoke(action, UiDispatcherPriority);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(LOG_UI_ERROR, ex);
+            }
         }
 
         private void SafeAbort()
@@ -369,24 +507,54 @@ namespace WPFTheWeakestRival.Infrastructure
             }
         }
 
-        private static string NormalizeLobbyName(string lobbyName)
+        private void SendChatMessageInternal(SendLobbyMessageRequest request)
         {
-            if (string.IsNullOrWhiteSpace(lobbyName))
+            if (request == null || isStoppedOrDisposed)
             {
-                return null;
+                return;
             }
 
-            return lobbyName.Trim();
+            try
+            {
+                if (client.State == CommunicationState.Faulted)
+                {
+                    return;
+                }
+
+                client.SendChatMessage(request);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("SendChatMessage communication error.", ex);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("SendChatMessage timeout.", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("SendChatMessage unexpected error.", ex);
+            }
+        }
+
+        private void ResetLobbyContext()
+        {
+            CurrentLobbyId = null;
+            CurrentAccessCode = string.Empty;
+        }
+
+        private static string NormalizeLobbyName(string lobbyName)
+        {
+            return string.IsNullOrWhiteSpace(lobbyName)
+                ? string.Empty
+                : lobbyName.Trim();
         }
 
         private static byte NormalizeMaxPlayers(byte requestedMaxPlayers)
         {
-            if (requestedMaxPlayers < MIN_ALLOWED_MAX_PLAYERS)
-            {
-                return DEFAULT_MAX_PLAYERS;
-            }
-
-            return requestedMaxPlayers;
+            return requestedMaxPlayers < MIN_ALLOWED_MAX_PLAYERS
+                ? DEFAULT_MAX_PLAYERS
+                : requestedMaxPlayers;
         }
 
         private static string NormalizeAccessCode(string accessCode)
