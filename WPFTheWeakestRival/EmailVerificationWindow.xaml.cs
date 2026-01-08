@@ -1,7 +1,7 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.ServiceModel;
 using System.Windows;
+using System.Windows.Threading;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Properties.Langs;
 
@@ -9,16 +9,17 @@ namespace WPFTheWeakestRival
 {
     public partial class EmailVerificationWindow : Window
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(EmailVerificationWindow));
+        private const int DEFAULT_RESEND_COOLDOWN_SECONDS = 60;
 
-        private readonly string email;
         private readonly string displayName;
         private readonly string password;
 
         private readonly byte[] profileImageBytes;
         private readonly string profileImageContentType;
 
-        private readonly int resendCooldownSeconds;
+        private int resendCooldownSeconds;
+        private DispatcherTimer cooldownTimer;
+        private int secondsRemaining;
 
         public EmailVerificationWindow(
             string email,
@@ -30,58 +31,52 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            this.email = email ?? string.Empty;
+            txtEmail.Text = email ?? string.Empty;
+
             this.displayName = displayName ?? string.Empty;
             this.password = password ?? string.Empty;
 
             this.profileImageBytes = profileImageBytes;
-            this.profileImageContentType = profileImageContentType ?? string.Empty;
+            this.profileImageContentType = profileImageContentType;
 
-            this.resendCooldownSeconds = resendCooldownSeconds;
+            this.resendCooldownSeconds = resendCooldownSeconds > 0
+                ? resendCooldownSeconds
+                : DEFAULT_RESEND_COOLDOWN_SECONDS;
+
+            txtCode.Focus();
+            StartResendCooldown(this.resendCooldownSeconds);
         }
 
-        private async void ConfirmClick(object sender, RoutedEventArgs e)
+        private void StartResendCooldown(int seconds)
         {
-            btnConfirm.IsEnabled = false;
+            secondsRemaining = seconds;
+            btnResend.IsEnabled = false;
+            lblCooldown.Text = $"Puedes reenviar en {secondsRemaining}s";
 
-            var authClient = new AuthServiceClient();
-
-            try
+            if (cooldownTimer != null)
             {
-                string code = txtCode.Text?.Trim() ?? string.Empty;
-
-                await authClient.CompleteRegisterAsync(new CompleteRegisterRequest
-                {
-                    Email = email,
-                    Code = code,
-                    Password = password,
-                    DisplayName = displayName,
-                    ProfileImageBytes = profileImageBytes,
-                    ProfileImageContentType = string.IsNullOrWhiteSpace(profileImageContentType) ? null : profileImageContentType
-                });
-
-                SafeClose(authClient);
-
-                MessageBox.Show("Registration completed.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Information);
-
-                new LoginWindow().Show();
-                Close();
+                cooldownTimer.Stop();
+                cooldownTimer.Tick -= OnCooldownTick;
             }
-            catch (FaultException<ServiceFault> fx)
-            {
-                authClient.Abort();
-                MessageBox.Show(fx.Detail.Message, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            catch (Exception ex)
-            {
-                authClient.Abort();
-                Logger.Error("EmailVerificationWindow.ConfirmClick: unexpected error.", ex);
 
-                MessageBox.Show("Network/service error.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
+            cooldownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            cooldownTimer.Tick += OnCooldownTick;
+            cooldownTimer.Start();
+        }
+
+        private void OnCooldownTick(object sender, EventArgs e)
+        {
+            secondsRemaining--;
+
+            if (secondsRemaining <= 0)
             {
-                btnConfirm.IsEnabled = true;
+                cooldownTimer.Stop();
+                lblCooldown.Text = string.Empty;
+                btnResend.IsEnabled = true;
+            }
+            else
+            {
+                lblCooldown.Text = $"Puedes reenviar en {secondsRemaining}s";
             }
         }
 
@@ -93,22 +88,59 @@ namespace WPFTheWeakestRival
 
             try
             {
-                await authClient.BeginRegisterAsync(new BeginRegisterRequest { Email = email });
-                SafeClose(authClient);
+                BeginRegisterResponse response = await authClient.BeginRegisterAsync(new BeginRegisterRequest
+                {
+                    Email = (txtEmail.Text ?? string.Empty).Trim()
+                });
 
-                MessageBox.Show("Verification code resent.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+                if (authClient.State != CommunicationState.Faulted)
+                {
+                    authClient.Close();
+                }
+                else
+                {
+                    authClient.Abort();
+                }
+
+                if (response != null && response.ResendAfterSeconds > 0)
+                {
+                    resendCooldownSeconds = response.ResendAfterSeconds;
+                }
+
+                StartResendCooldown(resendCooldownSeconds);
+                txtCode.Clear();
+                txtCode.Focus();
+
+                MessageBox.Show(
+                    "Se envió un nuevo código a tu correo.",
+                    "Auth",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
             catch (FaultException<ServiceFault> fx)
             {
                 authClient.Abort();
-                MessageBox.Show(fx.Detail.Message, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                MessageBox.Show(
+                    $"{fx.Detail.Code}: {fx.Detail.Message}",
+                    "Auth",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                if (string.Equals(fx.Detail.Code, "TOO_SOON", StringComparison.OrdinalIgnoreCase))
+                {
+                    StartResendCooldown(resendCooldownSeconds);
+                }
             }
             catch (Exception ex)
             {
                 authClient.Abort();
-                Logger.Error("EmailVerificationWindow.ResendClick: unexpected error.", ex);
 
-                MessageBox.Show("Network/service error.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"Error de red/servicio: {ex.Message}",
+                    "Auth",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -116,34 +148,114 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void CancelClick(object sender, RoutedEventArgs e)
+        private async void ConfirmClick(object sender, RoutedEventArgs e)
         {
-            new RegistrationWindow().Show();
-            Close();
-        }
-
-        private static void SafeClose(ICommunicationObject obj)
-        {
-            if (obj == null)
-            {
-                return;
-            }
+            btnConfirm.IsEnabled = false;
 
             try
             {
-                if (obj.State != CommunicationState.Faulted)
+                string email = (txtEmail.Text ?? string.Empty).Trim();
+                string code = (txtCode.Text ?? string.Empty).Trim();
+
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(code))
                 {
-                    obj.Close();
+                    MessageBox.Show(
+                        Lang.errorInvalidEmail,
+                        Lang.registerTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
                 }
-                else
+
+                var request = new CompleteRegisterRequest
                 {
-                    obj.Abort();
+                    Email = email,
+                    Code = code,
+                    Password = password,
+                    DisplayName = displayName,
+
+                    // NUEVO: ya no existe ProfileImageUrl
+                    ProfileImageBytes = profileImageBytes,
+                    ProfileImageContentType = profileImageContentType
+                };
+
+                var authClient = new AuthServiceClient();
+
+                try
+                {
+                    RegisterResponse response = await authClient.CompleteRegisterAsync(request);
+
+                    if (authClient.State != CommunicationState.Faulted)
+                    {
+                        authClient.Close();
+                    }
+                    else
+                    {
+                        authClient.Abort();
+                    }
+
+                    MessageBox.Show(
+                        $"{Lang.registSucces}\nUserId: {response.UserId}\nExp: {response.Token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
+                        "Auth",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    var loginWindow = new LoginWindow();
+                    loginWindow.Show();
+
+                    if (Owner != null)
+                    {
+                        Owner.Close();
+                    }
+
+                    Close();
+                }
+                catch (FaultException<ServiceFault> fx)
+                {
+                    authClient.Abort();
+
+                    MessageBox.Show(
+                        $"{fx.Detail.Code}: {fx.Detail.Message}",
+                        "Auth",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    if (string.Equals(fx.Detail.Code, "CODE_INVALID", StringComparison.OrdinalIgnoreCase))
+                    {
+                        txtCode.SelectAll();
+                        txtCode.Focus();
+                    }
+                    else if (string.Equals(fx.Detail.Code, "CODE_EXPIRED", StringComparison.OrdinalIgnoreCase))
+                    {
+                        txtCode.Clear();
+                        btnResend.Focus();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    authClient.Abort();
+
+                    MessageBox.Show(
+                        $"Error de red/servicio: {ex.Message}",
+                        "Auth",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             }
-            catch
+            finally
             {
-                obj.Abort();
+                btnConfirm.IsEnabled = true;
             }
+        }
+
+        private void CancelClick(object sender, RoutedEventArgs e)
+        {
+            if (Owner != null)
+            {
+                Owner.Show();
+            }
+
+            Close();
         }
     }
 }
