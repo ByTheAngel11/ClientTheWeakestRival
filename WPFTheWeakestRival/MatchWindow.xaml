@@ -472,6 +472,56 @@
                        Foreground="White"/>
         </Grid>
 
+        <!-- OVERLAY EVENTO ESPECIAL -->
+        <Grid x:Name="SpecialEventOverlay"
+              Grid.RowSpan="3"
+              Background="#AA000000"
+              Visibility="Collapsed">
+            <Border Width="620"
+                    MaxWidth="820"
+                    Padding="24"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="Black"
+                    BorderThickness="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="SpecialEventTitleText"
+                               Grid.Row="0"
+                               Text="EVENTO ESPECIAL"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="#222"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"/>
+
+                    <TextBlock x:Name="SpecialEventDescriptionText"
+                               Grid.Row="2"
+                               Text="Descripción del evento..."
+                               FontSize="14"
+                               Foreground="#444"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"/>
+
+                    <Button Grid.Row="4"
+                            Content="OK"
+                            Width="120"
+                            Height="34"
+                            HorizontalAlignment="Center"
+                            Click="SpecialEventCloseButtonClick"/>
+                </Grid>
+            </Border>
+        </Grid>
+
         <!-- BOTÓN CERRAR -->
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
