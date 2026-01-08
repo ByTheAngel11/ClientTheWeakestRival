@@ -13,6 +13,7 @@ using log4net;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Infrastructure.Faults;
 
 namespace WPFTheWeakestRival.Pages
 {
@@ -40,6 +41,19 @@ namespace WPFTheWeakestRival.Pages
             authToken = token ?? string.Empty;
             lstResults.ItemsSource = results;
         }
+
+        private static string Localize(string key)
+        {
+            string safeKey = (key ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(safeKey))
+            {
+                return string.Empty;
+            }
+
+            string value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            return string.IsNullOrWhiteSpace(value) ? safeKey : value;
+        }
+
 
         private async void BtnSearchClick(object sender, RoutedEventArgs e)
         {
@@ -132,8 +146,17 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
+                string messageKey = ex.Detail == null ? string.Empty : ex.Detail.Message;
+
+                Logger.WarnFormat(
+                    "SearchAsync: service fault. Code={0}, Key={1}",
+                    ex.Detail == null ? string.Empty : ex.Detail.Code,
+                    messageKey);
+
+                string uiMessage = FaultKeyMessageResolver.Resolve(messageKey, Localize);
+
                 MessageBox.Show(
-                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    uiMessage,
                     Lang.addFriendSearchTooltip,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -208,8 +231,17 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
+                string messageKey = ex.Detail == null ? string.Empty : ex.Detail.Message;
+
+                Logger.WarnFormat(
+                    "SendFriendRequest: service fault. Code={0}, Key={1}",
+                    ex.Detail == null ? string.Empty : ex.Detail.Code,
+                    messageKey);
+
+                string uiMessage = FaultKeyMessageResolver.Resolve(messageKey, Localize);
+
                 MessageBox.Show(
-                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    uiMessage,
                     Lang.addFriendTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -273,8 +305,17 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
+                string messageKey = ex.Detail == null ? string.Empty : ex.Detail.Message;
+
+                Logger.WarnFormat(
+                    "AcceptFriendRequest: service fault. Code={0}, Key={1}",
+                    ex.Detail == null ? string.Empty : ex.Detail.Code,
+                    messageKey);
+
+                string uiMessage = FaultKeyMessageResolver.Resolve(messageKey, Localize);
+
                 MessageBox.Show(
-                    ex.Detail.Code + ": " + ex.Detail.Message,
+                    uiMessage,
                     Lang.addFriendTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);

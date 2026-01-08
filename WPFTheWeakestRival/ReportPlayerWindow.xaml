@@ -1,0 +1,65 @@
+﻿<Window x:Class="WPFTheWeakestRival.Windows.ReportPlayerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:WPFTheWeakestRival.Globalization"
+        Title="{loc:Loc reportPlayer}"
+        Height="270"
+        Width="440"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="14"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="{loc:Loc reportPlayer}"
+                   FontSize="16"
+                   FontWeight="SemiBold"/>
+
+        <TextBlock x:Name="txtTarget"
+                   Grid.Row="2"
+                   Foreground="#444"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal">
+            <TextBlock Text="{loc:Loc reportPlayer}" Visibility="Collapsed"/>
+            <TextBlock Text="Motivo:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            <ComboBox x:Name="cmbReasons"
+                      Width="300"
+                      DisplayMemberPath="Text"
+                      SelectedValuePath="Code"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="6">
+            <TextBlock Text="Comentario (opcional):" Margin="0,0,0,6"/>
+            <TextBox x:Name="txtComment"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     Height="90"
+                     MaxLength="500"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="btnCancel"
+                    Width="90"
+                    Margin="0,0,10,0"
+                    Click="BtnCancelClick"
+                    Content="Cancelar"/>
+            <Button x:Name="btnSubmit"
+                    Width="110"
+                    Click="BtnSubmitClick"
+                    Content="Enviar"/>
+        </StackPanel>
+    </Grid>
+</Window>

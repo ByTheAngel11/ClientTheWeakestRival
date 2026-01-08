@@ -96,6 +96,15 @@
   <wsdl:message name="IFriendService_GetAccountsByIds_ServiceFaultFault_FaultMessage">
     <wsdl:part xmlns:q9="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q9:ServiceFault" />
   </wsdl:message>
+  <wsdl:message name="IFriendService_SendLobbyInviteEmail_InputMessage">
+    <wsdl:part name="parameters" element="tns:SendLobbyInviteEmail" />
+  </wsdl:message>
+  <wsdl:message name="IFriendService_SendLobbyInviteEmail_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SendLobbyInviteEmailResponse" />
+  </wsdl:message>
+  <wsdl:message name="IFriendService_SendLobbyInviteEmail_ServiceFaultFault_FaultMessage">
+    <wsdl:part xmlns:q10="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q10:ServiceFault" />
+  </wsdl:message>
   <wsdl:portType name="IFriendService">
     <wsdl:operation name="SendFriendRequest">
       <wsdl:input wsaw:Action="http://tempuri.org/IFriendService/SendFriendRequest" message="tns:IFriendService_SendFriendRequest_InputMessage" />
@@ -141,6 +150,11 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IFriendService/GetAccountsByIds" message="tns:IFriendService_GetAccountsByIds_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IFriendService/GetAccountsByIdsResponse" message="tns:IFriendService_GetAccountsByIds_OutputMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/IFriendService/GetAccountsByIdsServiceFaultFault" name="ServiceFaultFault" message="tns:IFriendService_GetAccountsByIds_ServiceFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SendLobbyInviteEmail">
+      <wsdl:input wsaw:Action="http://tempuri.org/IFriendService/SendLobbyInviteEmail" message="tns:IFriendService_SendLobbyInviteEmail_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IFriendService/SendLobbyInviteEmailResponse" message="tns:IFriendService_SendLobbyInviteEmail_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IFriendService/SendLobbyInviteEmailServiceFaultFault" name="ServiceFaultFault" message="tns:IFriendService_SendLobbyInviteEmail_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WSHttpBinding_IFriendService" type="tns:IFriendService">
@@ -244,6 +258,18 @@
     </wsdl:operation>
     <wsdl:operation name="GetAccountsByIds">
       <soap12:operation soapAction="http://tempuri.org/IFriendService/GetAccountsByIds" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceFaultFault">
+        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendLobbyInviteEmail">
+      <soap12:operation soapAction="http://tempuri.org/IFriendService/SendLobbyInviteEmail" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

@@ -5,8 +5,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
-using WPFTheWeakestRival.Globalization; // <<— para LocalizationManager
+using WPFTheWeakestRival.Globalization;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Infrastructure;
 
 namespace WPFTheWeakestRival
 {
@@ -157,7 +158,29 @@ namespace WPFTheWeakestRival
 
                 AppSession.CurrentToken = token;
 
+                try
+                {   
+                    
+                    AppServices.ResetAll();
+
+                    _ = AppServices.Lobby;
+                    AppServices.Friends.Start(); 
+                }
+                catch
+                {
+                    
+                }
+
+
                 var main = new MainMenuWindow();
+
+                var app = Application.Current;
+                if (app != null)
+                {
+                    app.ShutdownMode = ShutdownMode.OnMainWindowClose;
+                    app.MainWindow = main;
+                }
+
                 main.Show();
                 Close();
             }

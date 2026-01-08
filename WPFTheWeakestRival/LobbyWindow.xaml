@@ -369,7 +369,27 @@
          VirtualizingPanel.ScrollUnit="Pixel">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="4">
+                                <Grid Margin="4"
+                                      ContextMenuOpening="LobbyPlayerContextMenuOpening">
+                                    <Grid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="{loc:Loc mnuLobbyReportPlayer}"
+                      Click="MenuItemReportPlayerClick"
+                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                <MenuItem.Style>
+                                                    <Style TargetType="MenuItem">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsMe}" Value="True">
+                                                                <Setter Property="IsEnabled" Value="False"/>
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </MenuItem.Style>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Grid.ContextMenu>
+
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
@@ -638,14 +658,14 @@
                                 </StackPanel>
 
                                 <ListBox x:Name="lstFriends"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         ItemTemplate="{StaticResource FriendItemTemplate}"
-                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                         VirtualizingPanel.IsVirtualizing="True"
-                                         VirtualizingPanel.ScrollUnit="Pixel"
-                                         Margin="4"/>
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ItemTemplate="{StaticResource FriendItemTemplate}"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.ScrollUnit="Pixel"
+                                     Margin="4"/>
                             </Grid>
                         </Border>
                     </Grid>

@@ -457,4 +457,115 @@
   <data name="matchTitle" xml:space="preserve">
     <value>Partida</value>
   </data>
+  <data name="mnuLobbyReportPlayer" xml:space="preserve">
+    <value>Reportar</value>
+  </data>
+  <data name="reportPlayer" xml:space="preserve">
+    <value>Reportar</value>
+  </data>
+  <data name="reportReasonHarassment" xml:space="preserve">
+    <value>Acoso/insultos</value>
+  </data>
+  <data name="reportReasonCheating" xml:space="preserve">
+    <value>Trampas</value>
+  </data>
+  <data name="reportReasonSpam" xml:space="preserve">
+    <value>Spam</value>
+  </data>
+  <data name="reportReasonInappropriateName" xml:space="preserve">
+    <value>Nombre inapropiado</value>
+  </data>
+  <data name="reportReasonOther" xml:space="preserve">
+    <value>Otro</value>
+  </data>
+  <data name="reportSent" xml:space="preserve">
+    <value>Reporte enviado.</value>
+  </data>
+  <data name="reportCooldown" xml:space="preserve">
+    <value>Debes esperar 30 minutos para volver a reportar a ese jugador.</value>
+  </data>
+  <data name="reportFailed" xml:space="preserve">
+    <value>No se pudo enviar el reporte.</value>
+  </data>
+  <data name="reportUnexpectedError" xml:space="preserve">
+    <value>Ocurrió un error al enviar el reporte.</value>
+  </data>
+  <data name="reportSanctionTemporary" xml:space="preserve">
+    <value>Reporte enviado. Sanción temporal aplicada hasta: {0}.</value>
+  </data>
+  <data name="reportSanctionPermanent" xml:space="preserve">
+    <value>Reporte enviado. Se aplicó sanción permanente.</value>
+  </data>
+  <data name="mnuInviteLobbyByEmail" xml:space="preserve">
+    <value>Invitar al lobby por correo</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2627" xml:space="preserve">
+    <value>Error de duplicidad en la base de datos al enviar una solicitud de amistad: se intentó insertar un registro que ya existe.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2601" xml:space="preserve">
+    <value>Error de duplicidad en la base de datos al enviar una solicitud de amistad: se intentó insertar un registro duplicado</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.547" xml:space="preserve">
+    <value>Error de integridad referencial en la base de datos al enviar una solicitud de amistad: el jugador destino no existe o no es válido</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.1205" xml:space="preserve">
+    <value>Error de concurrencia en la base de datos al enviar una solicitud de amistad: se detectó un interbloqueo. Inténtalo de nuevamente</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.-2" xml:space="preserve">
+    <value>La base de datos tardó demasiado al enviar una solicitud de amistad. Inténtalo nuevamente.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.4060" xml:space="preserve">
+    <value>No se pudo acceder a la base de datos al enviar una solicitud de amistad: la base no existe o no tienes permisos para usarla</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.911" xml:space="preserve">
+    <value>No se pudo acceder a la base de datos al enviar una solicitud de amistad: la base indicada no existe o no está disponible.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.18456" xml:space="preserve">
+    <value>No se pudo autenticar el acceso a la base de datos al enviar una solicitud de amistad (credenciales inválidas).</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.229" xml:space="preserve">
+    <value>No tienes permisos suficientes en la base de datos para enviar una solicitud de amistad.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.208" xml:space="preserve">
+    <value>Error de configuración de la base de datos al enviar una solicitud de amistad: no se encontró la tabla o vista requerida.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.207" xml:space="preserve">
+    <value>Error de configuración de la base de datos al enviar una solicitud de amistad: falta una columna requerida.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2812" xml:space="preserve">
+    <value>Error de configuración de la base de datos al enviar una solicitud de amistad: no se encontró un procedimiento almacenado requerido.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.53" xml:space="preserve">
+    <value>No fue posible conectarse al servidor de base de datos al enviar una solicitud de amistad: el servidor no está disponible o la conexión fue rechazada.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
+    <value>No fue posible abrir conexión con la base de datos al enviar una solicitud de amistad.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>Ocurrió un error inesperado en la base de datos al enviar una solicitud de amistad.</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>Ocurrió un error inesperado. Inténtalo nuevamente.</value>
+  </data>
+  <data name="UiTitleWarning" xml:space="preserve">
+    <value>Advertencia</value>
+  </data>
+  <data name="lblFriendRequestsTitle" xml:space="preserve">
+    <value>Solicitudes de amistad</value>
+  </data>
+  <data name="lblFriendRequestsConnectionError" xml:space="preserve">
+    <value>No se pudo conectar con el servicio. Verifica tu conexión e inténtalo nuevamente.</value>
+  </data>
+  <data name="btnFriendRequestsAccept" xml:space="preserve">
+    <value>Aceptar solicitud</value>
+  </data>
+  <data name="btnFriendRequestsReject" xml:space="preserve">
+    <value>Rechazar solicitud</value>
+  </data>
+  <data name="btnFriendRequestsCancel" xml:space="preserve">
+    <value>Cancelar solicitud</value>
+  </data>
+  <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
+    <value>La solicitud ya fue resuelta.</value>
+  </data>
 </root>

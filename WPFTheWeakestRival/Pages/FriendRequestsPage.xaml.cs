@@ -8,13 +8,31 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using log4net;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Infrastructure.Faults;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Pages
 {
     public partial class FriendRequestsPage : Page
     {
+        private const string LOG_CTX_REFRESH = "FriendRequestsPage.RefreshAsync";
+        private const string LOG_CTX_ACCEPT = "FriendRequestsPage.Accept";
+        private const string LOG_CTX_REJECT = "FriendRequestsPage.Reject";
+        private const string LOG_CTX_CANCEL = "FriendRequestsPage.Cancel";
+        private const string LOG_CTX_CLOSE = "FriendRequestsPage.Close";
+
+        private const string KEY_LBL_FRIEND_REQUESTS_TITLE = "lblFriendRequestsTitle";
+        private const string KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR = "lblFriendRequestsConnectionError";
+
+        private const string KEY_BTN_FRIEND_REQUESTS_ACCEPT_TITLE = "btnFriendRequestsAccept";
+        private const string KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE = "btnFriendRequestsReject";
+        private const string KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE = "btnFriendRequestsCancel";
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FriendRequestsPage));
+
         private readonly FriendServiceClient friendServiceClient;
         private readonly string authToken;
 
@@ -23,7 +41,6 @@ namespace WPFTheWeakestRival.Pages
 
         public event EventHandler FriendsChanged;
         public event EventHandler CloseRequested;
-
 
         public FriendRequestsPage(FriendServiceClient client, string token)
         {
@@ -39,6 +56,8 @@ namespace WPFTheWeakestRival.Pages
 
         private async Task RefreshAsync()
         {
+            Logger.InfoFormat("{0}: start.", LOG_CTX_REFRESH);
+
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
@@ -63,7 +82,12 @@ namespace WPFTheWeakestRival.Pages
                 var accountsById = new System.Collections.Generic.Dictionary<int, AccountMini>();
                 if (accountIds.Count > 0)
                 {
-                    var getReq = new GetAccountsByIdsRequest { Token = authToken, AccountIds = new int[accountIds.Count] };
+                    var getReq = new GetAccountsByIdsRequest
+                    {
+                        Token = authToken,
+                        AccountIds = new int[accountIds.Count]
+                    };
+
                     accountIds.CopyTo(getReq.AccountIds, 0);
 
                     var info = await friendServiceClient.GetAccountsByIdsAsync(getReq);
@@ -77,8 +101,7 @@ namespace WPFTheWeakestRival.Pages
                 for (var i = 0; i < incoming.Length; i++)
                 {
                     var summary = incoming[i];
-                    AccountMini mini;
-                    accountsById.TryGetValue(summary.FromAccountId, out mini);
+                    accountsById.TryGetValue(summary.FromAccountId, out AccountMini mini);
 
                     var displayName = mini != null && !string.IsNullOrWhiteSpace(mini.DisplayName)
                         ? mini.DisplayName
@@ -101,8 +124,7 @@ namespace WPFTheWeakestRival.Pages
                 for (var i = 0; i < outgoing.Length; i++)
                 {
                     var summary = outgoing[i];
-                    AccountMini mini;
-                    accountsById.TryGetValue(summary.ToAccountId, out mini);
+                    accountsById.TryGetValue(summary.ToAccountId, out AccountMini mini);
 
                     var displayName = mini != null && !string.IsNullOrWhiteSpace(mini.DisplayName)
                         ? mini.DisplayName
@@ -121,14 +143,41 @@ namespace WPFTheWeakestRival.Pages
                         IsIncoming = false
                     });
                 }
+
+                Logger.InfoFormat(
+                    "{0}: completed. Incoming={1}, Outgoing={2}.",
+                    LOG_CTX_REFRESH,
+                    incomingRequests.Count,
+                    outgoingRequests.Count);
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Solicitudes", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string faultCode = GetFaultCode(ex.Detail);
+                string faultKey = GetFaultKey(ex.Detail);
+
+                Logger.WarnFormat(
+                    "{0}: service fault. Code={1}, Key={2}.",
+                    LOG_CTX_REFRESH,
+                    faultCode,
+                    faultKey);
+
+                string uiMessage = ResolveFaultMessage(ex.Detail);
+
+                MessageBox.Show(
+                    uiMessage,
+                    Localize(KEY_LBL_FRIEND_REQUESTS_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Solicitudes", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error(LOG_CTX_REFRESH, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_LBL_FRIEND_REQUESTS_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -156,6 +205,12 @@ namespace WPFTheWeakestRival.Pages
 
                 incomingRequests.Remove(viewModel);
 
+                Logger.InfoFormat(
+                    "{0}: accepted. FriendRequestId={1}, OtherAccountId={2}.",
+                    LOG_CTX_ACCEPT,
+                    viewModel.FriendRequestId,
+                    viewModel.OtherAccountId);
+
                 var handler = FriendsChanged;
                 if (handler != null)
                 {
@@ -164,11 +219,33 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Aceptar solicitud", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string faultCode = GetFaultCode(ex.Detail);
+                string faultKey = GetFaultKey(ex.Detail);
+
+                Logger.WarnFormat(
+                    "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
+                    LOG_CTX_ACCEPT,
+                    viewModel.FriendRequestId,
+                    faultCode,
+                    faultKey);
+
+                string uiMessage = ResolveFaultMessage(ex.Detail);
+
+                MessageBox.Show(
+                    uiMessage,
+                    Localize(KEY_BTN_FRIEND_REQUESTS_ACCEPT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Aceptar solicitud", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error(LOG_CTX_ACCEPT, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_ACCEPT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -196,6 +273,12 @@ namespace WPFTheWeakestRival.Pages
 
                 incomingRequests.Remove(viewModel);
 
+                Logger.InfoFormat(
+                    "{0}: rejected. FriendRequestId={1}, OtherAccountId={2}.",
+                    LOG_CTX_REJECT,
+                    viewModel.FriendRequestId,
+                    viewModel.OtherAccountId);
+
                 var handler = FriendsChanged;
                 if (handler != null)
                 {
@@ -204,11 +287,33 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Rechazar solicitud", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string faultCode = GetFaultCode(ex.Detail);
+                string faultKey = GetFaultKey(ex.Detail);
+
+                Logger.WarnFormat(
+                    "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
+                    LOG_CTX_REJECT,
+                    viewModel.FriendRequestId,
+                    faultCode,
+                    faultKey);
+
+                string uiMessage = ResolveFaultMessage(ex.Detail);
+
+                MessageBox.Show(
+                    uiMessage,
+                    Localize(KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Rechazar solicitud", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error(LOG_CTX_REJECT, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -236,6 +341,12 @@ namespace WPFTheWeakestRival.Pages
 
                 outgoingRequests.Remove(viewModel);
 
+                Logger.InfoFormat(
+                    "{0}: cancelled. FriendRequestId={1}, OtherAccountId={2}.",
+                    LOG_CTX_CANCEL,
+                    viewModel.FriendRequestId,
+                    viewModel.OtherAccountId);
+
                 var handler = FriendsChanged;
                 if (handler != null)
                 {
@@ -244,11 +355,33 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Code + ": " + ex.Detail.Message, "Cancelar solicitud", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string faultCode = GetFaultCode(ex.Detail);
+                string faultKey = GetFaultKey(ex.Detail);
+
+                Logger.WarnFormat(
+                    "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
+                    LOG_CTX_CANCEL,
+                    viewModel.FriendRequestId,
+                    faultCode,
+                    faultKey);
+
+                string uiMessage = ResolveFaultMessage(ex.Detail);
+
+                MessageBox.Show(
+                    uiMessage,
+                    Localize(KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
-                MessageBox.Show("No se pudo conectar con el servicio.\n" + ex.Message, "Cancelar solicitud", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logger.Error(LOG_CTX_CANCEL, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
@@ -258,13 +391,14 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
+            Logger.InfoFormat("{0}: close requested.", LOG_CTX_CLOSE);
+
             var handler = CloseRequested;
             if (handler != null)
             {
                 handler(this, EventArgs.Empty);
             }
         }
-
 
         private class RequestViewModel : INotifyPropertyChanged
         {
@@ -285,6 +419,34 @@ namespace WPFTheWeakestRival.Pages
                     handler(this, new PropertyChangedEventArgs(propertyName));
                 }
             }
+        }
+
+        private static string Localize(string key)
+        {
+            string safeKey = (key ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(safeKey))
+            {
+                return string.Empty;
+            }
+
+            string value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            return string.IsNullOrWhiteSpace(value) ? safeKey : value;
+        }
+
+        private static string ResolveFaultMessage(ServiceFault fault)
+        {
+            string key = fault == null ? string.Empty : fault.Message;
+            return FaultKeyMessageResolver.Resolve(key, Localize);
+        }
+
+        private static string GetFaultCode(ServiceFault fault)
+        {
+            return fault == null ? string.Empty : (fault.Code ?? string.Empty);
+        }
+
+        private static string GetFaultKey(ServiceFault fault)
+        {
+            return fault == null ? string.Empty : (fault.Message ?? string.Empty);
         }
     }
 }

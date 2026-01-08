@@ -457,4 +457,115 @@
   <data name="matchTitle" xml:space="preserve">
     <value>Départ</value>
   </data>
+  <data name="mnuLobbyReportPlayer" xml:space="preserve">
+    <value>Rapport</value>
+  </data>
+  <data name="reportPlayer" xml:space="preserve">
+    <value>Rapport</value>
+  </data>
+  <data name="reportReasonHarassment" xml:space="preserve">
+    <value>Harcèlement/insultes</value>
+  </data>
+  <data name="reportReasonCheating" xml:space="preserve">
+    <value>Pièges</value>
+  </data>
+  <data name="reportReasonSpam" xml:space="preserve">
+    <value>Courrier indésirable</value>
+  </data>
+  <data name="reportReasonInappropriateName" xml:space="preserve">
+    <value>nom inapproprié</value>
+  </data>
+  <data name="reportReasonOther" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="reportSent" xml:space="preserve">
+    <value>Rapport envoyé.</value>
+  </data>
+  <data name="reportCooldown" xml:space="preserve">
+    <value>Vous devez attendre 30 minutes pour signaler à nouveau ce joueur.</value>
+  </data>
+  <data name="reportFailed" xml:space="preserve">
+    <value>Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="reportUnexpectedError" xml:space="preserve">
+    <value>Une erreur s'est produite lors de l'envoi du rapport.</value>
+  </data>
+  <data name="reportSanctionTemporary" xml:space="preserve">
+    <value>Rapport envoyé. Sanction temporaire appliquée jusqu'au : {0}.</value>
+  </data>
+  <data name="reportSanctionPermanent" xml:space="preserve">
+    <value>Rapport envoyé. Une sanction permanente a été appliquée.</value>
+  </data>
+  <data name="mnuInviteLobbyByEmail" xml:space="preserve">
+    <value>Inviter le lobby par e-mail</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2627" xml:space="preserve">
+    <value>Erreur de duplicité de base de données lors de l'envoi d'une demande d'ami : Une tentative d'insertion d'un enregistrement qui existe déjà a été effectuée.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2601" xml:space="preserve">
+    <value>Erreur de duplicité de base de données lors de l'envoi d'une demande d'ami : une tentative d'insertion d'un enregistrement en double a été effectuée</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.547" xml:space="preserve">
+    <value>Erreur d'intégrité référentielle dans la base de données lors de l'envoi d'une demande d'ami : le joueur cible n'existe pas ou est invalide</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.1205" xml:space="preserve">
+    <value>Erreur de concurrence de base de données lors de l'envoi d'une demande d'ami : blocage détecté. essayer à nouveau</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.-2" xml:space="preserve">
+    <value>La base de données prenait trop de temps lors de l'envoi d'une demande d'ami. Veuillez réessayer.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.4060" xml:space="preserve">
+    <value>La base de données n'est pas accessible lors de l'envoi d'une demande d'ami : la base de données n'existe pas ou vous n'avez pas les autorisations pour l'utiliser</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.911" xml:space="preserve">
+    <value>La base de données n'est pas accessible lors de l'envoi d'une demande d'ami : la base de données indiquée n'existe pas ou n'est pas disponible.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.18456" xml:space="preserve">
+    <value>Échec de l'authentification de l'accès à la base de données lors de l'envoi d'une demande d'ami (informations d'identification non valides).</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.229" xml:space="preserve">
+    <value>Vous ne disposez pas des autorisations suffisantes sur la base de données pour envoyer une demande d'ami.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.208" xml:space="preserve">
+    <value>Erreur de configuration de la base de données lors de l'envoi d'une demande d'ami : La table ou la vue requise n'a pas été trouvée.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.207" xml:space="preserve">
+    <value>Erreur de configuration de la base de données lors de l'envoi d'une demande d'ami : il manque une colonne obligatoire.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2812" xml:space="preserve">
+    <value>Erreur de configuration de la base de données lors de l'envoi d'une demande d'ami : une procédure stockée requise n'a pas été trouvée.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.53" xml:space="preserve">
+    <value>Echec de la connexion au serveur de base de données lors de l'envoi d'une demande d'ami : le serveur est indisponible ou la connexion a été refusée.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
+    <value>Il n'était pas possible d'ouvrir une connexion à la base de données lors de l'envoi d'une demande d'ami.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>Une erreur de base de données inattendue s'est produite lors de l'envoi d'une demande d'ami.</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>Une erreur inattendue s'est produite. Veuillez réessayer.</value>
+  </data>
+  <data name="UiTitleWarning" xml:space="preserve">
+    <value>Avertissement</value>
+  </data>
+  <data name="lblFriendRequestsTitle" xml:space="preserve">
+    <value>Demandes d'amis</value>
+  </data>
+  <data name="lblFriendRequestsConnectionError" xml:space="preserve">
+    <value>Impossible de se connecter au service. Veuillez vérifier votre connexion et réessayer.</value>
+  </data>
+  <data name="btnFriendRequestsAccept" xml:space="preserve">
+    <value>Accepter la demande</value>
+  </data>
+  <data name="btnFriendRequestsReject" xml:space="preserve">
+    <value>Rejeter la demande</value>
+  </data>
+  <data name="btnFriendRequestsCancel" xml:space="preserve">
+    <value>Annuler la demande</value>
+  </data>
+  <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
+    <value>La demande a déjà été résolue.</value>
+  </data>
 </root>

@@ -113,6 +113,9 @@
   <wsdl:message name="ILobbyService_OnMatchStarted_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnMatchStarted" />
   </wsdl:message>
+  <wsdl:message name="ILobbyService_ForcedLogout_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ForcedLogout" />
+  </wsdl:message>
   <wsdl:portType name="ILobbyService">
     <wsdl:operation name="JoinLobby">
       <wsdl:input wsaw:Action="http://tempuri.org/ILobbyService/JoinLobby" message="tns:ILobbyService_JoinLobby_InputMessage" />
@@ -174,6 +177,9 @@
     </wsdl:operation>
     <wsdl:operation name="OnMatchStarted">
       <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/OnMatchStarted" message="tns:ILobbyService_OnMatchStarted_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ForcedLogout">
+      <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/ForcedLogout" message="tns:ILobbyService_ForcedLogout_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WSDualHttpBinding_ILobbyService" type="tns:ILobbyService">
@@ -313,6 +319,12 @@
     </wsdl:operation>
     <wsdl:operation name="OnMatchStarted">
       <soap12:operation soapAction="http://tempuri.org/ILobbyService/OnMatchStarted" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ForcedLogout">
+      <soap12:operation soapAction="http://tempuri.org/ILobbyService/ForcedLogout" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

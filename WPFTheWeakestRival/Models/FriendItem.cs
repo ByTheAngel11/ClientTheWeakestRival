@@ -11,6 +11,13 @@ namespace WPFTheWeakestRival.Models
         private string presence = "Offline";
         private ImageSource avatar;
         private bool isOnline;
+        private int accountId;
+
+        public int AccountId
+        {
+            get => accountId;
+            set => Set(ref accountId, value);
+        }
 
         public string DisplayName
         {

@@ -450,4 +450,115 @@
   <data name="matchTitle" xml:space="preserve">
     <value>Match</value>
   </data>
+  <data name="mnuLobbyReportPlayer" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="reportPlayer" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="reportReasonHarassment" xml:space="preserve">
+    <value>Harassment/insults</value>
+  </data>
+  <data name="reportReasonCheating" xml:space="preserve">
+    <value>Traps</value>
+  </data>
+  <data name="reportReasonSpam" xml:space="preserve">
+    <value>Spam</value>
+  </data>
+  <data name="reportReasonInappropriateName" xml:space="preserve">
+    <value>inappropriate name</value>
+  </data>
+  <data name="reportReasonOther" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="reportSent" xml:space="preserve">
+    <value>Report sent.</value>
+  </data>
+  <data name="reportCooldown" xml:space="preserve">
+    <value>You must wait 30 minutes to report that player again.</value>
+  </data>
+  <data name="reportFailed" xml:space="preserve">
+    <value>The report could not be sent.</value>
+  </data>
+  <data name="reportUnexpectedError" xml:space="preserve">
+    <value>An error occurred while sending the report.</value>
+  </data>
+  <data name="reportSanctionTemporary" xml:space="preserve">
+    <value>Report sent. Temporary sanction applied until: {0}.</value>
+  </data>
+  <data name="reportSanctionPermanent" xml:space="preserve">
+    <value>Report sent. Permanent sanction was applied.</value>
+  </data>
+  <data name="mnuInviteLobbyByEmail" xml:space="preserve">
+    <value>Invite Lobby By Email</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2627" xml:space="preserve">
+    <value>Database duplicity error when sending a friend request: An attempt was made to insert a record that already exists.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2601" xml:space="preserve">
+    <value>Database duplicity error when sending a friend request: An attempt was made to insert a duplicate record</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.547" xml:space="preserve">
+    <value>Referential integrity error in the database when sending a friend request: the target player does not exist or is invalid</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.1205" xml:space="preserve">
+    <value>Database concurrency error when sending a friend request: Deadlock detected. try again</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.-2" xml:space="preserve">
+    <value>The database took too long when sending a friend request. Please try again.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.4060" xml:space="preserve">
+    <value>The database could not be accessed when sending a friend request: the database does not exist or you do not have permissions to use it</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.911" xml:space="preserve">
+    <value>The database could not be accessed when sending a friend request: the indicated database does not exist or is not available.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.18456" xml:space="preserve">
+    <value>Failed to authenticate database access when sending a friend request (invalid credentials).</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.229" xml:space="preserve">
+    <value>You do not have sufficient permissions on the database to send a friend request.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.208" xml:space="preserve">
+    <value>Database configuration error when sending a friend request: The required table or view was not found.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.207" xml:space="preserve">
+    <value>Database configuration error when sending a friend request: a required column is missing.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2812" xml:space="preserve">
+    <value>Database configuration error when sending a friend request: A required stored procedure was not found.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.53" xml:space="preserve">
+    <value>Failed to connect to the database server when sending a friend request: the server is unavailable or the connection was refused.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
+    <value>It was not possible to open a connection to the database when sending a friend request.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>An unexpected database error occurred while sending a friend request.</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>An unexpected error occurred. Please try again.</value>
+  </data>
+  <data name="UiTitleWarning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="lblFriendRequestsTitle" xml:space="preserve">
+    <value>Friend Requests</value>
+  </data>
+  <data name="lblFriendRequestsConnectionError" xml:space="preserve">
+    <value>Could not connect to the service. Please check your connection and try again.</value>
+  </data>
+  <data name="btnFriendRequestsAccept" xml:space="preserve">
+    <value>Accept request</value>
+  </data>
+  <data name="btnFriendRequestsReject" xml:space="preserve">
+    <value>Reject request</value>
+  </data>
+  <data name="btnFriendRequestsCancel" xml:space="preserve">
+    <value>Cancel request</value>
+  </data>
+  <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
+    <value>The request has already been resolved.</value>
+  </data>
 </root>
