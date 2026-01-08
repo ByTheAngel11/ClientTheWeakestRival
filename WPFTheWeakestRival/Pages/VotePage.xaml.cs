@@ -10,7 +10,9 @@ namespace WPFTheWeakestRival.Pages
 {
     public sealed partial class VotePage : Page
     {
-        private const int VOTE_DURATION_SECONDS = 15;
+        private const int DEFAULT_VOTE_DURATION_SECONDS = 15;
+        private const int MIN_VOTE_DURATION_SECONDS = 1;
+        private const int MAX_VOTE_DURATION_SECONDS = 120;
 
         private readonly int matchId;
         private readonly int myUserId;
@@ -25,7 +27,8 @@ namespace WPFTheWeakestRival.Pages
         public VotePage(
             int matchId,
             int myUserId,
-            IEnumerable<PlayerVoteItem> playersSource)
+            IEnumerable<PlayerVoteItem> playersSource,
+            int voteDurationSeconds)
         {
             InitializeComponent();
 
@@ -36,7 +39,6 @@ namespace WPFTheWeakestRival.Pages
 
             if (playersSource != null)
             {
-                // Ya NO filtramos aquí por myUserId.
                 foreach (var player in playersSource)
                 {
                     players.Add(player);
@@ -45,7 +47,7 @@ namespace WPFTheWeakestRival.Pages
 
             LstVotePlayers.ItemsSource = players;
 
-            remainingVoteSeconds = VOTE_DURATION_SECONDS;
+            remainingVoteSeconds = NormalizeVoteDurationSeconds(voteDurationSeconds);
             UpdateCountdownLabel();
 
             voteTimer = new DispatcherTimer
@@ -54,6 +56,21 @@ namespace WPFTheWeakestRival.Pages
             };
             voteTimer.Tick += VoteTimerTick;
             voteTimer.Start();
+        }
+
+        private static int NormalizeVoteDurationSeconds(int seconds)
+        {
+            if (seconds < MIN_VOTE_DURATION_SECONDS)
+            {
+                return DEFAULT_VOTE_DURATION_SECONDS;
+            }
+
+            if (seconds > MAX_VOTE_DURATION_SECONDS)
+            {
+                return MAX_VOTE_DURATION_SECONDS;
+            }
+
+            return seconds;
         }
 
         private void VoteTimerTick(object sender, EventArgs e)
@@ -70,7 +87,6 @@ namespace WPFTheWeakestRival.Pages
 
             if (!voteSent)
             {
-                // Se acabó el tiempo sin voto → se envía "skip"
                 OnVoteCompleted(null);
             }
 

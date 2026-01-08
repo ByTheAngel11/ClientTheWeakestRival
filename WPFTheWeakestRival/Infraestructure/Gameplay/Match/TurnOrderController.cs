@@ -1,5 +1,4 @@
-﻿// TurnOrderController.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -55,7 +54,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 var alive = basePlayers
                     .Where(p => p != null && p.UserId > 0 && !state.IsEliminated(p.UserId))
-                    .Select(p => p)
                     .ToList();
 
                 Shuffle(alive, seed);
@@ -109,9 +107,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.CurrentTurnUserId = snapshot.CurrentTurnUserId;
 
-            if (!state.IsDarknessActive)
+            if (snapshot.OrderedAliveUserIds.Length > 0)
             {
-                if (snapshot.OrderedAliveUserIds.Length > 0)
+                if (state.IsDarknessActive)
+                {
+                    RebuildPlayersForUiDarkness(snapshot.OrderedAliveUserIds);
+                }
+                else
                 {
                     RebuildPlayersForUi(snapshot.OrderedAliveUserIds);
                 }
@@ -265,6 +267,63 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 }
 
                 ordered.Add(p);
+            }
+
+            playersForUi = ordered.ToArray();
+            ui.LstPlayers.ItemsSource = playersForUi;
+
+            if (ui.TxtPlayersSummary != null)
+            {
+                ui.TxtPlayersSummary.Text = string.Format(CultureInfo.CurrentCulture, "({0})", playersForUi.Length);
+            }
+        }
+
+        private void RebuildPlayersForUiDarkness(int[] orderedAliveUserIds)
+        {
+            if (ui.LstPlayers == null)
+            {
+                return;
+            }
+
+            var byId = new Dictionary<int, PlayerSummary>();
+
+            foreach (PlayerSummary p in playersForUi ?? Array.Empty<PlayerSummary>())
+            {
+                if (p != null && p.UserId > 0 && !byId.ContainsKey(p.UserId))
+                {
+                    byId[p.UserId] = p;
+                }
+            }
+
+            var ordered = new List<PlayerSummary>();
+
+            foreach (int userId in orderedAliveUserIds)
+            {
+                if (userId <= 0)
+                {
+                    continue;
+                }
+
+                if (state.IsEliminated(userId))
+                {
+                    continue;
+                }
+
+                PlayerSummary found;
+                if (byId.TryGetValue(userId, out found))
+                {
+                    ordered.Add(found);
+                }
+                else
+                {
+                    ordered.Add(
+                        new PlayerSummary
+                        {
+                            UserId = userId,
+                            DisplayName = DarknessFallbackName,
+                            Avatar = null
+                        });
+                }
             }
 
             playersForUi = ordered.ToArray();

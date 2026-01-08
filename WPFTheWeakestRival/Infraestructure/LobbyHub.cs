@@ -1,12 +1,14 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
-    [CallbackBehavior(UseSynchronizationContext = true, ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public sealed class LobbyHub : ILobbyServiceCallback, IDisposable
     {
         private const byte DEFAULT_MAX_PLAYERS = 8;
@@ -15,6 +17,7 @@ namespace WPFTheWeakestRival.Infrastructure
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyHub));
 
         private readonly LobbyServiceClient client;
+        private readonly Dispatcher dispatcher;
 
         public Guid? CurrentLobbyId { get; private set; }
         public string CurrentAccessCode { get; private set; }
@@ -27,13 +30,32 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public LobbyHub(string endpointName)
         {
+            dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
+
             var instanceContext = new InstanceContext(this);
             client = new LobbyServiceClient(instanceContext, endpointName);
         }
 
         public LobbyServiceClient RawClient => client;
 
-        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token,string lobbyName,byte maxPlayers = DEFAULT_MAX_PLAYERS)
+        private void Ui(Action action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            try
+            {
+                dispatcher.BeginInvoke(action, DispatcherPriority.Send);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyHub.Ui error.", ex);
+            }
+        }
+
+        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token, string lobbyName, byte maxPlayers = DEFAULT_MAX_PLAYERS)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -55,11 +77,9 @@ namespace WPFTheWeakestRival.Infrastructure
 
             try
             {
-                var response = await Task
-                    .Run(() => client.CreateLobby(request))
-                    .ConfigureAwait(false);
+                var response = await Task.Run(() => client.CreateLobby(request)).ConfigureAwait(false);
 
-                if (response?.Lobby != null)
+                if (response != null && response.Lobby != null)
                 {
                     CurrentLobbyId = response.Lobby.LobbyId;
                     CurrentAccessCode = response.Lobby.AccessCode;
@@ -67,12 +87,13 @@ namespace WPFTheWeakestRival.Infrastructure
 
                 return response;
             }
-            catch (FaultException<ServiceFault> fault)
+            catch (FaultException<ServiceFault> ex)
             {
                 Logger.WarnFormat(
                     "CreateLobbyAsync fault. Code={0}, Message={1}",
-                    fault.Detail.Code,
-                    fault.Detail.Message);
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
                 return null;
             }
             catch (CommunicationException ex)
@@ -91,7 +112,6 @@ namespace WPFTheWeakestRival.Infrastructure
                 return null;
             }
         }
-
 
         public async Task<JoinByCodeResponse> JoinByCodeAsync(string token, string accessCode)
         {
@@ -120,11 +140,9 @@ namespace WPFTheWeakestRival.Infrastructure
 
             try
             {
-                var response = await Task
-                    .Run(() => client.JoinByCode(request))
-                    .ConfigureAwait(false);
+                var response = await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
 
-                if (response?.Lobby != null)
+                if (response != null && response.Lobby != null)
                 {
                     CurrentLobbyId = response.Lobby.LobbyId;
                     CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
@@ -134,12 +152,13 @@ namespace WPFTheWeakestRival.Infrastructure
 
                 return response;
             }
-            catch (FaultException<ServiceFault> fault)
+            catch (FaultException<ServiceFault> ex)
             {
                 Logger.WarnFormat(
                     "JoinByCodeAsync fault. Code={0}, Message={1}",
-                    fault.Detail.Code,
-                    fault.Detail.Message);
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
                 return null;
             }
             catch (CommunicationException ex)
@@ -158,7 +177,6 @@ namespace WPFTheWeakestRival.Infrastructure
                 return null;
             }
         }
-
 
         public async Task LeaveLobbyAsync(string token)
         {
@@ -251,18 +269,15 @@ namespace WPFTheWeakestRival.Infrastructure
 
             try
             {
-                var response = await Task
-                    .Run(() => client.StartLobbyMatch(request))
-                    .ConfigureAwait(false);
-
-                return response;
+                return await Task.Run(() => client.StartLobbyMatch(request)).ConfigureAwait(false);
             }
-            catch (FaultException<ServiceFault> fault)
+            catch (FaultException<ServiceFault> ex)
             {
                 Logger.WarnFormat(
                     "StartLobbyMatchAsync fault. Code={0}, Message={1}",
-                    fault.Detail.Code,
-                    fault.Detail.Message);
+                    ex.Detail != null ? ex.Detail.Code : string.Empty,
+                    ex.Detail != null ? ex.Detail.Message : ex.Message);
+
                 return null;
             }
             catch (CommunicationException ex)
@@ -282,40 +297,94 @@ namespace WPFTheWeakestRival.Infrastructure
             }
         }
 
-
         void ILobbyServiceCallback.OnLobbyUpdated(LobbyInfo lobby)
         {
-            if (lobby != null)
+            Ui(() =>
             {
-                CurrentLobbyId = lobby.LobbyId;
-
-                if (!string.IsNullOrWhiteSpace(lobby.AccessCode))
+                try
                 {
-                    CurrentAccessCode = lobby.AccessCode;
-                }
-            }
+                    if (lobby != null)
+                    {
+                        CurrentLobbyId = lobby.LobbyId;
 
-            LobbyUpdated?.Invoke(lobby);
+                        if (!string.IsNullOrWhiteSpace(lobby.AccessCode))
+                        {
+                            CurrentAccessCode = lobby.AccessCode;
+                        }
+                    }
+
+                    LobbyUpdated?.Invoke(lobby);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("OnLobbyUpdated handler error.", ex);
+                }
+            });
         }
 
         void ILobbyServiceCallback.OnPlayerJoined(PlayerSummary player)
         {
-            PlayerJoined?.Invoke(player);
+            Ui(() =>
+            {
+                try
+                {
+                    PlayerJoined?.Invoke(player);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("OnPlayerJoined handler error.", ex);
+                }
+            });
         }
 
         void ILobbyServiceCallback.OnPlayerLeft(Guid playerId)
         {
-            PlayerLeft?.Invoke(playerId);
+            Ui(() =>
+            {
+                try
+                {
+                    PlayerLeft?.Invoke(playerId);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("OnPlayerLeft handler error.", ex);
+                }
+            });
         }
 
         void ILobbyServiceCallback.OnChatMessageReceived(ChatMessage message)
         {
-            ChatMessageReceived?.Invoke(message);
+            Ui(() =>
+            {
+                try
+                {
+                    ChatMessageReceived?.Invoke(message);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("OnChatMessageReceived handler error.", ex);
+                }
+            });
         }
 
         void ILobbyServiceCallback.OnMatchStarted(MatchInfo match)
         {
-            MatchStarted?.Invoke(match);
+            Ui(() =>
+            {
+                try
+                {
+                    Logger.InfoFormat(
+                        "OnMatchStarted received. MatchId={0}, PlayersCount={1}",
+                        match != null ? match.MatchId : Guid.Empty,
+                        match != null && match.Players != null ? match.Players.Length : 0);
+
+                    MatchStarted?.Invoke(match);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("OnMatchStarted handler error.", ex);
+                }
+            });
         }
 
         public void Dispose()

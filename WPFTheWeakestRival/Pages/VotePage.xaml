@@ -26,7 +26,7 @@
             <TextBlock x:Name="LblVoteCountdown"
                        Foreground="#FFFFCC00"
                        FontWeight="Bold"
-                       Text="15" />
+                       Text="0" />
             <TextBlock Text=" s"
                        Foreground="White" />
         </StackPanel>

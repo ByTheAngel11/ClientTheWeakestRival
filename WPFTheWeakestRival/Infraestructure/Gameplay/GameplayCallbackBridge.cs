@@ -7,6 +7,7 @@ using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay
 {
+    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     internal sealed class GameplayCallbackBridge : GameplayServiceProxy.IGameplayServiceCallback
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GameplayCallbackBridge));
@@ -46,13 +47,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
             try
             {
-                if (dispatcher.CheckAccess())
-                {
-                    action();
-                    return;
-                }
-
-                dispatcher.BeginInvoke(action);
+                dispatcher.BeginInvoke(action, DispatcherPriority.Send);
             }
             catch (Exception ex)
             {

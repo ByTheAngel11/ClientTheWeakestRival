@@ -1,5 +1,4 @@
-﻿// MatchDialogController.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -19,6 +18,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchDialogController));
 
         private const string DarknessAliasFormat = "Concursante {0}";
+        private const string DarknessFallbackName = "???";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -121,7 +121,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
         }
 
-        public async Task ShowVoteAndSendAsync()
+        public async Task ShowVoteAndSendAsync(int voteDurationSeconds)
         {
             if (state.IsEliminated(state.MyUserId))
             {
@@ -135,7 +135,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             var votePage = new VotePage(
                 state.MatchDbId,
                 state.MyUserId,
-                playersForVote);
+                playersForVote,
+                voteDurationSeconds);
 
             int? selectedTargetUserId = null;
 
@@ -174,11 +175,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             await SendVoteAsync(selectedTargetUserId);
         }
 
+
         private IEnumerable<PlayerVoteItem> BuildVotePlayers()
         {
             PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
 
-            int anonIndex = 1;
+            Dictionary<int, string> aliasByUserId = state.IsDarknessActive
+                ? BuildDarknessAliasMapIncludingMe()
+                : null;
 
             foreach (PlayerSummary p in lobbyPlayers)
             {
@@ -196,8 +200,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 if (state.IsDarknessActive)
                 {
-                    displayName = string.Format(CultureInfo.CurrentCulture, DarknessAliasFormat, anonIndex);
-                    anonIndex++;
+                    displayName = ResolveAlias(aliasByUserId, p.UserId);
                 }
                 else
                 {
@@ -214,6 +217,76 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     CorrectAnswers = 0,
                     WrongAnswers = 0
                 };
+            }
+        }
+
+        private static string ResolveAlias(Dictionary<int, string> aliasByUserId, int userId)
+        {
+            if (aliasByUserId == null || userId <= 0)
+            {
+                return DarknessFallbackName;
+            }
+
+            string alias;
+            if (aliasByUserId.TryGetValue(userId, out alias) && !string.IsNullOrWhiteSpace(alias))
+            {
+                return alias;
+            }
+
+            return DarknessFallbackName;
+        }
+
+        private Dictionary<int, string> BuildDarknessAliasMapIncludingMe()
+        {
+            int seed = state.DarknessSeed.HasValue
+                ? state.DarknessSeed.Value
+                : (state.Match.MatchId.GetHashCode() ^ state.CurrentRoundNumber);
+
+            PlayerSummary[] basePlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
+
+            var alive = basePlayers
+                .Where(p => p != null && p.UserId > 0 && !state.IsEliminated(p.UserId))
+                .ToList();
+
+            Shuffle(alive, seed);
+
+            var map = new Dictionary<int, string>();
+
+            int index = 1;
+            foreach (PlayerSummary p in alive)
+            {
+                if (p == null || p.UserId <= 0)
+                {
+                    continue;
+                }
+
+                if (!map.ContainsKey(p.UserId))
+                {
+                    map[p.UserId] = string.Format(CultureInfo.CurrentCulture, DarknessAliasFormat, index);
+                }
+
+                index++;
+            }
+
+            return map;
+        }
+
+        private static void Shuffle(List<PlayerSummary> list, int seed)
+        {
+            if (list == null || list.Count <= 1)
+            {
+                return;
+            }
+
+            var random = new Random(seed);
+
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+
+                PlayerSummary temp = list[i];
+                list[i] = list[j];
+                list[j] = temp;
             }
         }
 

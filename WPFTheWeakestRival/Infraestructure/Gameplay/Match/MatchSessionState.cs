@@ -59,6 +59,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public IReadOnlyCollection<int> EliminatedUserIds => eliminatedUserIds;
         public IReadOnlyList<int> EliminationOrder => eliminationOrder;
 
+        public int? DarknessSeed { get; set; }
+
         public void AddEliminated(int userId)
         {
             if (userId <= 0)

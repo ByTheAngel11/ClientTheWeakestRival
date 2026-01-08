@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using log4net;
@@ -14,6 +15,9 @@ namespace WPFTheWeakestRival
 
         private readonly MatchSessionState state;
         private readonly MatchSessionCoordinator coordinator;
+        private readonly LobbyWindow lobbyWindow;
+
+        private bool isCloseFlowInProgress;
 
         public MatchWindow(
             MatchInfo match,
@@ -28,6 +32,8 @@ namespace WPFTheWeakestRival
             }
 
             InitializeComponent();
+
+            this.lobbyWindow = lobbyWindow;
 
             state = new MatchSessionState(match, token, myUserId, isHost);
 
@@ -49,6 +55,7 @@ namespace WPFTheWeakestRival
                 imgWildcardIcon: imgWildcardIcon,
                 btnWildcardPrev: btnWildcardPrev,
                 btnWildcardNext: btnWildcardNext,
+                btnUseWildcard: btnUseWildcard,
                 btnAnswer1: btnAnswer1,
                 btnAnswer2: btnAnswer2,
                 btnAnswer3: btnAnswer3,
@@ -67,30 +74,8 @@ namespace WPFTheWeakestRival
             coordinator = new MatchSessionCoordinator(ui, state);
 
             Loaded += MatchWindowLoaded;
-            Closed += (s, e) =>
-            {
-                try
-                {
-                    coordinator.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("MatchWindow.Closed: coordinator.Dispose error.", ex);
-                }
-
-                try
-                {
-                    if (lobbyWindow != null)
-                    {
-                        lobbyWindow.Show();
-                        lobbyWindow.Activate();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("MatchWindow.Closed: lobbyWindow.Show/Activate error.", ex);
-                }
-            };
+            Closing += MatchWindowClosing;
+            Closed += MatchWindowClosed;
         }
 
         private async void MatchWindowLoaded(object sender, RoutedEventArgs e)
@@ -111,13 +96,61 @@ namespace WPFTheWeakestRival
             }
         }
 
+        private void MatchWindowClosing(object sender, CancelEventArgs e)
+        {
+            if (isCloseFlowInProgress)
+            {
+                return;
+            }
+
+            e.Cancel = true;
+
+            try
+            {
+                RequestCloseFlow();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("MatchWindowClosing error.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void MatchWindowClosed(object sender, EventArgs e)
+        {
+            try
+            {
+                coordinator.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("MatchWindow.Closed: coordinator.Dispose error.", ex);
+            }
+
+            try
+            {
+                if (lobbyWindow != null)
+                {
+                    lobbyWindow.Show();
+                    lobbyWindow.Activate();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("MatchWindow.Closed: lobbyWindow.Show/Activate error.", ex);
+            }
+        }
+
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                coordinator.OnCloseRequested(
-                    closeWindow: Close,
-                    showResultAndClose: () => coordinator.ShowResultAndClose(Close));
+                RequestCloseFlow();
             }
             catch (Exception ex)
             {
@@ -129,6 +162,24 @@ namespace WPFTheWeakestRival
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private void RequestCloseFlow()
+        {
+            coordinator.OnCloseRequested(
+                closeWindow: ForceClose,
+                showResultAndClose: () => coordinator.ShowResultAndClose(ForceClose));
+        }
+
+        private void ForceClose()
+        {
+            if (isCloseFlowInProgress)
+            {
+                return;
+            }
+
+            isCloseFlowInProgress = true;
+            Close();
         }
 
         private async void AnswerButtonClick(object sender, RoutedEventArgs e)
@@ -168,6 +219,24 @@ namespace WPFTheWeakestRival
                 MessageBox.Show(
                     ex.Message,
                     MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnUseWildcardClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await coordinator.OnUseWildcardClickAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("BtnUseWildcardClick error.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.WILDCARDS_MESSAGE_TITLE,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }

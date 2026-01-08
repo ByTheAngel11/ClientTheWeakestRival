@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.Controls;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
@@ -25,6 +24,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             Image imgWildcardIcon,
             Button btnWildcardPrev,
             Button btnWildcardNext,
+            Button btnUseWildcard,
             Button btnAnswer1,
             Button btnAnswer2,
             Button btnAnswer3,
@@ -41,16 +41,21 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             TextBlock specialEventDescriptionText)
         {
             Window = window;
+
             TxtMatchCodeSmall = txtMatchCodeSmall;
             LstPlayers = lstPlayers;
             TxtPlayersSummary = txtPlayersSummary;
+
             TxtChain = txtChain;
             TxtBanked = txtBanked;
+
             TxtTurnPlayerName = txtTurnPlayerName;
             TxtTurnLabel = txtTurnLabel;
             TxtTimer = txtTimer;
+
             TxtQuestion = txtQuestion;
             TxtAnswerFeedback = txtAnswerFeedback;
+
             TxtPhase = txtPhase;
 
             TxtWildcardName = txtWildcardName;
@@ -59,6 +64,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             BtnWildcardPrev = btnWildcardPrev;
             BtnWildcardNext = btnWildcardNext;
+            BtnUseWildcard = btnUseWildcard;
 
             BtnAnswer1 = btnAnswer1;
             BtnAnswer2 = btnAnswer2;
@@ -105,6 +111,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public Button BtnWildcardPrev { get; }
         public Button BtnWildcardNext { get; }
+        public Button BtnUseWildcard { get; }
 
         public Button BtnAnswer1 { get; }
         public Button BtnAnswer2 { get; }

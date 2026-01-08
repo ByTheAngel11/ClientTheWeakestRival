@@ -22,12 +22,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string DarknessUnknownName = "???";
         private const string DarknessTurnLabel = "A oscuras";
 
+        private const int MIN_SECONDS = 0;
+
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
         private readonly GameplayClientProxy gameplay;
         private readonly QuestionTimerController timer;
 
         private int remainingSeconds;
+
+        private int? pendingNextTurnTimeLimitSeconds;
+        private int? pendingNextTurnTimeLimitSourceUserId;
+        private int? pendingNextTurnTimeLimitTargetUserId;
 
         public QuestionController(
             MatchWindowUiRefs ui,
@@ -68,6 +74,78 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 ui.BtnBank.IsEnabled = false;
             }
+        }
+
+        /// <summary>
+        /// Programa un override de tiempo para el "siguiente turno".
+        /// - Si targetUserId viene, se aplica solo a ese usuario.
+        /// - Si no viene y sourceTurnUserId viene, se aplica al primer turno cuyo targetUserId != sourceTurnUserId.
+        /// </summary>
+        public void ScheduleNextTurnTimeLimitOverride(int seconds, int? sourceTurnUserId, int? targetUserId)
+        {
+            if (seconds < MIN_SECONDS)
+            {
+                seconds = MIN_SECONDS;
+            }
+
+            if (pendingNextTurnTimeLimitSeconds.HasValue)
+            {
+                pendingNextTurnTimeLimitSeconds = Math.Min(pendingNextTurnTimeLimitSeconds.Value, seconds);
+            }
+            else
+            {
+                pendingNextTurnTimeLimitSeconds = seconds;
+            }
+
+            if (targetUserId.HasValue && targetUserId.Value > 0)
+            {
+                pendingNextTurnTimeLimitTargetUserId = targetUserId.Value;
+            }
+            else if (!pendingNextTurnTimeLimitTargetUserId.HasValue && sourceTurnUserId.HasValue && sourceTurnUserId.Value > 0)
+            {
+                pendingNextTurnTimeLimitSourceUserId = sourceTurnUserId.Value;
+            }
+        }
+
+        private int? TryConsumeNextTurnTimeLimitOverride(int targetUserId)
+        {
+            if (!pendingNextTurnTimeLimitSeconds.HasValue)
+            {
+                return null;
+            }
+
+            if (targetUserId <= 0)
+            {
+                return null;
+            }
+
+            bool shouldApply;
+
+            if (pendingNextTurnTimeLimitTargetUserId.HasValue)
+            {
+                shouldApply = targetUserId == pendingNextTurnTimeLimitTargetUserId.Value;
+            }
+            else if (pendingNextTurnTimeLimitSourceUserId.HasValue)
+            {
+                shouldApply = targetUserId != pendingNextTurnTimeLimitSourceUserId.Value;
+            }
+            else
+            {
+                shouldApply = true;
+            }
+
+            if (!shouldApply)
+            {
+                return null;
+            }
+
+            int seconds = pendingNextTurnTimeLimitSeconds.Value;
+
+            pendingNextTurnTimeLimitSeconds = null;
+            pendingNextTurnTimeLimitSourceUserId = null;
+            pendingNextTurnTimeLimitTargetUserId = null;
+
+            return seconds;
         }
 
         public void SetDarknessActive(bool isActive)
@@ -171,6 +249,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.CurrentQuestion = question;
             state.CurrentTurnUserId = targetUserId;
 
+            int? timeLimitOverrideSeconds = TryConsumeNextTurnTimeLimitOverride(targetUserId);
+
             highlightPlayer?.Invoke(targetUserId);
 
             if (ui.TxtChain != null)
@@ -231,6 +311,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 int limitSeconds = state.IsSurpriseExamActive
                     ? MatchConstants.SURPRISE_EXAM_TIME_SECONDS
                     : MatchConstants.QUESTION_TIME_SECONDS;
+
+                if (!state.IsSurpriseExamActive && timeLimitOverrideSeconds.HasValue)
+                {
+                    limitSeconds = timeLimitOverrideSeconds.Value;
+                }
 
                 remainingSeconds = limitSeconds;
                 UpdateTimerText();

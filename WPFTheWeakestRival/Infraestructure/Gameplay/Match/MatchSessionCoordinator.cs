@@ -1,5 +1,4 @@
-﻿// MatchSessionCoordinator.cs
-using log4net;
+﻿using log4net;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,12 +18,24 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchSessionCoordinator));
 
-        private const string DarknessStartCode = "DARKNESS_STARTED";
-        private const string DarknessEndCode = "DARKNESS_ENDED";
+        private const string LegacyDarknessStartCode = "DARKNESS_STARTED";
+        private const string LegacyDarknessEndCode = "DARKNESS_ENDED";
+
+        private const string DarkModeStartCode = "DARK_MODE_STARTED";
+        private const string DarkModeEndCode = "DARK_MODE_ENDED";
+        private const string DarkModeVoteRevealCode = "DARK_MODE_VOTE_REVEAL";
+
         private const string DarknessKeywordEs = "oscuras";
 
         private const string DarknessUnknownName = "???";
         private const string DarknessTurnLabel = "A oscuras";
+
+        private const string SabotageCode = "SABOTAGE";
+        private const string SabotageUsedCode = "SABOTAGE_USED";
+        private const string SabotageAppliedCode = "SABOTAGE_APPLIED";
+        private const string SabotageKeywordEs = "sabotaje";
+
+        private const int SabotageTimeSeconds = 15;
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -63,6 +74,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             await JoinMatchAsync();
             await EnsureMatchStartedAsync();
+
+            RefreshWildcardUseState();
         }
 
         private void InitializeUi()
@@ -249,6 +262,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 chain,
                 banked,
                 userId => turns.TryHighlightPlayerInList(userId));
+
+            RefreshWildcardUseState();
         }
 
         private async Task HandleVotePhaseStartedAsync(Guid matchId, TimeSpan timeLimit)
@@ -258,7 +273,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 matchId,
                 timeLimit.TotalSeconds);
 
-            await dialogs.ShowVoteAndSendAsync();
+            int voteDurationSeconds = (int)Math.Ceiling(timeLimit.TotalSeconds);
+            await dialogs.ShowVoteAndSendAsync(voteDurationSeconds);
         }
 
         private void HandleElimination(GameplayServiceProxy.PlayerSummary eliminated)
@@ -279,6 +295,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             dialogs.ShowEliminationMessage(eliminated);
             questions.OnEliminated(isMe);
+
+            RefreshWildcardUseState();
         }
 
         private async Task HandleSpecialEventAsync(Guid matchId, string eventName, string description)
@@ -292,23 +310,50 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.CurrentPhase = MatchPhase.SpecialEvent;
             UpdatePhaseLabel();
 
-            overlay.ShowSpecialEvent(
-                string.IsNullOrWhiteSpace(eventName) ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT : eventName,
-                string.IsNullOrWhiteSpace(description) ? string.Empty : description);
-
-            if (IsDarknessStartEvent(eventName, description))
+            if (IsDarkModeVoteRevealEvent(eventName, description))
             {
-                BeginDarknessMode();
+                int? revealedUserId = TryParseFirstInt(eventName) ?? TryParseFirstInt(description);
+
+                if (revealedUserId.HasValue && revealedUserId.Value > 0)
+                {
+                    state.PendingDarknessVotedUserId = revealedUserId.Value;
+                }
+
+                overlay.ShowSpecialEvent("A oscuras", "Voto revelado.");
+                TryRevealDarknessVote();
 
                 await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
                 return;
             }
 
-            if (IsDarknessEndEvent(eventName, description))
+            overlay.ShowSpecialEvent(
+                string.IsNullOrWhiteSpace(eventName) ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT : eventName,
+                string.IsNullOrWhiteSpace(description) ? string.Empty : description);
+
+            if (IsDarkModeStartEvent(eventName, description))
+            {
+                BeginDarknessMode();
+
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                RefreshWildcardUseState();
+                return;
+            }
+
+            if (IsDarkModeEndEvent(eventName, description))
+            {
+                EndDarknessMode(revealVote: false);
+
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                RefreshWildcardUseState();
+                return;
+            }
+
+            if (IsLegacyDarknessEndEvent(eventName, description))
             {
                 EndDarknessMode(revealVote: true);
 
                 await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                RefreshWildcardUseState();
                 return;
             }
 
@@ -316,6 +361,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 questions.SetSurpriseExamActive(true);
                 await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                RefreshWildcardUseState();
                 return;
             }
 
@@ -323,18 +369,39 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 questions.SetSurpriseExamActive(false);
                 await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                RefreshWildcardUseState();
                 return;
             }
 
             if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE, StringComparison.OrdinalIgnoreCase))
             {
                 questions.SetBombQuestionUi(true);
+                RefreshWildcardUseState();
                 return;
             }
 
             if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE, StringComparison.OrdinalIgnoreCase))
             {
                 questions.SetBombQuestionUi(false);
+                RefreshWildcardUseState();
+                return;
+            }
+
+            if (IsSabotageEvent(eventName, description))
+            {
+                int sourceTurnUserId = state.CurrentTurnUserId;
+                int? parsedTargetUserId = TryParseFirstInt(eventName) ?? TryParseFirstInt(description);
+
+                if (questions != null)
+                {
+                    questions.ScheduleNextTurnTimeLimitOverride(
+                        SabotageTimeSeconds,
+                        sourceTurnUserId > 0 ? (int?)sourceTurnUserId : null,
+                        parsedTargetUserId);
+                }
+
+                await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
+                RefreshWildcardUseState();
                 return;
             }
 
@@ -342,52 +409,77 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 string.Equals(eventName, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase))
             {
                 await wildcards.LoadAsync();
+                RefreshWildcardUseState();
             }
         }
 
-        private static bool IsDarknessStartEvent(string eventName, string description)
+        private static bool IsSabotageEvent(string eventName, string description)
         {
-            if (ContainsDarknessToken(eventName))
-            {
-                return true;
-            }
-
-            if (ContainsDarknessToken(description))
-            {
-                return true;
-            }
-
-            return false;
+            return IsCode(eventName, SabotageCode)
+                || IsCode(description, SabotageCode)
+                || IsCode(eventName, SabotageUsedCode)
+                || IsCode(description, SabotageUsedCode)
+                || IsCode(eventName, SabotageAppliedCode)
+                || IsCode(description, SabotageAppliedCode)
+                || StartsWithCode(eventName, SabotageCode)
+                || StartsWithCode(description, SabotageCode)
+                || ContainsKeyword(eventName, SabotageKeywordEs)
+                || ContainsKeyword(description, SabotageKeywordEs)
+                || ContainsKeyword(eventName, SabotageCode)
+                || ContainsKeyword(description, SabotageCode);
         }
 
-        private static bool IsDarknessEndEvent(string eventName, string description)
+        private static bool IsDarkModeStartEvent(string eventName, string description)
         {
-            if (string.Equals(eventName, DarknessEndCode, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            if (string.Equals(description, DarknessEndCode, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            return false;
+            return IsCode(eventName, DarkModeStartCode)
+                || IsCode(description, DarkModeStartCode)
+                || IsCode(eventName, LegacyDarknessStartCode)
+                || IsCode(description, LegacyDarknessStartCode)
+                || ContainsKeyword(eventName, DarknessKeywordEs)
+                || ContainsKeyword(description, DarknessKeywordEs);
         }
 
-        private static bool ContainsDarknessToken(string text)
+        private static bool IsDarkModeEndEvent(string eventName, string description)
         {
-            if (string.IsNullOrWhiteSpace(text))
+            return IsCode(eventName, DarkModeEndCode)
+                || IsCode(description, DarkModeEndCode);
+        }
+
+        private static bool IsLegacyDarknessEndEvent(string eventName, string description)
+        {
+            return IsCode(eventName, LegacyDarknessEndCode)
+                || IsCode(description, LegacyDarknessEndCode);
+        }
+
+        private static bool IsDarkModeVoteRevealEvent(string eventName, string description)
+        {
+            return StartsWithCode(eventName, DarkModeVoteRevealCode)
+                || StartsWithCode(description, DarkModeVoteRevealCode);
+        }
+
+        private static bool IsCode(string text, string code)
+        {
+            return string.Equals(text != null ? text.Trim() : null, code, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool StartsWithCode(string text, string code)
+        {
+            if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(code))
             {
                 return false;
             }
 
-            if (string.Equals(text, DarknessStartCode, StringComparison.OrdinalIgnoreCase))
+            return text.Trim().StartsWith(code, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool ContainsKeyword(string text, string keyword)
+        {
+            if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(keyword))
             {
-                return true;
+                return false;
             }
 
-            return text.IndexOf(DarknessKeywordEs, StringComparison.OrdinalIgnoreCase) >= 0;
+            return text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void BeginDarknessMode()
@@ -400,6 +492,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.IsDarknessActive = true;
 
             int seed = BuildDarknessSeed(state.Match.MatchId, state.CurrentRoundNumber);
+
+            state.DarknessSeed = seed;
 
             turns.EnableDarknessMode(seed);
             questions.SetDarknessActive(true);
@@ -438,6 +532,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             state.IsDarknessActive = false;
+
+            state.DarknessSeed = null;
 
             turns.DisableDarknessMode();
             questions.SetDarknessActive(false);
@@ -490,6 +586,44 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             return matchId.GetHashCode() ^ roundNumber;
         }
 
+        private static int? TryParseFirstInt(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return null;
+            }
+
+            string t = text.Trim();
+
+            int i = 0;
+            while (i < t.Length && !char.IsDigit(t[i]))
+            {
+                i++;
+            }
+
+            if (i >= t.Length)
+            {
+                return null;
+            }
+
+            int start = i;
+
+            while (i < t.Length && char.IsDigit(t[i]))
+            {
+                i++;
+            }
+
+            string numberText = t.Substring(start, i - start);
+
+            int value;
+            if (int.TryParse(numberText, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+            {
+                return value;
+            }
+
+            return null;
+        }
+
         private void HandleCoinFlip(GameplayServiceProxy.CoinFlipResolvedDto coinFlip)
         {
             if (coinFlip == null)
@@ -497,11 +631,24 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            state.CurrentRoundNumber++;
+            int serverRoundId = coinFlip.RoundId;
+            if (serverRoundId > 0)
+            {
+                state.CurrentRoundNumber = serverRoundId;
+            }
+            else
+            {
+                state.CurrentRoundNumber = state.CurrentRoundNumber < 1
+                    ? 1
+                    : state.CurrentRoundNumber + 1;
+            }
+
             state.CurrentPhase = coinFlip.ShouldEnableDuel ? MatchPhase.Duel : MatchPhase.NormalRound;
             UpdatePhaseLabel();
 
             overlay.ShowCoinFlip(coinFlip);
+
+            RefreshWildcardUseState();
         }
 
         private async Task HandleDuelCandidatesAsync(GameplayServiceProxy.DuelCandidatesDto duelCandidates)
@@ -563,6 +710,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (ui.BtnAnswer3 != null) ui.BtnAnswer3.IsEnabled = false;
             if (ui.BtnAnswer4 != null) ui.BtnAnswer4.IsEnabled = false;
 
+            RefreshWildcardUseState();
+
             dialogs.ShowMatchFinishedMessage(winner);
 
             if (ui.TxtTurnLabel != null)
@@ -599,6 +748,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ui.TurnBannerBackground.Background =
                     (Brush)ui.Window.FindResource(state.IsMyTurn ? "Brush.Turn.MyTurn" : "Brush.Turn.OtherTurn");
             }
+
+            wildcards.RefreshUseState(false);
         }
 
         private void HandleLightningChallengeQuestion(GameplayServiceProxy.QuestionWithAnswersDto question)
@@ -644,11 +795,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.CurrentPhase = MatchPhase.NormalRound;
             UpdatePhaseLabel();
+
+            RefreshWildcardUseState();
         }
 
         private async Task HandleTurnOrderInitializedAsync(object turnOrder)
         {
             turns.ApplyTurnOrder(turnOrder);
+
+            SyncMyTurnFromTurnOrder(turnOrder);
+            RefreshWildcardUseState();
 
             if (state.IsDarknessActive)
             {
@@ -664,6 +820,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
         {
             turns.ApplyTurnOrder(turnOrder);
+
+            SyncMyTurnFromTurnOrder(turnOrder);
+            RefreshWildcardUseState();
 
             if (state.IsDarknessActive)
             {
@@ -697,6 +856,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public void OnWildcardNext()
         {
             wildcards.SelectNext();
+        }
+
+        public async Task OnUseWildcardClickAsync()
+        {
+            bool canUse = CanUseWildcardNow();
+            await wildcards.UseSelectedAsync(canUse);
+            RefreshWildcardUseState();
         }
 
         public void OnIntroEnded()
@@ -785,6 +951,46 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 "{0}: {1}",
                 MatchConstants.PHASE_TITLE,
                 phaseDetail);
+        }
+
+        private void SyncMyTurnFromTurnOrder(object turnOrder)
+        {
+            var dto = turnOrder as GameplayServiceProxy.TurnOrderDto;
+            if (dto == null)
+            {
+                return;
+            }
+
+            bool isMyTurnNow = dto.CurrentTurnUserId == state.MyUserId
+                && !state.IsEliminated(state.MyUserId)
+                && !state.IsMatchFinished;
+
+            state.IsMyTurn = isMyTurnNow;
+        }
+
+        private bool CanUseWildcardNow()
+        {
+            if (state.IsMatchFinished)
+            {
+                return false;
+            }
+
+            if (state.IsEliminated(state.MyUserId))
+            {
+                return false;
+            }
+
+            if (!state.IsMyTurn)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void RefreshWildcardUseState()
+        {
+            wildcards.RefreshUseState(CanUseWildcardNow());
         }
 
         public void Dispose()

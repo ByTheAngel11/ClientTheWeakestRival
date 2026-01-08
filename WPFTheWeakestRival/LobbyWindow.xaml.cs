@@ -83,6 +83,8 @@ namespace WPFTheWeakestRival
         private decimal pointsEliminationGain = 5m;
         private bool isTiebreakCoinflipAllowed = true;
 
+        private bool isOpeningMatchWindow;
+
         private sealed class ChatLine
         {
             public string Author { get; set; } = string.Empty;
@@ -146,6 +148,22 @@ namespace WPFTheWeakestRival
             };
 
             Unloaded += OnWindowUnloaded;
+        }
+
+        private void Ui(Action action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            if (Dispatcher.CheckAccess())
+            {
+                action();
+                return;
+            }
+
+            Dispatcher.BeginInvoke(action);
         }
 
         public void InitializeExistingLobby(Guid lobbyId, string accessCode, string lobbyName)
@@ -492,19 +510,9 @@ namespace WPFTheWeakestRival
                     imgAvatar.Source = avatarImageSource;
                 }
             }
-            catch (FaultException<AuthService.ServiceFault> ex)
-            {
-                Logger.Warn("Auth fault while refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar();
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar();
-            }
             catch (Exception ex)
             {
-                Logger.Error("Unexpected error while refreshing profile button avatar in lobby.", ex);
+                Logger.Warn("Error refreshing profile button avatar in lobby.", ex);
                 SetDefaultAvatar();
             }
         }
@@ -650,20 +658,11 @@ namespace WPFTheWeakestRival
                     txtChatInput.Text = string.Empty;
                 }
             }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while sending chat message in lobby.", ex);
-                MessageBox.Show(
-                    Lang.chatSendFailed + Environment.NewLine + ex.Message,
-                    Lang.chatTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
             catch (Exception ex)
             {
-                Logger.Error("Unexpected error while sending chat message in lobby.", ex);
+                Logger.Error("Error sending chat message in lobby.", ex);
                 MessageBox.Show(
-                    Lang.chatSendFailed + " " + ex.Message,
+                    Lang.chatSendFailed,
                     Lang.chatTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -702,16 +701,15 @@ namespace WPFTheWeakestRival
                     currentAccessCode = info.AccessCode;
                 }
 
-                Dispatcher.Invoke(
-                    () =>
-                    {
-                        UpdateLobbyHeader(info.LobbyName, currentAccessCode);
+                Ui(() =>
+                {
+                    UpdateLobbyHeader(info.LobbyName, currentAccessCode);
 
-                        LobbyAvatarHelper.RebuildLobbyPlayers(
-                            lobbyPlayers,
-                            info.Players,
-                            MapPlayerToLobbyItem);
-                    });
+                    LobbyAvatarHelper.RebuildLobbyPlayers(
+                        lobbyPlayers,
+                        info.Players,
+                        MapPlayerToLobbyItem);
+                });
             }
             catch (Exception ex)
             {
@@ -719,12 +717,11 @@ namespace WPFTheWeakestRival
             }
         }
 
-
         private void OnPlayerJoinedFromHub(LobbyContracts.PlayerSummary _)
         {
             try
             {
-                Dispatcher.Invoke(() => AppendSystemLine(Lang.lobbyPlayerJoined));
+                Ui(() => AppendSystemLine(Lang.lobbyPlayerJoined));
             }
             catch (Exception ex)
             {
@@ -736,7 +733,7 @@ namespace WPFTheWeakestRival
         {
             try
             {
-                Dispatcher.Invoke(() => AppendSystemLine(Lang.lobbyPlayerLeft));
+                Ui(() => AppendSystemLine(Lang.lobbyPlayerLeft));
             }
             catch (Exception ex)
             {
@@ -753,23 +750,22 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Dispatcher.Invoke(
-                    () =>
+                Ui(() =>
+                {
+                    var author = string.IsNullOrWhiteSpace(chat.FromPlayerName)
+                        ? Lang.player
+                        : chat.FromPlayerName;
+
+                    var isMyRecentEcho =
+                        string.Equals(author, myDisplayName, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(chat.Message ?? string.Empty, lastSentText, StringComparison.Ordinal) &&
+                        (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(RECENT_ECHO_WINDOW_SECONDS);
+
+                    if (!isMyRecentEcho)
                     {
-                        var author = string.IsNullOrWhiteSpace(chat.FromPlayerName)
-                            ? Lang.player
-                            : chat.FromPlayerName;
-
-                        var isMyRecentEcho =
-                            string.Equals(author, myDisplayName, StringComparison.OrdinalIgnoreCase) &&
-                            string.Equals(chat.Message ?? string.Empty, lastSentText, StringComparison.Ordinal) &&
-                            (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(RECENT_ECHO_WINDOW_SECONDS);
-
-                        if (!isMyRecentEcho)
-                        {
-                            AppendLine(author, chat.Message ?? string.Empty);
-                        }
-                    });
+                        AppendLine(author, chat.Message ?? string.Empty);
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -837,13 +833,9 @@ namespace WPFTheWeakestRival
                     await AppServices.Lobby.LeaveLobbyAsync(token);
                 }
             }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while leaving lobby on window close.", ex);
-            }
             catch (Exception ex)
             {
-                Logger.Error("Unexpected error while leaving lobby on window close.", ex);
+                Logger.Error("Error leaving lobby on window close.", ex);
             }
 
             base.OnClosed(e);
@@ -885,8 +877,17 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Dispatcher.Invoke(
-                    () =>
+                Ui(() =>
+                {
+                    if (isOpeningMatchWindow)
+                    {
+                        Logger.Warn("OnMatchStartedFromHub ignored because match window is already opening.");
+                        return;
+                    }
+
+                    isOpeningMatchWindow = true;
+
+                    try
                     {
                         var token = LoginWindow.AppSession.CurrentToken?.Token;
                         var session = LoginWindow.AppSession.CurrentToken;
@@ -895,9 +896,49 @@ namespace WPFTheWeakestRival
                         var isHost = false;
 
                         var matchWindow = new MatchWindow(match, token, myUserId, isHost, this);
+
+                        matchWindow.Closed += (_, __) =>
+                        {
+                            Ui(() =>
+                            {
+                                try
+                                {
+                                    Show();
+                                    Activate();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Warn("Error restoring lobby after match window closed.", ex);
+                                }
+                                finally
+                                {
+                                    isOpeningMatchWindow = false;
+                                }
+                            });
+                        };
+
                         Hide();
                         matchWindow.Show();
-                    });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("Error opening MatchWindow from lobby.", ex);
+
+                        try
+                        {
+                            Show();
+                            Activate();
+                        }
+                        catch (Exception showEx)
+                        {
+                            Logger.Warn("Error restoring lobby after MatchWindow open failure.", showEx);
+                        }
+                        finally
+                        {
+                            isOpeningMatchWindow = false;
+                        }
+                    }
+                });
             }
             catch (Exception ex)
             {

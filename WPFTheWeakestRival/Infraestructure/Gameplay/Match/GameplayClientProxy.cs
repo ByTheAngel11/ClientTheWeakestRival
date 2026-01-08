@@ -11,6 +11,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GameplayClientProxy));
 
         private readonly GameplayServiceProxy.GameplayServiceClient client;
+        private bool isDisposed;
 
         public GameplayClientProxy(GameplayServiceProxy.GameplayServiceClient client)
         {
@@ -21,62 +22,58 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public Task JoinMatchAsync(GameplayServiceProxy.GameplayJoinMatchRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ValidateNotDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return Task.Run(() => client.JoinMatch(request));
+            return client.JoinMatchAsync(request);
         }
 
         public Task StartMatchAsync(GameplayServiceProxy.GameplayStartMatchRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ValidateNotDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return Task.Run(() => client.StartMatch(request));
+            return client.StartMatchAsync(request);
         }
 
         public Task SubmitAnswerAsync(GameplayServiceProxy.SubmitAnswerRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ValidateNotDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return Task.Run(() => client.SubmitAnswer(request));
+            return client.SubmitAnswerAsync(request);
         }
 
         public Task<GameplayServiceProxy.BankResponse> BankAsync(GameplayServiceProxy.BankRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ValidateNotDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return Task.Run(() => client.Bank(request));
+            return client.BankAsync(request);
         }
 
         public Task CastVoteAsync(GameplayServiceProxy.CastVoteRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ValidateNotDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return Task.Run(() => client.CastVote(request));
+            return client.CastVoteAsync(request);
         }
 
         public Task ChooseDuelOpponentAsync(GameplayServiceProxy.ChooseDuelOpponentRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            ValidateNotDisposed();
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return Task.Run(() => client.ChooseDuelOpponent(request));
+            return client.ChooseDuelOpponentAsync(request);
+        }
+
+        private void ValidateNotDisposed()
+        {
+            if (isDisposed)
+            {
+                throw new ObjectDisposedException(nameof(GameplayClientProxy));
+            }
         }
 
         public void CloseSafely()
@@ -113,6 +110,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void Dispose()
         {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            isDisposed = true;
             CloseSafely();
         }
     }

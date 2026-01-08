@@ -16,6 +16,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(WildcardController));
 
+        private const int MIN_ROUND_NUMBER = 1;
+
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
 
@@ -23,10 +25,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private PlayerWildcardDto selectedWildcard;
         private int currentWildcardIndex;
 
+        private bool canUseNow;
+
         public WildcardController(MatchWindowUiRefs ui, MatchSessionState state)
         {
             this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
+        }
+
+        public void RefreshUseState(bool canUse)
+        {
+            canUseNow = canUse;
+            ApplyUseButtonState();
         }
 
         public void SelectPrev()
@@ -66,11 +76,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         MatchId = state.MatchDbId
                     };
 
-                    var response = await Task.Run(() => client.GetPlayerWildcards(request));
+                    GetPlayerWildcardsResponse response = await client.GetPlayerWildcardsAsync(request);
 
-                    IEnumerable<PlayerWildcardDto> source = response != null && response.Wildcards != null
-                        ? response.Wildcards
-                        : Enumerable.Empty<PlayerWildcardDto>();
+                    IEnumerable<PlayerWildcardDto> source =
+                        response != null && response.Wildcards != null
+                            ? response.Wildcards
+                            : Enumerable.Empty<PlayerWildcardDto>();
 
                     myWildcards = source.Where(w => w != null).ToList();
 
@@ -119,6 +130,135 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+            finally
+            {
+                ApplyUseButtonState();
+            }
+        }
+
+        public async Task UseSelectedAsync(bool canUse)
+        {
+            canUseNow = canUse;
+            ApplyUseButtonState();
+
+            if (!canUseNow)
+            {
+                return;
+            }
+
+            if (selectedWildcard == null || selectedWildcard.PlayerWildcardId <= 0)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(state.Token) || state.MatchDbId <= 0)
+            {
+                return;
+            }
+
+            if (ui.BtnUseWildcard != null)
+            {
+                ui.BtnUseWildcard.IsEnabled = false;
+            }
+
+            int playerWildcardId = selectedWildcard.PlayerWildcardId;
+            int roundNumber = GetSafeRoundNumber();
+
+            try
+            {
+                using (var client = new WildcardServiceClient("WSHttpBinding_IWildcardService"))
+                {
+                    await InvokeUseWildcardAsync(client, state.Token, state.MatchDbId, playerWildcardId, roundNumber);
+                }
+
+                await LoadAsync();
+            }
+            catch (FaultException<WildcardFault> ex)
+            {
+                Logger.Warn("Fault al usar comodín.", ex);
+
+                MessageBox.Show(
+                    ex.Detail != null ? ex.Detail.Message : ex.Message,
+                    MatchConstants.WILDCARDS_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Error de comunicación al usar comodín.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.WILDCARDS_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error inesperado al usar comodín.", ex);
+
+                MessageBox.Show(
+                    ex.Message,
+                    MatchConstants.WILDCARDS_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                ApplyUseButtonState();
+            }
+        }
+
+        private int GetSafeRoundNumber()
+        {
+            int roundNumber = state != null ? state.CurrentRoundNumber : MIN_ROUND_NUMBER;
+
+            return roundNumber < MIN_ROUND_NUMBER
+                ? MIN_ROUND_NUMBER
+                : roundNumber;
+        }
+
+        private static async Task InvokeUseWildcardAsync(
+            WildcardServiceClient client,
+            string token,
+            int matchId,
+            int playerWildcardId,
+            int roundNumber)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException("Token inválido.", nameof(token));
+            }
+
+            if (matchId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(matchId));
+            }
+
+            if (playerWildcardId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(playerWildcardId));
+            }
+
+            if (roundNumber <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(roundNumber));
+            }
+
+            var request = new UseWildcardRequest
+            {
+                Token = token.Trim(),
+                MatchId = matchId,
+                PlayerWildcardId = playerWildcardId,
+                RoundNumber = roundNumber
+            };
+
+            await client.UseWildcardAsync(request);
         }
 
         private void SelectAtIndex(int index)
@@ -175,6 +315,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ui.BtnWildcardNext.Visibility = Visibility.Collapsed;
                 ui.BtnWildcardNext.IsEnabled = false;
             }
+
+            if (ui.BtnUseWildcard != null)
+            {
+                ui.BtnUseWildcard.Visibility = Visibility.Collapsed;
+                ui.BtnUseWildcard.IsEnabled = false;
+            }
         }
 
         private void UpdateUi()
@@ -190,7 +336,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            int sameCodeCount = myWildcards.Count(w => string.Equals(w.Code, selectedWildcard.Code, StringComparison.OrdinalIgnoreCase));
+            int sameCodeCount = myWildcards.Count(w =>
+                string.Equals(w.Code, selectedWildcard.Code, StringComparison.OrdinalIgnoreCase));
 
             string baseName = string.IsNullOrWhiteSpace(selectedWildcard.Name)
                 ? selectedWildcard.Code
@@ -235,6 +382,31 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             UpdateIcon();
+            ApplyUseButtonState();
+        }
+
+        private void ApplyUseButtonState()
+        {
+            if (ui.BtnUseWildcard == null)
+            {
+                return;
+            }
+
+            bool hasWildcard =
+                myWildcards != null &&
+                myWildcards.Count > 0 &&
+                selectedWildcard != null &&
+                selectedWildcard.PlayerWildcardId > 0;
+
+            if (!hasWildcard)
+            {
+                ui.BtnUseWildcard.Visibility = Visibility.Collapsed;
+                ui.BtnUseWildcard.IsEnabled = false;
+                return;
+            }
+
+            ui.BtnUseWildcard.Visibility = Visibility.Visible;
+            ui.BtnUseWildcard.IsEnabled = canUseNow;
         }
 
         private void UpdateIcon()
