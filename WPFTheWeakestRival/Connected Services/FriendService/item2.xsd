@@ -127,17 +127,31 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetProfileImage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q19:GetProfileImageRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetProfileImageResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetProfileImageResult" nillable="true" type="q20:GetProfileImageResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="SendLobbyInviteEmail">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q19:SendLobbyInviteEmailRequest" />
+        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q21:SendLobbyInviteEmailRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SendLobbyInviteEmailResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="SendLobbyInviteEmailResult" nillable="true" type="q20:SendLobbyInviteEmailResponse" />
+        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="SendLobbyInviteEmailResult" nillable="true" type="q22:SendLobbyInviteEmailResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -1,16 +1,16 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using log4net;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.Infrastructure.Faults;
 using WPFTheWeakestRival.Properties.Langs;
 
@@ -31,13 +31,18 @@ namespace WPFTheWeakestRival.Pages
         private const string KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE = "btnFriendRequestsReject";
         private const string KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE = "btnFriendRequestsCancel";
 
+        private const int AVATAR_DECODE_WIDTH = 36;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(FriendRequestsPage));
 
         private readonly FriendServiceClient friendServiceClient;
         private readonly string authToken;
 
-        private readonly ObservableCollection<RequestViewModel> incomingRequests = new ObservableCollection<RequestViewModel>();
-        private readonly ObservableCollection<RequestViewModel> outgoingRequests = new ObservableCollection<RequestViewModel>();
+        private readonly ObservableCollection<RequestViewModel> incomingRequests =
+            new ObservableCollection<RequestViewModel>();
+
+        private readonly ObservableCollection<RequestViewModel> outgoingRequests =
+            new ObservableCollection<RequestViewModel>();
 
         public event EventHandler FriendsChanged;
         public event EventHandler CloseRequested;
@@ -45,6 +50,7 @@ namespace WPFTheWeakestRival.Pages
         public FriendRequestsPage(FriendServiceClient client, string token)
         {
             InitializeComponent();
+
             friendServiceClient = client ?? throw new ArgumentNullException(nameof(client));
             authToken = token ?? string.Empty;
 
@@ -52,6 +58,50 @@ namespace WPFTheWeakestRival.Pages
             lstOutgoing.ItemsSource = outgoingRequests;
 
             Loaded += async (_, __) => await RefreshAsync();
+        }
+
+        private static string Localize(string key)
+        {
+            var safeKey = (key ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(safeKey))
+            {
+                return string.Empty;
+            }
+
+            var value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            return string.IsNullOrWhiteSpace(value) ? safeKey : value;
+        }
+
+        private static string ResolveFaultMessage(FriendService.ServiceFault fault)
+        {
+            var key = fault == null ? string.Empty : (fault.Message ?? string.Empty);
+            return FaultKeyMessageResolver.Resolve(key, Localize);
+        }
+
+        private static string GetFaultCode(FriendService.ServiceFault fault) =>
+            fault == null ? string.Empty : (fault.Code ?? string.Empty);
+
+        private static string GetFaultKey(FriendService.ServiceFault fault) =>
+            fault == null ? string.Empty : (fault.Message ?? string.Empty);
+
+        private static ImageSource DefaultAvatar()
+        {
+            return UiImageHelper.DefaultAvatar(AVATAR_DECODE_WIDTH);
+        }
+
+        private static string ResolveDisplayName(AccountMini mini, int fallbackAccountId)
+        {
+            if (!string.IsNullOrWhiteSpace(mini?.DisplayName))
+            {
+                return mini.DisplayName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(mini?.Email))
+            {
+                return mini.Email;
+            }
+
+            return "Cuenta #" + fallbackAccountId;
         }
 
         private async Task RefreshAsync()
@@ -72,8 +122,8 @@ namespace WPFTheWeakestRival.Pages
                 incomingRequests.Clear();
                 outgoingRequests.Clear();
 
-                var incoming = response.PendingIncoming ?? Array.Empty<FriendRequestSummary>();
-                var outgoing = response.PendingOutgoing ?? Array.Empty<FriendRequestSummary>();
+                var incoming = response?.PendingIncoming ?? Array.Empty<FriendRequestSummary>();
+                var outgoing = response?.PendingOutgoing ?? Array.Empty<FriendRequestSummary>();
 
                 var accountIds = new System.Collections.Generic.HashSet<int>();
                 for (var i = 0; i < incoming.Length; i++) accountIds.Add(incoming[i].FromAccountId);
@@ -91,7 +141,8 @@ namespace WPFTheWeakestRival.Pages
                     accountIds.CopyTo(getReq.AccountIds, 0);
 
                     var info = await friendServiceClient.GetAccountsByIdsAsync(getReq);
-                    var minis = info.Accounts ?? Array.Empty<AccountMini>();
+                    var minis = info?.Accounts ?? Array.Empty<AccountMini>();
+
                     for (var i = 0; i < minis.Length; i++)
                     {
                         accountsById[minis[i].AccountId] = minis[i];
@@ -101,47 +152,51 @@ namespace WPFTheWeakestRival.Pages
                 for (var i = 0; i < incoming.Length; i++)
                 {
                     var summary = incoming[i];
-                    accountsById.TryGetValue(summary.FromAccountId, out AccountMini mini);
+                    accountsById.TryGetValue(summary.FromAccountId, out var mini);
 
-                    var displayName = mini != null && !string.IsNullOrWhiteSpace(mini.DisplayName)
-                        ? mini.DisplayName
-                        : "Cuenta #" + summary.FromAccountId;
-
-                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(mini != null ? mini.AvatarUrl : null, 36)
-                                 ?? UiImageHelper.DefaultAvatar(36);
-
-                    incomingRequests.Add(new RequestViewModel
+                    var vm = new RequestViewModel
                     {
                         FriendRequestId = summary.FriendRequestId,
                         OtherAccountId = summary.FromAccountId,
-                        DisplayName = displayName,
-                        Subtitle = "Te ha enviado una solicitud",
-                        Avatar = avatar,
-                        IsIncoming = true
-                    });
+                        DisplayName = ResolveDisplayName(mini, summary.FromAccountId),
+                        Subtitle = Lang.statusPendingIn,
+                        Avatar = DefaultAvatar(),
+                        IsIncoming = true,
+                        HasProfileImage = mini != null && mini.HasProfileImage,
+                        ProfileImageCode = mini == null ? string.Empty : (mini.ProfileImageCode ?? string.Empty)
+                    };
+
+                    incomingRequests.Add(vm);
+
+                    if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
+                    {
+                        _ = LoadAvatarAsync(vm);
+                    }
                 }
 
                 for (var i = 0; i < outgoing.Length; i++)
                 {
                     var summary = outgoing[i];
-                    accountsById.TryGetValue(summary.ToAccountId, out AccountMini mini);
+                    accountsById.TryGetValue(summary.ToAccountId, out var mini);
 
-                    var displayName = mini != null && !string.IsNullOrWhiteSpace(mini.DisplayName)
-                        ? mini.DisplayName
-                        : "Cuenta #" + summary.ToAccountId;
-
-                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(mini != null ? mini.AvatarUrl : null, 36)
-                                 ?? UiImageHelper.DefaultAvatar(36);
-
-                    outgoingRequests.Add(new RequestViewModel
+                    var vm = new RequestViewModel
                     {
                         FriendRequestId = summary.FriendRequestId,
                         OtherAccountId = summary.ToAccountId,
-                        DisplayName = displayName,
-                        Subtitle = "Solicitud enviada",
-                        Avatar = avatar,
-                        IsIncoming = false
-                    });
+                        DisplayName = ResolveDisplayName(mini, summary.ToAccountId),
+                        Subtitle = Lang.statusPendingOut,
+                        Avatar = DefaultAvatar(),
+                        IsIncoming = false,
+                        HasProfileImage = mini != null && mini.HasProfileImage,
+                        ProfileImageCode = mini == null ? string.Empty : (mini.ProfileImageCode ?? string.Empty)
+                    };
+
+                    outgoingRequests.Add(vm);
+
+                    if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
+                    {
+                        _ = LoadAvatarAsync(vm);
+                    }
                 }
 
                 Logger.InfoFormat(
@@ -150,26 +205,41 @@ namespace WPFTheWeakestRival.Pages
                     incomingRequests.Count,
                     outgoingRequests.Count);
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string faultCode = GetFaultCode(ex.Detail);
-                string faultKey = GetFaultKey(ex.Detail);
-
                 Logger.WarnFormat(
                     "{0}: service fault. Code={1}, Key={2}.",
                     LOG_CTX_REFRESH,
-                    faultCode,
-                    faultKey);
-
-                string uiMessage = ResolveFaultMessage(ex.Detail);
+                    GetFaultCode(ex.Detail),
+                    GetFaultKey(ex.Detail));
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Localize(KEY_LBL_FRIEND_REQUESTS_TITLE),
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Error(LOG_CTX_REFRESH, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_LBL_FRIEND_REQUESTS_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (CommunicationException ex)
+            {
+                Logger.Error(LOG_CTX_REFRESH, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_LBL_FRIEND_REQUESTS_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
             {
                 Logger.Error(LOG_CTX_REFRESH, ex);
 
@@ -182,6 +252,44 @@ namespace WPFTheWeakestRival.Pages
             finally
             {
                 Mouse.OverrideCursor = null;
+            }
+        }
+
+        private async Task LoadAvatarAsync(RequestViewModel vm)
+        {
+            if (vm == null || !vm.HasProfileImage || string.IsNullOrWhiteSpace(vm.ProfileImageCode))
+            {
+                return;
+            }
+
+            try
+            {
+                ImageSource image = await ProfileImageCache.Current.GetOrFetchAsync(
+                    vm.OtherAccountId,
+                    vm.ProfileImageCode,
+                    AVATAR_DECODE_WIDTH,
+                    async () =>
+                    {
+                        var resp = await friendServiceClient.GetProfileImageAsync(
+                            new FriendService.GetProfileImageRequest
+                            {
+                                Token = authToken,
+                                AccountId = vm.OtherAccountId,
+                                ProfileImageCode = vm.ProfileImageCode
+                            });
+
+                        return resp?.ImageBytes ?? Array.Empty<byte>();
+                    });
+
+                if (image != null)
+                {
+                    vm.Avatar = image;
+                    vm.NotifyAvatarChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("FriendRequestsPage.LoadAvatarAsync: best-effort failed.", ex);
             }
         }
 
@@ -211,33 +319,44 @@ namespace WPFTheWeakestRival.Pages
                     viewModel.FriendRequestId,
                     viewModel.OtherAccountId);
 
-                var handler = FriendsChanged;
-                if (handler != null)
-                {
-                    handler(this, EventArgs.Empty);
-                }
+                FriendsChanged?.Invoke(this, EventArgs.Empty);
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string faultCode = GetFaultCode(ex.Detail);
-                string faultKey = GetFaultKey(ex.Detail);
-
                 Logger.WarnFormat(
                     "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
                     LOG_CTX_ACCEPT,
                     viewModel.FriendRequestId,
-                    faultCode,
-                    faultKey);
-
-                string uiMessage = ResolveFaultMessage(ex.Detail);
+                    GetFaultCode(ex.Detail),
+                    GetFaultKey(ex.Detail));
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Localize(KEY_BTN_FRIEND_REQUESTS_ACCEPT_TITLE),
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Error(LOG_CTX_ACCEPT, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_ACCEPT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (CommunicationException ex)
+            {
+                Logger.Error(LOG_CTX_ACCEPT, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_ACCEPT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
             {
                 Logger.Error(LOG_CTX_ACCEPT, ex);
 
@@ -279,33 +398,44 @@ namespace WPFTheWeakestRival.Pages
                     viewModel.FriendRequestId,
                     viewModel.OtherAccountId);
 
-                var handler = FriendsChanged;
-                if (handler != null)
-                {
-                    handler(this, EventArgs.Empty);
-                }
+                FriendsChanged?.Invoke(this, EventArgs.Empty);
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string faultCode = GetFaultCode(ex.Detail);
-                string faultKey = GetFaultKey(ex.Detail);
-
                 Logger.WarnFormat(
                     "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
                     LOG_CTX_REJECT,
                     viewModel.FriendRequestId,
-                    faultCode,
-                    faultKey);
-
-                string uiMessage = ResolveFaultMessage(ex.Detail);
+                    GetFaultCode(ex.Detail),
+                    GetFaultKey(ex.Detail));
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Localize(KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE),
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Error(LOG_CTX_REJECT, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (CommunicationException ex)
+            {
+                Logger.Error(LOG_CTX_REJECT, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_REJECT_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
             {
                 Logger.Error(LOG_CTX_REJECT, ex);
 
@@ -347,33 +477,44 @@ namespace WPFTheWeakestRival.Pages
                     viewModel.FriendRequestId,
                     viewModel.OtherAccountId);
 
-                var handler = FriendsChanged;
-                if (handler != null)
-                {
-                    handler(this, EventArgs.Empty);
-                }
+                FriendsChanged?.Invoke(this, EventArgs.Empty);
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string faultCode = GetFaultCode(ex.Detail);
-                string faultKey = GetFaultKey(ex.Detail);
-
                 Logger.WarnFormat(
                     "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
                     LOG_CTX_CANCEL,
                     viewModel.FriendRequestId,
-                    faultCode,
-                    faultKey);
-
-                string uiMessage = ResolveFaultMessage(ex.Detail);
+                    GetFaultCode(ex.Detail),
+                    GetFaultKey(ex.Detail));
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Localize(KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE),
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Error(LOG_CTX_CANCEL, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (CommunicationException ex)
+            {
+                Logger.Error(LOG_CTX_CANCEL, ex);
+
+                MessageBox.Show(
+                    Localize(KEY_LBL_FRIEND_REQUESTS_CONNECTION_ERROR),
+                    Localize(KEY_BTN_FRIEND_REQUESTS_CANCEL_TITLE),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
             {
                 Logger.Error(LOG_CTX_CANCEL, ex);
 
@@ -392,61 +533,44 @@ namespace WPFTheWeakestRival.Pages
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
             Logger.InfoFormat("{0}: close requested.", LOG_CTX_CLOSE);
-
-            var handler = CloseRequested;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            CloseRequested?.Invoke(this, EventArgs.Empty);
         }
 
-        private class RequestViewModel : INotifyPropertyChanged
+        private sealed class RequestViewModel : INotifyPropertyChanged
         {
+            private ImageSource avatar;
+
             public int FriendRequestId { get; set; }
             public int OtherAccountId { get; set; }
-            public string DisplayName { get; set; }
-            public string Subtitle { get; set; }
-            public ImageSource Avatar { get; set; }
+            public string DisplayName { get; set; } = string.Empty;
+            public string Subtitle { get; set; } = string.Empty;
+
+            public bool HasProfileImage { get; set; }
+            public string ProfileImageCode { get; set; } = string.Empty;
+
+            public ImageSource Avatar
+            {
+                get => avatar;
+                set
+                {
+                    avatar = value;
+                    OnPropertyChanged(nameof(Avatar));
+                }
+            }
+
             public bool IsIncoming { get; set; }
 
             public event PropertyChangedEventHandler PropertyChanged;
 
+            public void NotifyAvatarChanged()
+            {
+                OnPropertyChanged(nameof(Avatar));
+            }
+
             private void OnPropertyChanged(string propertyName)
             {
-                var handler = PropertyChanged;
-                if (handler != null)
-                {
-                    handler(this, new PropertyChangedEventArgs(propertyName));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
-        }
-
-        private static string Localize(string key)
-        {
-            string safeKey = (key ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(safeKey))
-            {
-                return string.Empty;
-            }
-
-            string value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
-            return string.IsNullOrWhiteSpace(value) ? safeKey : value;
-        }
-
-        private static string ResolveFaultMessage(ServiceFault fault)
-        {
-            string key = fault == null ? string.Empty : fault.Message;
-            return FaultKeyMessageResolver.Resolve(key, Localize);
-        }
-
-        private static string GetFaultCode(ServiceFault fault)
-        {
-            return fault == null ? string.Empty : (fault.Code ?? string.Empty);
-        }
-
-        private static string GetFaultKey(ServiceFault fault)
-        {
-            return fault == null ? string.Empty : (fault.Message ?? string.Empty);
         }
     }
 }

@@ -189,9 +189,6 @@
   <data name="errorMatchingPasswords" xml:space="preserve">
     <value>The passwords don't match</value>
   </data>
-  <data name="tittleImageSelector" xml:space="preserve">
-    <value>Select your profile picture</value>
-  </data>
   <data name="btnChooseImage" xml:space="preserve">
     <value>Select an image</value>
   </data>
@@ -221,5 +218,369 @@
   </data>
   <data name="forgotPassword" xml:space="preserve">
     <value>Forgot your password?</value>
+  </data>
+  <data name="txtEmail" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="txtPassword" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Logo" xml:space="preserve">
+    <value>/Properties/Images/logo_en.png</value>
+  </data>
+  <data name="lblNoFriends" xml:space="preserve">
+    <value>You don't have friends yet</value>
+  </data>
+  <data name="lblSendInvitations" xml:space="preserve">
+    <value>Use “Send Request” to add new ones</value>
+  </data>
+  <data name="btnPersonalization" xml:space="preserve">
+    <value>Personalization</value>
+  </data>
+  <data name="btnScoreboard" xml:space="preserve">
+    <value>Scoreboard</value>
+  </data>
+  <data name="btnFriends" xml:space="preserve">
+    <value>Friends</value>
+  </data>
+  <data name="btnPlay" xml:space="preserve">
+    <value>PLAY</value>
+  </data>
+  <data name="btnSendRequests" xml:space="preserve">
+    <value>Send Request</value>
+  </data>
+  <data name="btnRequests" xml:space="preserve">
+    <value>Requests</value>
+  </data>
+  <data name="noValidSessionCode" xml:space="preserve">
+    <value>No valid session</value>
+  </data>
+  <data name="btnLogout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="lblSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="addFriendTitle" xml:space="preserve">
+    <value>Add Friends</value>
+  </data>
+  <data name="commonClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="commonSearch" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="commonSucces" xml:space="preserve">
+    <value>Succes</value>
+  </data>
+  <data name="profileUpdated" xml:space="preserve">
+    <value>Profile Updated</value>
+  </data>
+  <data name="addFriendAccept" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="modifyProfileTitle" xml:space="preserve">
+    <value>Modify Profile</value>
+  </data>
+  <data name="profileTitle" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="profileSelectAvatarTitle" xml:space="preserve">
+    <value>Select your profile picture</value>
+  </data>
+  <data name="profileImageFilter" xml:space="preserve">
+    <value>Filtr image</value>
+  </data>
+  <data name="logoutConfirmMessage" xml:space="preserve">
+    <value>Session closed successfully.</value>
+  </data>
+  <data name="logoutTitle" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="searching" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
+  <data name="noResults" xml:space="preserve">
+    <value>No found results</value>
+  </data>
+  <data name="results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="addFriendServiceError" xml:space="preserve">
+    <value>We had an error on the FriendService try again later</value>
+  </data>
+  <data name="noConnection" xml:space="preserve">
+    <value>There is no connection</value>
+  </data>
+  <data name="nowFriends" xml:space="preserve">
+    <value>Now are friends</value>
+  </data>
+  <data name="statusPendingOut" xml:space="preserve">
+    <value>Request sent</value>
+  </data>
+  <data name="statusPendingIn" xml:space="preserve">
+    <value>Request recieved</value>
+  </data>
+  <data name="stateSuggested" xml:space="preserve">
+    <value>Suggested</value>
+  </data>
+  <data name="stateAlreadyFriends" xml:space="preserve">
+    <value>You are already friends</value>
+  </data>
+  <data name="statusAvailable" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="statusOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="errorLoadFriends" xml:space="preserve">
+    <value>Error loading friends:</value>
+  </data>
+  <data name="lobbyTitle" xml:space="preserve">
+    <value>Lobby</value>
+  </data>
+  <data name="lobbyCreateFailed" xml:space="preserve">
+    <value>The lobby could not be created</value>
+  </data>
+  <data name="lobbyCreated" xml:space="preserve">
+    <value>The lobby was successfully created</value>
+  </data>
+  <data name="lobbyEnterAccessCode" xml:space="preserve">
+    <value>Enter an access code</value>
+  </data>
+  <data name="lobbyJoinFailed" xml:space="preserve">
+    <value>Could not join the lobby</value>
+  </data>
+  <data name="lobbyJoined" xml:space="preserve">
+    <value>You joined the lobby</value>
+  </data>
+  <data name="lobbyIdPrefix" xml:space="preserve">
+    <value>LobbyId</value>
+  </data>
+  <data name="lobbyCodePrefix" xml:space="preserve">
+    <value>Code:</value>
+  </data>
+  <data name="chatCreateOrJoinFirst" xml:space="preserve">
+    <value>First create or join a lobby</value>
+  </data>
+  <data name="chatSendFailed" xml:space="preserve">
+    <value>The message could not be sent</value>
+  </data>
+  <data name="addFriendSearchTooltip" xml:space="preserve">
+    <value>Search friends</value>
+  </data>
+  <data name="chatTitle" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="system" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="lobbyPlayerJoined" xml:space="preserve">
+    <value>A player joined the lobby</value>
+  </data>
+  <data name="lobbyPlayerLeft" xml:space="preserve">
+    <value>A player left the lobby</value>
+  </data>
+  <data name="player" xml:space="preserve">
+    <value>Player</value>
+  </data>
+  <data name="btnCreateLobby" xml:space="preserve">
+    <value>Create lobby</value>
+  </data>
+  <data name="btnJoinByCode" xml:space="preserve">
+    <value>Join by a code</value>
+  </data>
+  <data name="pt" xml:space="preserve">
+    <value>Portuguese</value>
+  </data>
+  <data name="it" xml:space="preserve">
+    <value>Italian</value>
+  </data>
+  <data name="fr" xml:space="preserve">
+    <value>French</value>
+  </data>
+  <data name="playOptionsTitle" xml:space="preserve">
+    <value>Play Options</value>
+  </data>
+  <data name="matchStartingSoon" xml:space="preserve">
+    <value>Match Starting soon...</value>
+  </data>
+  <data name="mainMenuTitle" xml:space="preserve">
+    <value>Main Menu</value>
+  </data>
+  <data name="noLobby" xml:space="preserve">
+    <value>No Lobby</value>
+  </data>
+  <data name="lobbyJoinByCode" xml:space="preserve">
+    <value>Join a lobby by code</value>
+  </data>
+  <data name="playChoose" xml:space="preserve">
+    <value>What you want to do?</value>
+  </data>
+  <data name="playEnterCode" xml:space="preserve">
+    <value>Enter de access code</value>
+  </data>
+  <data name="startMatch" xml:space="preserve">
+    <value>Start match</value>
+  </data>
+  <data name="chatPlaceholder" xml:space="preserve">
+    <value>Write and press enter...</value>
+  </data>
+  <data name="featureNotImplemented" xml:space="preserve">
+    <value>Feature not implemented</value>
+  </data>
+  <data name="btnProfileBrowse" xml:space="preserve">
+    <value>Choose an image</value>
+  </data>
+  <data name="btnProfileRemoveImage" xml:space="preserve">
+    <value>Remove the image</value>
+  </data>
+  <data name="save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="profileAvatar" xml:space="preserve">
+    <value>Profile image</value>
+  </data>
+  <data name="friendRequestsIncoming" xml:space="preserve">
+    <value>Requests recieved</value>
+  </data>
+  <data name="friendRequestsOutgoing" xml:space="preserve">
+    <value>Requests sended</value>
+  </data>
+  <data name="matchTitle" xml:space="preserve">
+    <value>Match</value>
+  </data>
+  <data name="mnuLobbyReportPlayer" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="reportPlayer" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="reportReasonHarassment" xml:space="preserve">
+    <value>Harassment/insults</value>
+  </data>
+  <data name="reportReasonCheating" xml:space="preserve">
+    <value>Traps</value>
+  </data>
+  <data name="reportReasonSpam" xml:space="preserve">
+    <value>Spam</value>
+  </data>
+  <data name="reportReasonInappropriateName" xml:space="preserve">
+    <value>inappropriate name</value>
+  </data>
+  <data name="reportReasonOther" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="reportSent" xml:space="preserve">
+    <value>Report sent.</value>
+  </data>
+  <data name="reportCooldown" xml:space="preserve">
+    <value>You must wait 30 minutes to report that player again.</value>
+  </data>
+  <data name="reportFailed" xml:space="preserve">
+    <value>The report could not be sent.</value>
+  </data>
+  <data name="reportUnexpectedError" xml:space="preserve">
+    <value>An error occurred while sending the report.</value>
+  </data>
+  <data name="reportSanctionTemporary" xml:space="preserve">
+    <value>Report sent. Temporary sanction applied until: {0}.</value>
+  </data>
+  <data name="reportSanctionPermanent" xml:space="preserve">
+    <value>Report sent. Permanent sanction was applied.</value>
+  </data>
+  <data name="mnuInviteLobbyByEmail" xml:space="preserve">
+    <value>Invite Lobby By Email</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2627" xml:space="preserve">
+    <value>Database duplicity error when sending a friend request: An attempt was made to insert a record that already exists.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2601" xml:space="preserve">
+    <value>Database duplicity error when sending a friend request: An attempt was made to insert a duplicate record</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.547" xml:space="preserve">
+    <value>Referential integrity error in the database when sending a friend request: the target player does not exist or is invalid</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.1205" xml:space="preserve">
+    <value>Database concurrency error when sending a friend request: Deadlock detected. try again</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.-2" xml:space="preserve">
+    <value>The database took too long when sending a friend request. Please try again.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.4060" xml:space="preserve">
+    <value>The database could not be accessed when sending a friend request: the database does not exist or you do not have permissions to use it</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.911" xml:space="preserve">
+    <value>The database could not be accessed when sending a friend request: the indicated database does not exist or is not available.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.18456" xml:space="preserve">
+    <value>Failed to authenticate database access when sending a friend request (invalid credentials).</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.229" xml:space="preserve">
+    <value>You do not have sufficient permissions on the database to send a friend request.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.208" xml:space="preserve">
+    <value>Database configuration error when sending a friend request: The required table or view was not found.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.207" xml:space="preserve">
+    <value>Database configuration error when sending a friend request: a required column is missing.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.2812" xml:space="preserve">
+    <value>Database configuration error when sending a friend request: A required stored procedure was not found.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.53" xml:space="preserve">
+    <value>Failed to connect to the database server when sending a friend request: the server is unavailable or the connection was refused.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
+    <value>It was not possible to open a connection to the database when sending a friend request.</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>An unexpected database error occurred while sending a friend request.</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>An unexpected error occurred. Please try again.</value>
+  </data>
+  <data name="UiTitleWarning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="lblFriendRequestsTitle" xml:space="preserve">
+    <value>Friend Requests</value>
+  </data>
+  <data name="lblFriendRequestsConnectionError" xml:space="preserve">
+    <value>Could not connect to the service. Please check your connection and try again.</value>
+  </data>
+  <data name="btnFriendRequestsAccept" xml:space="preserve">
+    <value>Accept request</value>
+  </data>
+  <data name="btnFriendRequestsReject" xml:space="preserve">
+    <value>Reject request</value>
+  </data>
+  <data name="btnFriendRequestsCancel" xml:space="preserve">
+    <value>Cancel request</value>
+  </data>
+  <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
+    <value>The request has already been resolved.</value>
+  </data>
+  <data name="tittleImageSelector" xml:space="preserve">
+    <value>Select your profile picture</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="profileLoadFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="profileUpdateFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="logoutFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="profileLoadFailed" xml:space="preserve">
+    <value>Profile load failed</value>
+  </data>
+  <data name="profileUpdateFailed" xml:space="preserve">
+    <value>Profile update failed</value>
+  </data>
+  <data name="logoutFailed" xml:space="preserve">
+    <value>Logout failed</value>
   </data>
 </root>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -9,18 +10,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using log4net;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
-using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.Infrastructure.Faults;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Pages
 {
     public partial class AddFriendPage : Page
     {
-        private const int SearchDebounceMilliseconds = 300;
-        private const int MaxSearchResults = 20;
+        private const int SEARCH_DEBOUNCE_MILLISECONDS = 300;
+        private const int MAX_SEARCH_RESULTS = 20;
+        private const int AVATAR_DECODE_WIDTH = 36;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AddFriendPage));
 
@@ -28,75 +30,105 @@ namespace WPFTheWeakestRival.Pages
         private readonly string authToken;
 
         private readonly ObservableCollection<FriendSearchResultVm> results = new ObservableCollection<FriendSearchResultVm>();
+
         private CancellationTokenSource debounceCancellation;
+        private int lastSearchRequestId;
 
         public event EventHandler FriendsUpdated;
         public event EventHandler CloseRequested;
 
-
         public AddFriendPage(FriendServiceClient client, string token)
         {
             InitializeComponent();
+
             friendServiceClient = client ?? throw new ArgumentNullException(nameof(client));
             authToken = token ?? string.Empty;
+
             lstResults.ItemsSource = results;
+
+            Unloaded += OnUnloaded;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            CancelAndDisposeDebounce();
+        }
+
+        private void CancelAndDisposeDebounce()
+        {
+            var old = Interlocked.Exchange(ref debounceCancellation, null);
+            if (old == null)
+            {
+                return;
+            }
+
+            try { old.Cancel(); } catch { }
+            try { old.Dispose(); } catch { }
         }
 
         private static string Localize(string key)
         {
-            string safeKey = (key ?? string.Empty).Trim();
+            var safeKey = (key ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(safeKey))
             {
                 return string.Empty;
             }
 
-            string value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            var value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
             return string.IsNullOrWhiteSpace(value) ? safeKey : value;
         }
 
+        private static string ResolveFaultMessage(FriendService.ServiceFault fault)
+        {
+            var key = fault == null ? string.Empty : (fault.Message ?? string.Empty);
+            return FaultKeyMessageResolver.Resolve(key, Localize);
+        }
+
+        private static ImageSource DefaultAvatar()
+        {
+            return UiImageHelper.DefaultAvatar(AVATAR_DECODE_WIDTH);
+        }
 
         private async void BtnSearchClick(object sender, RoutedEventArgs e)
         {
-            await SearchAsync(txtSearchQuery.Text);
+            var requestId = Interlocked.Increment(ref lastSearchRequestId);
+            await SearchAsync(txtSearchQuery.Text, requestId);
         }
 
         private async void TxtSearchQueryTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (debounceCancellation != null)
-            {
-                debounceCancellation.Cancel();
-            }
+            CancelAndDisposeDebounce();
 
-            var currentCts = new CancellationTokenSource();
-            debounceCancellation = currentCts;
-            var ct = currentCts.Token;
+            var cts = new CancellationTokenSource();
+            debounceCancellation = cts;
+            var ct = cts.Token;
+
+            var requestId = Interlocked.Increment(ref lastSearchRequestId);
 
             try
             {
-                await Task.Delay(SearchDebounceMilliseconds, ct);
+                await Task.Delay(SEARCH_DEBOUNCE_MILLISECONDS, ct);
 
                 if (!ct.IsCancellationRequested)
                 {
-                    var textBox = (TextBox)sender;
-                    await SearchAsync(textBox.Text);
+                    await SearchAsync(txtSearchQuery.Text, requestId);
                 }
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                Logger.Debug("Search debounce task was canceled.", ex);
             }
             finally
             {
-                currentCts.Dispose();
+                try { cts.Dispose(); } catch { }
 
-                if (ReferenceEquals(debounceCancellation, currentCts))
+                if (ReferenceEquals(debounceCancellation, cts))
                 {
                     debounceCancellation = null;
                 }
             }
         }
 
-        private async Task SearchAsync(string query)
+        private async Task SearchAsync(string query, int requestId)
         {
             var trimmedQuery = (query ?? string.Empty).Trim();
 
@@ -116,62 +148,100 @@ namespace WPFTheWeakestRival.Pages
                 {
                     Token = authToken,
                     Query = trimmedQuery,
-                    MaxResults = MaxSearchResults
+                    MaxResults = MAX_SEARCH_RESULTS
                 });
 
-                results.Clear();
-                var serviceResults = response.Results ?? new SearchAccountItem[0];
-
-                foreach (var item in serviceResults)
+                if (requestId != Volatile.Read(ref lastSearchRequestId))
                 {
-                    var avatar = UiImageHelper.TryCreateFromUrlOrPath(item.AvatarUrl, 36)
-                                 ?? UiImageHelper.DefaultAvatar(36);
+                    return;
+                }
 
-                    results.Add(new FriendSearchResultVm
+                results.Clear();
+
+                var serviceResults = response?.Results ?? Array.Empty<SearchAccountItem>();
+
+                for (var i = 0; i < serviceResults.Length; i++)
+                {
+                    var item = serviceResults[i];
+
+                    var vm = new FriendSearchResultVm
                     {
                         AccountId = item.AccountId,
-                        DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Email : item.DisplayName,
-                        Email = item.Email,
-                        Avatar = avatar,
+                        DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? (item.Email ?? string.Empty) : item.DisplayName,
+                        Email = item.Email ?? string.Empty,
+
+                        HasProfileImage = item.HasProfileImage,
+                        ProfileImageCode = item.ProfileImageCode ?? string.Empty,
+
+                        Avatar = DefaultAvatar(),
                         IsFriend = item.IsFriend,
                         HasPendingOutgoing = item.HasPendingOutgoing,
                         HasPendingIncoming = item.HasPendingIncoming,
                         PendingIncomingRequestId = item.PendingIncomingRequestId
-                    });
+                    };
+
+                    results.Add(vm);
+
+                    if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
+                    {
+                        _ = LoadAvatarAsync(vm);
+                    }
                 }
 
                 lblStatus.Text = results.Count == 0
                     ? Lang.noResults
                     : string.Format(Lang.results, results.Count);
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string messageKey = ex.Detail == null ? string.Empty : ex.Detail.Message;
-
                 Logger.WarnFormat(
-                    "SearchAsync: service fault. Code={0}, Key={1}",
+                    "AddFriendPage.SearchAsync: service fault. Code={0}, Key={1}",
                     ex.Detail == null ? string.Empty : ex.Detail.Code,
-                    messageKey);
-
-                string uiMessage = FaultKeyMessageResolver.Resolve(messageKey, Localize);
+                    ex.Detail == null ? string.Empty : ex.Detail.Message);
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Lang.addFriendSearchTooltip,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
                 lblStatus.Text = Lang.addFriendServiceError;
             }
-            catch (CommunicationException ex)
+            catch (TimeoutException ex)
             {
+                Logger.Error("AddFriendPage.SearchAsync: timeout.", ex);
+
                 MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.noConnection,
                     Lang.addFriendSearchTooltip,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
                 lblStatus.Text = Lang.noConnection;
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("AddFriendPage.SearchAsync: communication error.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.addFriendSearchTooltip,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                lblStatus.Text = Lang.noConnection;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("AddFriendPage.SearchAsync: unexpected error.", ex);
+
+                MessageBox.Show(
+                    Lang.addFriendServiceError,
+                    Lang.addFriendSearchTooltip,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                lblStatus.Text = Lang.addFriendServiceError;
             }
             finally
             {
@@ -179,15 +249,46 @@ namespace WPFTheWeakestRival.Pages
             }
         }
 
-        private async void BtnAddClick(object sender, RoutedEventArgs e)
+        private async Task LoadAvatarAsync(FriendSearchResultVm vm)
         {
-            var button = sender as Button;
-            if (button == null)
+            if (vm == null || !vm.HasProfileImage || string.IsNullOrWhiteSpace(vm.ProfileImageCode))
             {
                 return;
             }
 
-            var viewModel = button.DataContext as FriendSearchResultVm;
+            try
+            {
+                ImageSource image = await ProfileImageCache.Current.GetOrFetchAsync(
+                    vm.AccountId,
+                    vm.ProfileImageCode,
+                    AVATAR_DECODE_WIDTH,
+                    async () =>
+                    {
+                        var resp = await friendServiceClient.GetProfileImageAsync(new FriendService.GetProfileImageRequest
+                        {
+                            Token = authToken,
+                            AccountId = vm.AccountId,
+                            ProfileImageCode = vm.ProfileImageCode
+                        });
+
+                        return resp?.ImageBytes ?? Array.Empty<byte>();
+                    });
+
+                if (image != null)
+                {
+                    vm.Avatar = image;
+                    vm.NotifyAvatarChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("AddFriendPage.LoadAvatarAsync: best-effort failed.", ex);
+            }
+        }
+
+        private async void BtnAddClick(object sender, RoutedEventArgs e)
+        {
+            var viewModel = (sender as Button)?.DataContext as FriendSearchResultVm;
             if (viewModel == null || !viewModel.CanAdd)
             {
                 return;
@@ -203,7 +304,7 @@ namespace WPFTheWeakestRival.Pages
                     TargetAccountId = viewModel.AccountId
                 });
 
-                if (response.Status == FriendRequestStatus.Accepted)
+                if (response != null && response.Status == FriendRequestStatus.Accepted)
                 {
                     viewModel.IsFriend = true;
                     viewModel.HasPendingOutgoing = false;
@@ -211,45 +312,59 @@ namespace WPFTheWeakestRival.Pages
                     viewModel.PendingIncomingRequestId = null;
                     viewModel.NotifyStateChanged();
 
-                    var handler = FriendsUpdated;
-                    if (handler != null)
-                    {
-                        handler(this, EventArgs.Empty);
-                    }
+                    FriendsUpdated?.Invoke(this, EventArgs.Empty);
 
                     MessageBox.Show(
                         string.Format(Lang.nowFriends, viewModel.DisplayName),
                         Lang.addFriendTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
+
+                    return;
                 }
-                else
-                {
-                    viewModel.HasPendingOutgoing = true;
-                    viewModel.NotifyStateChanged();
-                }
+
+                viewModel.HasPendingOutgoing = true;
+                viewModel.NotifyStateChanged();
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string messageKey = ex.Detail == null ? string.Empty : ex.Detail.Message;
-
                 Logger.WarnFormat(
-                    "SendFriendRequest: service fault. Code={0}, Key={1}",
+                    "AddFriendPage.SendFriendRequest: service fault. Code={0}, Key={1}",
                     ex.Detail == null ? string.Empty : ex.Detail.Code,
-                    messageKey);
-
-                string uiMessage = FaultKeyMessageResolver.Resolve(messageKey, Localize);
+                    ex.Detail == null ? string.Empty : ex.Detail.Message);
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Lang.addFriendTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("AddFriendPage.SendFriendRequest: timeout.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (CommunicationException ex)
             {
+                Logger.Error("AddFriendPage.SendFriendRequest: communication error.", ex);
+
                 MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.noConnection,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("AddFriendPage.SendFriendRequest: unexpected error.", ex);
+
+                MessageBox.Show(
+                    Lang.addFriendServiceError,
                     Lang.addFriendTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -262,19 +377,8 @@ namespace WPFTheWeakestRival.Pages
 
         private async void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            if (button == null)
-            {
-                return;
-            }
-
-            var viewModel = button.DataContext as FriendSearchResultVm;
-            if (viewModel == null)
-            {
-                return;
-            }
-
-            if (!viewModel.HasPendingIncoming || !viewModel.PendingIncomingRequestId.HasValue)
+            var viewModel = (sender as Button)?.DataContext as FriendSearchResultVm;
+            if (viewModel == null || !viewModel.HasPendingIncoming || !viewModel.PendingIncomingRequestId.HasValue)
             {
                 return;
             }
@@ -297,33 +401,47 @@ namespace WPFTheWeakestRival.Pages
                 viewModel.HasPendingOutgoing = false;
                 viewModel.NotifyStateChanged();
 
-                var handler = FriendsUpdated;
-                if (handler != null)
-                {
-                    handler(this, EventArgs.Empty);
-                }
+                FriendsUpdated?.Invoke(this, EventArgs.Empty);
             }
-            catch (FaultException<ServiceFault> ex)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                string messageKey = ex.Detail == null ? string.Empty : ex.Detail.Message;
-
                 Logger.WarnFormat(
-                    "AcceptFriendRequest: service fault. Code={0}, Key={1}",
+                    "AddFriendPage.AcceptFriendRequest: service fault. Code={0}, Key={1}",
                     ex.Detail == null ? string.Empty : ex.Detail.Code,
-                    messageKey);
-
-                string uiMessage = FaultKeyMessageResolver.Resolve(messageKey, Localize);
+                    ex.Detail == null ? string.Empty : ex.Detail.Message);
 
                 MessageBox.Show(
-                    uiMessage,
+                    ResolveFaultMessage(ex.Detail),
                     Lang.addFriendTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("AddFriendPage.AcceptFriendRequest: timeout.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             catch (CommunicationException ex)
             {
+                Logger.Error("AddFriendPage.AcceptFriendRequest: communication error.", ex);
+
                 MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.noConnection,
+                    Lang.addFriendTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("AddFriendPage.AcceptFriendRequest: unexpected error.", ex);
+
+                MessageBox.Show(
+                    Lang.addFriendServiceError,
                     Lang.addFriendTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -336,23 +454,19 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
         {
-            var handler = CloseRequested;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            CloseRequested?.Invoke(this, EventArgs.Empty);
         }
 
-
-        [SuppressMessage(
-            "Major Code Smell",
-            "S1144:Unused private types or members should be removed",
-            Justification = "Properties are used via WPF data binding in XAML.")]
+        [SuppressMessage("Major Code Smell", "S1144:Unused private types or members should be removed", Justification = "Used via WPF binding.")]
         private sealed class FriendSearchResultVm : INotifyPropertyChanged
         {
             public int AccountId { get; set; }
             public string DisplayName { get; set; } = string.Empty;
             public string Email { get; set; } = string.Empty;
+
+            public bool HasProfileImage { get; set; }
+            public string ProfileImageCode { get; set; } = string.Empty;
+
             public ImageSource Avatar { get; set; }
 
             public bool IsFriend { get; set; }
@@ -360,15 +474,8 @@ namespace WPFTheWeakestRival.Pages
             public bool HasPendingIncoming { get; set; }
             public int? PendingIncomingRequestId { get; set; }
 
-            public bool CanAdd
-            {
-                get { return !IsFriend && !HasPendingOutgoing && !HasPendingIncoming; }
-            }
-
-            public bool ShowAccept
-            {
-                get { return HasPendingIncoming; }
-            }
+            public bool CanAdd => !IsFriend && !HasPendingOutgoing && !HasPendingIncoming;
+            public bool ShowAccept => HasPendingIncoming && PendingIncomingRequestId.HasValue;
 
             public string AddButtonText
             {
@@ -394,21 +501,22 @@ namespace WPFTheWeakestRival.Pages
 
             public void NotifyStateChanged()
             {
-                OnPropertyChanged("CanAdd");
-                OnPropertyChanged("ShowAccept");
-                OnPropertyChanged("AddButtonText");
-                OnPropertyChanged("StateText");
+                OnPropertyChanged(nameof(CanAdd));
+                OnPropertyChanged(nameof(ShowAccept));
+                OnPropertyChanged(nameof(AddButtonText));
+                OnPropertyChanged(nameof(StateText));
+            }
+
+            public void NotifyAvatarChanged()
+            {
+                OnPropertyChanged(nameof(Avatar));
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
 
             private void OnPropertyChanged(string propertyName)
             {
-                var handler = PropertyChanged;
-                if (handler != null)
-                {
-                    handler(this, new PropertyChangedEventArgs(propertyName));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
     }

@@ -145,6 +145,7 @@
     <Compile Include="Infraestructure\IStoppable.cs" />
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
+    <Compile Include="Infraestructure\ProfileImageCache.cs" />
     <Compile Include="LobbyCallback.cs" />
     <Compile Include="LobbyWindow.xaml.cs">
       <DependentUpon>LobbyWindow.xaml</DependentUpon>
@@ -188,7 +189,7 @@
     <Compile Include="Pages\VotePage.xaml.cs">
       <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Langs\Lang.Designer.cs">
+    <Compile Include="Properties\Langs\Lang4.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Lang.resx</DependentUpon>
@@ -309,6 +310,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Properties\Langs\Lang.en.resx" />
     <EmbeddedResource Include="Properties\Langs\Lang.es.resx" />
     <EmbeddedResource Include="Properties\Langs\Lang.fr.resx" />
     <EmbeddedResource Include="Properties\Langs\Lang.it.resx" />
@@ -321,14 +323,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Connected Services\AuthService\AuthService1.wsdl" />
-    <None Include="Connected Services\AuthService\item3.xsd">
+    <None Include="Connected Services\AuthService\AuthService.wsdl" />
+    <None Include="Connected Services\AuthService\item.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\AuthService\item31.xsd">
+    <None Include="Connected Services\AuthService\item1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\AuthService\item32.xsd">
+    <None Include="Connected Services\AuthService\item2.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\AuthService\WPFTheWeakestRival.AuthService.BeginPasswordResetResponse.datasource">
@@ -369,6 +371,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.GetFriendsPresenceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.GetProfileImageResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\FriendService\WPFTheWeakestRival.FriendService.HeartbeatResponse.datasource">
@@ -761,7 +766,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Connected Services\AuthService\item1.disco" />
+    <None Include="Connected Services\AuthService\item.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\Avatars\default.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

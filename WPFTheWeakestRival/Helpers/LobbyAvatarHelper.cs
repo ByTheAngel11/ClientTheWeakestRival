@@ -22,21 +22,23 @@ namespace WPFTheWeakestRival.Helpers
             {
                 AccountId = account.AccountId,
                 DisplayName = string.IsNullOrWhiteSpace(account.DisplayName)
-                    ? $"Jugador {account.AccountId}"
+                    ? string.Format("Jugador {0}", account.AccountId)
                     : account.DisplayName,
                 IsMe = false
             };
 
-            var profileImageSource = UiImageHelper.TryCreateFromUrlOrPath(
-                account.AvatarUrl,
-                DEFAULT_AVATAR_SIZE);
+            bool hasProfilePhoto = HasProfilePhoto(account);
 
-            playerItem.Avatar = profileImageSource
-                                ?? UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
+            ImageSource profileImageSource =
+                TryReadProfileImage(account) ??
+                UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
+
+            playerItem.Avatar = profileImageSource;
 
             playerItem.AvatarAppearance = MapAvatarAppearance(
                 account.Avatar,
-                playerItem.Avatar);
+                profileImageSource,
+                hasProfilePhoto);
 
             return playerItem;
         }
@@ -73,16 +75,38 @@ namespace WPFTheWeakestRival.Helpers
             }
         }
 
+        private static ImageSource TryReadProfileImage(LobbyAccountMini account)
+        {
+            if (account == null)
+            {
+                return null;
+            }
+
+            return UiImageHelper.TryCreateFromBytes(account.AvatarBytes, DEFAULT_AVATAR_SIZE);
+        }
+
+        private static bool HasProfilePhoto(LobbyAccountMini account)
+        {
+            if (account == null)
+            {
+                return false;
+            }
+
+            byte[] bytes = account.AvatarBytes;
+            return bytes != null && bytes.Length > 0;
+        }
+
         private static AvatarAppearance MapAvatarAppearance(
             LobbyAvatarDto dto,
-            ImageSource profileImage)
+            ImageSource profileImage,
+            bool hasProfilePhoto)
         {
             if (dto == null)
             {
                 return null;
             }
 
-            var appearance = new AvatarAppearance
+            return new AvatarAppearance
             {
                 BodyColor = (int)dto.BodyColor,
                 PantsColor = (int)dto.PantsColor,
@@ -90,10 +114,8 @@ namespace WPFTheWeakestRival.Helpers
                 HatColor = (int)dto.HatColor,
                 FaceType = (int)dto.FaceType,
                 ProfileImage = profileImage,
-                UseProfilePhotoAsFace = profileImage != null
+                UseProfilePhotoAsFace = dto.UseProfilePhotoAsFace && hasProfilePhoto
             };
-
-            return appearance;
         }
     }
 }

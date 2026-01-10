@@ -234,17 +234,17 @@ namespace WPFTheWeakestRival.LobbyService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int AccountIdField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string DisplayNameField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string EmailField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string AvatarUrlField;
+        private byte[] AvatarBytesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvatarContentTypeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.LobbyService.AvatarAppearanceDto AvatarField;
@@ -259,7 +259,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int AccountId {
             get {
                 return this.AccountIdField;
@@ -272,7 +272,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -285,7 +285,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Email {
             get {
                 return this.EmailField;
@@ -298,20 +298,33 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public string AvatarUrl {
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public byte[] AvatarBytes {
             get {
-                return this.AvatarUrlField;
+                return this.AvatarBytesField;
             }
             set {
-                if ((object.ReferenceEquals(this.AvatarUrlField, value) != true)) {
-                    this.AvatarUrlField = value;
-                    this.RaisePropertyChanged("AvatarUrl");
+                if ((object.ReferenceEquals(this.AvatarBytesField, value) != true)) {
+                    this.AvatarBytesField = value;
+                    this.RaisePropertyChanged("AvatarBytes");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
+        public string AvatarContentType {
+            get {
+                return this.AvatarContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvatarContentTypeField, value) != true)) {
+                    this.AvatarContentTypeField = value;
+                    this.RaisePropertyChanged("AvatarContentType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
         public WPFTheWeakestRival.LobbyService.AvatarAppearanceDto Avatar {
             get {
                 return this.AvatarField;
@@ -859,7 +872,10 @@ namespace WPFTheWeakestRival.LobbyService {
         private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ProfileImageUrlField;
+        private byte[] ProfileImageBytesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageContentTypeField;
         
         private System.DateTime CreatedAtUtcField;
         
@@ -891,7 +907,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -904,20 +920,33 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public string ProfileImageUrl {
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public byte[] ProfileImageBytes {
             get {
-                return this.ProfileImageUrlField;
+                return this.ProfileImageBytesField;
             }
             set {
-                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
-                    this.ProfileImageUrlField = value;
-                    this.RaisePropertyChanged("ProfileImageUrl");
+                if ((object.ReferenceEquals(this.ProfileImageBytesField, value) != true)) {
+                    this.ProfileImageBytesField = value;
+                    this.RaisePropertyChanged("ProfileImageBytes");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string ProfileImageContentType {
+            get {
+                return this.ProfileImageContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageContentTypeField, value) != true)) {
+                    this.ProfileImageContentTypeField = value;
+                    this.RaisePropertyChanged("ProfileImageContentType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=4)]
         public System.DateTime CreatedAtUtc {
             get {
                 return this.CreatedAtUtcField;
@@ -930,7 +959,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=5)]
         public string Email {
             get {
                 return this.EmailField;
@@ -943,7 +972,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=6)]
         public WPFTheWeakestRival.LobbyService.AvatarAppearanceDto Avatar {
             get {
                 return this.AvatarField;
@@ -981,7 +1010,13 @@ namespace WPFTheWeakestRival.LobbyService {
         private string DisplayNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ProfileImageUrlField;
+        private byte[] ProfileImageBytesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageContentTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool RemoveProfileImageField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string EmailField;
@@ -1009,7 +1044,7 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=1)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -1022,20 +1057,46 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public string ProfileImageUrl {
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
+        public byte[] ProfileImageBytes {
             get {
-                return this.ProfileImageUrlField;
+                return this.ProfileImageBytesField;
             }
             set {
-                if ((object.ReferenceEquals(this.ProfileImageUrlField, value) != true)) {
-                    this.ProfileImageUrlField = value;
-                    this.RaisePropertyChanged("ProfileImageUrl");
+                if ((object.ReferenceEquals(this.ProfileImageBytesField, value) != true)) {
+                    this.ProfileImageBytesField = value;
+                    this.RaisePropertyChanged("ProfileImageBytes");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        public string ProfileImageContentType {
+            get {
+                return this.ProfileImageContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageContentTypeField, value) != true)) {
+                    this.ProfileImageContentTypeField = value;
+                    this.RaisePropertyChanged("ProfileImageContentType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public bool RemoveProfileImage {
+            get {
+                return this.RemoveProfileImageField;
+            }
+            set {
+                if ((this.RemoveProfileImageField.Equals(value) != true)) {
+                    this.RemoveProfileImageField = value;
+                    this.RaisePropertyChanged("RemoveProfileImage");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
         public string Email {
             get {
                 return this.EmailField;

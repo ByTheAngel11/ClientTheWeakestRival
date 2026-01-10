@@ -1,27 +1,48 @@
-﻿using Microsoft.Win32;
+﻿using log4net;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
-using log4net;
+using System.Windows.Media.Imaging;
+using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.LobbyService;
-using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
     public partial class ModifyProfilePage : Page
     {
+        private const int PREVIEW_DECODE_WIDTH = 0;
+
+        private const int MAX_PROFILE_IMAGE_BYTES = 524288;
+        private const int JPEG_QUALITY_PRIMARY = 85;
+        private const int JPEG_QUALITY_SECONDARY = 75;
+
+        private const int RESIZE_W_PRIMARY = 512;
+        private const int RESIZE_W_SECONDARY = 384;
+        private const int RESIZE_W_TERTIARY = 256;
+
+        private const string CONTENT_TYPE_PNG = "image/png";
+        private const string CONTENT_TYPE_JPEG = "image/jpeg";
+
+        private const string IMG_FILTER = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All files (*.*)|*.*";
+        private const string MSG_INVALID_IMAGE = "Selecciona una imagen PNG o JPG (máximo 512 KB).";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ModifyProfilePage));
 
         private readonly LobbyServiceClient lobbyClient;
         private readonly AuthServiceClient authClient;
         private readonly string authToken;
 
-        public LobbyServiceClient Lobby { get; }
-        public string Token { get; }
+        private string originalEmail = string.Empty;
+        private string originalDisplayName = string.Empty;
+
+        private byte[] selectedProfileImageBytes;
+        private string selectedProfileImageContentType;
+        private bool removeProfileImage;
 
         public event EventHandler Closed;
         public event EventHandler LoggedOut;
@@ -29,16 +50,16 @@ namespace WPFTheWeakestRival
         public ModifyProfilePage(LobbyServiceClient lobbyClient, AuthServiceClient authClient, string authToken)
         {
             InitializeComponent();
+
             this.lobbyClient = lobbyClient ?? throw new ArgumentNullException(nameof(lobbyClient));
             this.authClient = authClient ?? throw new ArgumentNullException(nameof(authClient));
             this.authToken = authToken ?? throw new ArgumentNullException(nameof(authToken));
-            LoadProfile();
-        }
 
-        public ModifyProfilePage(LobbyServiceClient lobby, string token)
-        {
-            Lobby = lobby;
-            Token = token;
+            selectedProfileImageBytes = null;
+            selectedProfileImageContentType = null;
+            removeProfileImage = false;
+
+            LoadProfile();
         }
 
         private void LoadProfile()
@@ -46,60 +67,127 @@ namespace WPFTheWeakestRival
             try
             {
                 var profile = lobbyClient.GetMyProfile(authToken);
-                txtEmail.Text = profile.Email ?? string.Empty;
-                txtDisplayName.Text = profile.DisplayName ?? string.Empty;
-                txtAvatarUrl.Text = profile.ProfileImageUrl ?? string.Empty;
-                LoadPreviewFromURL(txtAvatarUrl.Text);
+
+                originalEmail = (profile?.Email ?? string.Empty).Trim();
+                originalDisplayName = (profile?.DisplayName ?? string.Empty).Trim();
+
+                txtEmail.Text = originalEmail;
+                txtDisplayName.Text = originalDisplayName;
+
+                if (profile != null && profile.ProfileImageBytes != null && profile.ProfileImageBytes.Length > 0)
+                {
+                    imgPreview.Source = UiImageHelper.TryCreateFromBytes(profile.ProfileImageBytes, PREVIEW_DECODE_WIDTH);
+                }
+                else
+                {
+                    imgPreview.Source = null;
+                }
             }
-            catch (FaultException<AuthService.ServiceFault> ex)
+            catch (FaultException<LobbyService.ServiceFault> ex)
             {
-                Logger.Warn("Auth fault while loading profile.", ex);
-                MessageBox.Show(
-                    $"{ex.Detail.Code}: {ex.Detail.Message}",
-                    Lang.profileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                Logger.Warn("Lobby fault while loading profile.", ex);
+                MessageBox.Show(Lang.profileLoadFailed, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while loading profile.", ex);
-                MessageBox.Show(
-                    ex.Message,
-                    Lang.profileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MessageBox.Show(Lang.noConnection, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("Timeout while loading profile.", ex);
+                MessageBox.Show(Lang.noConnection, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while loading profile.", ex);
-                MessageBox.Show(
-                    ex.Message,
-                    Lang.profileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.profileLoadFailed, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void BtnCancelClick(object sender, RoutedEventArgs e)
         {
-            var handler = Closed;
-            if (handler != null)
+            Closed?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void BtnBrowseClick(object sender, RoutedEventArgs e)
+        {
+            try
             {
-                handler(this, EventArgs.Empty);
+                var dialog = new OpenFileDialog
+                {
+                    Title = Lang.profileSelectAvatarTitle,
+                    Filter = IMG_FILTER,
+                    Multiselect = false
+                };
+
+                var result = dialog.ShowDialog();
+                if (result != true)
+                {
+                    return;
+                }
+
+                if (!TryLoadProfileImage(dialog.FileName, out var bytes, out var contentType))
+                {
+                    MessageBox.Show(MSG_INVALID_IMAGE, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                selectedProfileImageBytes = bytes;
+                selectedProfileImageContentType = contentType;
+                removeProfileImage = false;
+
+                imgPreview.Source = UiImageHelper.TryCreateFromBytes(selectedProfileImageBytes, PREVIEW_DECODE_WIDTH);
             }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while browsing profile image.", ex);
+                MessageBox.Show(Lang.profileLoadFailed, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnClearImageClick(object sender, RoutedEventArgs e)
+        {
+            removeProfileImage = true;
+            selectedProfileImageBytes = null;
+            selectedProfileImageContentType = null;
+            imgPreview.Source = null;
         }
 
         private void BtnSaveClick(object sender, RoutedEventArgs e)
         {
             try
             {
+                var email = (txtEmail.Text ?? string.Empty).Trim();
+                var displayName = (txtDisplayName.Text ?? string.Empty).Trim();
+
+                var hasEmailChange = email.Length > 0 && !string.Equals(email, originalEmail, StringComparison.Ordinal);
+                var hasDisplayNameChange = displayName.Length > 0 && !string.Equals(displayName, originalDisplayName, StringComparison.Ordinal);
+
                 var request = new UpdateAccountRequest
                 {
-                    Token = authToken,
-                    Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text,
-                    DisplayName = string.IsNullOrWhiteSpace(txtDisplayName.Text) ? null : txtDisplayName.Text,
-                    ProfileImageUrl = string.IsNullOrWhiteSpace(txtAvatarUrl.Text) ? null : txtAvatarUrl.Text
+                    Token = authToken
                 };
+
+                if (hasEmailChange)
+                {
+                    request.Email = email;
+                }
+
+                if (hasDisplayNameChange)
+                {
+                    request.DisplayName = displayName;
+                }
+
+                if (removeProfileImage)
+                {
+                    request.RemoveProfileImage = true;
+                }
+                else if (selectedProfileImageBytes != null && selectedProfileImageBytes.Length > 0)
+                {
+                    request.ProfileImageBytes = selectedProfileImageBytes;
+                    request.ProfileImageContentType = selectedProfileImageContentType;
+                }
 
                 lobbyClient.UpdateAccount(request);
 
@@ -109,17 +197,13 @@ namespace WPFTheWeakestRival
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
-                var handler = Closed;
-                if (handler != null)
-                {
-                    handler(this, EventArgs.Empty);
-                }
+                Closed?.Invoke(this, EventArgs.Empty);
             }
-            catch (FaultException<AuthService.ServiceFault> ex)
+            catch (FaultException<LobbyService.ServiceFault> ex)
             {
-                Logger.Warn("Auth fault while updating profile.", ex);
+                Logger.Warn("Lobby fault while updating profile.", ex);
                 MessageBox.Show(
-                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.profileUpdateFailed,
                     Lang.modifyProfileTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -127,65 +211,18 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while updating profile.", ex);
-                MessageBox.Show(
-                    ex.Message,
-                    Lang.modifyProfileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MessageBox.Show(Lang.noConnection, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("Timeout while updating profile.", ex);
+                MessageBox.Show(Lang.noConnection, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while updating profile.", ex);
-                MessageBox.Show(
-                    ex.Message,
-                    Lang.modifyProfileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.profileUpdateFailed, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private void BtnBrowseClick(object sender, RoutedEventArgs e)
-        {
-            var dialog = new OpenFileDialog
-            {
-                Title = Lang.profileSelectAvatarTitle,
-                Filter = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All files (*.*)|*.*",
-                Multiselect = false
-            };
-
-            var result = dialog.ShowDialog();
-            if (result == true)
-            {
-                LoadPreviewFromFile(dialog.FileName);
-                txtAvatarUrl.Text = new Uri(dialog.FileName, UriKind.Absolute).AbsoluteUri;
-            }
-        }
-
-
-        private void BtnClearImageClick(object sender, RoutedEventArgs e)
-        {
-            txtAvatarUrl.Text = string.Empty;
-            imgPreview.Source = null;
-        }
-
-        private void LoadPreviewFromFile(string filePath)
-        {
-            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
-            {
-                Logger.WarnFormat(
-                    "Requested avatar preview from invalid file path: '{0}'.",
-                    filePath ?? "<null>");
-
-                imgPreview.Source = null;
-                return;
-            }
-
-            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(filePath, 128);
-        }
-
-        private void LoadPreviewFromURL(string source)
-        {
-            imgPreview.Source = UiImageHelper.TryCreateFromUrlOrPath(source, 128);
         }
 
         private void LogoutClick(object sender, RoutedEventArgs e)
@@ -209,7 +246,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Warn("Auth fault while logging out.", ex);
                 MessageBox.Show(
-                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.logoutFailed,
                     Lang.logoutTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -217,20 +254,17 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while logging out.", ex);
-                MessageBox.Show(
-                    ex.Message,
-                    Lang.logoutTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                MessageBox.Show(Lang.noConnection, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("Timeout while logging out.", ex);
+                MessageBox.Show(Lang.noConnection, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while logging out.", ex);
-                MessageBox.Show(
-                    ex.Message,
-                    Lang.logoutTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.logoutFailed, Lang.logoutTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -243,11 +277,98 @@ namespace WPFTheWeakestRival
                     Logger.Warn("Error clearing current session token during logout.", ex);
                 }
 
-                var handler = LoggedOut;
-                if (handler != null)
+                LoggedOut?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private static bool TryLoadProfileImage(string filePath, out byte[] bytes, out string contentType)
+        {
+            bytes = null;
+            contentType = null;
+
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+            {
+                return false;
+            }
+
+            var ext = Path.GetExtension(filePath) ?? string.Empty;
+            var isPng = ext.Equals(".png", StringComparison.OrdinalIgnoreCase);
+            var isJpg = ext.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || ext.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
+
+            if (!isPng && !isJpg)
+            {
+                return false;
+            }
+
+            var originalBytes = File.ReadAllBytes(filePath);
+            if (originalBytes.Length <= MAX_PROFILE_IMAGE_BYTES)
+            {
+                bytes = originalBytes;
+                contentType = isPng ? CONTENT_TYPE_PNG : CONTENT_TYPE_JPEG;
+                return true;
+            }
+
+            // Si pesa mucho, re-encode a JPEG y baja resolución.
+            if (TryDownscaleToJpegUnderLimit(filePath, RESIZE_W_PRIMARY, JPEG_QUALITY_PRIMARY, out bytes))
+            {
+                contentType = CONTENT_TYPE_JPEG;
+                return true;
+            }
+
+            if (TryDownscaleToJpegUnderLimit(filePath, RESIZE_W_SECONDARY, JPEG_QUALITY_PRIMARY, out bytes))
+            {
+                contentType = CONTENT_TYPE_JPEG;
+                return true;
+            }
+
+            if (TryDownscaleToJpegUnderLimit(filePath, RESIZE_W_TERTIARY, JPEG_QUALITY_SECONDARY, out bytes))
+            {
+                contentType = CONTENT_TYPE_JPEG;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryDownscaleToJpegUnderLimit(string filePath, int decodeWidth, int quality, out byte[] jpegBytes)
+        {
+            jpegBytes = null;
+
+            try
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                bitmap.DecodePixelWidth = decodeWidth;
+                bitmap.UriSource = new Uri(filePath, UriKind.Absolute);
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                var encoder = new JpegBitmapEncoder
                 {
-                    handler(this, EventArgs.Empty);
+                    QualityLevel = quality
+                };
+
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+                using (var ms = new MemoryStream())
+                {
+                    encoder.Save(ms);
+                    var result = ms.ToArray();
+
+                    if (result.Length <= MAX_PROFILE_IMAGE_BYTES && result.Length > 0)
+                    {
+                        jpegBytes = result;
+                        return true;
+                    }
                 }
+
+                return false;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

@@ -54,12 +54,13 @@
   <xs:element name="AcceptFriendRequestResponse" nillable="true" type="tns:AcceptFriendRequestResponse" />
   <xs:complexType name="FriendSummary">
     <xs:sequence>
-      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
-      <xs:element minOccurs="0" name="Username" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="SinceUtc" type="xs:dateTime" />
-      <xs:element minOccurs="0" name="IsOnline" type="xs:boolean" />
+      <xs:element name="AccountId" type="xs:int" />
+      <xs:element name="Username" nillable="true" type="xs:string" />
+      <xs:element name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element name="HasProfileImage" type="xs:boolean" />
+      <xs:element name="SinceUtc" type="xs:dateTime" />
+      <xs:element name="IsOnline" type="xs:boolean" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="FriendSummary" nillable="true" type="tns:FriendSummary" />
@@ -131,15 +132,15 @@
   <xs:element name="FriendRequestSummary" nillable="true" type="tns:FriendRequestSummary" />
   <xs:complexType name="SearchAccountsRequest">
     <xs:sequence>
-      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Query" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="MaxResults" type="xs:int" />
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="Query" nillable="true" type="xs:string" />
+      <xs:element name="MaxResults" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SearchAccountsRequest" nillable="true" type="tns:SearchAccountsRequest" />
   <xs:complexType name="SearchAccountsResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="Results" nillable="true" type="tns:ArrayOfSearchAccountItem" />
+      <xs:element name="Results" nillable="true" type="tns:ArrayOfSearchAccountItem" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SearchAccountsResponse" nillable="true" type="tns:SearchAccountsResponse" />
@@ -151,13 +152,14 @@
   <xs:element name="ArrayOfSearchAccountItem" nillable="true" type="tns:ArrayOfSearchAccountItem" />
   <xs:complexType name="SearchAccountItem">
     <xs:sequence>
-      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
-      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="IsFriend" type="xs:boolean" />
-      <xs:element minOccurs="0" name="HasPendingOutgoing" type="xs:boolean" />
-      <xs:element minOccurs="0" name="HasPendingIncoming" type="xs:boolean" />
+      <xs:element name="AccountId" type="xs:int" />
+      <xs:element name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element name="Email" nillable="true" type="xs:string" />
+      <xs:element name="HasProfileImage" type="xs:boolean" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
+      <xs:element name="IsFriend" type="xs:boolean" />
+      <xs:element name="HasPendingOutgoing" type="xs:boolean" />
+      <xs:element name="HasPendingIncoming" type="xs:boolean" />
       <xs:element minOccurs="0" name="PendingIncomingRequestId" nillable="true" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
@@ -203,14 +205,14 @@
   <xs:element name="FriendPresence" nillable="true" type="tns:FriendPresence" />
   <xs:complexType name="GetAccountsByIdsRequest">
     <xs:sequence>
-      <xs:element minOccurs="0" name="Token" nillable="true" type="xs:string" />
-      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AccountIds" nillable="true" type="q1:ArrayOfint" />
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" name="AccountIds" nillable="true" type="q1:ArrayOfint" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GetAccountsByIdsRequest" nillable="true" type="tns:GetAccountsByIdsRequest" />
   <xs:complexType name="GetAccountsByIdsResponse">
     <xs:sequence>
-      <xs:element minOccurs="0" name="Accounts" nillable="true" type="tns:ArrayOfAccountMini" />
+      <xs:element name="Accounts" nillable="true" type="tns:ArrayOfAccountMini" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GetAccountsByIdsResponse" nillable="true" type="tns:GetAccountsByIdsResponse" />
@@ -222,10 +224,11 @@
   <xs:element name="ArrayOfAccountMini" nillable="true" type="tns:ArrayOfAccountMini" />
   <xs:complexType name="AccountMini">
     <xs:sequence>
-      <xs:element minOccurs="0" name="AccountId" type="xs:int" />
-      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Email" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="AvatarUrl" nillable="true" type="xs:string" />
+      <xs:element name="AccountId" type="xs:int" />
+      <xs:element name="DisplayName" nillable="true" type="xs:string" />
+      <xs:element name="Email" nillable="true" type="xs:string" />
+      <xs:element name="HasProfileImage" type="xs:boolean" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Avatar" nillable="true" type="tns:AvatarAppearanceDto" />
     </xs:sequence>
   </xs:complexType>
@@ -287,6 +290,23 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="AvatarFaceType" nillable="true" type="tns:AvatarFaceType" />
+  <xs:complexType name="GetProfileImageRequest">
+    <xs:sequence>
+      <xs:element name="Token" nillable="true" type="xs:string" />
+      <xs:element name="AccountId" type="xs:int" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetProfileImageRequest" nillable="true" type="tns:GetProfileImageRequest" />
+  <xs:complexType name="GetProfileImageResponse">
+    <xs:sequence>
+      <xs:element name="ImageBytes" nillable="true" type="xs:base64Binary" />
+      <xs:element name="ContentType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UpdatedAtUtc" nillable="true" type="xs:dateTime" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GetProfileImageResponse" nillable="true" type="tns:GetProfileImageResponse" />
   <xs:complexType name="SendLobbyInviteEmailRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />

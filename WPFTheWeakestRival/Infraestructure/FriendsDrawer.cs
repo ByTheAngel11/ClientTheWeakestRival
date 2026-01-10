@@ -1,7 +1,7 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -42,16 +42,22 @@ namespace WPFTheWeakestRival.Infrastructure
             CloseStoryboard = closeStoryboard ?? throw new ArgumentNullException(nameof(closeStoryboard));
         }
     }
+
     public sealed class FriendsDrawerOptions
     {
+        private const double DEFAULT_DRAWER_INITIAL_TRANSLATION_X = 340.0;
+
         public Func<bool> CanClearEffect { get; set; }
         public double BlurInRadius { get; set; } = 3.0;
         public int AnimInMs { get; set; } = 180;
         public int AnimOutMs { get; set; } = 160;
+        public double DrawerInitialTranslationX { get; set; } = DEFAULT_DRAWER_INITIAL_TRANSLATION_X;
     }
 
     public sealed class FriendsDrawer : IDisposable
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FriendsDrawer));
+
         private readonly FriendManager manager;
         private readonly FriendsDrawerView view;
         private readonly FriendsDrawerOptions options;
@@ -69,7 +75,7 @@ namespace WPFTheWeakestRival.Infrastructure
             this.manager.FriendsUpdated += OnFriendsUpdated;
         }
 
-        public async Task OpenAsync()
+        public async System.Threading.Tasks.Task OpenAsync()
         {
             if (view.DrawerHost.Visibility == Visibility.Visible)
             {
@@ -86,7 +92,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             await manager.ManualRefreshAsync();
 
-            view.DrawerTransform.X = 340;
+            view.DrawerTransform.X = options.DrawerInitialTranslationX;
             view.DrawerHost.Opacity = 0;
             view.DrawerHost.Visibility = Visibility.Visible;
 
@@ -135,6 +141,7 @@ namespace WPFTheWeakestRival.Infrastructure
             }
 
             var pending = Math.Max(0, pendingCount);
+
             view.EmptyPanel.Visibility = items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             view.FriendsList.Visibility = items.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
             view.RequestsCountText.Text = pending.ToString();
@@ -142,7 +149,14 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public void Dispose()
         {
-            manager.FriendsUpdated -= OnFriendsUpdated;
+            try
+            {
+                manager.FriendsUpdated -= OnFriendsUpdated;
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Error detaching FriendsUpdated handler.", ex);
+            }
         }
     }
 }

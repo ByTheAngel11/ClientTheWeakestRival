@@ -1,10 +1,14 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Threading;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Models;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
@@ -12,8 +16,11 @@ namespace WPFTheWeakestRival.Infrastructure
     {
         private const int HEARTBEAT_SECONDS = 30;
         private const int REFRESH_SECONDS = 45;
+
         private const int DEFAULT_AVATAR_SIZE = 36;
         private const string DEVICE_NAME = "WPF";
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(FriendManager));
 
         private readonly string endpointName;
         private readonly DispatcherTimer heartbeatTimer;
@@ -22,7 +29,11 @@ namespace WPFTheWeakestRival.Infrastructure
         private FriendServiceClient client;
         private bool isDisposed;
 
-        public event Action<IReadOnlyList<Models.FriendItem>, int> FriendsUpdated;
+        private readonly object lastStateLock = new object();
+        private List<FriendItem> lastItems = new List<FriendItem>();
+        private int lastPendingCount;
+
+        public event Action<IReadOnlyList<FriendItem>, int> FriendsUpdated;
 
         public FriendManager(string endpointName)
         {
@@ -34,18 +45,10 @@ namespace WPFTheWeakestRival.Infrastructure
             this.endpointName = endpointName;
             client = CreateClient();
 
-            heartbeatTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(HEARTBEAT_SECONDS)
-            };
-
+            heartbeatTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(HEARTBEAT_SECONDS) };
             heartbeatTimer.Tick += async (_, __) => await SendHeartbeatSafeAsync();
 
-            refreshTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(REFRESH_SECONDS)
-            };
-
+            refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(REFRESH_SECONDS) };
             refreshTimer.Tick += async (_, __) => await RefreshFriendsSafeAsync();
         }
 
@@ -75,6 +78,35 @@ namespace WPFTheWeakestRival.Infrastructure
             CloseClientSafe();
         }
 
+        public Task ManualRefreshAsync()
+        {
+            return RefreshFriendsSafeAsync();
+        }
+
+        private FriendServiceClient CreateClient()
+        {
+            return new FriendServiceClient(endpointName);
+        }
+
+        private FriendServiceClient GetOrCreateClient()
+        {
+            if (isDisposed)
+            {
+                return null;
+            }
+
+            if (client == null ||
+                client.State == CommunicationState.Closed ||
+                client.State == CommunicationState.Faulted)
+            {
+                try { client?.Abort(); } catch { }
+
+                client = CreateClient();
+            }
+
+            return client;
+        }
+
         private void CloseClientSafe()
         {
             var local = client;
@@ -100,43 +132,6 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 try { local.Abort(); } catch { }
             }
-        }
-
-
-        public Task ManualRefreshAsync()
-        {
-            return RefreshFriendsSafeAsync();
-        }
-
-        private FriendServiceClient CreateClient()
-        {
-            return new FriendServiceClient(endpointName);
-        }
-
-        private FriendServiceClient GetOrCreateClient()
-        {
-            if (isDisposed)
-            {
-                return null;
-            }
-
-            if (client == null ||
-                client.State == CommunicationState.Closed ||
-                client.State == CommunicationState.Faulted)
-            {
-                try
-                {
-                    client?.Abort();
-                }
-                catch
-                {
-                    // Ignore
-                }
-
-                client = CreateClient();
-            }
-
-            return client;
         }
 
         private async Task SendHeartbeatSafeAsync()
@@ -166,9 +161,9 @@ namespace WPFTheWeakestRival.Infrastructure
                     Device = DEVICE_NAME
                 });
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore: heartbeat es best-effort
+                Logger.Debug("Heartbeat failed (best-effort).", ex);
             }
         }
 
@@ -201,47 +196,157 @@ namespace WPFTheWeakestRival.Infrastructure
                         IncludePendingOutgoing = false
                     }));
 
-                var items = new List<Models.FriendItem>();
+                var builtItems = BuildFriendItems(response);
+                var pendingCount = Math.Max(0, response?.PendingIncoming?.Length ?? 0);
 
-                foreach (var friend in response.Friends ?? Array.Empty<FriendSummary>())
+                lock (lastStateLock)
                 {
-                    var displayName = string.IsNullOrWhiteSpace(friend.DisplayName)
-                        ? friend.Username
-                        : friend.DisplayName;
-
-                    var avatarImage = UiImageHelper.TryCreateFromUrlOrPath(friend.AvatarUrl)
-                                      ?? UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
-
-                    items.Add(new Models.FriendItem
-                    {
-                        AccountId = friend.AccountId,
-                        DisplayName = displayName ?? string.Empty,
-                        StatusText = friend.IsOnline
-                        ? Properties.Langs.Lang.statusAvailable
-                        : Properties.Langs.Lang.statusOffline,
-                        Presence = friend.IsOnline ? "Online" : "Offline",
-                        Avatar = avatarImage,
-                        IsOnline = friend.IsOnline
-                    });
-
+                    lastItems = new List<FriendItem>(builtItems);
+                    lastPendingCount = pendingCount;
                 }
 
-                var pendingCount = Math.Max(0, response.PendingIncoming?.Length ?? 0);
+                FriendsUpdated?.Invoke(builtItems, pendingCount);
 
-                FriendsUpdated?.Invoke(items, pendingCount);
+                _ = WarmUpAvatarsAsync(token, response?.Friends ?? Array.Empty<FriendSummary>());
             }
-            catch (FaultException<FriendService.ServiceFault>)
+            catch (FaultException<FriendService.ServiceFault> ex)
             {
-                // Ignorar: errores de negocio ya se manejan en UI si hace falta
+                Logger.Warn("Friend service fault while refreshing friends.", ex);
             }
-            catch (CommunicationException)
+            catch (CommunicationException ex)
             {
-                // Ignorar: caída de red / canal, se reintentará en el siguiente tick
+                Logger.Warn("Communication error while refreshing friends.", ex);
             }
-            catch (Exception)
+            catch (TimeoutException ex)
             {
-                // Ignorar cualquier otra cosa para no reventar el timer
+                Logger.Warn("Timeout while refreshing friends.", ex);
             }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while refreshing friends.", ex);
+            }
+        }
+
+        private async Task WarmUpAvatarsAsync(string token, FriendSummary[] friends)
+        {
+            if (friends == null || friends.Length == 0)
+            {
+                return;
+            }
+
+            var proxy = GetOrCreateClient();
+            if (proxy == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < friends.Length; i++)
+            {
+                FriendSummary f = friends[i];
+                if (f == null || !f.HasProfileImage || string.IsNullOrWhiteSpace(f.ProfileImageCode))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    ImageSource image = await ProfileImageCache.Current.GetOrFetchAsync(
+                        f.AccountId,
+                        f.ProfileImageCode,
+                        DEFAULT_AVATAR_SIZE,
+                        async () =>
+                        {
+                            var resp = await proxy.GetProfileImageAsync(new FriendService.GetProfileImageRequest
+                            {
+                                Token = token,
+                                AccountId = f.AccountId,
+                                ProfileImageCode = f.ProfileImageCode
+                            });
+
+                            return resp?.ImageBytes ?? Array.Empty<byte>();
+                        });
+
+                    if (image != null)
+                    {
+                        ApplyAvatarToLastItems(f.AccountId, image);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug("WarmUpAvatarsAsync: best-effort failed.", ex);
+                }
+            }
+        }
+
+        private void ApplyAvatarToLastItems(int accountId, ImageSource avatar)
+        {
+            if (avatar == null)
+            {
+                return;
+            }
+
+            List<FriendItem> snapshot;
+            int pending;
+
+            lock (lastStateLock)
+            {
+                for (int i = 0; i < lastItems.Count; i++)
+                {
+                    if (lastItems[i] != null && lastItems[i].AccountId == accountId)
+                    {
+                        lastItems[i].Avatar = avatar;
+                    }
+                }
+
+                snapshot = new List<FriendItem>(lastItems);
+                pending = lastPendingCount;
+            }
+
+            FriendsUpdated?.Invoke(snapshot, pending);
+        }
+
+        private static IReadOnlyList<FriendItem> BuildFriendItems(ListFriendsResponse response)
+        {
+            var items = new List<FriendItem>();
+
+            foreach (var friend in response?.Friends ?? Array.Empty<FriendSummary>())
+            {
+                FriendItem item = BuildFriendItem(friend);
+                if (item != null)
+                {
+                    items.Add(item);
+                }
+            }
+
+            return items;
+        }
+
+        private static FriendItem BuildFriendItem(FriendSummary friend)
+        {
+            if (friend == null)
+            {
+                return null;
+            }
+
+            var displayName = string.IsNullOrWhiteSpace(friend.DisplayName)
+                ? friend.Username
+                : friend.DisplayName;
+
+            var presenceText = friend.IsOnline
+                ? Lang.statusAvailable
+                : Lang.statusOffline;
+
+            var avatarImage = UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
+
+            return new FriendItem
+            {
+                AccountId = friend.AccountId,
+                DisplayName = displayName ?? string.Empty,
+                StatusText = presenceText,
+                Presence = presenceText,
+                Avatar = avatarImage,
+                IsOnline = friend.IsOnline
+            };
         }
 
         public void Dispose()
@@ -253,33 +358,17 @@ namespace WPFTheWeakestRival.Infrastructure
 
             isDisposed = true;
 
-            Stop();
-
             try
             {
-                if (client != null)
-                {
-                    if (client.State == CommunicationState.Faulted)
-                    {
-                        client.Abort();
-                    }
-                    else
-                    {
-                        client.Close();
-                    }
-                }
+                heartbeatTimer.Stop();
+                refreshTimer.Stop();
             }
-            catch
+            catch (Exception ex)
             {
-                try
-                {
-                    client?.Abort();
-                }
-                catch
-                {
-                    // Ignore
-                }
+                Logger.Warn("Error stopping timers on dispose.", ex);
             }
+
+            CloseClientSafe();
         }
     }
 }

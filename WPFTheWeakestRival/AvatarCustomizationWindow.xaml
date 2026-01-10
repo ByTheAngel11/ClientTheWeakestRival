@@ -9,6 +9,71 @@
         ResizeMode="NoResize"
         Background="#1F1F1F">
 
+    <Window.Resources>
+        <!-- ComboBox dark theme (texto visible) -->
+        <SolidColorBrush x:Key="ComboBg" Color="#2B2B2B" />
+        <SolidColorBrush x:Key="ComboBorder" Color="#454545" />
+        <SolidColorBrush x:Key="ComboFg" Color="#F2F2F2" />
+        <SolidColorBrush x:Key="ComboItemHover" Color="#3A3A3A" />
+        <SolidColorBrush x:Key="ComboItemSelected" Color="#4A4A4A" />
+
+        <Style x:Key="DarkComboBoxStyle" TargetType="{x:Type ComboBox}">
+            <Setter Property="Background" Value="{StaticResource ComboBg}" />
+            <Setter Property="BorderBrush" Value="{StaticResource ComboBorder}" />
+            <Setter Property="Foreground" Value="{StaticResource ComboFg}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="DarkComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="Foreground" Value="{StaticResource ComboFg}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="6,4" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ComboItemHover}" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ComboItemSelected}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Template para opciones de color -->
+        <DataTemplate x:Key="ColorOptionTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="26"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="18"
+                        Height="18"
+                        CornerRadius="3"
+                        BorderBrush="#404040"
+                        BorderThickness="1"
+                        Background="{Binding Brush}"
+                        VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Name}"
+                           Foreground="{StaticResource ComboFg}"
+                           VerticalAlignment="Center"
+                           Margin="8,0,0,0"/>
+            </Grid>
+        </DataTemplate>
+
+        <!-- Template para opciones enum (Hat/Face) -->
+        <DataTemplate x:Key="EnumOptionTemplate">
+            <TextBlock Text="{Binding Name}"
+                       Foreground="{StaticResource ComboFg}"
+                       VerticalAlignment="Center"/>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid Margin="16">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -36,200 +101,132 @@
 
         <!-- PANEL OPCIONES -->
         <Border Grid.Row="0"
-        Grid.Column="2"
-        Background="#262626"
-        CornerRadius="16"
-        Padding="16">
+                Grid.Column="2"
+                Background="#262626"
+                CornerRadius="16"
+                Padding="16">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="4" VerticalAlignment="Top">
 
-                <TextBlock Text="Avatar colors"
-                           Foreground="White"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Margin="0,0,0,10" />
+                    <TextBlock Text="Avatar colors"
+                               Foreground="White"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,10" />
 
-                <!-- Skin -->
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,8">
-                    <TextBlock Text="Skin"
-                               Width="90"
-                               VerticalAlignment="Center"
-                               Foreground="#E0E0E0"
-                               Margin="0,0,8,0" />
-                    <ComboBox x:Name="SkinColorCombo"
-                              Width="200"
-                              SelectedValuePath="Color"
-                              SelectedValue="{Binding SkinColor, ElementName=AvatarPreview, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="18" Height="18"
-                                               RadiusX="3" RadiusY="3"
-                                               Stroke="#404040"
-                                               Fill="{Binding}"
-                                               Margin="0,0,8,0" />
-                                    <TextBlock Text="{Binding Color}"
-                                               Foreground="White"
-                                               FontSize="11" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
+                    <!-- Skin -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Skin"
+                                   Width="90"
+                                   VerticalAlignment="Center"
+                                   Foreground="#E0E0E0"
+                                   Margin="0,0,8,0" />
+                        <ComboBox x:Name="SkinColorCombo"
+                                  Width="200"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
+                                  ItemsSource="{Binding SkinColorOptions}"
+                                  ItemTemplate="{StaticResource ColorOptionTemplate}"
+                                  SelectedValuePath="Color"
+                                  SelectedValue="{Binding SkinColor, ElementName=AvatarPreview, Mode=TwoWay}" />
+                    </StackPanel>
 
-                        <SolidColorBrush Color="#FFEED8C8" />
-                        <SolidColorBrush Color="#FFE1C3A3" />
-                        <SolidColorBrush Color="#FFD4A078" />
-                        <SolidColorBrush Color="#FFC27A4C" />
-                        <SolidColorBrush Color="#FF915335" />
-                    </ComboBox>
+                    <!-- Shirt / Body -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Shirt"
+                                   Width="90"
+                                   VerticalAlignment="Center"
+                                   Foreground="#E0E0E0"
+                                   Margin="0,0,8,0" />
+                        <ComboBox x:Name="ShirtColorCombo"
+                                  Width="200"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
+                                  ItemsSource="{Binding BodyColorOptions}"
+                                  ItemTemplate="{StaticResource ColorOptionTemplate}"
+                                  SelectedValuePath="Color"
+                                  SelectedValue="{Binding BodyColor, ElementName=AvatarPreview, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Pants -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Pants"
+                                   Width="90"
+                                   VerticalAlignment="Center"
+                                   Foreground="#E0E0E0"
+                                   Margin="0,0,8,0" />
+                        <ComboBox x:Name="PantsColorCombo"
+                                  Width="200"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
+                                  ItemsSource="{Binding PantsColorOptions}"
+                                  ItemTemplate="{StaticResource ColorOptionTemplate}"
+                                  SelectedValuePath="Color"
+                                  SelectedValue="{Binding PantsColor, ElementName=AvatarPreview, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <Separator Margin="0,4,0,8" />
+
+                    <!-- Hat type -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Hat type"
+                                   Width="90"
+                                   VerticalAlignment="Center"
+                                   Foreground="#E0E0E0"
+                                   Margin="0,0,8,0" />
+                        <ComboBox x:Name="HatTypeCombo"
+                                  Width="200"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
+                                  ItemsSource="{Binding HatTypeOptions}"
+                                  ItemTemplate="{StaticResource EnumOptionTemplate}"
+                                  SelectedValuePath="Value"
+                                  SelectedValue="{Binding HatType, ElementName=AvatarPreview, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Hat color -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Hat color"
+                                   Width="90"
+                                   VerticalAlignment="Center"
+                                   Foreground="#E0E0E0"
+                                   Margin="0,0,8,0" />
+                        <ComboBox x:Name="HatColorCombo"
+                                  Width="200"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
+                                  ItemsSource="{Binding HatColorOptions}"
+                                  ItemTemplate="{StaticResource ColorOptionTemplate}"
+                                  SelectedValuePath="Color"
+                                  SelectedValue="{Binding HatColor, ElementName=AvatarPreview, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <Separator Margin="0,4,0,8" />
+
+                    <!-- Face type -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="Expression"
+                                   Width="90"
+                                   VerticalAlignment="Center"
+                                   Foreground="#E0E0E0"
+                                   Margin="0,0,8,0" />
+                        <ComboBox x:Name="FaceTypeCombo"
+                                  Width="200"
+                                  Style="{StaticResource DarkComboBoxStyle}"
+                                  ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
+                                  ItemsSource="{Binding FaceTypeOptions}"
+                                  ItemTemplate="{StaticResource EnumOptionTemplate}"
+                                  SelectedValuePath="Value"
+                                  SelectedValue="{Binding FaceType, ElementName=AvatarPreview, Mode=TwoWay}" />
+                    </StackPanel>
+
+                    <!-- Use profile photo -->
+                    <CheckBox x:Name="UsePhotoCheck"
+                              Content="Use profile photo"
+                              Foreground="#E0E0E0"
+                              Margin="0,8,0,0"
+                              IsChecked="{Binding UseProfilePhotoAsFace, ElementName=AvatarPreview, Mode=TwoWay}" />
                 </StackPanel>
-
-                <!-- Shirt / Body -->
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,8">
-                    <TextBlock Text="Shirt"
-                               Width="90"
-                               VerticalAlignment="Center"
-                               Foreground="#E0E0E0"
-                               Margin="0,0,8,0" />
-                    <ComboBox x:Name="ShirtColorCombo"
-                              Width="200"
-                              SelectedValuePath="Color"
-                              SelectedValue="{Binding BodyColor, ElementName=AvatarPreview, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="18" Height="18"
-                                               RadiusX="3" RadiusY="3"
-                                               Stroke="#404040"
-                                               Fill="{Binding}"
-                                               Margin="0,0,8,0" />
-                                    <TextBlock Text="{Binding Color}"
-                                               Foreground="White"
-                                               FontSize="11" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-
-                        <SolidColorBrush Color="#FFD32F2F" />
-                        <SolidColorBrush Color="#FF2F6AA3" />
-                        <SolidColorBrush Color="#FF4CAF50" />
-                        <SolidColorBrush Color="#FFED4C00" />
-                        <SolidColorBrush Color="#FF9C27B0" />
-                        <SolidColorBrush Color="#FF9E9E9E" />
-                    </ComboBox>
-                </StackPanel>
-
-                <!-- Pants -->
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,8">
-                    <TextBlock Text="Pants"
-                               Width="90"
-                               VerticalAlignment="Center"
-                               Foreground="#E0E0E0"
-                               Margin="0,0,8,0" />
-                    <ComboBox x:Name="PantsColorCombo"
-                              Width="200"
-                              SelectedValuePath="Color"
-                              SelectedValue="{Binding PantsColor, ElementName=AvatarPreview, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="18" Height="18"
-                                               RadiusX="3" RadiusY="3"
-                                               Stroke="#404040"
-                                               Fill="{Binding}"
-                                               Margin="0,0,8,0" />
-                                    <TextBlock Text="{Binding Color}"
-                                               Foreground="White"
-                                               FontSize="11" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-
-                        <SolidColorBrush Color="#FF111111" />
-                        <SolidColorBrush Color="#FF444444" />
-                        <SolidColorBrush Color="#FF3F51B5" />
-                    </ComboBox>
-                </StackPanel>
-
-                <Separator Margin="0,4,0,8" />
-
-                <!-- Hat type -->
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,8">
-                    <TextBlock Text="Hat type"
-                               Width="90"
-                               VerticalAlignment="Center"
-                               Foreground="#E0E0E0"
-                               Margin="0,0,8,0" />
-                    <ComboBox x:Name="HatTypeCombo"
-                              Width="200"
-                              SelectedValuePath="Tag"
-                              SelectedValue="{Binding HatType, ElementName=AvatarPreview, Mode=TwoWay}">
-                        <ComboBoxItem Content="None"     Tag="{x:Static controls:HatType.None}" />
-                        <ComboBoxItem Content="Baseball" Tag="{x:Static controls:HatType.Baseball}" />
-                        <ComboBoxItem Content="Top hat"  Tag="{x:Static controls:HatType.TopHat}" />
-                        <ComboBoxItem Content="Beanie"   Tag="{x:Static controls:HatType.Beanie}" />
-                    </ComboBox>
-                </StackPanel>
-
-                <!-- Hat color -->
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,8">
-                    <TextBlock Text="Hat color"
-                               Width="90"
-                               VerticalAlignment="Center"
-                               Foreground="#E0E0E0"
-                               Margin="0,0,8,0" />
-                    <ComboBox x:Name="HatColorCombo"
-                              Width="200"
-                              SelectedValuePath="Color"
-                              SelectedValue="{Binding HatColor, ElementName=AvatarPreview, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="18" Height="18"
-                                               RadiusX="3" RadiusY="3"
-                                               Stroke="#404040"
-                                               Fill="{Binding}"
-                                               Margin="0,0,8,0" />
-                                    <TextBlock Text="{Binding Color}"
-                                               Foreground="White"
-                                               FontSize="11" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-
-                        <SolidColorBrush Color="#FF2F6AA3" />
-                        <SolidColorBrush Color="#FFD32F2F" />
-                        <SolidColorBrush Color="#FF111111" />
-                        <SolidColorBrush Color="#FF4CAF50" />
-                    </ComboBox>
-                </StackPanel>
-
-                <Separator Margin="0,4,0,8" />
-
-                <!-- Face type -->
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,4">
-                    <TextBlock Text="Expression"
-                               Width="90"
-                               VerticalAlignment="Center"
-                               Foreground="#E0E0E0"
-                               Margin="0,0,8,0" />
-                    <ComboBox x:Name="FaceTypeCombo"
-                              Width="200"
-                              SelectedItem="{Binding FaceType, ElementName=AvatarPreview, Mode=TwoWay}" />
-                </StackPanel>
-
-                <!-- Use profile photo -->
-                <CheckBox x:Name="UsePhotoCheck"
-                          Content="Use profile photo"
-                          Foreground="#E0E0E0"
-                          Margin="0,2,0,0"
-                          IsChecked="{Binding UseProfilePhotoAsFace, ElementName=AvatarPreview, Mode=TwoWay}" />
-            </StackPanel>
             </ScrollViewer>
         </Border>
 

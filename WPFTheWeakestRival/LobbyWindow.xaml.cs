@@ -66,8 +66,6 @@ namespace WPFTheWeakestRival
         private const string ERROR_INVITE_GENERIC = "Ocurrió un error al enviar la invitación.";
         private const string INFO_INVITE_SENT = "Invitación enviada.";
 
-
-
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyWindow));
 
         private readonly BlurEffect overlayBlur = new BlurEffect
@@ -79,7 +77,7 @@ namespace WPFTheWeakestRival
             new ObservableCollection<LobbyPlayerItem>();
 
         private Guid? currentLobbyId;
-        private string currentAccessCode;
+        private string currentAccessCode = string.Empty;
         private string myDisplayName = DEFAULT_DISPLAY_NAME;
 
         private readonly ObservableCollection<ChatLine> chatLines = new ObservableCollection<ChatLine>();
@@ -148,6 +146,7 @@ namespace WPFTheWeakestRival
             AppServices.Lobby.ChatMessageReceived += OnChatMessageReceivedFromHub;
             AppServices.Lobby.MatchStarted += OnMatchStartedFromHub;
             AppServices.Lobby.ForcedLogout += OnForcedLogoutFromHub;
+
             AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
             AppServices.Friends.Start();
 
@@ -187,7 +186,7 @@ namespace WPFTheWeakestRival
         public void InitializeExistingLobby(Guid lobbyId, string accessCode, string lobbyName)
         {
             currentLobbyId = lobbyId;
-            currentAccessCode = accessCode;
+            currentAccessCode = accessCode ?? string.Empty;
             UpdateLobbyHeader(lobbyName, currentAccessCode);
         }
 
@@ -476,7 +475,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Communication error while opening ModifyProfilePage from lobby.", ex);
                 MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.noConnection,
                     Lang.profileTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -485,7 +484,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Unexpected error while opening ModifyProfilePage from lobby.", ex);
                 MessageBox.Show(
-                    Lang.profileTitle,
+                    Lang.UiGenericError,
                     Lang.profileTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -502,25 +501,59 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void RefreshProfileButtonAvatar()
+        private static byte[] TryGetProfileBytes(object profile)
         {
+            if (profile == null)
+            {
+                return Array.Empty<byte>();
+            }
+
             try
             {
-                var token = LoginWindow.AppSession.CurrentToken?.Token;
-                if (string.IsNullOrWhiteSpace(token))
+                var type = profile.GetType();
+
+                var prop =
+                    type.GetProperty("AvatarBytes") ??
+                    type.GetProperty("ProfileImageBytes") ??
+                    type.GetProperty("ProfilePhotoBytes") ??
+                    type.GetProperty("PhotoBytes");
+
+                if (prop == null || prop.PropertyType != typeof(byte[]))
                 {
-                    SetDefaultAvatar();
-                    return;
+                    return Array.Empty<byte>();
                 }
 
+                var value = prop.GetValue(profile, null) as byte[];
+                return value ?? Array.Empty<byte>();
+            }
+            catch
+            {
+                return Array.Empty<byte>();
+            }
+        }
+
+        // FIX: sin URL; solo bytes + default. Y sin ex.Message al usuario.
+        private void RefreshProfileButtonAvatar()
+        {
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                SetDefaultAvatar();
+                return;
+            }
+
+            try
+            {
                 var myProfile = AppServices.Lobby.GetMyProfile(token);
 
                 myDisplayName = string.IsNullOrWhiteSpace(myProfile?.DisplayName)
                     ? DEFAULT_DISPLAY_NAME
                     : myProfile.DisplayName;
 
+                byte[] avatarBytes = TryGetProfileBytes(myProfile);
+
                 var avatarImageSource =
-                    UiImageHelper.TryCreateFromUrlOrPath(myProfile?.ProfileImageUrl) ??
+                    UiImageHelper.TryCreateFromBytes(avatarBytes, DEFAULT_AVATAR_SIZE) ??
                     UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
 
                 if (imgAvatar != null)
@@ -528,9 +561,19 @@ namespace WPFTheWeakestRival
                     imgAvatar.Source = avatarImageSource;
                 }
             }
+            catch (FaultException<LobbyService.ServiceFault> ex)
+            {
+                Logger.Warn("Lobby fault while refreshing profile button avatar in lobby.", ex);
+                SetDefaultAvatar();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("Communication error while refreshing profile button avatar in lobby.", ex);
+                SetDefaultAvatar();
+            }
             catch (Exception ex)
             {
-                Logger.Warn("Error refreshing profile button avatar in lobby.", ex);
+                Logger.Warn("Unexpected error refreshing profile button avatar in lobby.", ex);
                 SetDefaultAvatar();
             }
         }
@@ -573,7 +616,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Error de comunicación al iniciar partida desde Lobby.", ex);
                 MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.noConnection,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -582,7 +625,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Error inesperado al iniciar partida desde Lobby.", ex);
                 MessageBox.Show(
-                    ERROR_START_MATCH_GENERIC + Environment.NewLine + ex.Message,
+                    ERROR_START_MATCH_GENERIC,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -849,7 +892,6 @@ namespace WPFTheWeakestRival
             }
         }
 
-
         protected override async void OnClosed(EventArgs e)
         {
             try
@@ -916,7 +958,7 @@ namespace WPFTheWeakestRival
 
                     try
                     {
-                        var token = LoginWindow.AppSession.CurrentToken?.Token;
+                        var token = LoginWindow.AppSession.CurrentToken?.Token ?? string.Empty;
                         var session = LoginWindow.AppSession.CurrentToken;
                         var myUserId = session != null ? session.UserId : 0;
 
@@ -1010,7 +1052,7 @@ namespace WPFTheWeakestRival
                 }
 
                 var session = LoginWindow.AppSession.CurrentToken;
-                string token = session != null ? session.Token : null;
+                string token = session != null ? (session.Token ?? string.Empty) : string.Empty;
 
                 if (string.IsNullOrWhiteSpace(token))
                 {
@@ -1038,7 +1080,7 @@ namespace WPFTheWeakestRival
                         ReportedAccountId = targetPlayer.AccountId,
                         LobbyId = currentLobbyId,
                         ReasonCode = (ReportService.ReportReasonCode)dialog.SelectedReasonCode,
-                        Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? null : dialog.Comment
+                        Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? string.Empty : dialog.Comment
                     };
 
                     ReportService.SubmitPlayerReportResponse response =
@@ -1127,8 +1169,6 @@ namespace WPFTheWeakestRival
                     MessageBoxImage.Error);
             }
         }
-
-
 
         private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
@@ -1279,7 +1319,7 @@ namespace WPFTheWeakestRival
                 Logger.Error("Communication error while sending lobby invite email.", ex);
 
                 MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
+                    Lang.noConnection,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -1453,9 +1493,5 @@ namespace WPFTheWeakestRival
                 catch { client.Abort(); }
             }
         }
-
-
     }
-
-
 }

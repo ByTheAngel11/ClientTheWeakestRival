@@ -358,23 +358,19 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int AccountIdField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string UsernameField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string DisplayNameField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string AvatarUrlField;
+        private bool HasProfileImageField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.DateTime SinceUtcField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool IsOnlineField;
+        
+        private string ProfileImageCodeField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -386,7 +382,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int AccountId {
             get {
                 return this.AccountIdField;
@@ -399,7 +395,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Username {
             get {
                 return this.UsernameField;
@@ -412,7 +408,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -425,20 +421,20 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public string AvatarUrl {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public bool HasProfileImage {
             get {
-                return this.AvatarUrlField;
+                return this.HasProfileImageField;
             }
             set {
-                if ((object.ReferenceEquals(this.AvatarUrlField, value) != true)) {
-                    this.AvatarUrlField = value;
-                    this.RaisePropertyChanged("AvatarUrl");
+                if ((this.HasProfileImageField.Equals(value) != true)) {
+                    this.HasProfileImageField = value;
+                    this.RaisePropertyChanged("HasProfileImage");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=4)]
         public System.DateTime SinceUtc {
             get {
                 return this.SinceUtcField;
@@ -451,7 +447,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=5)]
         public bool IsOnline {
             get {
                 return this.IsOnlineField;
@@ -460,6 +456,19 @@ namespace WPFTheWeakestRival.FriendService {
                 if ((this.IsOnlineField.Equals(value) != true)) {
                     this.IsOnlineField = value;
                     this.RaisePropertyChanged("IsOnline");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=6)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
                 }
             }
         }
@@ -990,13 +999,10 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string TokenField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string QueryField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int MaxResultsField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -1009,7 +1015,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Token {
             get {
                 return this.TokenField;
@@ -1022,7 +1028,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
         public string Query {
             get {
                 return this.QueryField;
@@ -1035,7 +1041,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
         public int MaxResults {
             get {
                 return this.MaxResultsField;
@@ -1067,7 +1073,6 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.FriendService.SearchAccountItem[] ResultsField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -1080,7 +1085,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public WPFTheWeakestRival.FriendService.SearchAccountItem[] Results {
             get {
                 return this.ResultsField;
@@ -1112,25 +1117,20 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int AccountIdField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string DisplayNameField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string EmailField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string AvatarUrlField;
+        private bool HasProfileImageField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ProfileImageCodeField;
+        
         private bool IsFriendField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool HasPendingOutgoingField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private bool HasPendingIncomingField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -1146,7 +1146,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int AccountId {
             get {
                 return this.AccountIdField;
@@ -1159,7 +1159,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -1172,7 +1172,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Email {
             get {
                 return this.EmailField;
@@ -1185,20 +1185,33 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public string AvatarUrl {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public bool HasProfileImage {
             get {
-                return this.AvatarUrlField;
+                return this.HasProfileImageField;
             }
             set {
-                if ((object.ReferenceEquals(this.AvatarUrlField, value) != true)) {
-                    this.AvatarUrlField = value;
-                    this.RaisePropertyChanged("AvatarUrl");
+                if ((this.HasProfileImageField.Equals(value) != true)) {
+                    this.HasProfileImageField = value;
+                    this.RaisePropertyChanged("HasProfileImage");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=5)]
         public bool IsFriend {
             get {
                 return this.IsFriendField;
@@ -1211,7 +1224,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=6)]
         public bool HasPendingOutgoing {
             get {
                 return this.HasPendingOutgoingField;
@@ -1224,7 +1237,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=7)]
         public bool HasPendingIncoming {
             get {
                 return this.HasPendingIncomingField;
@@ -1237,7 +1250,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=8)]
         public System.Nullable<int> PendingIncomingRequestId {
             get {
                 return this.PendingIncomingRequestIdField;
@@ -1542,10 +1555,8 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string TokenField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int[] AccountIdsField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -1558,7 +1569,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Token {
             get {
                 return this.TokenField;
@@ -1571,7 +1582,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
         public int[] AccountIds {
             get {
                 return this.AccountIdsField;
@@ -1603,7 +1614,6 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.FriendService.AccountMini[] AccountsField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -1616,7 +1626,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public WPFTheWeakestRival.FriendService.AccountMini[] Accounts {
             get {
                 return this.AccountsField;
@@ -1648,17 +1658,15 @@ namespace WPFTheWeakestRival.FriendService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int AccountIdField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string DisplayNameField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string EmailField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string AvatarUrlField;
+        private bool HasProfileImageField;
+        
+        private string ProfileImageCodeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.FriendService.AvatarAppearanceDto AvatarField;
@@ -1673,7 +1681,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public int AccountId {
             get {
                 return this.AccountIdField;
@@ -1686,7 +1694,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string DisplayName {
             get {
                 return this.DisplayNameField;
@@ -1699,7 +1707,7 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
         public string Email {
             get {
                 return this.EmailField;
@@ -1712,20 +1720,33 @@ namespace WPFTheWeakestRival.FriendService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public string AvatarUrl {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public bool HasProfileImage {
             get {
-                return this.AvatarUrlField;
+                return this.HasProfileImageField;
             }
             set {
-                if ((object.ReferenceEquals(this.AvatarUrlField, value) != true)) {
-                    this.AvatarUrlField = value;
-                    this.RaisePropertyChanged("AvatarUrl");
+                if ((this.HasProfileImageField.Equals(value) != true)) {
+                    this.HasProfileImageField = value;
+                    this.RaisePropertyChanged("HasProfileImage");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
         public WPFTheWeakestRival.FriendService.AvatarAppearanceDto Avatar {
             get {
                 return this.AvatarField;
@@ -1963,6 +1984,170 @@ namespace WPFTheWeakestRival.FriendService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GetProfileImageRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GetProfileImageRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private string TokenField;
+        
+        private int AccountIdField;
+        
+        private string ProfileImageCodeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string Token {
+            get {
+                return this.TokenField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenField, value) != true)) {
+                    this.TokenField = value;
+                    this.RaisePropertyChanged("Token");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public int AccountId {
+            get {
+                return this.AccountIdField;
+            }
+            set {
+                if ((this.AccountIdField.Equals(value) != true)) {
+                    this.AccountIdField = value;
+                    this.RaisePropertyChanged("AccountId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GetProfileImageResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GetProfileImageResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        private byte[] ImageBytesField;
+        
+        private string ContentTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<System.DateTime> UpdatedAtUtcField;
+        
+        private string ProfileImageCodeField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public byte[] ImageBytes {
+            get {
+                return this.ImageBytesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ImageBytesField, value) != true)) {
+                    this.ImageBytesField = value;
+                    this.RaisePropertyChanged("ImageBytes");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public string ContentType {
+            get {
+                return this.ContentTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ContentTypeField, value) != true)) {
+                    this.ContentTypeField = value;
+                    this.RaisePropertyChanged("ContentType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public System.Nullable<System.DateTime> UpdatedAtUtc {
+            get {
+                return this.UpdatedAtUtcField;
+            }
+            set {
+                if ((this.UpdatedAtUtcField.Equals(value) != true)) {
+                    this.UpdatedAtUtcField = value;
+                    this.RaisePropertyChanged("UpdatedAtUtc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="SendLobbyInviteEmailRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
     [System.SerializableAttribute()]
     public partial class SendLobbyInviteEmailRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -2147,6 +2332,13 @@ namespace WPFTheWeakestRival.FriendService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetAccountsByIds", ReplyAction="http://tempuri.org/IFriendService/GetAccountsByIdsResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse> GetAccountsByIdsAsync(WPFTheWeakestRival.FriendService.GetAccountsByIdsRequest request);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetProfileImage", ReplyAction="http://tempuri.org/IFriendService/GetProfileImageResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.FriendService.ServiceFault), Action="http://tempuri.org/IFriendService/GetProfileImageServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.FriendService.GetProfileImageResponse GetProfileImage(WPFTheWeakestRival.FriendService.GetProfileImageRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/GetProfileImage", ReplyAction="http://tempuri.org/IFriendService/GetProfileImageResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetProfileImageResponse> GetProfileImageAsync(WPFTheWeakestRival.FriendService.GetProfileImageRequest request);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IFriendService/SendLobbyInviteEmail", ReplyAction="http://tempuri.org/IFriendService/SendLobbyInviteEmailResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.FriendService.ServiceFault), Action="http://tempuri.org/IFriendService/SendLobbyInviteEmailServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
         WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse SendLobbyInviteEmail(WPFTheWeakestRival.FriendService.SendLobbyInviteEmailRequest request);
@@ -2252,6 +2444,14 @@ namespace WPFTheWeakestRival.FriendService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetAccountsByIdsResponse> GetAccountsByIdsAsync(WPFTheWeakestRival.FriendService.GetAccountsByIdsRequest request) {
             return base.Channel.GetAccountsByIdsAsync(request);
+        }
+        
+        public WPFTheWeakestRival.FriendService.GetProfileImageResponse GetProfileImage(WPFTheWeakestRival.FriendService.GetProfileImageRequest request) {
+            return base.Channel.GetProfileImage(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.FriendService.GetProfileImageResponse> GetProfileImageAsync(WPFTheWeakestRival.FriendService.GetProfileImageRequest request) {
+            return base.Channel.GetProfileImageAsync(request);
         }
         
         public WPFTheWeakestRival.FriendService.SendLobbyInviteEmailResponse SendLobbyInviteEmail(WPFTheWeakestRival.FriendService.SendLobbyInviteEmailRequest request) {

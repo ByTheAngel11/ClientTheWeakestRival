@@ -441,13 +441,6 @@
   <data name="profileAvatar" xml:space="preserve">
     <value>Immagine del profilo</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="friendRequestsIncoming" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="friendRequestsOutgoing" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="friendRequestsIncoming" xml:space="preserve">
     <value>Richieste ricevute</value>
   </data>
@@ -567,5 +560,27 @@
   </data>
   <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
     <value>La richiesta è già stata risolta.</value>
+  </data>
+  <data name="tittleImageSelector" xml:space="preserve">
+    <value>Seleziona un'immagine</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="profileLoadFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="profileUpdateFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="logoutFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="profileLoadFailed" xml:space="preserve">
+    <value>Caricamento del profilo non riuscito</value>
+  </data>
+  <data name="profileUpdateFailed" xml:space="preserve">
+    <value>Aggiornamento del profilo non riuscito</value>
+  </data>
+  <data name="logoutFailed" xml:space="preserve">
+    <value>Disconnessione non riuscita</value>
   </data>
 </root>

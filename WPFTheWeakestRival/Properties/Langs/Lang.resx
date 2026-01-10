@@ -561,4 +561,16 @@
   <data name="Friends.FriendRequests.RequestAlreadyProcessed" xml:space="preserve">
     <value>The request has already been resolved.</value>
   </data>
+  <data name="tittleImageSelector" xml:space="preserve">
+    <value>Select an image</value>
+  </data>
+  <data name="profileLoadFailed" xml:space="preserve">
+    <value>Profile load failed</value>
+  </data>
+  <data name="profileUpdateFailed" xml:space="preserve">
+    <value>Profile update failed</value>
+  </data>
+  <data name="logoutFailed" xml:space="preserve">
+    <value>Logout failed</value>
+  </data>
 </root>

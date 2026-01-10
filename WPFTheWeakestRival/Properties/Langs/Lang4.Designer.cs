@@ -115,6 +115,33 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Accept request.
+        /// </summary>
+        public static string btnFriendRequestsAccept {
+            get {
+                return ResourceManager.GetString("btnFriendRequestsAccept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Cancel request.
+        /// </summary>
+        public static string btnFriendRequestsCancel {
+            get {
+                return ResourceManager.GetString("btnFriendRequestsCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Reject request.
+        /// </summary>
+        public static string btnFriendRequestsReject {
+            get {
+                return ResourceManager.GetString("btnFriendRequestsReject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Friends.
         /// </summary>
         public static string btnFriends {
@@ -457,6 +484,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a The request has already been resolved..
+        /// </summary>
+        public static string Friends_FriendRequests_RequestAlreadyProcessed {
+            get {
+                return ResourceManager.GetString("Friends.FriendRequests.RequestAlreadyProcessed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a The database took too long when sending a friend request. Please try again..
         /// </summary>
         public static string Friends_SendFriendRequest_Sql__2 {
@@ -637,7 +673,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Could not connect to the service. Please check your connection and try again..
         /// </summary>
         public static string lblFriendRequestsConnectionError {
             get {
@@ -646,7 +682,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Friend Requests.
         /// </summary>
         public static string lblFriendRequestsTitle {
             get {
@@ -822,6 +858,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string logoutConfirmMessage {
             get {
                 return ResourceManager.GetString("logoutConfirmMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Logout failed.
+        /// </summary>
+        public static string logoutFailed {
+            get {
+                return ResourceManager.GetString("logoutFailed", resourceCulture);
             }
         }
         
@@ -1015,6 +1060,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Profile load failed.
+        /// </summary>
+        public static string profileLoadFailed {
+            get {
+                return ResourceManager.GetString("profileLoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Select your profile picture.
         /// </summary>
         public static string profileSelectAvatarTitle {
@@ -1038,6 +1092,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string profileUpdated {
             get {
                 return ResourceManager.GetString("profileUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Profile update failed.
+        /// </summary>
+        public static string profileUpdateFailed {
+            get {
+                return ResourceManager.GetString("profileUpdateFailed", resourceCulture);
             }
         }
         
@@ -1317,6 +1380,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string system {
             get {
                 return ResourceManager.GetString("system", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Select an image.
+        /// </summary>
+        public static string tittleImageSelector {
+            get {
+                return ResourceManager.GetString("tittleImageSelector", resourceCulture);
             }
         }
         

@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Controls;
 using WPFTheWeakestRival.FriendService;
@@ -39,6 +40,9 @@ namespace WPFTheWeakestRival
 
         private const int DEFAULT_MAX_LOBBY_PLAYERS = 8;
 
+        private const int PROFILE_BUTTON_AVATAR_DECODE_WIDTH = 48;
+        private const int AVATAR_FACE_DECODE_WIDTH = 256;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MainMenuWindow));
 
         private readonly BlurEffect overlayBlur = new BlurEffect { Radius = 0 };
@@ -50,7 +54,12 @@ namespace WPFTheWeakestRival
             InitializeComponent();
 
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
-            RenderOptions.SetBitmapScalingMode(imgAvatar, BitmapScalingMode.HighQuality);
+
+            if (imgAvatar != null)
+            {
+                RenderOptions.SetBitmapScalingMode(imgAvatar, BitmapScalingMode.HighQuality);
+            }
+
             if (UserAvatarControl != null)
             {
                 RenderOptions.SetBitmapScalingMode(UserAvatarControl, BitmapScalingMode.HighQuality);
@@ -108,22 +117,26 @@ namespace WPFTheWeakestRival
 
         private void SetAvatarImage(ImageSource imageSource)
         {
-            if (FindName("imgAvatar") is Image img && imageSource != null)
+            if (imgAvatar == null)
             {
-                img.Source = imageSource;
+                return;
             }
+
+            imgAvatar.Source = imageSource;
         }
 
         private void SetDefaultAvatar()
         {
             var avatarSize = GetAvatarSize();
-            var defaultAvatar = UiImageHelper.DefaultAvatar(avatarSize);
-            SetAvatarImage(defaultAvatar);
+
+            SetAvatarImage(UiImageHelper.DefaultAvatar(avatarSize));
 
             if (UserAvatarControl != null)
             {
                 UserAvatarControl.ProfileImage = null;
+                UserAvatarControl.FacePhoto = null;
                 UserAvatarControl.Appearance = null;
+                UserAvatarControl.UseProfilePhotoAsFace = false;
             }
         }
 
@@ -134,8 +147,6 @@ namespace WPFTheWeakestRival
 
         private void RefreshProfileButtonAvatar()
         {
-            var avatarSize = GetAvatarSize();
-
             try
             {
                 var token = GetCurrentToken();
@@ -147,60 +158,40 @@ namespace WPFTheWeakestRival
 
                 var profile = AppServices.Lobby.GetMyProfile(token);
 
-                var avatarPath = profile?.ProfileImageUrl;
-                var avatarImage = UiImageHelper.TryCreateFromUrlOrPath(avatarPath)
-                                  ?? UiImageHelper.DefaultAvatar(avatarSize);
-                SetAvatarImage(avatarImage);
+                var smallAvatar =
+                    UiImageHelper.TryCreateFromBytes(profile?.ProfileImageBytes, PROFILE_BUTTON_AVATAR_DECODE_WIDTH) ??
+                    UiImageHelper.DefaultAvatar(PROFILE_BUTTON_AVATAR_DECODE_WIDTH);
 
-                if (UserAvatarControl != null)
+                SetAvatarImage(smallAvatar);
+
+                if (UserAvatarControl == null)
                 {
-                    var faceImage = UiImageHelper.TryCreateFromUrlOrPath(profile?.ProfileImageUrl);
-                    UserAvatarControl.ProfileImage = faceImage;
-
-                    var appearanceDto = profile?.Avatar;
-                    if (appearanceDto != null)
-                    {
-                        var appearance = new AvatarAppearance
-                        {
-                            BodyColor = (int)appearanceDto.BodyColor,
-                            PantsColor = (int)appearanceDto.PantsColor,
-                            HatType = (int)appearanceDto.HatType,
-                            HatColor = (int)appearanceDto.HatColor,
-                            FaceType = (int)appearanceDto.FaceType,
-                            UseProfilePhotoAsFace = true
-                        };
-
-                        UserAvatarControl.Appearance = appearance;
-                    }
-                    else
-                    {
-                        UserAvatarControl.Appearance = null;
-                    }
-
-                    UserAvatarControl.UseProfilePhotoAsFace = faceImage != null;
+                    return;
                 }
+
+                var faceImage = UiImageHelper.TryCreateFromBytes(profile?.ProfileImageBytes, AVATAR_FACE_DECODE_WIDTH);
+
+                var appearanceDto = profile?.Avatar;
+                if (appearanceDto == null)
+                {
+                    UserAvatarControl.Appearance = null;
+                    UserAvatarControl.ProfileImage = null;
+                    return;
+                }
+
+                var appearance = AvatarMapper.FromLobbyDto(appearanceDto);
+                appearance.ProfileImage = faceImage;
+                appearance.UseProfilePhotoAsFace = appearanceDto.UseProfilePhotoAsFace && faceImage != null;
+
+                UserAvatarControl.ProfileImage = faceImage;
+                UserAvatarControl.Appearance = appearance;
             }
-            catch (FaultException<AuthService.ServiceFault> ex)
+            catch
             {
-                Logger.Warn("Auth fault while refreshing profile button avatar.", ex);
-                SetDefaultAvatar();
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while refreshing profile button avatar.", ex);
-                SetDefaultAvatar();
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Logger.Warn("ObjectDisposedException while refreshing profile button avatar.", ex);
-                SetDefaultAvatar();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Unexpected error while refreshing profile button avatar.", ex);
                 SetDefaultAvatar();
             }
         }
+
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
@@ -255,9 +246,7 @@ namespace WPFTheWeakestRival
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn(
-                        "Error loading overlay background. Falling back to transparent background.",
-                        ex);
+                    Logger.Warn("Error loading overlay background. Falling back to transparent background.", ex);
                 }
             }
 
@@ -284,8 +273,7 @@ namespace WPFTheWeakestRival
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(0, OVERLAY_BLUR_MAX_RADIUS,
-                    TimeSpan.FromMilliseconds(OVERLAY_FADE_IN_DURATION_MS))
+                new DoubleAnimation(0, OVERLAY_BLUR_MAX_RADIUS, TimeSpan.FromMilliseconds(OVERLAY_FADE_IN_DURATION_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
@@ -293,10 +281,7 @@ namespace WPFTheWeakestRival
 
         private void HideOverlay()
         {
-            var anim = new DoubleAnimation(
-                pnlOverlayHost.Opacity,
-                0,
-                TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
+            var anim = new DoubleAnimation(pnlOverlayHost.Opacity, 0, TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
             {
                 EasingFunction = new QuadraticEase()
             };
@@ -323,10 +308,7 @@ namespace WPFTheWeakestRival
             {
                 be.BeginAnimation(
                     BlurEffect.RadiusProperty,
-                    new DoubleAnimation(
-                        be.Radius,
-                        0,
-                        TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
+                    new DoubleAnimation(be.Radius, 0, TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
                     {
                         EasingFunction = new QuadraticEase()
                     });
@@ -340,15 +322,8 @@ namespace WPFTheWeakestRival
                 Title = Lang.playOptionsTitle
             };
 
-            page.CreateRequested += async (_, __) =>
-            {
-                await OnCreateLobbyRequestedAsync();
-            };
-
-            page.JoinRequested += async (_, code) =>
-            {
-                await OnJoinLobbyRequestedAsync(code);
-            };
+            page.CreateRequested += async (_, __) => { await OnCreateLobbyRequestedAsync(); };
+            page.JoinRequested += async (_, code) => { await OnJoinLobbyRequestedAsync(code); };
 
             ShowOverlay(page);
         }
@@ -366,11 +341,7 @@ namespace WPFTheWeakestRival
 
             try
             {
-                var result = await AppServices.Lobby.CreateLobbyAsync(
-                    token,
-                    Lang.lobbyTitle,
-                    DEFAULT_MAX_LOBBY_PLAYERS);
-
+                var result = await AppServices.Lobby.CreateLobbyAsync(token, Lang.lobbyTitle, DEFAULT_MAX_LOBBY_PLAYERS);
                 if (result?.Lobby == null)
                 {
                     MessageBox.Show(Lang.lobbyCreateFailed);
@@ -383,7 +354,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Warn("Lobby service fault while creating lobby.", ex);
                 MessageBox.Show(
-                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.lobbyCreateFailed,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -391,20 +362,17 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while creating lobby.", ex);
-                MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("Timeout while creating lobby.", ex);
+                MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while creating lobby.", ex);
-                MessageBox.Show(
-                    Lang.lobbyCreateFailed + " " + ex.Message,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.lobbyCreateFailed, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -439,7 +407,7 @@ namespace WPFTheWeakestRival
             {
                 Logger.Warn("Lobby service fault while joining lobby by code.", ex);
                 MessageBox.Show(
-                    $"{ex.Detail.Code}: {ex.Detail.Message}",
+                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.lobbyJoinFailed,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -447,20 +415,17 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while joining lobby by code.", ex);
-                MessageBox.Show(
-                    Lang.noConnection + Environment.NewLine + ex.Message,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("Timeout while joining lobby by code.", ex);
+                MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while joining lobby by code.", ex);
-                MessageBox.Show(
-                    Lang.lobbyJoinFailed + " " + ex.Message,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(Lang.lobbyJoinFailed, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -473,20 +438,12 @@ namespace WPFTheWeakestRival
 
             window.Closed += (_, __) =>
             {
-                try
-                {
-                    Show();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("Error showing MainMenuWindow after LobbyWindow was closed.", ex);
-                }
+                try { Show(); }
+                catch (Exception ex) { Logger.Warn("Error showing MainMenuWindow after LobbyWindow was closed.", ex); }
             };
         }
 
-        private void OnFriendsUpdated(
-            System.Collections.Generic.IReadOnlyList<FriendItem> list,
-            int pending)
+        private void OnFriendsUpdated(System.Collections.Generic.IReadOnlyList<FriendItem> list, int pending)
         {
             friendItems.Clear();
             foreach (var item in list)
@@ -519,10 +476,7 @@ namespace WPFTheWeakestRival
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(
-                    overlayBlur.Radius,
-                    FRIENDS_DRAWER_BLUR_RADIUS,
-                    TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
+                new DoubleAnimation(overlayBlur.Radius, FRIENDS_DRAWER_BLUR_RADIUS, TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
@@ -563,97 +517,10 @@ namespace WPFTheWeakestRival
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(
-                    overlayBlur.Radius,
-                    0.0,
-                    TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
+                new DoubleAnimation(overlayBlur.Radius, 0.0, TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
                 {
                     EasingFunction = new QuadraticEase()
                 });
-        }
-
-        private async void BtnPersonalizationClick(object sender, RoutedEventArgs e)
-        {
-            if (UserAvatarControl == null)
-            {
-                return;
-            }
-
-            var dialog = new AvatarCustomizationWindow(
-                UserAvatarControl.BodyColor,
-                UserAvatarControl.PantsColor,
-                UserAvatarControl.SkinColor,
-                UserAvatarControl.HatColor,
-                UserAvatarControl.HatType,
-                UserAvatarControl.FaceType,
-                UserAvatarControl.FacePhoto)   // <-- ya sin el bool
-            {
-                Owner = this
-            };
-
-            var result = dialog.ShowDialog();
-            if (result != true)
-            {
-                return;
-            }
-
-            var facePhoto = dialog.ResultUseProfilePhotoAsFace
-                ? UserAvatarControl.FacePhoto
-                : null;
-
-            UserAvatarControl.SetAppearance(
-                dialog.ResultSkinColor,
-                dialog.ResultBodyColor,
-                dialog.ResultPantsColor,
-                dialog.ResultHatType,
-                dialog.ResultHatColor,
-                dialog.ResultFaceType,
-                facePhoto);
-
-            await SaveAvatarToServerAsync();
-        }
-
-        private async Task SaveAvatarToServerAsync()
-        {
-            try
-            {
-                var token = GetCurrentToken();
-                if (string.IsNullOrWhiteSpace(token) || UserAvatarControl == null)
-                {
-                    return;
-                }
-
-                var bodyIndex = AvatarMapper.GetBodyColorIndex(UserAvatarControl.BodyColor);
-                var pantsIndex = AvatarMapper.GetPantsColorIndex(UserAvatarControl.PantsColor);
-                var hatColorIndex = AvatarMapper.GetHatColorIndex(UserAvatarControl.HatColor);
-                var hatTypeIndex = AvatarMapper.GetHatTypeIndex(UserAvatarControl.HatType);
-                var faceTypeIndex = AvatarMapper.GetFaceTypeIndex(UserAvatarControl.FaceType);
-
-                var request = new LobbyService.UpdateAvatarRequest
-                {
-                    Token = token,
-                    BodyColor = (byte)bodyIndex,
-                    PantsColor = (byte)pantsIndex,
-                    HatType = (byte)hatTypeIndex,
-                    HatColor = (byte)hatColorIndex,
-                    FaceType = (byte)faceTypeIndex,
-                    UseProfilePhotoAsFace = UserAvatarControl.UseProfilePhotoAsFace
-                };
-
-                await AppServices.Lobby.RawClient.UpdateAvatarAsync(request);
-            }
-            catch (FaultException<LobbyService.ServiceFault> ex)
-            {
-                Logger.Warn("Lobby service fault while updating avatar.", ex);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while updating avatar.", ex);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Unexpected error while updating avatar.", ex);
-            }
         }
 
         private void FriendsDimmerMouseDown(object sender, MouseButtonEventArgs e)
@@ -680,11 +547,9 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var page = new Pages.AddFriendPage(
-                new FriendServiceClient("WSHttpBinding_IFriendService"),
-                token);
-
+            var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
             page.CloseRequested += (_, __) => { HideOverlay(); };
+
             ShowOverlay(page);
         }
 
@@ -697,11 +562,9 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var page = new Pages.FriendRequestsPage(
-                new FriendServiceClient("WSHttpBinding_IFriendService"),
-                token);
-
+            var page = new Pages.FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
             page.CloseRequested += (_, __) => { HideOverlay(); };
+
             ShowOverlay(page);
         }
 
@@ -751,6 +614,95 @@ namespace WPFTheWeakestRival
             loginWindow.Show();
 
             Close();
+        }
+
+        private async void BtnPersonalizationClick(object sender, RoutedEventArgs e)
+        {
+            if (UserAvatarControl == null)
+            {
+                return;
+            }
+
+            var dialog = new AvatarCustomizationWindow(
+                UserAvatarControl.BodyColor,
+                UserAvatarControl.PantsColor,
+                UserAvatarControl.SkinColor,
+                UserAvatarControl.HatColor,
+                UserAvatarControl.HatType,
+                UserAvatarControl.FaceType,
+                UserAvatarControl.FacePhoto)
+            {
+                Owner = this
+            };
+
+            var result = dialog.ShowDialog();
+            if (result != true)
+            {
+                return;
+            }
+
+            var resolvedFacePhoto = dialog.ResultUseProfilePhotoAsFace
+                ? (UserAvatarControl.FacePhoto ?? UserAvatarControl.ProfileImage)
+                : null;
+
+            UserAvatarControl.SetAppearance(
+                dialog.ResultSkinColor,
+                dialog.ResultBodyColor,
+                dialog.ResultPantsColor,
+                dialog.ResultHatType,
+                dialog.ResultHatColor,
+                dialog.ResultFaceType,
+                resolvedFacePhoto);
+
+            await SaveAvatarToServerAsync();
+            RefreshProfileButtonAvatar();
+        }
+
+        private async Task SaveAvatarToServerAsync()
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrWhiteSpace(token) || UserAvatarControl == null)
+                {
+                    return;
+                }
+
+                var bodyIndex = AvatarMapper.GetBodyColorIndex(UserAvatarControl.BodyColor);
+                var pantsIndex = AvatarMapper.GetPantsColorIndex(UserAvatarControl.PantsColor);
+                var hatColorIndex = AvatarMapper.GetHatColorIndex(UserAvatarControl.HatColor);
+                var hatTypeIndex = AvatarMapper.GetHatTypeIndex(UserAvatarControl.HatType);
+                var faceTypeIndex = AvatarMapper.GetFaceTypeIndex(UserAvatarControl.FaceType);
+
+                var request = new LobbyService.UpdateAvatarRequest
+                {
+                    Token = token,
+                    BodyColor = (byte)bodyIndex,
+                    PantsColor = (byte)pantsIndex,
+                    HatType = (byte)hatTypeIndex,
+                    HatColor = (byte)hatColorIndex,
+                    FaceType = (byte)faceTypeIndex,
+                    UseProfilePhotoAsFace = UserAvatarControl.UseProfilePhotoAsFace
+                };
+
+                await AppServices.Lobby.RawClient.UpdateAvatarAsync(request);
+            }
+            catch (FaultException<LobbyService.ServiceFault> ex)
+            {
+                Logger.Warn("Lobby service fault while updating avatar.", ex);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error("Communication error while updating avatar.", ex);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error("Timeout while updating avatar.", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Unexpected error while updating avatar.", ex);
+            }
         }
     }
 }

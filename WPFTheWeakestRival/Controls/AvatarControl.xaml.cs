@@ -308,21 +308,17 @@ namespace WPFTheWeakestRival.Controls
             DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs eventArgs)
         {
-            var control = dependencyObject as AvatarControl;
-            if (control == null)
+            if (dependencyObject is AvatarControl control)
             {
-                return;
+                control.RebuildAll();
             }
-
-            control.RebuildAll();
         }
 
         private static void OnAppearanceChanged(
             DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs eventArgs)
         {
-            var control = dependencyObject as AvatarControl;
-            if (control == null)
+            if (!(dependencyObject is AvatarControl control))
             {
                 return;
             }
@@ -331,6 +327,7 @@ namespace WPFTheWeakestRival.Controls
             if (appearance == null)
             {
                 control.UseProfilePhotoAsFace = false;
+                control.FacePhoto = null;
                 control.RebuildAll();
                 return;
             }
@@ -342,13 +339,13 @@ namespace WPFTheWeakestRival.Controls
             DependencyObject dependencyObject,
             DependencyPropertyChangedEventArgs eventArgs)
         {
-            var control = dependencyObject as AvatarControl;
-            if (control == null)
+            if (!(dependencyObject is AvatarControl control))
             {
                 return;
             }
 
             var imageSource = eventArgs.NewValue as ImageSource;
+
             control.FacePhoto = imageSource;
             control.RebuildAll();
         }
@@ -470,13 +467,7 @@ namespace WPFTheWeakestRival.Controls
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            var handler = PropertyChanged;
-            if (handler == null)
-            {
-                return;
-            }
-
-            handler.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void ApplyAppearance(AvatarAppearance avatar)
@@ -486,8 +477,10 @@ namespace WPFTheWeakestRival.Controls
                 return;
             }
 
-            var shouldUsePhoto = avatar.UseProfilePhotoAsFace;
-            var faceImage = shouldUsePhoto ? FacePhoto : null;
+            ImageSource avatarProfileImage = avatar.ProfileImage ?? ProfileImage ?? FacePhoto;
+
+            bool shouldUsePhoto = avatar.UseProfilePhotoAsFace && avatarProfileImage != null;
+            ImageSource faceImage = shouldUsePhoto ? avatarProfileImage : null;
 
             SetAppearance(
                 SkinColor,
