@@ -284,7 +284,8 @@
                             Style="{StaticResource TopBarIconButtonStyle}"
                             Height="51"
                             Width="57"
-                            ToolTip="{loc:Loc btnScoreboard}">
+                            ToolTip="{loc:Loc btnScoreboard}"
+                            Click="BtnScoreClick">
                         <Image Source="{StaticResource ScoreboardIcon}"
                                Width="52"
                                Height="51"

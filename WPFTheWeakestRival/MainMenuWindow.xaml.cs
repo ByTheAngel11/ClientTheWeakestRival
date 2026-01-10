@@ -599,6 +599,14 @@ namespace WPFTheWeakestRival
             ShowOverlay(page);
         }
 
+        private void BtnScoreClick(object sender, RoutedEventArgs e)
+        {
+            var page = new Pages.LeaderboardPage();
+            page.CloseRequested += (_, __) => { HideOverlay(); };
+
+            ShowOverlay(page);
+        }
+
         private void OnLoggedOut(object sender, EventArgs e)
         {
             HideOverlay();

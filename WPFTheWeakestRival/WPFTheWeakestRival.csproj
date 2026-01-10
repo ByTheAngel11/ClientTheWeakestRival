@@ -148,6 +148,7 @@
     <Compile Include="Infraestructure\ProfileImageCache.cs" />
     <Compile Include="Infraestructure\SessionCleanup.cs" />
     <Compile Include="Infraestructure\SessionLogoutCoordinator.cs" />
+    <Compile Include="Infraestructure\StatsGateway.cs" />
     <Compile Include="LobbyCallback.cs" />
     <Compile Include="LobbyWindow.xaml.cs">
       <DependentUpon>LobbyWindow.xaml</DependentUpon>
@@ -168,10 +169,14 @@
     <Compile Include="Models\DuelCandidateItem.cs" />
     <Compile Include="Models\DuelSelectionCompletedEventArgs.cs" />
     <Compile Include="Models\FriendItem.cs" />
+    <Compile Include="Models\LeaderboardRow.cs" />
     <Compile Include="Models\LobbyPlayerItem.cs" />
     <Compile Include="Models\PlayerVoteItem.cs" />
     <Compile Include="Pages\DuelSelectionPage.xaml.cs">
       <DependentUpon>DuelSelectionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\LeaderboardPage.xaml.cs">
+      <DependentUpon>LeaderboardPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\MatchSettingsPage.xaml.cs">
       <DependentUpon>MatchSettingsPage.xaml</DependentUpon>
@@ -258,6 +263,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\DuelSelectionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\LeaderboardPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
