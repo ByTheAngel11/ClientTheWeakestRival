@@ -16,25 +16,38 @@ namespace WPFTheWeakestRival.Infrastructure
         private const string CONTEXT_DISPOSE_FRIENDS = "AppServices.ResetAll.Friends";
         private const string CONTEXT_DISPOSE_LOBBY = "AppServices.ResetAll.Lobby";
 
-        private static LobbyHub _lobby;
-        private static FriendManager _friends;
+        private static LobbyHub lobby;
+        private static FriendManager friends;
 
-        public static LobbyHub Lobby => _lobby ?? (_lobby = new LobbyHub(LOBBY_ENDPOINT_CONFIGURATION_NAME));
-        public static FriendManager Friends => _friends ?? (_friends = new FriendManager(FRIEND_ENDPOINT_CONFIGURATION_NAME));
+        public static LobbyHub Lobby
+        {
+            get
+            {
+                if (lobby == null)
+                {
+                    lobby = new LobbyHub(LOBBY_ENDPOINT_CONFIGURATION_NAME);
+                    SessionLogoutCoordinator.Attach(lobby);
+                }
+
+                return lobby;
+            }
+        }
+
+        public static FriendManager Friends => friends ?? (friends = new FriendManager(FRIEND_ENDPOINT_CONFIGURATION_NAME));
 
         public static void StopAll()
         {
-            StopSafe(_friends, CONTEXT_STOP_FRIENDS);
-            StopSafe(_lobby, CONTEXT_STOP_LOBBY);
+            StopSafe(friends, CONTEXT_STOP_FRIENDS);
+            StopSafe(lobby, CONTEXT_STOP_LOBBY);
         }
 
         public static void ResetAll()
         {
-            DisposeSafe(_friends, CONTEXT_DISPOSE_FRIENDS);
-            _friends = null;
+            DisposeSafe(friends, CONTEXT_DISPOSE_FRIENDS);
+            friends = null;
 
-            DisposeSafe(_lobby, CONTEXT_DISPOSE_LOBBY);
-            _lobby = null;
+            DisposeSafe(lobby, CONTEXT_DISPOSE_LOBBY);
+            lobby = null;
         }
 
         private static void StopSafe(IStoppable stoppable, string context)

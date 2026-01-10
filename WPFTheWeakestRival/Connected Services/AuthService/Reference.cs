@@ -996,7 +996,9 @@ namespace WPFTheWeakestRival.AuthService {
         
         private string TokenField;
         
-        private int UserIdField;
+        private int AccountIdField;
+        
+        private string ProfileImageCodeField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1021,15 +1023,28 @@ namespace WPFTheWeakestRival.AuthService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public int UserId {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
+        public int AccountId {
             get {
-                return this.UserIdField;
+                return this.AccountIdField;
             }
             set {
-                if ((this.UserIdField.Equals(value) != true)) {
-                    this.UserIdField = value;
-                    this.RaisePropertyChanged("UserId");
+                if ((this.AccountIdField.Equals(value) != true)) {
+                    this.AccountIdField = value;
+                    this.RaisePropertyChanged("AccountId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
                 }
             }
         }
@@ -1053,18 +1068,14 @@ namespace WPFTheWeakestRival.AuthService {
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        private int UserIdField;
-        
-        private bool HasImageField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private byte[] ImageBytesField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string ContentTypeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Nullable<System.DateTime> UpdatedAtUtcField;
+        
+        private string ProfileImageCodeField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1077,32 +1088,6 @@ namespace WPFTheWeakestRival.AuthService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public int UserId {
-            get {
-                return this.UserIdField;
-            }
-            set {
-                if ((this.UserIdField.Equals(value) != true)) {
-                    this.UserIdField = value;
-                    this.RaisePropertyChanged("UserId");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
-        public bool HasImage {
-            get {
-                return this.HasImageField;
-            }
-            set {
-                if ((this.HasImageField.Equals(value) != true)) {
-                    this.HasImageField = value;
-                    this.RaisePropertyChanged("HasImage");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=2)]
         public byte[] ImageBytes {
             get {
                 return this.ImageBytesField;
@@ -1115,7 +1100,7 @@ namespace WPFTheWeakestRival.AuthService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=1)]
         public string ContentType {
             get {
                 return this.ContentTypeField;
@@ -1128,7 +1113,7 @@ namespace WPFTheWeakestRival.AuthService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
         public System.Nullable<System.DateTime> UpdatedAtUtc {
             get {
                 return this.UpdatedAtUtcField;
@@ -1137,6 +1122,19 @@ namespace WPFTheWeakestRival.AuthService {
                 if ((this.UpdatedAtUtcField.Equals(value) != true)) {
                     this.UpdatedAtUtcField = value;
                     this.RaisePropertyChanged("UpdatedAtUtc");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=3)]
+        public string ProfileImageCode {
+            get {
+                return this.ProfileImageCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
                 }
             }
         }

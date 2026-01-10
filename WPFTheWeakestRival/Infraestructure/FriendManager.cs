@@ -211,6 +211,15 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                string code = ex.Detail?.Code;
+
+                if (SessionLogoutCoordinator.IsSessionFault(code))
+                {
+                    Logger.WarnFormat("FriendManager: session fault received. Code={0}", code ?? string.Empty);
+                    SessionLogoutCoordinator.ForceLogout(code);
+                    return;
+                }
+
                 Logger.Warn("Friend service fault while refreshing friends.", ex);
             }
             catch (CommunicationException ex)

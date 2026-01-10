@@ -1,9 +1,7 @@
-﻿// QuestionController.cs
-using log4net;
+﻿using log4net;
 using System;
 using System.Globalization;
 using System.Linq;
-using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +20,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string DarknessUnknownName = "???";
         private const string DarknessTurnLabel = "A oscuras";
 
+        private const string LightningInProgressText = "Reto relámpago en curso";
+
         private const int MIN_SECONDS = 0;
 
         private readonly MatchWindowUiRefs ui;
@@ -30,6 +30,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private readonly QuestionTimerController timer;
 
         private int remainingSeconds;
+
+        private int currentTurnTimeLimitSeconds;
 
         private int? pendingNextTurnTimeLimitSeconds;
         private int? pendingNextTurnTimeLimitSourceUserId;
@@ -57,6 +59,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void InitializeEmptyUi()
         {
+            currentTurnTimeLimitSeconds = 0;
+
             if (ui.TxtQuestion != null)
             {
                 ui.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_QUESTION_TEXT;
@@ -317,12 +321,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     limitSeconds = timeLimitOverrideSeconds.Value;
                 }
 
+                currentTurnTimeLimitSeconds = limitSeconds;
+
                 remainingSeconds = limitSeconds;
                 UpdateTimerText();
                 timer.Start(limitSeconds);
             }
             else
             {
+                currentTurnTimeLimitSeconds = 0;
+
                 if (!state.IsDarknessActive)
                 {
                     if (ui.TxtTurnLabel != null)
@@ -369,6 +377,67 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             EnableAnswerButtons(true);
+        }
+
+        public void OnLightningQuestion(GameplayServiceProxy.QuestionWithAnswersDto question, int timeLimitSeconds)
+        {
+            SetBombQuestionUi(false);
+
+            state.CurrentQuestion = question;
+
+            if (ui.BtnBank != null)
+            {
+                ui.BtnBank.IsEnabled = false;
+            }
+
+            if (!state.IsMyTurn)
+            {
+                timer.Stop();
+                currentTurnTimeLimitSeconds = 0;
+
+                InitializeEmptyUi();
+
+                if (ui.TxtQuestion != null)
+                {
+                    ui.TxtQuestion.Text = LightningInProgressText;
+                }
+
+                return;
+            }
+
+            if (question == null)
+            {
+                InitializeEmptyUi();
+                return;
+            }
+
+            if (ui.TxtQuestion != null)
+            {
+                ui.TxtQuestion.Text = question.Body;
+            }
+
+            SetAnswerButtonContent(ui.BtnAnswer1, question.Answers, 0);
+            SetAnswerButtonContent(ui.BtnAnswer2, question.Answers, 1);
+            SetAnswerButtonContent(ui.BtnAnswer3, question.Answers, 2);
+            SetAnswerButtonContent(ui.BtnAnswer4, question.Answers, 3);
+
+            if (ui.TxtAnswerFeedback != null)
+            {
+                ui.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
+                ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+            }
+
+            EnableAnswerButtons(true);
+
+            int limitSeconds = timeLimitSeconds > 0
+                ? timeLimitSeconds
+                : MatchConstants.QUESTION_TIME_SECONDS;
+
+            currentTurnTimeLimitSeconds = limitSeconds;
+
+            remainingSeconds = limitSeconds;
+            UpdateTimerText();
+            timer.Start(limitSeconds);
         }
 
         public void OnAnswerEvaluated(GameplayServiceProxy.PlayerSummary player, GameplayServiceProxy.AnswerResult result)
@@ -589,9 +658,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 int questionId = state.CurrentQuestion != null ? state.CurrentQuestion.QuestionId : 0;
 
-                int limitSeconds = state.IsSurpriseExamActive
-                    ? MatchConstants.SURPRISE_EXAM_TIME_SECONDS
-                    : MatchConstants.QUESTION_TIME_SECONDS;
+                int limitSeconds = currentTurnTimeLimitSeconds > 0
+                    ? currentTurnTimeLimitSeconds
+                    : (state.IsSurpriseExamActive
+                        ? MatchConstants.SURPRISE_EXAM_TIME_SECONDS
+                        : MatchConstants.QUESTION_TIME_SECONDS);
 
                 var request = new GameplayServiceProxy.SubmitAnswerRequest
                 {

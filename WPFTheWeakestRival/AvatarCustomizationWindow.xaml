@@ -13,7 +13,8 @@
         <!-- ComboBox dark theme (texto visible) -->
         <SolidColorBrush x:Key="ComboBg" Color="#2B2B2B" />
         <SolidColorBrush x:Key="ComboBorder" Color="#454545" />
-        <SolidColorBrush x:Key="ComboFg" Color="#F2F2F2" />
+        <!-- Use black for combobox item/text foreground so items are readable -->
+        <SolidColorBrush x:Key="ComboFg" Color="#000000" />
         <SolidColorBrush x:Key="ComboItemHover" Color="#3A3A3A" />
         <SolidColorBrush x:Key="ComboItemSelected" Color="#4A4A4A" />
 
@@ -123,6 +124,7 @@
                                    Margin="0,0,8,0" />
                         <ComboBox x:Name="SkinColorCombo"
                                   Width="200"
+                                  Foreground="Black"
                                   Style="{StaticResource DarkComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
                                   ItemsSource="{Binding SkinColorOptions}"
@@ -131,7 +133,6 @@
                                   SelectedValue="{Binding SkinColor, ElementName=AvatarPreview, Mode=TwoWay}" />
                     </StackPanel>
 
-                    <!-- Shirt / Body -->
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                         <TextBlock Text="Shirt"
                                    Width="90"
@@ -140,6 +141,7 @@
                                    Margin="0,0,8,0" />
                         <ComboBox x:Name="ShirtColorCombo"
                                   Width="200"
+                                  Foreground="Black"
                                   Style="{StaticResource DarkComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
                                   ItemsSource="{Binding BodyColorOptions}"
@@ -157,6 +159,7 @@
                                    Margin="0,0,8,0" />
                         <ComboBox x:Name="PantsColorCombo"
                                   Width="200"
+                                  Foreground="Black"
                                   Style="{StaticResource DarkComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
                                   ItemsSource="{Binding PantsColorOptions}"
@@ -176,6 +179,7 @@
                                    Margin="0,0,8,0" />
                         <ComboBox x:Name="HatTypeCombo"
                                   Width="200"
+                                  Foreground="Black"
                                   Style="{StaticResource DarkComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
                                   ItemsSource="{Binding HatTypeOptions}"
@@ -193,6 +197,7 @@
                                    Margin="0,0,8,0" />
                         <ComboBox x:Name="HatColorCombo"
                                   Width="200"
+                                  Foreground="Black"
                                   Style="{StaticResource DarkComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
                                   ItemsSource="{Binding HatColorOptions}"
@@ -212,6 +217,7 @@
                                    Margin="0,0,8,0" />
                         <ComboBox x:Name="FaceTypeCombo"
                                   Width="200"
+                                  Foreground="Black"
                                   Style="{StaticResource DarkComboBoxStyle}"
                                   ItemContainerStyle="{StaticResource DarkComboBoxItemStyle}"
                                   ItemsSource="{Binding FaceTypeOptions}"

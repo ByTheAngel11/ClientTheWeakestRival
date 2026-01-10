@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,91 +117,79 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-
-  <!-- Skin -->
   <data name="Skin_Light" xml:space="preserve">
-    <value>Light</value>
+    <value>Luz</value>
   </data>
   <data name="Skin_Fair" xml:space="preserve">
-    <value>Fair</value>
+    <value>Justo</value>
   </data>
   <data name="Skin_Tan" xml:space="preserve">
-    <value>Tan</value>
+    <value>Broncearse</value>
   </data>
   <data name="Skin_Brown" xml:space="preserve">
-    <value>Brown</value>
+    <value>Marrón</value>
   </data>
   <data name="Skin_Dark" xml:space="preserve">
-    <value>Dark</value>
+    <value>Oscuro</value>
   </data>
-
-  <!-- Body colors -->
   <data name="Color_Red" xml:space="preserve">
-    <value>Red</value>
+    <value>Rojo</value>
   </data>
   <data name="Color_Blue" xml:space="preserve">
-    <value>Blue</value>
+    <value>Azul</value>
   </data>
   <data name="Color_Green" xml:space="preserve">
-    <value>Green</value>
+    <value>Verde</value>
   </data>
   <data name="Color_Orange" xml:space="preserve">
-    <value>Orange</value>
+    <value>Naranja</value>
   </data>
   <data name="Color_Purple" xml:space="preserve">
-    <value>Purple</value>
+    <value>Púrpura</value>
   </data>
   <data name="Color_Gray" xml:space="preserve">
-    <value>Gray</value>
+    <value>Gris</value>
   </data>
-
-  <!-- Pants colors -->
   <data name="Color_Black" xml:space="preserve">
-    <value>Black</value>
+    <value>Negro</value>
   </data>
   <data name="Color_DarkGray" xml:space="preserve">
-    <value>Dark gray</value>
+    <value>Gris oscuro</value>
   </data>
   <data name="Color_Jeans" xml:space="preserve">
-    <value>Jeans blue</value>
+    <value>Vaqueros azules</value>
   </data>
-
-  <!-- Hat colors -->
   <data name="HatColor_Blue" xml:space="preserve">
-    <value>Blue</value>
+    <value>Azul</value>
   </data>
   <data name="HatColor_Red" xml:space="preserve">
-    <value>Red</value>
+    <value>Rojo</value>
   </data>
   <data name="HatColor_Black" xml:space="preserve">
-    <value>Black</value>
+    <value>Negro</value>
   </data>
   <data name="HatColor_Green" xml:space="preserve">
-    <value>Green</value>
+    <value>Verde</value>
   </data>
-
-  <!-- Hat types -->
   <data name="Hat_None" xml:space="preserve">
-    <value>None</value>
+    <value>Ninguno</value>
   </data>
   <data name="Hat_Baseball" xml:space="preserve">
-    <value>Baseball</value>
+    <value>Béisbol</value>
   </data>
   <data name="Hat_TopHat" xml:space="preserve">
-    <value>Top hat</value>
+    <value>sombrero de copa</value>
   </data>
   <data name="Hat_Beanie" xml:space="preserve">
-    <value>Beanie</value>
+    <value>Gorro</value>
   </data>
-
-  <!-- Face types -->
   <data name="Face_Neutral" xml:space="preserve">
     <value>Neutral</value>
   </data>
   <data name="Face_Happy" xml:space="preserve">
-    <value>Happy</value>
+    <value>Feliz</value>
   </data>
   <data name="Face_Angry" xml:space="preserve">
-    <value>Angry</value>
+    <value>Enojado</value>
   </data>
 </root>

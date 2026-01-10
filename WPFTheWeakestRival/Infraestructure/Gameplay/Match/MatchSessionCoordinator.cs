@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿// MatchSessionCoordinator.cs
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -51,6 +52,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private QuestionController questions;
         private MatchDialogController dialogs;
+
+        private int lightningTimeLimitSeconds;
 
         public MatchSessionCoordinator(MatchWindowUiRefs ui, MatchSessionState state)
         {
@@ -136,7 +139,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 HandleMatchFinished(winner);
 
             callbackBridge.LightningChallengeStarted += (m, r, tp, tq, ts) =>
-                HandleLightningChallengeStarted(tp);
+                HandleLightningChallengeStarted(tp, ts);
 
             callbackBridge.LightningChallengeQuestion += (m, r, qi, qq) =>
                 HandleLightningChallengeQuestion(qq);
@@ -723,7 +726,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             UpdatePhaseLabel();
         }
 
-        private void HandleLightningChallengeStarted(GameplayServiceProxy.PlayerSummary targetPlayer)
+        private void HandleLightningChallengeStarted(GameplayServiceProxy.PlayerSummary targetPlayer, int totalTimeSeconds)
         {
             state.CurrentPhase = MatchPhase.SpecialEvent;
             UpdatePhaseLabel();
@@ -732,6 +735,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             bool isTargetMe = targetUserId == state.MyUserId && !state.IsEliminated(state.MyUserId);
 
             state.IsMyTurn = isTargetMe;
+
+            lightningTimeLimitSeconds = totalTimeSeconds > 0
+                ? totalTimeSeconds
+                : MatchConstants.QUESTION_TIME_SECONDS;
 
             if (ui.BtnBank != null)
             {
@@ -757,12 +764,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.CurrentPhase = MatchPhase.SpecialEvent;
             UpdatePhaseLabel();
 
-            if (!state.IsMyTurn)
-            {
-                return;
-            }
-
-            state.CurrentQuestion = question;
+            questions.OnLightningQuestion(question, lightningTimeLimitSeconds);
         }
 
         private async Task HandleLightningChallengeFinishedAsync(int correctAnswers, bool isSuccess)

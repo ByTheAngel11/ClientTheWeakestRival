@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,8 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-
-  <!-- Skin -->
   <data name="Skin_Light" xml:space="preserve">
     <value>Light</value>
   </data>
@@ -134,8 +132,6 @@
   <data name="Skin_Dark" xml:space="preserve">
     <value>Dark</value>
   </data>
-
-  <!-- Body colors -->
   <data name="Color_Red" xml:space="preserve">
     <value>Red</value>
   </data>
@@ -154,8 +150,6 @@
   <data name="Color_Gray" xml:space="preserve">
     <value>Gray</value>
   </data>
-
-  <!-- Pants colors -->
   <data name="Color_Black" xml:space="preserve">
     <value>Black</value>
   </data>
@@ -165,8 +159,6 @@
   <data name="Color_Jeans" xml:space="preserve">
     <value>Jeans blue</value>
   </data>
-
-  <!-- Hat colors -->
   <data name="HatColor_Blue" xml:space="preserve">
     <value>Blue</value>
   </data>
@@ -179,8 +171,6 @@
   <data name="HatColor_Green" xml:space="preserve">
     <value>Green</value>
   </data>
-
-  <!-- Hat types -->
   <data name="Hat_None" xml:space="preserve">
     <value>None</value>
   </data>
@@ -193,8 +183,6 @@
   <data name="Hat_Beanie" xml:space="preserve">
     <value>Beanie</value>
   </data>
-
-  <!-- Face types -->
   <data name="Face_Neutral" xml:space="preserve">
     <value>Neutral</value>
   </data>

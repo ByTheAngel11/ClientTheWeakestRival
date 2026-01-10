@@ -146,6 +146,8 @@
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
     <Compile Include="Infraestructure\ProfileImageCache.cs" />
+    <Compile Include="Infraestructure\SessionCleanup.cs" />
+    <Compile Include="Infraestructure\SessionLogoutCoordinator.cs" />
     <Compile Include="LobbyCallback.cs" />
     <Compile Include="LobbyWindow.xaml.cs">
       <DependentUpon>LobbyWindow.xaml</DependentUpon>
@@ -319,6 +321,11 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Lang4.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.en.resx" />
+    <EmbeddedResource Include="Properties\Resources.es.resx" />
+    <EmbeddedResource Include="Properties\Resources.fr.resx" />
+    <EmbeddedResource Include="Properties\Resources.it.resx" />
+    <EmbeddedResource Include="Properties\Resources.pt.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -746,9 +753,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Wildcards\SHIELD.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Wildcards\SWAP.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\ReportService\item.disco" />

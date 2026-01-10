@@ -1,38 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using WPFTheWeakestRival.Controls;
+using WPFTheWeakestRival.Properties;
 
 namespace WPFTheWeakestRival.Windows
 {
     public partial class AvatarCustomizationWindow : Window
     {
-        private const string SKIN_LIGHT_NAME = "Light";
-        private const string SKIN_FAIR_NAME = "Fair";
-        private const string SKIN_TAN_NAME = "Tan";
-        private const string SKIN_BROWN_NAME = "Brown";
-        private const string SKIN_DARK_NAME = "Dark";
-
-        private const string COLOR_RED_NAME = "Red";
-        private const string COLOR_BLUE_NAME = "Blue";
-        private const string COLOR_GREEN_NAME = "Green";
-        private const string COLOR_ORANGE_NAME = "Orange";
-        private const string COLOR_PURPLE_NAME = "Purple";
-        private const string COLOR_GRAY_NAME = "Gray";
-        private const string COLOR_BLACK_NAME = "Black";
-        private const string COLOR_DARK_GRAY_NAME = "Dark gray";
-        private const string COLOR_JEANS_NAME = "Jeans blue";
-
-        private const string HAT_NONE_NAME = "None";
-        private const string HAT_BASEBALL_NAME = "Baseball";
-        private const string HAT_TOP_HAT_NAME = "Top hat";
-        private const string HAT_BEANIE_NAME = "Beanie";
-
-        private const string FACE_NEUTRAL_NAME = "Neutral";
-        private const string FACE_HAPPY_NAME = "Happy";
-        private const string FACE_ANGRY_NAME = "Angry";
-
         private static readonly Color SKIN_LIGHT = (Color)ColorConverter.ConvertFromString("#FFEED8C8");
         private static readonly Color SKIN_FAIR = (Color)ColorConverter.ConvertFromString("#FFE1C3A3");
         private static readonly Color SKIN_TAN = (Color)ColorConverter.ConvertFromString("#FFD4A078");
@@ -103,42 +80,44 @@ namespace WPFTheWeakestRival.Windows
 
         private void BuildOptions()
         {
+            Func<string, string> R = key => global::WPFTheWeakestRival.Properties.Resources.ResourceManager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+
             SkinColorOptions.Clear();
-            SkinColorOptions.Add(new ColorOption(SKIN_LIGHT_NAME, SKIN_LIGHT));
-            SkinColorOptions.Add(new ColorOption(SKIN_FAIR_NAME, SKIN_FAIR));
-            SkinColorOptions.Add(new ColorOption(SKIN_TAN_NAME, SKIN_TAN));
-            SkinColorOptions.Add(new ColorOption(SKIN_BROWN_NAME, SKIN_BROWN));
-            SkinColorOptions.Add(new ColorOption(SKIN_DARK_NAME, SKIN_DARK));
+            SkinColorOptions.Add(new ColorOption(R("Skin_Light"), SKIN_LIGHT));
+            SkinColorOptions.Add(new ColorOption(R("Skin_Fair"), SKIN_FAIR));
+            SkinColorOptions.Add(new ColorOption(R("Skin_Tan"), SKIN_TAN));
+            SkinColorOptions.Add(new ColorOption(R("Skin_Brown"), SKIN_BROWN));
+            SkinColorOptions.Add(new ColorOption(R("Skin_Dark"), SKIN_DARK));
 
             BodyColorOptions.Clear();
-            BodyColorOptions.Add(new ColorOption(COLOR_RED_NAME, BODY_RED));
-            BodyColorOptions.Add(new ColorOption(COLOR_BLUE_NAME, BODY_BLUE));
-            BodyColorOptions.Add(new ColorOption(COLOR_GREEN_NAME, BODY_GREEN));
-            BodyColorOptions.Add(new ColorOption(COLOR_ORANGE_NAME, BODY_ORANGE));
-            BodyColorOptions.Add(new ColorOption(COLOR_PURPLE_NAME, BODY_PURPLE));
-            BodyColorOptions.Add(new ColorOption(COLOR_GRAY_NAME, BODY_GRAY));
+            BodyColorOptions.Add(new ColorOption(R("Color_Red"), BODY_RED));
+            BodyColorOptions.Add(new ColorOption(R("Color_Blue"), BODY_BLUE));
+            BodyColorOptions.Add(new ColorOption(R("Color_Green"), BODY_GREEN));
+            BodyColorOptions.Add(new ColorOption(R("Color_Orange"), BODY_ORANGE));
+            BodyColorOptions.Add(new ColorOption(R("Color_Purple"), BODY_PURPLE));
+            BodyColorOptions.Add(new ColorOption(R("Color_Gray"), BODY_GRAY));
 
             PantsColorOptions.Clear();
-            PantsColorOptions.Add(new ColorOption(COLOR_BLACK_NAME, PANTS_BLACK));
-            PantsColorOptions.Add(new ColorOption(COLOR_DARK_GRAY_NAME, PANTS_DARK_GRAY));
-            PantsColorOptions.Add(new ColorOption(COLOR_JEANS_NAME, PANTS_JEANS_BLUE));
+            PantsColorOptions.Add(new ColorOption(R("Color_Black"), PANTS_BLACK));
+            PantsColorOptions.Add(new ColorOption(R("Color_DarkGray"), PANTS_DARK_GRAY));
+            PantsColorOptions.Add(new ColorOption(R("Color_Jeans"), PANTS_JEANS_BLUE));
 
             HatColorOptions.Clear();
-            HatColorOptions.Add(new ColorOption(COLOR_BLUE_NAME, HAT_BLUE));
-            HatColorOptions.Add(new ColorOption(COLOR_RED_NAME, HAT_RED));
-            HatColorOptions.Add(new ColorOption(COLOR_BLACK_NAME, HAT_BLACK));
-            HatColorOptions.Add(new ColorOption(COLOR_GREEN_NAME, HAT_GREEN));
+            HatColorOptions.Add(new ColorOption(R("HatColor_Blue"), HAT_BLUE));
+            HatColorOptions.Add(new ColorOption(R("HatColor_Red"), HAT_RED));
+            HatColorOptions.Add(new ColorOption(R("HatColor_Black"), HAT_BLACK));
+            HatColorOptions.Add(new ColorOption(R("HatColor_Green"), HAT_GREEN));
 
             HatTypeOptions.Clear();
-            HatTypeOptions.Add(new HatTypeOption(HAT_NONE_NAME, HatType.None));
-            HatTypeOptions.Add(new HatTypeOption(HAT_BASEBALL_NAME, HatType.Baseball));
-            HatTypeOptions.Add(new HatTypeOption(HAT_TOP_HAT_NAME, HatType.TopHat));
-            HatTypeOptions.Add(new HatTypeOption(HAT_BEANIE_NAME, HatType.Beanie));
+            HatTypeOptions.Add(new HatTypeOption(R("Hat_None"), HatType.None));
+            HatTypeOptions.Add(new HatTypeOption(R("Hat_Baseball"), HatType.Baseball));
+            HatTypeOptions.Add(new HatTypeOption(R("Hat_TopHat"), HatType.TopHat));
+            HatTypeOptions.Add(new HatTypeOption(R("Hat_Beanie"), HatType.Beanie));
 
             FaceTypeOptions.Clear();
-            FaceTypeOptions.Add(new FaceTypeOption(FACE_NEUTRAL_NAME, FaceType.Neutral));
-            FaceTypeOptions.Add(new FaceTypeOption(FACE_HAPPY_NAME, FaceType.Happy));
-            FaceTypeOptions.Add(new FaceTypeOption(FACE_ANGRY_NAME, FaceType.Angry));
+            FaceTypeOptions.Add(new FaceTypeOption(R("Face_Neutral"), FaceType.Neutral));
+            FaceTypeOptions.Add(new FaceTypeOption(R("Face_Happy"), FaceType.Happy));
+            FaceTypeOptions.Add(new FaceTypeOption(R("Face_Angry"), FaceType.Angry));
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

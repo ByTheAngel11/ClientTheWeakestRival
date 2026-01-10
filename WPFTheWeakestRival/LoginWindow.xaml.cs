@@ -1,19 +1,21 @@
-﻿using System;
-using System.Globalization;
+﻿using log4net;
+using System;
 using System.ServiceModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Globalization;
-using WPFTheWeakestRival.Properties.Langs;
 using WPFTheWeakestRival.Infrastructure;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
     public partial class LoginWindow : Window
     {
-        private bool isPasswordVisible = false;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(LoginWindow));
+
+        private bool isPasswordVisible;
 
         public LoginWindow()
         {
@@ -45,10 +47,12 @@ namespace WPFTheWeakestRival
                     logoImage.Source = null;
                     return;
                 }
+
                 logoImage.Source = new BitmapImage(new Uri(path, UriKind.RelativeOrAbsolute));
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Warn("UpdateMainImage failed.", ex);
                 logoImage.Source = null;
             }
         }
@@ -112,8 +116,8 @@ namespace WPFTheWeakestRival
 
             try
             {
-                var email = txtEmail.Text?.Trim();
-                var password = pwdPassword.Password ?? string.Empty;
+                string email = txtEmail.Text?.Trim();
+                string password = pwdPassword.Password ?? string.Empty;
 
                 if (string.IsNullOrWhiteSpace(email))
                 {
@@ -121,7 +125,7 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                if (string.IsNullOrEmpty(password))
+                if (string.IsNullOrWhiteSpace(password))
                 {
                     MessageBox.Show(Lang.errorMisingFields, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
@@ -129,48 +133,59 @@ namespace WPFTheWeakestRival
 
                 var request = new LoginRequest { Email = email, Password = password };
 
-                var client = new AuthServiceClient();
                 LoginResponse response;
+                var client = new AuthServiceClient();
 
                 try
                 {
                     response = await client.LoginAsync(request);
-                    if (client.State != CommunicationState.Faulted) client.Close(); else client.Abort();
+
+                    if (client.State != CommunicationState.Faulted)
+                    {
+                        client.Close();
+                    }
+                    else
+                    {
+                        client.Abort();
+                    }
                 }
                 catch (FaultException<ServiceFault> fx)
                 {
                     client.Abort();
-                    MessageBox.Show($"{fx.Detail.Code}: {fx.Detail.Message}", "Auth", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Logger.WarnFormat(
+                        "Login fault. Code={0}, Message={1}",
+                        fx.Detail?.Code ?? string.Empty,
+                        fx.Detail?.Message ?? fx.Message);
+
+                    MessageBox.Show(
+                        fx.Detail != null ? (fx.Detail.Code + ": " + fx.Detail.Message) : Lang.noConnection,
+                        Lang.loginTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
                     return;
                 }
                 catch (Exception ex)
                 {
                     client.Abort();
-                    MessageBox.Show("Error de red/servicio: " + ex.Message, "Auth", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Logger.Error("Login unexpected error.", ex);
+
+                    MessageBox.Show(Lang.noConnection, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                var token = response.Token;
-
-                MessageBox.Show(
-                    $"{Lang.succesLoginMessage}\nUserId: {token.UserId}\nToken: {token.Token}\nExp: {token.ExpiresAtUtc:yyyy-MM-dd HH:mm} UTC",
-                    "Auth", MessageBoxButton.OK, MessageBoxImage.Information);
+                var token = response?.Token;
+                if (token == null || string.IsNullOrWhiteSpace(token.Token))
+                {
+                    MessageBox.Show(Lang.noConnection, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
                 AppSession.CurrentToken = token;
 
-                try
-                {   
-                    
-                    AppServices.ResetAll();
+                AppServices.ResetAll();
 
-                    _ = AppServices.Lobby;
-                    AppServices.Friends.Start(); 
-                }
-                catch
-                {
-                    
-                }
-
+                _ = AppServices.Lobby;
 
                 var main = new MainMenuWindow();
 
@@ -200,7 +215,7 @@ namespace WPFTheWeakestRival
             var forgotWindow = new ForgotPasswordWindow(txtEmail.Text, 60);
             forgotWindow.Owner = this;
             forgotWindow.Show();
-            this.Hide();
+            Hide();
         }
     }
 }

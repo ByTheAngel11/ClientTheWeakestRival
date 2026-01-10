@@ -119,29 +119,17 @@
   <xs:complexType name="GetProfileImageRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
-      <xs:element name="UserId" type="xs:int" />
+      <xs:element name="AccountId" type="xs:int" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GetProfileImageRequest" nillable="true" type="tns:GetProfileImageRequest" />
   <xs:complexType name="GetProfileImageResponse">
     <xs:sequence>
-      <xs:element name="UserId" type="xs:int" />
-      <xs:element name="HasImage" type="xs:boolean" />
-      <xs:element minOccurs="0" name="ImageBytes" nillable="true" type="xs:base64Binary">
-        <xs:annotation>
-          <xs:appinfo>
-            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:element>
-      <xs:element minOccurs="0" name="ContentType" nillable="true" type="xs:string">
-        <xs:annotation>
-          <xs:appinfo>
-            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:element>
+      <xs:element name="ImageBytes" nillable="true" type="xs:base64Binary" />
+      <xs:element name="ContentType" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="UpdatedAtUtc" nillable="true" type="xs:dateTime" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GetProfileImageResponse" nillable="true" type="tns:GetProfileImageResponse" />

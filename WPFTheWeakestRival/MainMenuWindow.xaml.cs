@@ -80,22 +80,25 @@ namespace WPFTheWeakestRival
         {
             try
             {
-                AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
+                if (friendItems != null)
+                {
+                }
             }
             catch (Exception ex)
             {
-                Logger.Warn("Error detaching FriendsUpdated handler on window unload.", ex);
+                Logger.Warn("MainMenuWindow.OnUnloaded: detach failed.", ex);
             }
 
             try
             {
-                AppServices.Friends.Stop();
+                AppServices.StopAll();
             }
             catch (Exception ex)
             {
-                Logger.Warn("Error stopping Friends service on window unload.", ex);
+                Logger.Warn("MainMenuWindow.OnUnloaded: stop failed.", ex);
             }
         }
+
 
         private int GetAvatarSize()
         {
@@ -598,16 +601,9 @@ namespace WPFTheWeakestRival
 
         private void OnLoggedOut(object sender, EventArgs e)
         {
-            try
-            {
-                LoginWindow.AppSession.CurrentToken = null;
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error clearing current session token during logout.", ex);
-            }
-
             HideOverlay();
+
+            SessionCleanup.Shutdown("MainMenuWindow.OnLoggedOut");
 
             var loginWindow = new LoginWindow();
             Application.Current.MainWindow = loginWindow;
@@ -615,6 +611,7 @@ namespace WPFTheWeakestRival
 
             Close();
         }
+
 
         private async void BtnPersonalizationClick(object sender, RoutedEventArgs e)
         {
