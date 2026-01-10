@@ -1,6 +1,7 @@
 ﻿using log4net;
 using System;
 using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -13,6 +14,21 @@ namespace WPFTheWeakestRival
 {
     public partial class LoginWindow : Window
     {
+        private const string LANGUAGE_CODE_ES = "es";
+        private const string DEFAULT_LANGUAGE_CODE = LANGUAGE_CODE_ES;
+
+        private const int LANGUAGE_INDEX_ES = 0;
+        private const int LANGUAGE_INDEX_EN = 1;
+
+        private const int PASSWORD_TOGGLE_ICON_FONT_SIZE = 14;
+        private const string PASSWORD_ICON_SHOW = "👁";
+        private const string PASSWORD_ICON_HIDE = "🙈";
+
+        private const int FORGOT_PASSWORD_WINDOW_TIMEOUT_SECONDS = 60;
+
+        private const string CTX_LOGIN = "Login";
+        private const string CTX_GUEST_LOGIN = "GuestLogin";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LoginWindow));
 
         private bool isPasswordVisible;
@@ -21,8 +37,11 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            var current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
-            cmblanguage.SelectedIndex = (current == "es") ? 0 : 1;
+            string current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
+
+            cmblanguage.SelectedIndex = string.Equals(current, LANGUAGE_CODE_ES, StringComparison.OrdinalIgnoreCase)
+                ? LANGUAGE_INDEX_ES
+                : LANGUAGE_INDEX_EN;
 
             UpdateMainImage();
         }
@@ -31,7 +50,7 @@ namespace WPFTheWeakestRival
         {
             if (cmblanguage.SelectedItem is ComboBoxItem item)
             {
-                var code = (item.Tag as string) ?? "es";
+                string code = (item.Tag as string) ?? DEFAULT_LANGUAGE_CODE;
                 LocalizationManager.Current.SetCulture(code);
                 UpdateMainImage();
             }
@@ -41,7 +60,8 @@ namespace WPFTheWeakestRival
         {
             try
             {
-                var path = Lang.imageLogo;
+                string path = Lang.imageLogo;
+
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     logoImage.Source = null;
@@ -66,21 +86,36 @@ namespace WPFTheWeakestRival
 
         private void BtnTogglePasswordClick(object sender, RoutedEventArgs e)
         {
-            isPasswordVisible = !isPasswordVisible;
+            SetPasswordVisibility(!isPasswordVisible);
+        }
 
-            if (isPasswordVisible)
+        private void SetPasswordVisibility(bool visible)
+        {
+            isPasswordVisible = visible;
+
+            if (visible)
             {
                 txtPasswordVisible.Text = pwdPassword.Password;
                 txtPasswordVisible.Visibility = Visibility.Visible;
                 pwdPassword.Visibility = Visibility.Collapsed;
-                btnTogglePassword.Content = new TextBlock { Text = "🙈", FontSize = 14 };
+
+                btnTogglePassword.Content = new TextBlock
+                {
+                    Text = PASSWORD_ICON_HIDE,
+                    FontSize = PASSWORD_TOGGLE_ICON_FONT_SIZE
+                };
             }
             else
             {
                 pwdPassword.Password = txtPasswordVisible.Text;
                 txtPasswordVisible.Visibility = Visibility.Collapsed;
                 pwdPassword.Visibility = Visibility.Visible;
-                btnTogglePassword.Content = new TextBlock { Text = "👁", FontSize = 14 };
+
+                btnTogglePassword.Content = new TextBlock
+                {
+                    Text = PASSWORD_ICON_SHOW,
+                    FontSize = PASSWORD_TOGGLE_ICON_FONT_SIZE
+                };
             }
         }
 
@@ -131,78 +166,196 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                var request = new LoginRequest { Email = email, Password = password };
-
-                LoginResponse response;
-                var client = new AuthServiceClient();
-
-                try
+                var request = new LoginRequest
                 {
-                    response = await client.LoginAsync(request);
+                    Email = email,
+                    Password = password
+                };
 
-                    if (client.State != CommunicationState.Faulted)
-                    {
-                        client.Close();
-                    }
-                    else
-                    {
-                        client.Abort();
-                    }
-                }
-                catch (FaultException<ServiceFault> fx)
+                LoginResponse response = await InvokeAuthAsync(
+                    client => client.LoginAsync(request),
+                    CTX_LOGIN);
+
+                if (response == null)
                 {
-                    client.Abort();
-                    Logger.WarnFormat(
-                        "Login fault. Code={0}, Message={1}",
-                        fx.Detail?.Code ?? string.Empty,
-                        fx.Detail?.Message ?? fx.Message);
-
-                    MessageBox.Show(
-                        fx.Detail != null ? (fx.Detail.Code + ": " + fx.Detail.Message) : Lang.noConnection,
-                        Lang.loginTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    client.Abort();
-                    Logger.Error("Login unexpected error.", ex);
-
-                    MessageBox.Show(Lang.noConnection, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                var token = response?.Token;
-                if (token == null || string.IsNullOrWhiteSpace(token.Token))
+                if (!TryStartSessionAndNavigate(response))
                 {
-                    MessageBox.Show(Lang.noConnection, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-
-                AppSession.CurrentToken = token;
-
-                AppServices.ResetAll();
-
-                _ = AppServices.Lobby;
-
-                var main = new MainMenuWindow();
-
-                var app = Application.Current;
-                if (app != null)
-                {
-                    app.ShutdownMode = ShutdownMode.OnMainWindowClose;
-                    app.MainWindow = main;
-                }
-
-                main.Show();
-                Close();
             }
             finally
             {
                 btnLogin.IsEnabled = true;
             }
+        }
+
+        private async void BtnGuestLoginClick(object sender, RoutedEventArgs e)
+        {
+            btnLogin.IsEnabled = false;
+
+            try
+            {
+                var request = new GuestLoginRequest
+                {
+                    DisplayName = string.Empty
+                };
+
+                LoginResponse response = await InvokeAuthAsync(
+                    client => client.GuestLoginAsync(request),
+                    CTX_GUEST_LOGIN);
+
+                if (response == null)
+                {
+                    return;
+                }
+
+                if (!TryStartSessionAndNavigate(response))
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                btnLogin.IsEnabled = true;
+            }
+        }
+
+        private static async Task<LoginResponse> InvokeAuthAsync(
+            Func<AuthServiceClient, Task<LoginResponse>> actionAsync,
+            string context)
+        {
+            if (actionAsync == null)
+            {
+                throw new ArgumentNullException(nameof(actionAsync));
+            }
+
+            var client = new AuthServiceClient();
+
+            try
+            {
+                LoginResponse response = await actionAsync(client);
+
+                CloseClientSafe(client);
+
+                return response;
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                AbortClientSafe(client);
+
+                Logger.WarnFormat(
+                    "{0} fault. Code={1}, Message={2}",
+                    context,
+                    ex.Detail?.Code ?? string.Empty,
+                    ex.Detail?.Message ?? ex.Message);
+
+                MessageBox.Show(
+                    ex.Detail != null
+                        ? (ex.Detail.Code + ": " + ex.Detail.Message)
+                        : Lang.noConnection,
+                    Lang.loginTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                AbortClientSafe(client);
+
+                Logger.Error(context + " unexpected error.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.loginTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                return null;
+            }
+        }
+
+        private static void CloseClientSafe(ICommunicationObject client)
+        {
+            if (client == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (client.State == CommunicationState.Faulted)
+                {
+                    client.Abort();
+                }
+                else
+                {
+                    client.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("CloseClientSafe failed.", ex);
+
+                try
+                {
+                    client.Abort();
+                }
+                catch (Exception abortEx)
+                {
+                    Logger.Warn("CloseClientSafe abort failed.", abortEx);
+                }
+            }
+        }
+
+        private static void AbortClientSafe(ICommunicationObject client)
+        {
+            if (client == null)
+            {
+                return;
+            }
+
+            try
+            {
+                client.Abort();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("AbortClientSafe failed.", ex);
+            }
+        }
+
+        private bool TryStartSessionAndNavigate(LoginResponse response)
+        {
+            AuthToken token = response?.Token;
+
+            if (token == null || string.IsNullOrWhiteSpace(token.Token))
+            {
+                MessageBox.Show(Lang.noConnection, Lang.loginTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            AppSession.CurrentToken = token;
+
+            AppServices.ResetAll();
+            _ = AppServices.Lobby;
+
+            var main = new MainMenuWindow();
+
+            var app = Application.Current;
+            if (app != null)
+            {
+                app.ShutdownMode = ShutdownMode.OnMainWindowClose;
+                app.MainWindow = main;
+            }
+
+            main.Show();
+            Close();
+
+            return true;
         }
 
         public static class AppSession
@@ -212,7 +365,7 @@ namespace WPFTheWeakestRival
 
         private void BtnForgotPassword(object sender, RoutedEventArgs e)
         {
-            var forgotWindow = new ForgotPasswordWindow(txtEmail.Text, 60);
+            var forgotWindow = new ForgotPasswordWindow(txtEmail.Text, FORGOT_PASSWORD_WINDOW_TIMEOUT_SECONDS);
             forgotWindow.Owner = this;
             forgotWindow.Show();
             Hide();

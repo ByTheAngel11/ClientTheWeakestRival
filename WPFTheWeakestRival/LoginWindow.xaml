@@ -15,7 +15,6 @@
         Background="Transparent">
 
     <Window.Resources>
-        <!-- Fondo pared + puerta -->
         <BitmapImage x:Key="LoginWallBackground"
                      UriSource="pack://application:,,,/Assets/Backgrounds/LoginBackground.png" />
         <BitmapImage x:Key="NotePad"
@@ -23,7 +22,6 @@
     </Window.Resources>
 
     <Grid Margin="12">
-        <!-- Imagen de la pared con la puerta -->
         <Grid.Background>
             <ImageBrush ImageSource="{StaticResource LoginWallBackground}"
                         Stretch="UniformToFill"
@@ -31,7 +29,6 @@
                         AlignmentY="Center" />
         </Grid.Background>
 
-        <!-- Combo de idioma -->
         <ComboBox x:Name="cmblanguage"
                   HorizontalAlignment="Right"
                   VerticalAlignment="Top"
@@ -48,14 +45,12 @@
             <ComboBoxItem Tag="fr" Content="{loc:Loc fr}" />
         </ComboBox>
 
-        <!-- HOST DEL CARTEL + LOGIN, CENTRADO SOBRE LA PUERTA -->
         <Grid x:Name="doorHost"
               HorizontalAlignment="Center"
               VerticalAlignment="Center"
               Width="420"
               Height="520">
 
-            <!-- Imagen de fondo para registro (RegistrationBackground) -->
             <Image x:Name="registrationBackground"
                    Source="{StaticResource NotePad}"
                    Width="75"
@@ -66,7 +61,6 @@
                    Margin="0,170,-46,0"
                    Panel.ZIndex="5" />
 
-            <!-- CARTEL PARA EL LOGO (tamaño pensado para el logo) -->
             <Border x:Name="signBoard"
                     Width="184"
                     Height="161"
@@ -75,21 +69,22 @@
                     Padding="8"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Panel.ZIndex="10" Margin="112,-13,0,0">
+                    Panel.ZIndex="10"
+                    Margin="112,-13,0,0">
                 <Image x:Name="logoImage"
                        Stretch="UniformToFill"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"/>
             </Border>
 
-            <!-- PANEL DE LOGIN PEGADO A LA PUERTA -->
             <Border Background="#CC222222"
                     CornerRadius="14"
                     Padding="20"
                     VerticalAlignment="Top"
                     Margin="52,153,0,0"
                     HorizontalAlignment="Left"
-                    Panel.ZIndex="9" Width="303">
+                    Panel.ZIndex="9"
+                    Width="303">
                 <StackPanel Width="260">
 
                     <Label x:Name="lblWelcome"
@@ -100,7 +95,6 @@
                            Foreground="White"
                            Margin="0,0,0,16"/>
 
-                    <!-- EMAIL -->
                     <Grid Width="226"
                           Margin="0,0,0,10"
                           HorizontalAlignment="Center">
@@ -131,7 +125,6 @@
                         </TextBlock>
                     </Grid>
 
-                    <!-- PASSWORD -->
                     <Grid Width="226"
                           Margin="0,0,0,16"
                           HorizontalAlignment="Center">
@@ -175,7 +168,6 @@
                         </Button>
                     </Grid>
 
-                    <!-- LOGIN -->
                     <Button x:Name="btnLogin"
                             Content="{loc:Loc btnLogin}"
                             Width="160"
@@ -186,7 +178,6 @@
                             Foreground="White"
                             Click="BtnLoginClick"/>
 
-                    <!-- Forgot / No account -->
                     <Button x:Name="btnForgotPassword"
                             Content="{loc:Loc forgotPassword}"
                             Width="200"
@@ -204,9 +195,9 @@
                             Background="Transparent"
                             Foreground="White"
                             Margin="0,0,0,8"
-                            BorderThickness="0"/>
+                            BorderThickness="0"
+                            Click="RegistrationClick"/>
 
-                    <!-- Registrarse -->
                     <Button x:Name="btnRegist"
                             Content="{loc:Loc regist}"
                             Width="160"
@@ -217,14 +208,14 @@
                             Foreground="White"
                             Click="RegistrationClick"/>
 
-                    <!-- Jugar como invitado -->
                     <Button x:Name="btnPlayAsGuest"
                             Content="{loc:Loc playAsGuest}"
                             Width="180"
                             Height="34"
                             HorizontalAlignment="Center"
                             Background="Gray"
-                            Foreground="White"/>
+                            Foreground="White"
+                            Click="BtnGuestLoginClick"/>
                 </StackPanel>
             </Border>
         </Grid>

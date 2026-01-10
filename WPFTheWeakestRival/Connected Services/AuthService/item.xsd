@@ -133,4 +133,10 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GetProfileImageResponse" nillable="true" type="tns:GetProfileImageResponse" />
+  <xs:complexType name="GuestLoginRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="DisplayName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="GuestLoginRequest" nillable="true" type="tns:GuestLoginRequest" />
 </xs:schema>

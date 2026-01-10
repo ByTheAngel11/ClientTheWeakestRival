@@ -84,6 +84,15 @@
   <wsdl:message name="IAuthService_GetProfileImage_ServiceFaultFault_FaultMessage">
     <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q5:ServiceFault" />
   </wsdl:message>
+  <wsdl:message name="IAuthService_GuestLogin_InputMessage">
+    <wsdl:part name="parameters" element="tns:GuestLogin" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_GuestLogin_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GuestLoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="IAuthService_GuestLogin_ServiceFaultFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q6:ServiceFault" />
+  </wsdl:message>
   <wsdl:portType name="IAuthService">
     <wsdl:operation name="Ping">
       <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/Ping" message="tns:IAuthService_Ping_InputMessage" />
@@ -125,6 +134,11 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/GetProfileImage" message="tns:IAuthService_GetProfileImage_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/GetProfileImageResponse" message="tns:IAuthService_GetProfileImage_OutputMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/IAuthService/GetProfileImageServiceFaultFault" name="ServiceFaultFault" message="tns:IAuthService_GetProfileImage_ServiceFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GuestLogin">
+      <wsdl:input wsaw:Action="http://tempuri.org/IAuthService/GuestLogin" message="tns:IAuthService_GuestLogin_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IAuthService/GuestLoginResponse" message="tns:IAuthService_GuestLogin_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IAuthService/GuestLoginServiceFaultFault" name="ServiceFaultFault" message="tns:IAuthService_GuestLogin_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WSHttpBinding_IAuthService" type="tns:IAuthService">
@@ -216,6 +230,18 @@
     </wsdl:operation>
     <wsdl:operation name="GetProfileImage">
       <soap12:operation soapAction="http://tempuri.org/IAuthService/GetProfileImage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceFaultFault">
+        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GuestLogin">
+      <soap12:operation soapAction="http://tempuri.org/IAuthService/GuestLogin" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

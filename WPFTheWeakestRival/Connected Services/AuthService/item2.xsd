@@ -123,4 +123,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GuestLogin">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q17:GuestLoginRequest" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GuestLoginResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GuestLoginResult" nillable="true" type="q18:LoginResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

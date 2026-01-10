@@ -1149,6 +1149,51 @@ namespace WPFTheWeakestRival.AuthService {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GuestLoginRequest", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class GuestLoginRequest : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DisplayNameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string DisplayName {
+            get {
+                return this.DisplayNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DisplayNameField, value) != true)) {
+                    this.DisplayNameField = value;
+                    this.RaisePropertyChanged("DisplayName");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="AuthService.IAuthService")]
     public interface IAuthService {
@@ -1211,6 +1256,13 @@ namespace WPFTheWeakestRival.AuthService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/GetProfileImage", ReplyAction="http://tempuri.org/IAuthService/GetProfileImageResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.GetProfileImageResponse> GetProfileImageAsync(WPFTheWeakestRival.AuthService.GetProfileImageRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/GuestLogin", ReplyAction="http://tempuri.org/IAuthService/GuestLoginResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.AuthService.ServiceFault), Action="http://tempuri.org/IAuthService/GuestLoginServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.AuthService.LoginResponse GuestLogin(WPFTheWeakestRival.AuthService.GuestLoginRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAuthService/GuestLogin", ReplyAction="http://tempuri.org/IAuthService/GuestLoginResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.LoginResponse> GuestLoginAsync(WPFTheWeakestRival.AuthService.GuestLoginRequest request);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -1310,6 +1362,14 @@ namespace WPFTheWeakestRival.AuthService {
         
         public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.GetProfileImageResponse> GetProfileImageAsync(WPFTheWeakestRival.AuthService.GetProfileImageRequest request) {
             return base.Channel.GetProfileImageAsync(request);
+        }
+        
+        public WPFTheWeakestRival.AuthService.LoginResponse GuestLogin(WPFTheWeakestRival.AuthService.GuestLoginRequest request) {
+            return base.Channel.GuestLogin(request);
+        }
+        
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.AuthService.LoginResponse> GuestLoginAsync(WPFTheWeakestRival.AuthService.GuestLoginRequest request) {
+            return base.Channel.GuestLoginAsync(request);
         }
     }
 }
