@@ -55,13 +55,15 @@ namespace WPFTheWeakestRival.Controls
         private const int FACE_TYPE_INDEX_HAPPY = 2;
         private const int FACE_TYPE_INDEX_NEUTRAL_ALT = 3;
 
+        private const string COLOR_HEX_BLUE_2F6AA3 = "#FF2F6AA3";
+
         private static readonly Color DEFAULT_BODY_COLOR = ColorFromHex("#FFED4C00");
         private static readonly Color DEFAULT_PANTS_COLOR = ColorFromHex("#FF111111");
         private static readonly Color DEFAULT_SKIN_COLOR = ColorFromHex("#FFEED8C8");
-        private static readonly Color DEFAULT_HAT_COLOR = ColorFromHex("#FF2F6AA3");
+        private static readonly Color DEFAULT_HAT_COLOR = ColorFromHex(COLOR_HEX_BLUE_2F6AA3);
 
         private static readonly Color BODY_COLOR_RED = ColorFromHex("#FFD32F2F");
-        private static readonly Color BODY_COLOR_BLUE = ColorFromHex("#FF2F6AA3");
+        private static readonly Color BODY_COLOR_BLUE = ColorFromHex(COLOR_HEX_BLUE_2F6AA3);
         private static readonly Color BODY_COLOR_GREEN = ColorFromHex("#FF4CAF50");
         private static readonly Color BODY_COLOR_ORANGE = ColorFromHex("#FFED4C00");
         private static readonly Color BODY_COLOR_PURPLE = ColorFromHex("#FF9C27B0");
@@ -71,9 +73,9 @@ namespace WPFTheWeakestRival.Controls
         private static readonly Color PANTS_COLOR_DARK_GRAY = ColorFromHex("#FF444444");
         private static readonly Color PANTS_COLOR_BLUE_JEANS = ColorFromHex("#FF3F51B5");
 
-        private static readonly Color HAT_COLOR_DEFAULT = ColorFromHex("#FF2F6AA3");
+        private static readonly Color HAT_COLOR_DEFAULT = ColorFromHex(COLOR_HEX_BLUE_2F6AA3);
         private static readonly Color HAT_COLOR_RED = ColorFromHex("#FFD32F2F");
-        private static readonly Color HAT_COLOR_BLUE = ColorFromHex("#FF2F6AA3");
+        private static readonly Color HAT_COLOR_BLUE = ColorFromHex(COLOR_HEX_BLUE_2F6AA3);
         private static readonly Color HAT_COLOR_BLACK = ColorFromHex("#FF111111");
 
         public static readonly DependencyProperty BodyColorProperty =
@@ -362,10 +364,31 @@ namespace WPFTheWeakestRival.Controls
         private void UpdateBrushes()
         {
             SkinBrush = new SolidColorBrush(SkinColor);
-            TorsoBrush = BuildShaded(BodyColor, BODY_SHADE_INTENSITY);
-            PantsBrush = BuildShaded(PantsColor, PANTS_SHADE_INTENSITY);
-            HatBrush = BuildShaded(HatColor, HAT_SHADE_INTENSITY);
-            HatRimBrush = BuildShaded(HatColor, HAT_RIM_SHADE_INTENSITY);
+
+            TorsoBrush = BuildBodyShaded(BodyColor);
+            PantsBrush = BuildPantsShaded(PantsColor);
+            HatBrush = BuildHatShaded(HatColor);
+            HatRimBrush = BuildHatRimShaded(HatColor);
+        }
+
+        private static LinearGradientBrush BuildBodyShaded(Color baseColor)
+        {
+            return BuildShadedInternal(baseColor, BODY_SHADE_INTENSITY);
+        }
+
+        private static LinearGradientBrush BuildPantsShaded(Color baseColor)
+        {
+            return BuildShadedInternal(baseColor, PANTS_SHADE_INTENSITY);
+        }
+
+        private static LinearGradientBrush BuildHatShaded(Color baseColor)
+        {
+            return BuildShadedInternal(baseColor, HAT_SHADE_INTENSITY);
+        }
+
+        private static LinearGradientBrush BuildHatRimShaded(Color baseColor)
+        {
+            return BuildShadedInternal(baseColor, HAT_RIM_SHADE_INTENSITY);
         }
 
         private void UpdateHatVisibility()
@@ -437,11 +460,11 @@ namespace WPFTheWeakestRival.Controls
             element.Opacity = isVisible ? 1 : 0;
         }
 
-        private static LinearGradientBrush BuildShaded(Color baseColor, double shade)
+        private static LinearGradientBrush BuildShadedInternal(Color baseColor, double shadeIntensity)
         {
             byte DarkenComponent(byte component)
             {
-                return (byte)Math.Max(0, component * (1 - shade));
+                return (byte)Math.Max(0, component * (1 - shadeIntensity));
             }
 
             var darker = Color.FromArgb(
@@ -545,7 +568,7 @@ namespace WPFTheWeakestRival.Controls
             }
         }
 
-        private HatType MapHatType(int index)
+        private static HatType MapHatType(int index)
         {
             switch (index)
             {
@@ -562,7 +585,7 @@ namespace WPFTheWeakestRival.Controls
             }
         }
 
-        private FaceType MapFaceType(int index)
+        private static FaceType MapFaceType(int index)
         {
             switch (index)
             {

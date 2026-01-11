@@ -14,23 +14,36 @@ namespace WPFTheWeakestRival
         private const string LOG_CTX_UI_UNHANDLED = "App.DispatcherUnhandledException";
         private const string LOG_CTX_TASK_UNOBSERVED = "App.TaskScheduler.UnobservedTaskException";
         private const string LOG_CTX_DOMAIN_UNHANDLED = "App.CurrentDomain.UnhandledException";
+        private const string LOG_CTX_SHOW_GENERIC_ERROR = "App.ShowGenericErrorSafe";
 
         private const string UI_ERROR_TITLE = "Error";
         private const string UI_GENERIC_ERROR_MESSAGE = "Ocurrió un error inesperado.";
 
         private const int EXIT_CODE_SUCCESS = 0;
 
-        private void OnAppStartup(object sender, StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
-            ConfigureLogging();
-            RegisterGlobalExceptionHandlers();
+            base.OnStartup(e);
 
-            OpenLoginWindow();
+            ConfigureLogging();
+
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+
+            var loginWindow = new LoginWindow();
+            MainWindow = loginWindow;
+            loginWindow.Show();
         }
 
-        private void OnAppExit(object sender, ExitEventArgs e)
+        protected override void OnExit(ExitEventArgs e)
         {
-            Shutdown(EXIT_CODE_SUCCESS);
+            if (e != null)
+            {
+                e.ApplicationExitCode = EXIT_CODE_SUCCESS;
+            }
+
+            base.OnExit(e);
         }
 
         private static void ConfigureLogging()
@@ -38,50 +51,90 @@ namespace WPFTheWeakestRival
             XmlConfigurator.Configure();
         }
 
-        private void RegisterGlobalExceptionHandlers()
+        private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            DispatcherUnhandledException += OnDispatcherUnhandledException;
-            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            Exception ex = e != null ? e.Exception : null;
+
+            if (ex != null)
+            {
+                Logger.Error(LOG_CTX_UI_UNHANDLED, ex);
+            }
+            else
+            {
+                Logger.ErrorFormat("{0}: dispatcher exception is null.", LOG_CTX_UI_UNHANDLED);
+            }
+
+            ShowGenericErrorSafe();
+
+            if (e != null)
+            {
+                e.Handled = true;
+            }
         }
 
-        private void OpenLoginWindow()
+        private static void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            LoginWindow loginWindow = new LoginWindow();
-            MainWindow = loginWindow;
-            loginWindow.Show();
+            Exception ex = e != null ? e.Exception : null;
+
+            if (ex != null)
+            {
+                Logger.Error(LOG_CTX_TASK_UNOBSERVED, ex);
+            }
+            else
+            {
+                Logger.ErrorFormat("{0}: task exception is null.", LOG_CTX_TASK_UNOBSERVED);
+            }
+
+            if (e != null)
+            {
+                e.SetObserved();
+            }
+
+            ShowGenericErrorSafe();
         }
 
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Exception ex = e.Exception;
-
-            Logger.Error(LOG_CTX_UI_UNHANDLED, ex);
-
-            ShowGenericError();
-            e.Handled = true;
-        }
-
-        private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
-        {
-            Exception ex = e.Exception;
-
-            Logger.Error(LOG_CTX_TASK_UNOBSERVED, ex);
-
-            e.SetObserved();
-            ShowGenericError();
-        }
-
-        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            Exception ex = e.ExceptionObject as Exception;
+            object exceptionObject = e != null ? e.ExceptionObject : null;
+            Exception ex = exceptionObject as Exception;
 
             if (ex != null)
             {
                 Logger.Error(LOG_CTX_DOMAIN_UNHANDLED, ex);
             }
+            else
+            {
+                Logger.ErrorFormat(
+                    "{0}: ExceptionObject is not Exception. Type={1}",
+                    LOG_CTX_DOMAIN_UNHANDLED,
+                    exceptionObject != null ? exceptionObject.GetType().FullName : "null");
+            }
 
-            ShowGenericError();
+            ShowGenericErrorSafe();
+        }
+
+        private static void ShowGenericErrorSafe()
+        {
+            try
+            {
+                Dispatcher dispatcher = Application.Current != null ? Application.Current.Dispatcher : null;
+                if (dispatcher == null || dispatcher.HasShutdownStarted || dispatcher.HasShutdownFinished)
+                {
+                    return;
+                }
+
+                if (dispatcher.CheckAccess())
+                {
+                    ShowGenericError();
+                    return;
+                }
+
+                dispatcher.BeginInvoke((Action)ShowGenericError, DispatcherPriority.Send);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(LOG_CTX_SHOW_GENERIC_ERROR, ex);
+            }
         }
 
         private static void ShowGenericError()

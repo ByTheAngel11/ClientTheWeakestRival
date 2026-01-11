@@ -40,13 +40,13 @@ namespace WPFTheWeakestRival.Windows
         public ObservableCollection<HatTypeOption> HatTypeOptions { get; } = new ObservableCollection<HatTypeOption>();
         public ObservableCollection<FaceTypeOption> FaceTypeOptions { get; } = new ObservableCollection<FaceTypeOption>();
 
-        public Color ResultBodyColor => AvatarPreview.BodyColor;
-        public Color ResultPantsColor => AvatarPreview.PantsColor;
-        public Color ResultSkinColor => AvatarPreview.SkinColor;
-        public Color ResultHatColor => AvatarPreview.HatColor;
-        public HatType ResultHatType => AvatarPreview.HatType;
-        public FaceType ResultFaceType => AvatarPreview.FaceType;
-        public bool ResultUseProfilePhotoAsFace => AvatarPreview.UseProfilePhotoAsFace;
+        public Color ResultBodyColor { get; private set; }
+        public Color ResultPantsColor { get; private set; }
+        public Color ResultSkinColor { get; private set; }
+        public Color ResultHatColor { get; private set; }
+        public HatType ResultHatType { get; private set; }
+        public FaceType ResultFaceType { get; private set; }
+        public bool ResultUseProfilePhotoAsFace { get; private set; }
 
         public AvatarCustomizationWindow()
         {
@@ -55,6 +55,7 @@ namespace WPFTheWeakestRival.Windows
             DataContext = this;
 
             BuildOptions();
+            SyncResultFromPreview();
         }
 
         public AvatarCustomizationWindow(
@@ -76,11 +77,39 @@ namespace WPFTheWeakestRival.Windows
 
             AvatarPreview.FacePhoto = facePhoto;
             AvatarPreview.UseProfilePhotoAsFace = facePhoto != null;
+
+            SyncResultFromPreview();
+        }
+
+        private void SyncResultFromPreview()
+        {
+            if (AvatarPreview == null)
+            {
+                ResultBodyColor = default;
+                ResultPantsColor = default;
+                ResultSkinColor = default;
+                ResultHatColor = default;
+                ResultHatType = HatType.None;
+                ResultFaceType = FaceType.Neutral;
+                ResultUseProfilePhotoAsFace = false;
+                return;
+            }
+
+            ResultBodyColor = AvatarPreview.BodyColor;
+            ResultPantsColor = AvatarPreview.PantsColor;
+            ResultSkinColor = AvatarPreview.SkinColor;
+            ResultHatColor = AvatarPreview.HatColor;
+            ResultHatType = AvatarPreview.HatType;
+            ResultFaceType = AvatarPreview.FaceType;
+            ResultUseProfilePhotoAsFace = AvatarPreview.UseProfilePhotoAsFace;
         }
 
         private void BuildOptions()
         {
-            Func<string, string> R = key => global::WPFTheWeakestRival.Properties.Resources.ResourceManager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+            Func<string, string> R =
+                key => global::WPFTheWeakestRival.Properties.Resources.ResourceManager.GetString(
+                    key,
+                    CultureInfo.CurrentUICulture) ?? key;
 
             SkinColorOptions.Clear();
             SkinColorOptions.Add(new ColorOption(R("Skin_Light"), SKIN_LIGHT));
@@ -128,6 +157,7 @@ namespace WPFTheWeakestRival.Windows
 
         private void BtnAccept_Click(object sender, RoutedEventArgs e)
         {
+            SyncResultFromPreview();
             DialogResult = true;
             Close();
         }
