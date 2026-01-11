@@ -110,94 +110,19 @@ namespace WPFTheWeakestRival.Pages
 
             try
             {
-                Mouse.OverrideCursor = Cursors.Wait;
+                SetBusyCursor(true);
 
-                var response = await friendServiceClient.ListFriendsAsync(new ListFriendsRequest
-                {
-                    Token = authToken,
-                    IncludePendingIncoming = true,
-                    IncludePendingOutgoing = true
-                });
+                ListFriendsResponse response = await ListFriendsWithPendingsAsync();
 
-                incomingRequests.Clear();
-                outgoingRequests.Clear();
+                ClearRequestCollections();
 
-                var incoming = response?.PendingIncoming ?? Array.Empty<FriendRequestSummary>();
-                var outgoing = response?.PendingOutgoing ?? Array.Empty<FriendRequestSummary>();
+                FriendRequestSummary[] incoming = response?.PendingIncoming ?? Array.Empty<FriendRequestSummary>();
+                FriendRequestSummary[] outgoing = response?.PendingOutgoing ?? Array.Empty<FriendRequestSummary>();
 
-                var accountIds = new System.Collections.Generic.HashSet<int>();
-                for (var i = 0; i < incoming.Length; i++) accountIds.Add(incoming[i].FromAccountId);
-                for (var i = 0; i < outgoing.Length; i++) accountIds.Add(outgoing[i].ToAccountId);
+                var accountsById = await LoadAccountsByIdAsync(incoming, outgoing);
 
-                var accountsById = new System.Collections.Generic.Dictionary<int, AccountMini>();
-                if (accountIds.Count > 0)
-                {
-                    var getReq = new GetAccountsByIdsRequest
-                    {
-                        Token = authToken,
-                        AccountIds = new int[accountIds.Count]
-                    };
-
-                    accountIds.CopyTo(getReq.AccountIds, 0);
-
-                    var info = await friendServiceClient.GetAccountsByIdsAsync(getReq);
-                    var minis = info?.Accounts ?? Array.Empty<AccountMini>();
-
-                    for (var i = 0; i < minis.Length; i++)
-                    {
-                        accountsById[minis[i].AccountId] = minis[i];
-                    }
-                }
-
-                for (var i = 0; i < incoming.Length; i++)
-                {
-                    var summary = incoming[i];
-                    accountsById.TryGetValue(summary.FromAccountId, out var mini);
-
-                    var vm = new RequestViewModel
-                    {
-                        FriendRequestId = summary.FriendRequestId,
-                        OtherAccountId = summary.FromAccountId,
-                        DisplayName = ResolveDisplayName(mini, summary.FromAccountId),
-                        Subtitle = Lang.statusPendingIn,
-                        Avatar = DefaultAvatar(),
-                        IsIncoming = true,
-                        HasProfileImage = mini != null && mini.HasProfileImage,
-                        ProfileImageCode = mini == null ? string.Empty : (mini.ProfileImageCode ?? string.Empty)
-                    };
-
-                    incomingRequests.Add(vm);
-
-                    if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
-                    {
-                        _ = LoadAvatarAsync(vm);
-                    }
-                }
-
-                for (var i = 0; i < outgoing.Length; i++)
-                {
-                    var summary = outgoing[i];
-                    accountsById.TryGetValue(summary.ToAccountId, out var mini);
-
-                    var vm = new RequestViewModel
-                    {
-                        FriendRequestId = summary.FriendRequestId,
-                        OtherAccountId = summary.ToAccountId,
-                        DisplayName = ResolveDisplayName(mini, summary.ToAccountId),
-                        Subtitle = Lang.statusPendingOut,
-                        Avatar = DefaultAvatar(),
-                        IsIncoming = false,
-                        HasProfileImage = mini != null && mini.HasProfileImage,
-                        ProfileImageCode = mini == null ? string.Empty : (mini.ProfileImageCode ?? string.Empty)
-                    };
-
-                    outgoingRequests.Add(vm);
-
-                    if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
-                    {
-                        _ = LoadAvatarAsync(vm);
-                    }
-                }
+                PopulateIncomingRequests(incoming, accountsById);
+                PopulateOutgoingRequests(outgoing, accountsById);
 
                 Logger.InfoFormat(
                     "{0}: completed. Incoming={1}, Outgoing={2}.",
@@ -251,7 +176,182 @@ namespace WPFTheWeakestRival.Pages
             }
             finally
             {
-                Mouse.OverrideCursor = null;
+                SetBusyCursor(false);
+            }
+        }
+
+        private static void SetBusyCursor(bool isBusy)
+        {
+            Mouse.OverrideCursor = isBusy ? Cursors.Wait : null;
+        }
+
+        private Task<ListFriendsResponse> ListFriendsWithPendingsAsync()
+        {
+            return friendServiceClient.ListFriendsAsync(new ListFriendsRequest
+            {
+                Token = authToken,
+                IncludePendingIncoming = true,
+                IncludePendingOutgoing = true
+            });
+        }
+
+        private void ClearRequestCollections()
+        {
+            incomingRequests.Clear();
+            outgoingRequests.Clear();
+        }
+
+        private async Task<System.Collections.Generic.Dictionary<int, AccountMini>> LoadAccountsByIdAsync(
+            FriendRequestSummary[] incoming,
+            FriendRequestSummary[] outgoing)
+        {
+            var accountIds = CollectAccountIds(incoming, outgoing);
+            var accountsById = new System.Collections.Generic.Dictionary<int, AccountMini>();
+
+            if (accountIds.Count == 0)
+            {
+                return accountsById;
+            }
+
+            var getReq = new GetAccountsByIdsRequest
+            {
+                Token = authToken,
+                AccountIds = new int[accountIds.Count]
+            };
+
+            accountIds.CopyTo(getReq.AccountIds, 0);
+
+            GetAccountsByIdsResponse info = await friendServiceClient.GetAccountsByIdsAsync(getReq);
+            AccountMini[] minis = info?.Accounts ?? Array.Empty<AccountMini>();
+
+            for (var i = 0; i < minis.Length; i++)
+            {
+                AccountMini mini = minis[i];
+                if (mini != null)
+                {
+                    accountsById[mini.AccountId] = mini;
+                }
+            }
+
+            return accountsById;
+        }
+
+        private static System.Collections.Generic.HashSet<int> CollectAccountIds(
+            FriendRequestSummary[] incoming,
+            FriendRequestSummary[] outgoing)
+        {
+            var accountIds = new System.Collections.Generic.HashSet<int>();
+
+            for (var i = 0; i < (incoming?.Length ?? 0); i++)
+            {
+                FriendRequestSummary summary = incoming[i];
+                if (summary != null)
+                {
+                    accountIds.Add(summary.FromAccountId);
+                }
+            }
+
+            for (var i = 0; i < (outgoing?.Length ?? 0); i++)
+            {
+                FriendRequestSummary summary = outgoing[i];
+                if (summary != null)
+                {
+                    accountIds.Add(summary.ToAccountId);
+                }
+            }
+
+            return accountIds;
+        }
+
+        private void PopulateIncomingRequests(
+            FriendRequestSummary[] incoming,
+            System.Collections.Generic.Dictionary<int, AccountMini> accountsById)
+        {
+            for (var i = 0; i < (incoming?.Length ?? 0); i++)
+            {
+                FriendRequestSummary summary = incoming[i];
+                if (summary == null)
+                {
+                    continue;
+                }
+
+                AccountMini mini = TryGetMini(accountsById, summary.FromAccountId);
+
+                RequestViewModel vm = BuildRequestViewModel(summary, mini, isIncoming: true);
+                incomingRequests.Add(vm);
+
+                QueueAvatarLoadIfNeeded(vm);
+            }
+        }
+
+        private void PopulateOutgoingRequests(
+            FriendRequestSummary[] outgoing,
+            System.Collections.Generic.Dictionary<int, AccountMini> accountsById)
+        {
+            for (var i = 0; i < (outgoing?.Length ?? 0); i++)
+            {
+                FriendRequestSummary summary = outgoing[i];
+                if (summary == null)
+                {
+                    continue;
+                }
+
+                AccountMini mini = TryGetMini(accountsById, summary.ToAccountId);
+
+                RequestViewModel vm = BuildRequestViewModel(summary, mini, isIncoming: false);
+                outgoingRequests.Add(vm);
+
+                QueueAvatarLoadIfNeeded(vm);
+            }
+        }
+
+        private static AccountMini TryGetMini(
+            System.Collections.Generic.Dictionary<int, AccountMini> accountsById,
+            int accountId)
+        {
+            if (accountsById == null || accountsById.Count == 0)
+            {
+                return null;
+            }
+
+            if (accountsById.ContainsKey(accountId))
+            {
+                return accountsById[accountId];
+            }
+
+            return null;
+        }
+
+        private static RequestViewModel BuildRequestViewModel(
+            FriendRequestSummary summary,
+            AccountMini mini,
+            bool isIncoming)
+        {
+            int otherAccountId = isIncoming ? summary.FromAccountId : summary.ToAccountId;
+
+            return new RequestViewModel
+            {
+                FriendRequestId = summary.FriendRequestId,
+                OtherAccountId = otherAccountId,
+                DisplayName = ResolveDisplayName(mini, otherAccountId),
+                Subtitle = isIncoming ? Lang.statusPendingIn : Lang.statusPendingOut,
+                Avatar = DefaultAvatar(),
+                IsIncoming = isIncoming,
+                HasProfileImage = mini != null && mini.HasProfileImage,
+                ProfileImageCode = mini == null ? string.Empty : (mini.ProfileImageCode ?? string.Empty)
+            };
+        }
+
+        private void QueueAvatarLoadIfNeeded(RequestViewModel vm)
+        {
+            if (vm == null)
+            {
+                return;
+            }
+
+            if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
+            {
+                _ = LoadAvatarAsync(vm);
             }
         }
 
