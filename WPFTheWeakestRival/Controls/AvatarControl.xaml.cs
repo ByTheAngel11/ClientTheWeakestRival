@@ -29,6 +29,10 @@ namespace WPFTheWeakestRival.Controls
         private const double HAT_SHADE_INTENSITY = 0.12;
         private const double HAT_RIM_SHADE_INTENSITY = 0.06;
 
+        private const double SHADE_INTENSITY_MIN = 0d;
+        private const double SHADE_INTENSITY_MAX = 1d;
+        private const double SHADE_FACTOR_BASE = 1d;
+
         private const int BODY_COLOR_INDEX_RED = 0;
         private const int BODY_COLOR_INDEX_BLUE = 1;
         private const int BODY_COLOR_INDEX_GREEN = 2;
@@ -364,7 +368,6 @@ namespace WPFTheWeakestRival.Controls
         private void UpdateBrushes()
         {
             SkinBrush = new SolidColorBrush(SkinColor);
-
             TorsoBrush = BuildBodyShaded(BodyColor);
             PantsBrush = BuildPantsShaded(PantsColor);
             HatBrush = BuildHatShaded(HatColor);
@@ -462,16 +465,13 @@ namespace WPFTheWeakestRival.Controls
 
         private static LinearGradientBrush BuildShadedInternal(Color baseColor, double shadeIntensity)
         {
-            byte DarkenComponent(byte component)
-            {
-                return (byte)Math.Max(0, component * (1 - shadeIntensity));
-            }
+            double clampedShade = ClampShadeIntensity(shadeIntensity);
 
             var darker = Color.FromArgb(
                 baseColor.A,
-                DarkenComponent(baseColor.R),
-                DarkenComponent(baseColor.G),
-                DarkenComponent(baseColor.B));
+                DarkenComponent(baseColor.R, clampedShade),
+                DarkenComponent(baseColor.G, clampedShade),
+                DarkenComponent(baseColor.B, clampedShade));
 
             return new LinearGradientBrush(
                 new GradientStopCollection
@@ -481,6 +481,38 @@ namespace WPFTheWeakestRival.Controls
                 },
                 new Point(0, 0),
                 new Point(0, 1));
+        }
+
+        private static double ClampShadeIntensity(double shadeIntensity)
+        {
+            if (shadeIntensity < SHADE_INTENSITY_MIN)
+            {
+                return SHADE_INTENSITY_MIN;
+            }
+
+            if (shadeIntensity > SHADE_INTENSITY_MAX)
+            {
+                return SHADE_INTENSITY_MAX;
+            }
+
+            return shadeIntensity;
+        }
+
+        private static byte DarkenComponent(byte component, double shadeIntensity)
+        {
+            double shadedValue = component * (SHADE_FACTOR_BASE - shadeIntensity);
+
+            if (shadedValue < byte.MinValue)
+            {
+                return byte.MinValue;
+            }
+
+            if (shadedValue > byte.MaxValue)
+            {
+                return byte.MaxValue;
+            }
+
+            return (byte)shadedValue;
         }
 
         private static Color ColorFromHex(string hexValue)
