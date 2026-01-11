@@ -1,45 +1,98 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.ServiceModel;
 using WPFTheWeakestRival.StatsService;
 
-public sealed class StatsGateway
+namespace WPFTheWeakestRival.Infrastructure
 {
-    public GetLeaderboardResponse GetTop(int top)
+    internal sealed class StatsGateway
     {
-        StatsServiceClient client = null;
+        private const string STATS_ENDPOINT_NAME = "WSHttpBinding_IStatsService";
 
-        try
-        {
-            client = new StatsServiceClient("WSHttpBinding_IStatsService");
-            return client.GetLeaderboard(new GetLeaderboardRequest { Top = top });
-        }
-        finally
-        {
-            CloseClientSafely(client);
-        }
-    }
+        private const string CONTEXT_GET_TOP = "StatsGateway.GetTop";
+        private const string CONTEXT_CLOSE_CLIENT = "StatsGateway.CloseClientSafely";
 
-    private static void CloseClientSafely(ICommunicationObject client)
-    {
-        if (client == null)
-        {
-            return;
-        }
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(StatsGateway));
 
-        try
+        public GetLeaderboardResponse GetTop(int top)
         {
-            if (client.State == CommunicationState.Faulted)
+            if (top <= 0)
             {
-                client.Abort();
+                throw new ArgumentOutOfRangeException(nameof(top));
+            }
+
+            StatsServiceClient client = null;
+
+            try
+            {
+                client = new StatsServiceClient(STATS_ENDPOINT_NAME);
+
+                var request = new GetLeaderboardRequest
+                {
+                    Top = top
+                };
+
+                return client.GetLeaderboard(request);
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn(CONTEXT_GET_TOP, ex);
+                throw;
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Error(CONTEXT_GET_TOP, ex);
+                throw;
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Error(CONTEXT_GET_TOP, ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(CONTEXT_GET_TOP, ex);
+                throw;
+            }
+            finally
+            {
+                CloseClientSafely(client);
+            }
+        }
+
+        private static void CloseClientSafely(ICommunicationObject client)
+        {
+            if (client == null)
+            {
                 return;
             }
 
-            client.Close();
-        }
-        catch
-        {
-            client.Abort();
-            throw;
+            try
+            {
+                if (client.State == CommunicationState.Faulted)
+                {
+                    client.Abort();
+                    return;
+                }
+
+                client.Close();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn(CONTEXT_CLOSE_CLIENT, ex);
+                client.Abort();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn(CONTEXT_CLOSE_CLIENT, ex);
+                client.Abort();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(CONTEXT_CLOSE_CLIENT, ex);
+                client.Abort();
+                throw;
+            }
         }
     }
 }

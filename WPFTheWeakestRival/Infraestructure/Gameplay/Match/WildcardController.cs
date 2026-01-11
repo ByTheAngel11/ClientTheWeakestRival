@@ -423,9 +423,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
+            string code = selectedWildcard.Code.Trim();
+
             try
             {
-                string code = selectedWildcard.Code.Trim();
                 string uriString = string.Format(
                     CultureInfo.InvariantCulture,
                     "pack://application:,,,/Assets/Wildcards/{0}.png",
@@ -443,10 +444,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.WarnFormat(
-                    "No se pudo cargar la imagen del comodín '{0}'.",
-                    selectedWildcard != null ? selectedWildcard.Code : string.Empty);
-
+                Logger.WarnFormat("No se pudo cargar la imagen del comodín '{0}'.", code);
                 Logger.Warn("WildcardController.UpdateIcon", ex);
 
                 ui.ImgWildcardIcon.Visibility = Visibility.Collapsed;
