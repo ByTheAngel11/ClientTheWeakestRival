@@ -19,9 +19,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private const string DarknessUnknownName = "???";
         private const string DarknessTurnLabel = "A oscuras";
-
         private const string LightningInProgressText = "Reto relámpago en curso";
         private const string SurpriseExamMyTurnText = "Examen sorpresa: responde";
+        private const string OtherAnswerRegisteredText = "Respuesta registrada.";
 
         private const int MIN_SECONDS = 0;
 
@@ -508,7 +508,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             remainingSeconds = limitSeconds;
 
             UpdateTimerText();
-
             timer.Start(limitSeconds);
         }
 
@@ -519,39 +518,59 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            bool isMyPlayer = player != null && player.UserId == state.MyUserId;
-
-            if (isMyPlayer)
+            if (IsMyPlayer(player))
             {
-                state.MyTotalAnswers++;
-
-                if (result != null && result.IsCorrect)
-                {
-                    state.MyCorrectAnswers++;
-                }
-
-                bool isCorrect = result != null && result.IsCorrect;
-
-                ui.TxtAnswerFeedback.Text = isCorrect
-                    ? MatchConstants.DEFAULT_CORRECT_TEXT
-                    : MatchConstants.DEFAULT_INCORRECT_TEXT;
-
-                ui.TxtAnswerFeedback.Foreground = isCorrect ? Brushes.LawnGreen : Brushes.OrangeRed;
-
+                UpdateMyAnswerStats(result);
+                ShowMyAnswerFeedback(result);
                 return;
             }
 
             if (state.IsDarknessActive)
             {
-                ui.TxtAnswerFeedback.Text = "Respuesta registrada.";
-                ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+                ShowOtherAnswerRegistered();
                 return;
             }
 
-            string name = string.IsNullOrWhiteSpace(player != null ? player.DisplayName : null)
-                ? MatchConstants.DEFAULT_OTHER_PLAYER_NAME
-                : player.DisplayName;
+            ShowOtherPlayerAnswerFeedback(player, result);
+        }
 
+        private bool IsMyPlayer(GameplayServiceProxy.PlayerSummary player)
+        {
+            return player != null && player.UserId == state.MyUserId;
+        }
+
+        private void UpdateMyAnswerStats(GameplayServiceProxy.AnswerResult result)
+        {
+            state.MyTotalAnswers++;
+
+            if (result != null && result.IsCorrect)
+            {
+                state.MyCorrectAnswers++;
+            }
+        }
+
+        private void ShowMyAnswerFeedback(GameplayServiceProxy.AnswerResult result)
+        {
+            bool isCorrect = result != null && result.IsCorrect;
+
+            ui.TxtAnswerFeedback.Text = isCorrect
+                ? MatchConstants.DEFAULT_CORRECT_TEXT
+                : MatchConstants.DEFAULT_INCORRECT_TEXT;
+
+            ui.TxtAnswerFeedback.Foreground = isCorrect
+                ? Brushes.LawnGreen
+                : Brushes.OrangeRed;
+        }
+
+        private void ShowOtherAnswerRegistered()
+        {
+            ui.TxtAnswerFeedback.Text = OtherAnswerRegisteredText;
+            ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+        }
+
+        private void ShowOtherPlayerAnswerFeedback(GameplayServiceProxy.PlayerSummary player, GameplayServiceProxy.AnswerResult result)
+        {
+            string name = ResolveOtherPlayerName(player);
             bool otherIsCorrect = result != null && result.IsCorrect;
 
             ui.TxtAnswerFeedback.Text = otherIsCorrect
@@ -559,6 +578,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 : string.Format(CultureInfo.CurrentCulture, "{0} respondió incorrecto.", name);
 
             ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+        }
+
+        private static string ResolveOtherPlayerName(GameplayServiceProxy.PlayerSummary player)
+        {
+            string displayName = player != null ? player.DisplayName : null;
+
+            return string.IsNullOrWhiteSpace(displayName)
+                ? MatchConstants.DEFAULT_OTHER_PLAYER_NAME
+                : displayName;
         }
 
         public void OnBankUpdated(GameplayServiceProxy.BankState bank)
@@ -649,7 +677,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 };
 
                 GameplayServiceProxy.BankResponse response = await gameplay.BankAsync(request);
-
                 if (response != null)
                 {
                     OnBankUpdated(response.Bank);
@@ -682,7 +709,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 MessageBoxImage.Information);
 
             state.IsMyTurn = false;
-
             timer.Stop();
             DisableInteractionsForTurn();
 
@@ -796,6 +822,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             button.Background = Brushes.Transparent;
         }
 
+        private static void SetAnswerButtonContent(GameplayServiceProxy.AnswerDto[] answers, int index, Button button)
+        {
+            // (No usada; solo para evitar overloads accidentales si copias/pegas.)
+        }
+
         private static void SetAnswerButtonContent(Button button, GameplayServiceProxy.AnswerDto[] answers, int index)
         {
             if (button == null)
@@ -812,7 +843,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 button.Visibility = Visibility.Visible;
                 button.IsEnabled = true;
                 button.Background = Brushes.Transparent;
-
                 return;
             }
 

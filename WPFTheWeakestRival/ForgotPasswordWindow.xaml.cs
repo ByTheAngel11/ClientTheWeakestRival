@@ -14,7 +14,6 @@ namespace WPFTheWeakestRival
     {
         private const int DEFAULT_RESEND_COOLDOWN_SECONDS = 60;
         private const int COOLDOWN_TICK_SECONDS = 1;
-
         private const int MIN_PASSWORD_LENGTH = 8;
 
         private const string WINDOW_TITLE_PASSWORD_RESET = "Recuperar contraseña";
@@ -24,13 +23,14 @@ namespace WPFTheWeakestRival
         private const string MSG_PASSWORDS_REQUIRED = "Debes ingresar y confirmar la nueva contraseña.";
         private const string MSG_PASSWORDS_MISMATCH = "La nueva contraseña y su confirmación no coinciden.";
         private const string MSG_PASSWORD_MIN_LENGTH_FORMAT = "La contraseña debe tener al menos {0} caracteres.";
-
         private const string MSG_CODE_SENT_INITIAL = "Se envió un código de recuperación a tu correo.";
         private const string MSG_CODE_SENT_RESEND = "Se envió un nuevo código de recuperación a tu correo.";
-
         private const string MSG_RESET_SUCCESS =
             "Tu contraseña ha sido restablecida correctamente.\n\n" +
             "Para continuar, debes ganar una mano de blackjack.";
+
+        private const string MSG_SEND_CODE_NETWORK_ERROR = "Error de red/servicio al enviar el código.";
+        private const string MSG_SEND_CODE_UNEXPECTED_ERROR = "Ocurrió un error al enviar el código de recuperación.";
 
         private const string FAULT_TOO_SOON = "TOO_SOON";
         private const string FAULT_CODE_INVALID = "CODE_INVALID";
@@ -142,114 +142,38 @@ namespace WPFTheWeakestRival
 
         private async Task SendPasswordResetCodeAsync(bool isInitial)
         {
-            string currentEmail = (txtEmail.Text ?? string.Empty).Trim();
-
-            if (string.IsNullOrWhiteSpace(currentEmail))
+            string currentEmail = GetTrimmedEmail();
+            if (!EnsureEmailForSend(currentEmail, isInitial))
             {
-                if (!isInitial)
-                {
-                    ShowWarning(MSG_EMAIL_REQUIRED_RESEND);
-                }
-
                 return;
             }
 
             btnResend.IsEnabled = false;
 
             AuthServiceClient authClient = new AuthServiceClient();
-
             try
             {
-                var request = new BeginPasswordResetRequest
-                {
-                    Email = currentEmail
-                };
-
-                BeginPasswordResetResponse response = await authClient.BeginPasswordResetAsync(request);
-
-                int resendAfterSeconds = response != null ? response.ResendAfterSeconds : 0;
-                if (resendAfterSeconds > 0)
-                {
-                    resendCooldownSeconds = resendAfterSeconds;
-                }
-
-                StartResendCooldown(resendCooldownSeconds);
-
-                txtCode.Clear();
-                txtCode.Focus();
-
-                string message = isInitial ? MSG_CODE_SENT_INITIAL : MSG_CODE_SENT_RESEND;
-                ShowInfo(message);
+                BeginPasswordResetResponse response = await BeginPasswordResetAsync(authClient, currentEmail);
+                ApplyBeginResetSuccess(response, isInitial);
             }
             catch (FaultException<ServiceFault> ex)
             {
-                authClient.Abort();
-
-                string faultCode = ex.Detail != null ? ex.Detail.Code : string.Empty;
-                string faultMessage = ex.Detail != null ? ex.Detail.Message : ex.Message;
-
-                Logger.Warn("Fault al obtener/enviar código de recuperación.", ex);
-
-                MessageBox.Show(
-                    string.Format(CultureInfo.CurrentCulture, "{0}: {1}", faultCode, faultMessage),
-                    WINDOW_TITLE_PASSWORD_RESET,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                if (string.Equals(faultCode, FAULT_TOO_SOON, StringComparison.OrdinalIgnoreCase))
-                {
-                    StartResendCooldown(resendCooldownSeconds);
-                }
-                else
-                {
-                    btnResend.IsEnabled = true;
-                }
+                HandleBeginResetFault(ex);
             }
             catch (TimeoutException ex)
             {
-                authClient.Abort();
-
-                Logger.Error("Timeout al enviar el código de recuperación.", ex);
-
-                MessageBox.Show(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Error de red/servicio al enviar el código: {0}",
-                        ex.Message),
-                    WINDOW_TITLE_PASSWORD_RESET,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-
-                btnResend.IsEnabled = true;
+                HandleBeginResetConnectivityError("Timeout al enviar el código de recuperación.", ex);
             }
             catch (CommunicationException ex)
             {
-                authClient.Abort();
-
-                Logger.Error("Error de comunicación al enviar el código de recuperación.", ex);
-
-                MessageBox.Show(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Error de red/servicio al enviar el código: {0}",
-                        ex.Message),
-                    WINDOW_TITLE_PASSWORD_RESET,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-
-                btnResend.IsEnabled = true;
+                HandleBeginResetConnectivityError("Error de comunicación al enviar el código de recuperación.", ex);
             }
             catch (Exception ex)
             {
-                authClient.Abort();
-
                 Logger.Error("Error inesperado al enviar el código de recuperación.", ex);
 
                 MessageBox.Show(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Error de red/servicio al enviar el código: {0}",
-                        ex.Message),
+                    MSG_SEND_CODE_UNEXPECTED_ERROR,
                     WINDOW_TITLE_PASSWORD_RESET,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -260,6 +184,88 @@ namespace WPFTheWeakestRival
             {
                 CloseOrAbortSafely(authClient);
             }
+        }
+
+        private string GetTrimmedEmail()
+        {
+            return (txtEmail.Text ?? string.Empty).Trim();
+        }
+
+        private bool EnsureEmailForSend(string currentEmail, bool isInitial)
+        {
+            if (!string.IsNullOrWhiteSpace(currentEmail))
+            {
+                return true;
+            }
+
+            if (!isInitial)
+            {
+                ShowWarning(MSG_EMAIL_REQUIRED_RESEND);
+            }
+
+            return false;
+        }
+
+        private static Task<BeginPasswordResetResponse> BeginPasswordResetAsync(AuthServiceClient authClient, string currentEmail)
+        {
+            var request = new BeginPasswordResetRequest
+            {
+                Email = currentEmail
+            };
+
+            return authClient.BeginPasswordResetAsync(request);
+        }
+
+        private void ApplyBeginResetSuccess(BeginPasswordResetResponse response, bool isInitial)
+        {
+            int resendAfterSeconds = response != null ? response.ResendAfterSeconds : 0;
+            if (resendAfterSeconds > 0)
+            {
+                resendCooldownSeconds = resendAfterSeconds;
+            }
+
+            StartResendCooldown(resendCooldownSeconds);
+
+            txtCode.Clear();
+            txtCode.Focus();
+
+            string message = isInitial ? MSG_CODE_SENT_INITIAL : MSG_CODE_SENT_RESEND;
+            ShowInfo(message);
+        }
+
+        private void HandleBeginResetFault(FaultException<ServiceFault> ex)
+        {
+            string faultCode = ex.Detail != null ? ex.Detail.Code : string.Empty;
+            string faultMessage = ex.Detail != null ? ex.Detail.Message : ex.Message;
+
+            Logger.Warn("Fault al obtener/enviar código de recuperación.", ex);
+
+            MessageBox.Show(
+                string.Format(CultureInfo.CurrentCulture, "{0}: {1}", faultCode, faultMessage),
+                WINDOW_TITLE_PASSWORD_RESET,
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            if (string.Equals(faultCode, FAULT_TOO_SOON, StringComparison.OrdinalIgnoreCase))
+            {
+                StartResendCooldown(resendCooldownSeconds);
+                return;
+            }
+
+            btnResend.IsEnabled = true;
+        }
+
+        private void HandleBeginResetConnectivityError(string logMessage, Exception ex)
+        {
+            Logger.Error(logMessage, ex);
+
+            MessageBox.Show(
+                MSG_SEND_CODE_NETWORK_ERROR,
+                WINDOW_TITLE_PASSWORD_RESET,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            btnResend.IsEnabled = true;
         }
 
         private async void ResendClick(object sender, RoutedEventArgs e)
@@ -533,8 +539,8 @@ namespace WPFTheWeakestRival
             StopCooldownTimer();
 
             isNavigationHandled = true;
-
             ShowOwnerOrLoginWindow();
+
             Close();
         }
 
