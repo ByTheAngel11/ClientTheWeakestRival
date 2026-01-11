@@ -20,6 +20,14 @@ namespace WPFTheWeakestRival.Infrastructure
         private const int DEFAULT_AVATAR_SIZE = 36;
         private const string DEVICE_NAME = "WPF";
 
+        private const string LOG_CTX_ABORT_CLIENT = "FriendManager.AbortClient";
+        private const string LOG_CTX_CLOSE_CLIENT = "FriendManager.CloseClient";
+        private const string LOG_CTX_GET_OR_CREATE_CLIENT = "FriendManager.GetOrCreateClient";
+        private const string LOG_CTX_SEND_HEARTBEAT = "FriendManager.SendHeartbeatSafeAsync";
+        private const string LOG_CTX_REFRESH_FRIENDS = "FriendManager.RefreshFriendsSafeAsync";
+        private const string LOG_CTX_WARM_UP_AVATARS = "FriendManager.WarmUpAvatarsAsync";
+        private const string LOG_CTX_DISPOSE = "FriendManager.Dispose";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(FriendManager));
 
         private readonly string endpointName;
@@ -99,8 +107,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 client.State == CommunicationState.Closed ||
                 client.State == CommunicationState.Faulted)
             {
-                try { client?.Abort(); } catch { }
-
+                AbortClientSafe(client, LOG_CTX_GET_OR_CREATE_CLIENT);
                 client = CreateClient();
             }
 
@@ -109,28 +116,68 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private void CloseClientSafe()
         {
-            var local = client;
+            FriendServiceClient local = client;
             client = null;
 
-            if (local == null)
+            CloseOrAbortClientSafe(local);
+        }
+
+        private static void CloseOrAbortClientSafe(ICommunicationObject communicationObject)
+        {
+            if (communicationObject == null)
             {
                 return;
             }
 
             try
             {
-                if (local.State == CommunicationState.Faulted)
+                if (communicationObject.State == CommunicationState.Faulted)
                 {
-                    local.Abort();
+                    communicationObject.Abort();
+                    return;
                 }
-                else
-                {
-                    local.Close();
-                }
+
+                communicationObject.Close();
             }
-            catch
+            catch (TimeoutException ex)
             {
-                try { local.Abort(); } catch { }
+                Logger.Debug(LOG_CTX_CLOSE_CLIENT, ex);
+                AbortClientSafe(communicationObject, LOG_CTX_CLOSE_CLIENT);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Debug(LOG_CTX_CLOSE_CLIENT, ex);
+                AbortClientSafe(communicationObject, LOG_CTX_CLOSE_CLIENT);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(LOG_CTX_CLOSE_CLIENT, ex);
+                AbortClientSafe(communicationObject, LOG_CTX_CLOSE_CLIENT);
+            }
+        }
+
+        private static void AbortClientSafe(ICommunicationObject communicationObject, string context)
+        {
+            if (communicationObject == null)
+            {
+                return;
+            }
+
+            try
+            {
+                communicationObject.Abort();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Debug(context ?? LOG_CTX_ABORT_CLIENT, ex);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Debug(context ?? LOG_CTX_ABORT_CLIENT, ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(context ?? LOG_CTX_ABORT_CLIENT, ex);
             }
         }
 
@@ -161,9 +208,17 @@ namespace WPFTheWeakestRival.Infrastructure
                     Device = DEVICE_NAME
                 });
             }
+            catch (TimeoutException ex)
+            {
+                Logger.Debug(LOG_CTX_SEND_HEARTBEAT, ex);
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Debug(LOG_CTX_SEND_HEARTBEAT, ex);
+            }
             catch (Exception ex)
             {
-                Logger.Debug("Heartbeat failed (best-effort).", ex);
+                Logger.Debug(LOG_CTX_SEND_HEARTBEAT, ex);
             }
         }
 
@@ -280,9 +335,17 @@ namespace WPFTheWeakestRival.Infrastructure
                         ApplyAvatarToLastItems(f.AccountId, image);
                     }
                 }
+                catch (TimeoutException ex)
+                {
+                    Logger.Debug(LOG_CTX_WARM_UP_AVATARS, ex);
+                }
+                catch (CommunicationException ex)
+                {
+                    Logger.Debug(LOG_CTX_WARM_UP_AVATARS, ex);
+                }
                 catch (Exception ex)
                 {
-                    Logger.Debug("WarmUpAvatarsAsync: best-effort failed.", ex);
+                    Logger.Debug(LOG_CTX_WARM_UP_AVATARS, ex);
                 }
             }
         }
@@ -374,7 +437,7 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Warn("Error stopping timers on dispose.", ex);
+                Logger.Warn(LOG_CTX_DISPOSE, ex);
             }
 
             CloseClientSafe();

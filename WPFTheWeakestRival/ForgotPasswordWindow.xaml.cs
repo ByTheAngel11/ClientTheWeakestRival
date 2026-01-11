@@ -32,6 +32,9 @@ namespace WPFTheWeakestRival
         private const string MSG_SEND_CODE_NETWORK_ERROR = "Error de red/servicio al enviar el código.";
         private const string MSG_SEND_CODE_UNEXPECTED_ERROR = "Ocurrió un error al enviar el código de recuperación.";
 
+        private const string MSG_RESET_PASSWORD_NETWORK_ERROR = "Error de red/servicio al restablecer la contraseña.";
+        private const string MSG_RESET_PASSWORD_UNEXPECTED_ERROR = "Ocurrió un error al restablecer la contraseña.";
+
         private const string FAULT_TOO_SOON = "TOO_SOON";
         private const string FAULT_CODE_INVALID = "CODE_INVALID";
         private const string FAULT_CODE_EXPIRED = "CODE_EXPIRED";
@@ -49,7 +52,7 @@ namespace WPFTheWeakestRival
         {
             InitializeComponent();
 
-            this.email = (email ?? string.Empty).Trim();
+            this.email = GetTrimmedEmail(email);
             txtEmail.Text = this.email;
 
             this.resendCooldownSeconds = resendCooldownSeconds > 0
@@ -142,7 +145,7 @@ namespace WPFTheWeakestRival
 
         private async Task SendPasswordResetCodeAsync(bool isInitial)
         {
-            string currentEmail = GetTrimmedEmail();
+            string currentEmail = GetTrimmedEmail(txtEmail.Text);
             if (!EnsureEmailForSend(currentEmail, isInitial))
             {
                 return;
@@ -158,18 +161,29 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<ServiceFault> ex)
             {
-                HandleBeginResetFault(ex);
+                authClient.Abort();
+
+                HandleBeginResetFault(
+                    ex,
+                    new BeginResetFaultUiHandlers(
+                        resendCooldownSeconds,
+                        StartResendCooldown,
+                        EnableResendButton));
             }
             catch (TimeoutException ex)
             {
-                HandleBeginResetConnectivityError("Timeout al enviar el código de recuperación.", ex);
+                authClient.Abort();
+                HandleBeginResetConnectivityError("Timeout al enviar el código de recuperación.", ex, EnableResendButton);
             }
             catch (CommunicationException ex)
             {
-                HandleBeginResetConnectivityError("Error de comunicación al enviar el código de recuperación.", ex);
+                authClient.Abort();
+                HandleBeginResetConnectivityError("Error de comunicación al enviar el código de recuperación.", ex, EnableResendButton);
             }
             catch (Exception ex)
             {
+                authClient.Abort();
+
                 Logger.Error("Error inesperado al enviar el código de recuperación.", ex);
 
                 MessageBox.Show(
@@ -186,12 +200,12 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private string GetTrimmedEmail()
+        private static string GetTrimmedEmail(string rawEmail)
         {
-            return (txtEmail.Text ?? string.Empty).Trim();
+            return (rawEmail ?? string.Empty).Trim();
         }
 
-        private bool EnsureEmailForSend(string currentEmail, bool isInitial)
+        private static bool EnsureEmailForSend(string currentEmail, bool isInitial)
         {
             if (!string.IsNullOrWhiteSpace(currentEmail))
             {
@@ -204,6 +218,14 @@ namespace WPFTheWeakestRival
             }
 
             return false;
+        }
+
+        private void EnableResendButton()
+        {
+            if (btnResend != null)
+            {
+                btnResend.IsEnabled = true;
+            }
         }
 
         private static Task<BeginPasswordResetResponse> BeginPasswordResetAsync(AuthServiceClient authClient, string currentEmail)
@@ -233,7 +255,9 @@ namespace WPFTheWeakestRival
             ShowInfo(message);
         }
 
-        private void HandleBeginResetFault(FaultException<ServiceFault> ex)
+        private static void HandleBeginResetFault(
+            FaultException<ServiceFault> ex,
+            BeginResetFaultUiHandlers uiHandlers)
         {
             string faultCode = ex.Detail != null ? ex.Detail.Code : string.Empty;
             string faultMessage = ex.Detail != null ? ex.Detail.Message : ex.Message;
@@ -248,14 +272,18 @@ namespace WPFTheWeakestRival
 
             if (string.Equals(faultCode, FAULT_TOO_SOON, StringComparison.OrdinalIgnoreCase))
             {
-                StartResendCooldown(resendCooldownSeconds);
+                int seconds = uiHandlers != null ? uiHandlers.CooldownSeconds : 0;
+                if (uiHandlers != null && uiHandlers.StartCooldown != null)
+                {
+                    uiHandlers.StartCooldown(seconds);
+                }
                 return;
             }
 
-            btnResend.IsEnabled = true;
+            uiHandlers?.EnableResend?.Invoke();
         }
 
-        private void HandleBeginResetConnectivityError(string logMessage, Exception ex)
+        private static void HandleBeginResetConnectivityError(string logMessage, Exception ex, Action enableResendAction)
         {
             Logger.Error(logMessage, ex);
 
@@ -265,7 +293,7 @@ namespace WPFTheWeakestRival
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
 
-            btnResend.IsEnabled = true;
+            enableResendAction?.Invoke();
         }
 
         private async void ResendClick(object sender, RoutedEventArgs e)
@@ -279,7 +307,9 @@ namespace WPFTheWeakestRival
 
             try
             {
-                ResetPasswordInput input = ValidateResetInputs();
+                ResetFields fields = ReadResetFieldsFromUi();
+                ResetPasswordInput input = ValidateResetInputs(fields);
+
                 if (!input.IsValid)
                 {
                     ShowWarning(input.ValidationMessage);
@@ -312,29 +342,38 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private ResetPasswordInput ValidateResetInputs()
+        private ResetFields ReadResetFieldsFromUi()
         {
-            string currentEmail = (txtEmail.Text ?? string.Empty).Trim();
-            string code = (txtCode.Text ?? string.Empty).Trim();
-            string newPassword = pwdNewPassword.Password ?? string.Empty;
-            string confirmPassword = pwdConfirmPassword.Password ?? string.Empty;
+            return new ResetFields(
+                GetTrimmedEmail(txtEmail.Text),
+                GetTrimmedEmail(txtCode.Text),
+                pwdNewPassword.Password ?? string.Empty,
+                pwdConfirmPassword.Password ?? string.Empty);
+        }
 
-            if (string.IsNullOrWhiteSpace(currentEmail) || string.IsNullOrWhiteSpace(code))
+        private static ResetPasswordInput ValidateResetInputs(ResetFields fields)
+        {
+            if (fields == null)
             {
                 return ResetPasswordInput.Invalid(MSG_EMAIL_AND_CODE_REQUIRED);
             }
 
-            if (string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+            if (string.IsNullOrWhiteSpace(fields.Email) || string.IsNullOrWhiteSpace(fields.Code))
+            {
+                return ResetPasswordInput.Invalid(MSG_EMAIL_AND_CODE_REQUIRED);
+            }
+
+            if (string.IsNullOrWhiteSpace(fields.NewPassword) || string.IsNullOrWhiteSpace(fields.ConfirmPassword))
             {
                 return ResetPasswordInput.Invalid(MSG_PASSWORDS_REQUIRED);
             }
 
-            if (!string.Equals(newPassword, confirmPassword, StringComparison.Ordinal))
+            if (!string.Equals(fields.NewPassword, fields.ConfirmPassword, StringComparison.Ordinal))
             {
                 return ResetPasswordInput.Invalid(MSG_PASSWORDS_MISMATCH);
             }
 
-            if (newPassword.Length < MIN_PASSWORD_LENGTH)
+            if (fields.NewPassword.Length < MIN_PASSWORD_LENGTH)
             {
                 return ResetPasswordInput.Invalid(
                     string.Format(
@@ -343,7 +382,7 @@ namespace WPFTheWeakestRival
                         MIN_PASSWORD_LENGTH));
             }
 
-            return ResetPasswordInput.Valid(currentEmail, code, newPassword);
+            return ResetPasswordInput.Valid(fields.Email, fields.Code, fields.NewPassword);
         }
 
         private async Task<bool> TryCompletePasswordResetAsync(CompletePasswordResetRequest request)
@@ -358,7 +397,11 @@ namespace WPFTheWeakestRival
             catch (FaultException<ServiceFault> ex)
             {
                 authClient.Abort();
-                HandleResetFault(ex);
+
+                HandleResetFault(
+                    ex,
+                    new ResetFaultUiHandlers(FocusInvalidCode, FocusExpiredCode));
+
                 return false;
             }
             catch (TimeoutException ex)
@@ -368,10 +411,7 @@ namespace WPFTheWeakestRival
                 Logger.Error("Timeout al restablecer la contraseña.", ex);
 
                 MessageBox.Show(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Error al restablecer la contraseña: {0}",
-                        ex.Message),
+                    MSG_RESET_PASSWORD_NETWORK_ERROR,
                     WINDOW_TITLE_PASSWORD_RESET,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -385,10 +425,7 @@ namespace WPFTheWeakestRival
                 Logger.Error("Error de comunicación al restablecer la contraseña.", ex);
 
                 MessageBox.Show(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Error al restablecer la contraseña: {0}",
-                        ex.Message),
+                    MSG_RESET_PASSWORD_NETWORK_ERROR,
                     WINDOW_TITLE_PASSWORD_RESET,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -402,10 +439,7 @@ namespace WPFTheWeakestRival
                 Logger.Error("Error inesperado al restablecer la contraseña.", ex);
 
                 MessageBox.Show(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Error al restablecer la contraseña: {0}",
-                        ex.Message),
+                    MSG_RESET_PASSWORD_UNEXPECTED_ERROR,
                     WINDOW_TITLE_PASSWORD_RESET,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -418,7 +452,21 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void HandleResetFault(FaultException<ServiceFault> ex)
+        private void FocusInvalidCode()
+        {
+            txtCode.SelectAll();
+            txtCode.Focus();
+        }
+
+        private void FocusExpiredCode()
+        {
+            txtCode.Clear();
+            btnResend.Focus();
+        }
+
+        private static void HandleResetFault(
+            FaultException<ServiceFault> ex,
+            ResetFaultUiHandlers uiHandlers)
         {
             string faultCode = ex.Detail != null ? ex.Detail.Code : string.Empty;
             string faultMessage = ex.Detail != null ? ex.Detail.Message : ex.Message;
@@ -431,15 +479,13 @@ namespace WPFTheWeakestRival
 
             if (string.Equals(faultCode, FAULT_CODE_INVALID, StringComparison.OrdinalIgnoreCase))
             {
-                txtCode.SelectAll();
-                txtCode.Focus();
+                uiHandlers?.OnInvalidCode?.Invoke();
                 return;
             }
 
             if (string.Equals(faultCode, FAULT_CODE_EXPIRED, StringComparison.OrdinalIgnoreCase))
             {
-                txtCode.Clear();
-                btnResend.Focus();
+                uiHandlers?.OnExpiredCode?.Invoke();
             }
         }
 
@@ -462,19 +508,18 @@ namespace WPFTheWeakestRival
             }
             catch (TimeoutException ex)
             {
-                LogManager.GetLogger(typeof(ForgotPasswordWindow)).Warn("CloseOrAbortSafely timeout.", ex);
+                Logger.Warn("CloseOrAbortSafely timeout.", ex);
                 client.Abort();
             }
             catch (CommunicationException ex)
             {
-                LogManager.GetLogger(typeof(ForgotPasswordWindow)).Warn("CloseOrAbortSafely communication error.", ex);
+                Logger.Warn("CloseOrAbortSafely communication error.", ex);
                 client.Abort();
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof(ForgotPasswordWindow)).Error("CloseOrAbortSafely unexpected error.", ex);
+                Logger.Error("CloseOrAbortSafely unexpected error.", ex);
                 client.Abort();
-                throw;
             }
         }
 
@@ -542,6 +587,48 @@ namespace WPFTheWeakestRival
             ShowOwnerOrLoginWindow();
 
             Close();
+        }
+
+        private sealed class ResetFields
+        {
+            public ResetFields(string email, string code, string newPassword, string confirmPassword)
+            {
+                Email = email ?? string.Empty;
+                Code = code ?? string.Empty;
+                NewPassword = newPassword ?? string.Empty;
+                ConfirmPassword = confirmPassword ?? string.Empty;
+            }
+
+            public string Email { get; }
+            public string Code { get; }
+            public string NewPassword { get; }
+            public string ConfirmPassword { get; }
+        }
+
+        private sealed class BeginResetFaultUiHandlers
+        {
+            public BeginResetFaultUiHandlers(int cooldownSeconds, Action<int> startCooldown, Action enableResend)
+            {
+                CooldownSeconds = cooldownSeconds;
+                StartCooldown = startCooldown;
+                EnableResend = enableResend;
+            }
+
+            public int CooldownSeconds { get; }
+            public Action<int> StartCooldown { get; }
+            public Action EnableResend { get; }
+        }
+
+        private sealed class ResetFaultUiHandlers
+        {
+            public ResetFaultUiHandlers(Action onInvalidCode, Action onExpiredCode)
+            {
+                OnInvalidCode = onInvalidCode;
+                OnExpiredCode = onExpiredCode;
+            }
+
+            public Action OnInvalidCode { get; }
+            public Action OnExpiredCode { get; }
         }
 
         private sealed class ResetPasswordInput
