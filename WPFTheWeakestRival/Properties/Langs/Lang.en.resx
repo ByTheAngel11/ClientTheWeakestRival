@@ -583,4 +583,91 @@
   <data name="logoutFailed" xml:space="preserve">
     <value>Logout failed</value>
   </data>
+  <data name="Report.SubmitPlayerReport.Sql.2" xml:space="preserve">
+    <value>Database error: The SQL Server service is turned off or inaccessible. The report could not be sent. Try later.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.53" xml:space="preserve">
+    <value>Database error: The specified server could not be found. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.-1" xml:space="preserve">
+    <value>Database error: Connection timed out. The report could not be sent. Try again.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.121" xml:space="preserve">
+    <value>Database error: Connection timed out. The report could not be sent. Try again.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.11001" xml:space="preserve">
+    <value>Database error: Host/server does not exist on the network. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.4060" xml:space="preserve">
+    <value>Database error: The database does not exist or cannot be opened. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.208" xml:space="preserve">
+    <value>Database error: A required table or object is missing. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.207" xml:space="preserve">
+    <value>Database error: A required column is missing. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2812" xml:space="preserve">
+    <value>Database error: Stored procedure does not exist. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.18456" xml:space="preserve">
+    <value>Database error: Invalid credentials when connecting. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.229" xml:space="preserve">
+    <value>Database error: Permission denied to execute operation. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2627" xml:space="preserve">
+    <value>Database error: duplicate record (PK/unique index violation). The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2601" xml:space="preserve">
+    <value>Database error: duplicate record (unique index violation). The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.547" xml:space="preserve">
+    <value>Database error: relationship conflict. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.515" xml:space="preserve">
+    <value>Database error: An attempt was made to insert a NULL value into a required field. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2628" xml:space="preserve">
+    <value>Database error: Text too long for a column (truncation). The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8152" xml:space="preserve">
+    <value>Database error: Text too long for a column (truncation). The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.245" xml:space="preserve">
+    <value>Database error: invalid data type conversion. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8114" xml:space="preserve">
+    <value>Database error: invalid data type conversion. The report could not be sent.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1205" xml:space="preserve">
+    <value>Database error: deadlock in transaction. The report could not be sent. Try again.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1222" xml:space="preserve">
+    <value>Database error: lock timeout. The report could not be sent. Try again.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1105" xml:space="preserve">
+    <value>Database error: Server disk is full. The report could not be sent. Try later.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.Unknown" xml:space="preserve">
+    <value>Database error: An unexpected problem occurred. The report could not be sent. Try later.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.RequestNull" xml:space="preserve">
+    <value>The report request is not valid.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.TokenInvalid" xml:space="preserve">
+    <value>Your session is not valid when sending report. Sign in again.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidTarget" xml:space="preserve">
+    <value>The report could not be sent: the selected player is not valid.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.SelfReport" xml:space="preserve">
+    <value>You can't report to yourself.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidReason" xml:space="preserve">
+    <value>The report could not be sent: the selected reason is invalid.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.CommentTooLong" xml:space="preserve">
+    <value>The report could not be sent: the comment exceeds the allowed limit.</value>
+  </data>
 </root>

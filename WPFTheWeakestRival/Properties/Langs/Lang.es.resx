@@ -583,4 +583,91 @@
   <data name="logoutFailed" xml:space="preserve">
     <value>Error al cerrar sesión</value>
   </data>
+  <data name="Report.SubmitPlayerReport.Sql.2" xml:space="preserve">
+    <value>Error de base de datos: el servicio de SQL Server está apagado o inaccesible. No se pudo enviar el reporte. Intenta más tarde.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.53" xml:space="preserve">
+    <value>Error de base de datos: no se encontró el servidor especificado. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.-1" xml:space="preserve">
+    <value>Error de base de datos: se agotó el tiempo de espera de conexión. No se pudo enviar el reporte. Intenta de nuevo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.121" xml:space="preserve">
+    <value>Error de base de datos: se agotó el tiempo de espera de conexión. No se pudo enviar el reporte. Intenta de nuevo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.11001" xml:space="preserve">
+    <value>Error de base de datos: el host/servidor no existe en la red. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.4060" xml:space="preserve">
+    <value>Error de base de datos: la base de datos no existe o no se puede abrir. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.208" xml:space="preserve">
+    <value>Error de base de datos: falta una tabla u objeto requerido. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.207" xml:space="preserve">
+    <value>Error de base de datos: falta una columna requerida. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2812" xml:space="preserve">
+    <value>Error de base de datos: el procedimiento almacenado no existe. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.18456" xml:space="preserve">
+    <value>Error de base de datos: credenciales inválidas al conectar. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.229" xml:space="preserve">
+    <value>Error de base de datos: permiso denegado para ejecutar la operación. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2627" xml:space="preserve">
+    <value>Error de base de datos: registro duplicado (violación de PK/índice único). No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2601" xml:space="preserve">
+    <value>Error de base de datos: registro duplicado (violación de índice único). No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.547" xml:space="preserve">
+    <value>Error de base de datos: conflicto de relación. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.515" xml:space="preserve">
+    <value>Error de base de datos: se intentó insertar un valor NULL en un campo requerido. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2628" xml:space="preserve">
+    <value>Error de base de datos: texto demasiado largo para una columna (truncamiento). No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8152" xml:space="preserve">
+    <value>Error de base de datos: texto demasiado largo para una columna (truncamiento). No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.245" xml:space="preserve">
+    <value>Error de base de datos: conversión de tipo de dato inválida. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8114" xml:space="preserve">
+    <value>Error de base de datos: conversión de tipo de dato inválida. No se pudo enviar el reporte.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1205" xml:space="preserve">
+    <value>Error de base de datos: deadlock en la transacción. No se pudo enviar el reporte. Intenta de nuevo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1222" xml:space="preserve">
+    <value>Error de base de datos: tiempo de espera de bloqueo excedido. No se pudo enviar el reporte. Intenta de nuevo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1105" xml:space="preserve">
+    <value>Error de base de datos: el disco del servidor está lleno. No se pudo enviar el reporte. Intenta más tarde.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.Unknown" xml:space="preserve">
+    <value>Error de base de datos: ocurrió un problema inesperado. No se pudo enviar el reporte. Intenta más tarde.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.RequestNull" xml:space="preserve">
+    <value>La solicitud del reporte no es válida.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.TokenInvalid" xml:space="preserve">
+    <value>Tu sesión no es válida al enviar reporte. Inicia sesión de nuevo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidTarget" xml:space="preserve">
+    <value>No se pudo enviar el reporte: el jugador seleccionado no es válido.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.SelfReport" xml:space="preserve">
+    <value>No puedes reportarte a ti mismo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidReason" xml:space="preserve">
+    <value>No se pudo enviar el reporte: el motivo seleccionado no es válido.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.CommentTooLong" xml:space="preserve">
+    <value>No se pudo enviar el reporte: el comentario excede el límite permitido.</value>
+  </data>
 </root>

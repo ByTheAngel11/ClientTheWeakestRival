@@ -583,4 +583,91 @@
   <data name="logoutFailed" xml:space="preserve">
     <value>Falha ao sair</value>
   </data>
+  <data name="Report.SubmitPlayerReport.Sql.2" xml:space="preserve">
+    <value>Erro de banco de dados: o serviço SQL Server está desativado ou inacessível. Não foi possível enviar o relatório. Tente mais tarde.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.53" xml:space="preserve">
+    <value>Erro de banco de dados: o servidor especificado não foi encontrado. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.-1" xml:space="preserve">
+    <value>Erro de banco de dados: Tempo limite de conexão esgotado. Não foi possível enviar o relatório. Tente novamente.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.121" xml:space="preserve">
+    <value>Erro de banco de dados: Tempo limite de conexão esgotado. Não foi possível enviar o relatório. Tente novamente.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.11001" xml:space="preserve">
+    <value>Erro de banco de dados: Host/servidor não existe na rede. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.4060" xml:space="preserve">
+    <value>Erro de banco de dados: O banco de dados não existe ou não pode ser aberto. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.208" xml:space="preserve">
+    <value>Erro de banco de dados: falta uma tabela ou objeto obrigatório. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.207" xml:space="preserve">
+    <value>Erro de banco de dados: falta uma coluna obrigatória. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2812" xml:space="preserve">
+    <value>Erro de banco de dados: o procedimento armazenado não existe. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.18456" xml:space="preserve">
+    <value>Erro de banco de dados: credenciais inválidas ao conectar. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.229" xml:space="preserve">
+    <value>Erro de banco de dados: permissão negada para executar a operação. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2627" xml:space="preserve">
+    <value>Erro de banco de dados: registro duplicado (violação de PK/índice exclusivo). Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2601" xml:space="preserve">
+    <value>Erro no banco de dados: registro duplicado (violação de índice exclusivo). Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.547" xml:space="preserve">
+    <value>Erro de banco de dados: conflito de relacionamento. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.515" xml:space="preserve">
+    <value>Erro de banco de dados: foi feita uma tentativa de inserir um valor NULL em um campo obrigatório. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2628" xml:space="preserve">
+    <value>Erro de banco de dados: Texto muito longo para uma coluna (truncamento). Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8152" xml:space="preserve">
+    <value>Erro de banco de dados: Texto muito longo para uma coluna (truncamento). Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.245" xml:space="preserve">
+    <value>Erro de banco de dados: conversão de tipo de dados inválida. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8114" xml:space="preserve">
+    <value>Erro de banco de dados: conversão de tipo de dados inválida. Não foi possível enviar o relatório.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1205" xml:space="preserve">
+    <value>Erro de banco de dados: impasse na transação. Não foi possível enviar o relatório. Tente novamente.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1222" xml:space="preserve">
+    <value>Erro de banco de dados: tempo limite de bloqueio. Não foi possível enviar o relatório. Tente novamente.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1105" xml:space="preserve">
+    <value>Erro de banco de dados: o disco do servidor está cheio. Não foi possível enviar o relatório. Tente mais tarde.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.Unknown" xml:space="preserve">
+    <value>Erro de banco de dados: ocorreu um problema inesperado. Não foi possível enviar o relatório. Tente mais tarde.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.RequestNull" xml:space="preserve">
+    <value>A solicitação de relatório não é válida.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.TokenInvalid" xml:space="preserve">
+    <value>Sua sessão não é válida ao enviar relatório. Faça login novamente.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidTarget" xml:space="preserve">
+    <value>Não foi possível enviar o relatório: o jogador selecionado não é válido.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.SelfReport" xml:space="preserve">
+    <value>Você não pode reportar a si mesmo.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidReason" xml:space="preserve">
+    <value>O relatório não pôde ser enviado: o motivo selecionado é inválido.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.CommentTooLong" xml:space="preserve">
+    <value>Não foi possível enviar o relatório: o comentário excede o limite permitido.</value>
+  </data>
 </root>

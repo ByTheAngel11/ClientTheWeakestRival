@@ -1168,6 +1168,276 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Connection timed out. The report could not be sent. Try again..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql__1 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.-1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Host/server does not exist on the network. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_11001 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Server disk is full. The report could not be sent. Try later..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_1105 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.1105", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: deadlock in transaction. The report could not be sent. Try again..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_1205 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.1205", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Connection timed out. The report could not be sent. Try again..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_121 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.121", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: lock timeout. The report could not be sent. Try again..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_1222 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.1222", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Invalid credentials when connecting. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_18456 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.18456", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: The SQL Server service is turned off or inaccessible. The report could not be sent. Try later..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_2 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: A required column is missing. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_207 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.207", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: A required table or object is missing. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_208 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.208", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Permission denied to execute operation. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_229 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.229", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: invalid data type conversion. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_245 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.245", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: duplicate record (unique index violation). The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_2601 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.2601", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: duplicate record (PK/unique index violation). The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_2627 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.2627", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Text too long for a column (truncation). The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_2628 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.2628", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Stored procedure does not exist. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_2812 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.2812", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: The database does not exist or cannot be opened. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_4060 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.4060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: An attempt was made to insert a NULL value into a required field. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_515 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.515", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: The specified server could not be found. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_53 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.53", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: relationship conflict. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_547 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.547", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: invalid data type conversion. The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_8114 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.8114", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: Text too long for a column (truncation). The report could not be sent..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_8152 {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.8152", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Database error: An unexpected problem occurred. The report could not be sent. Try later..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Sql_Unknown {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Sql.Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Unexpected {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The report could not be sent: the comment exceeds the allowed limit..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Validation_CommentTooLong {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Validation.CommentTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The report could not be sent: the selected reason is invalid..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Validation_InvalidReason {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Validation.InvalidReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The report could not be sent: the selected player is not valid..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Validation_InvalidTarget {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Validation.InvalidTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The report request is not valid..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Validation_RequestNull {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Validation.RequestNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You can&apos;t report to yourself..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Validation_SelfReport {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Validation.SelfReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your session is not valid when sending report. Sign in again..
+        /// </summary>
+        public static string Report_SubmitPlayerReport_Validation_TokenInvalid {
+            get {
+                return ResourceManager.GetString("Report.SubmitPlayerReport.Validation.TokenInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a You must wait 30 minutes to report that player again..
         /// </summary>
         public static string reportCooldown {

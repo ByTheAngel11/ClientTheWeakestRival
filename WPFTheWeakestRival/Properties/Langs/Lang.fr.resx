@@ -583,4 +583,91 @@
   <data name="logoutFailed" xml:space="preserve">
     <value>Échec de la déconnexion</value>
   </data>
+  <data name="Report.SubmitPlayerReport.Sql.2" xml:space="preserve">
+    <value>Erreur de base de données : le service SQL Server est désactivé ou inaccessible. Le rapport n'a pas pu être envoyé. Essayez plus tard.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.53" xml:space="preserve">
+    <value>Erreur de base de données : le serveur spécifié est introuvable. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.-1" xml:space="preserve">
+    <value>Erreur de base de données : la connexion a expiré. Le rapport n'a pas pu être envoyé. Essayer à nouveau.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.121" xml:space="preserve">
+    <value>Erreur de base de données : la connexion a expiré. Le rapport n'a pas pu être envoyé. Essayer à nouveau.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.11001" xml:space="preserve">
+    <value>Erreur de base de données : l'hôte/serveur n'existe pas sur le réseau. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.4060" xml:space="preserve">
+    <value>Erreur de base de données : la base de données n'existe pas ou ne peut pas être ouverte. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.208" xml:space="preserve">
+    <value>Erreur de base de données : une table ou un objet requis est manquant. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.207" xml:space="preserve">
+    <value>Erreur de base de données : une colonne obligatoire est manquante. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2812" xml:space="preserve">
+    <value>Erreur de base de données : la procédure stockée n'existe pas. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.18456" xml:space="preserve">
+    <value>Erreur de base de données : informations d'identification non valides lors de la connexion. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.229" xml:space="preserve">
+    <value>Erreur de base de données : autorisation refusée pour exécuter l'opération. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2627" xml:space="preserve">
+    <value>Erreur de base de données : enregistrement en double (violation PK/index unique). Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2601" xml:space="preserve">
+    <value>Erreur de base de données : enregistrement en double (violation d'index unique). Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.547" xml:space="preserve">
+    <value>Erreur de base de données : conflit de relation. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.515" xml:space="preserve">
+    <value>Erreur de base de données : une tentative a été effectuée pour insérer une valeur NULL dans un champ obligatoire. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.2628" xml:space="preserve">
+    <value>Erreur base de données : Texte trop long pour une colonne (troncature). Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8152" xml:space="preserve">
+    <value>Erreur base de données : Texte trop long pour une colonne (troncature). Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.245" xml:space="preserve">
+    <value>Erreur de base de données : conversion de type de données non valide. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.8114" xml:space="preserve">
+    <value>Erreur de base de données : conversion de type de données non valide. Le rapport n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1205" xml:space="preserve">
+    <value>Erreur de base de données : blocage dans la transaction. Le rapport n'a pas pu être envoyé. Essayer à nouveau.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1222" xml:space="preserve">
+    <value>Erreur de base de données : délai d'expiration du verrouillage. Le rapport n'a pas pu être envoyé. Essayer à nouveau.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.1105" xml:space="preserve">
+    <value>Erreur de base de données : le disque du serveur est plein. Le rapport n'a pas pu être envoyé. Essayez plus tard.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Sql.Unknown" xml:space="preserve">
+    <value>Erreur de base de données : un problème inattendu s'est produit. Le rapport n'a pas pu être envoyé. Essayez plus tard.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.RequestNull" xml:space="preserve">
+    <value>La demande de rapport n'est pas valide.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.TokenInvalid" xml:space="preserve">
+    <value>Votre session n'est pas valide lors de l'envoi du rapport. Connectez-vous à nouveau.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidTarget" xml:space="preserve">
+    <value>Le rapport n'a pas pu être envoyé : le joueur sélectionné n'est pas valide.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.SelfReport" xml:space="preserve">
+    <value>Vous ne pouvez pas vous signaler.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.InvalidReason" xml:space="preserve">
+    <value>Le rapport n'a pas pu être envoyé : le motif sélectionné n'est pas valide.</value>
+  </data>
+  <data name="Report.SubmitPlayerReport.Validation.CommentTooLong" xml:space="preserve">
+    <value>Le rapport n'a pas pu être envoyé : le commentaire dépasse la limite autorisée.</value>
+  </data>
 </root>
