@@ -197,7 +197,8 @@ namespace WPFTheWeakestRival
         {
             currentLobbyId = lobbyId;
             currentAccessCode = accessCode ?? string.Empty;
-            UpdateLobbyHeader(lobbyName, currentAccessCode);
+
+            UpdateLobbyHeader(txtLobbyHeader, txtAccessCode, lobbyName, currentAccessCode);
         }
 
         public void InitializeExistingLobby(LobbyContracts.LobbyInfo info)
@@ -213,7 +214,7 @@ namespace WPFTheWeakestRival
                 ? string.Empty
                 : info.AccessCode;
 
-            UpdateLobbyHeader(info.LobbyName, currentAccessCode);
+            UpdateLobbyHeader(txtLobbyHeader, txtAccessCode, info.LobbyName, currentAccessCode);
 
             LobbyAvatarHelper.RebuildLobbyPlayers(
                 lobbyPlayers,
@@ -520,13 +521,13 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void SetDefaultAvatar()
+        private static void SetDefaultAvatar(Image avatarTarget)
         {
             var defaultAvatar = UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
 
-            if (imgAvatar != null)
+            if (avatarTarget != null)
             {
-                imgAvatar.Source = defaultAvatar;
+                avatarTarget.Source = defaultAvatar;
             }
         }
 
@@ -567,7 +568,7 @@ namespace WPFTheWeakestRival
             var token = LoginWindow.AppSession.CurrentToken?.Token;
             if (string.IsNullOrWhiteSpace(token))
             {
-                SetDefaultAvatar();
+                SetDefaultAvatar(imgAvatar);
                 return;
             }
 
@@ -593,17 +594,17 @@ namespace WPFTheWeakestRival
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
                 Logger.Warn("Lobby fault while refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar();
+                SetDefaultAvatar(imgAvatar);
             }
             catch (CommunicationException ex)
             {
                 Logger.Warn("Communication error while refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar();
+                SetDefaultAvatar(imgAvatar);
             }
             catch (Exception ex)
             {
                 Logger.Warn("Unexpected error refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar();
+                SetDefaultAvatar(imgAvatar);
             }
         }
 
@@ -670,18 +671,22 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void UpdateLobbyHeader(string lobbyName, string accessCode)
+        private static void UpdateLobbyHeader(
+            TextBlock lobbyHeaderText,
+            TextBlock accessCodeText,
+            string lobbyName,
+            string accessCode)
         {
-            if (txtLobbyHeader != null)
+            if (lobbyHeaderText != null)
             {
-                txtLobbyHeader.Text = string.IsNullOrWhiteSpace(lobbyName)
+                lobbyHeaderText.Text = string.IsNullOrWhiteSpace(lobbyName)
                     ? Lang.lobbyTitle
                     : lobbyName;
             }
 
-            if (txtAccessCode != null)
+            if (accessCodeText != null)
             {
-                txtAccessCode.Text = string.IsNullOrWhiteSpace(accessCode)
+                accessCodeText.Text = string.IsNullOrWhiteSpace(accessCode)
                     ? string.Empty
                     : Lang.lobbyCodePrefix + accessCode;
             }
@@ -762,7 +767,7 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private LobbyPlayerItem MapPlayerToLobbyItem(LobbyContracts.AccountMini account)
+        private static LobbyPlayerItem MapPlayerToLobbyItem(LobbyContracts.AccountMini account)
         {
             var item = LobbyAvatarHelper.BuildFromAccountMini(account);
             if (item == null)
@@ -797,7 +802,7 @@ namespace WPFTheWeakestRival
 
                 Ui(() =>
                 {
-                    UpdateLobbyHeader(info.LobbyName, currentAccessCode);
+                    UpdateLobbyHeader(txtLobbyHeader, txtAccessCode, info.LobbyName, currentAccessCode);
 
                     LobbyAvatarHelper.RebuildLobbyPlayers(
                         lobbyPlayers,
@@ -1126,7 +1131,7 @@ namespace WPFTheWeakestRival
                 string.Equals(ex.Detail.Code, FAULT_REPORT_COOLDOWN, StringComparison.Ordinal);
         }
 
-        private LobbyPlayerItem TryGetReportTargetPlayer(object sender)
+        private static LobbyPlayerItem TryGetReportTargetPlayer(object sender)
         {
             var menuItem = sender as MenuItem;
             if (menuItem == null)
@@ -1190,12 +1195,9 @@ namespace WPFTheWeakestRival
 
         private void ShowReportResult(ReportService.SubmitPlayerReportResponse response)
         {
-            if (response != null && response.SanctionApplied)
+            if (response != null && response.SanctionApplied && TryShowSanctionMessage(response))
             {
-                if (TryShowSanctionMessage(response))
-                {
-                    return;
-                }
+                return;
             }
 
             MessageBox.Show(
@@ -1205,7 +1207,7 @@ namespace WPFTheWeakestRival
                 MessageBoxImage.Information);
         }
 
-        private bool TryShowSanctionMessage(ReportService.SubmitPlayerReportResponse response)
+        private static bool TryShowSanctionMessage(ReportService.SubmitPlayerReportResponse response)
         {
             if (response == null)
             {
@@ -1264,7 +1266,7 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private void OnForcedLogoutFromHub(ForcedLogoutNotification notification)
+        private static void OnForcedLogoutFromHub(ForcedLogoutNotification notification)
         {
             Infraestructure.ForcedLogoutCoordinator.Handle(notification);
         }
@@ -1565,7 +1567,7 @@ namespace WPFTheWeakestRival
             }
         }
 
-        private string GetSessionTokenOrShowMessage()
+        private static string GetSessionTokenOrShowMessage()
         {
             var token = LoginWindow.AppSession.CurrentToken?.Token;
 
@@ -1589,7 +1591,7 @@ namespace WPFTheWeakestRival
             {
                 if (client.State == CommunicationState.Faulted)
                 {
-                    client.Abort();
+                    TryAbort(client, context);
                     return;
                 }
 
@@ -1597,22 +1599,25 @@ namespace WPFTheWeakestRival
             }
             catch (CommunicationException ex)
             {
-                Logger.WarnFormat("CloseClientSafely communication error. Context={0}", context);
-                Logger.Warn("CloseClientSafely communication exception detail.", ex);
+                Logger.Warn(
+                    string.Format(CultureInfo.InvariantCulture, "CloseClientSafely communication error. Context={0}", context),
+                    ex);
 
                 TryAbort(client, context);
             }
             catch (TimeoutException ex)
             {
-                Logger.WarnFormat("CloseClientSafely timeout. Context={0}", context);
-                Logger.Warn("CloseClientSafely timeout exception detail.", ex);
+                Logger.Warn(
+                    string.Format(CultureInfo.InvariantCulture, "CloseClientSafely timeout. Context={0}", context),
+                    ex);
 
                 TryAbort(client, context);
             }
             catch (Exception ex)
             {
-                Logger.WarnFormat("CloseClientSafely unexpected error. Context={0}", context);
-                Logger.Warn("CloseClientSafely unexpected exception detail.", ex);
+                Logger.Warn(
+                    string.Format(CultureInfo.InvariantCulture, "CloseClientSafely unexpected error. Context={0}", context),
+                    ex);
 
                 TryAbort(client, context);
             }
@@ -1626,8 +1631,9 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.WarnFormat("Abort failed. Context={0}", context);
-                Logger.Warn("Abort exception detail.", ex);
+                Logger.Warn(
+                    string.Format(CultureInfo.InvariantCulture, "Abort failed. Context={0}", context),
+                    ex);
             }
         }
     }
