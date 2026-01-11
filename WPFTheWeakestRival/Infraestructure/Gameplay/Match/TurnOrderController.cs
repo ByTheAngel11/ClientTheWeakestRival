@@ -15,6 +15,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private const string DarknessAliasFormat = "Concursante {0}";
         private const string DarknessFallbackName = "???";
+        private const string FallbackPlayerNameFormat = "Jugador {0}";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -37,13 +38,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ui.LstPlayers.ItemsSource = playersForUi;
             }
 
-            if (ui.TxtPlayersSummary != null)
-            {
-                ui.TxtPlayersSummary.Text = string.Format(
-                    CultureInfo.CurrentCulture,
-                    "({0})",
-                    playersForUi.Length);
-            }
+            UpdatePlayersSummaryText();
         }
 
         public void EnableDarknessMode(int seed)
@@ -52,15 +47,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 PlayerSummary[] basePlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
 
-                var alive = basePlayers
+                List<PlayerSummary> alive = basePlayers
                     .Where(p => p != null && p.UserId > 0 && !state.IsEliminated(p.UserId))
                     .ToList();
 
                 Shuffle(alive, seed);
 
                 var anonymized = new List<PlayerSummary>(alive.Count);
-
                 int index = 1;
+
                 foreach (PlayerSummary p in alive)
                 {
                     anonymized.Add(
@@ -82,11 +77,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     ui.LstPlayers.ItemsSource = playersForUi;
                 }
 
-                if (ui.TxtPlayersSummary != null)
-                {
-                    ui.TxtPlayersSummary.Text = string.Format(CultureInfo.CurrentCulture, "({0})", playersForUi.Length);
-                }
-
+                UpdatePlayersSummaryText();
                 TryHighlightPlayerInList(state.CurrentTurnUserId);
             }
             catch (Exception ex)
@@ -135,8 +126,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             CancellationToken ct = turnIntroCts.Token;
 
             TurnOrderSnapshot snapshot = TurnOrderAdapter.ToSnapshot(turnOrderDto);
-
             int[] orderedAliveUserIds = snapshot.OrderedAliveUserIds;
+
             if (orderedAliveUserIds.Length == 0)
             {
                 return;
@@ -174,9 +165,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 TryHighlightPlayerInList(starterUserId);
                 await Task.Delay(MatchConstants.TURN_INTRO_FINAL_DELAY_MS, ct);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                // ignore
+                Logger.Info("TurnOrderController.PlayTurnIntroAsync cancelled.", ex);
             }
             catch (Exception ex)
             {
@@ -184,7 +175,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             finally
             {
-                hideOverlay?.Invoke();
+                try
+                {
+                    hideOverlay?.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("TurnOrderController.PlayTurnIntroAsync: error hiding overlay.", ex);
+                }
             }
         }
 
@@ -213,26 +211,41 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             PlayerSummary[] basePlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
+            Dictionary<int, PlayerSummary> byId = BuildPlayersById(basePlayers);
 
+            List<PlayerSummary> ordered = BuildOrderedAlivePlayers(orderedAliveUserIds, byId);
+            AppendMissingPlayers(basePlayers, ordered);
+
+            ApplyPlayersForUi(ordered);
+        }
+
+        private Dictionary<int, PlayerSummary> BuildPlayersById(PlayerSummary[] basePlayers)
+        {
             var byId = new Dictionary<int, PlayerSummary>();
-            foreach (PlayerSummary p in basePlayers)
+
+            foreach (PlayerSummary p in basePlayers ?? Array.Empty<PlayerSummary>())
             {
-                if (p != null && p.UserId > 0 && !byId.ContainsKey(p.UserId))
+                if (p == null || p.UserId <= 0)
+                {
+                    continue;
+                }
+
+                if (!byId.ContainsKey(p.UserId))
                 {
                     byId[p.UserId] = p;
                 }
             }
 
+            return byId;
+        }
+
+        private List<PlayerSummary> BuildOrderedAlivePlayers(int[] orderedAliveUserIds, Dictionary<int, PlayerSummary> byId)
+        {
             var ordered = new List<PlayerSummary>();
 
-            foreach (int userId in orderedAliveUserIds)
+            foreach (int userId in orderedAliveUserIds ?? Array.Empty<int>())
             {
-                if (userId <= 0)
-                {
-                    continue;
-                }
-
-                if (state.IsEliminated(userId))
+                if (userId <= 0 || state.IsEliminated(userId))
                 {
                     continue;
                 }
@@ -241,40 +254,65 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 if (byId.TryGetValue(userId, out found))
                 {
                     ordered.Add(found);
+                    continue;
                 }
-                else
-                {
-                    ordered.Add(
-                        new PlayerSummary
-                        {
-                            UserId = userId,
-                            DisplayName = string.Format(CultureInfo.CurrentCulture, "Jugador {0}", userId),
-                            Avatar = null
-                        });
-                }
+
+                ordered.Add(CreateFallbackPlayer(userId));
             }
 
-            foreach (PlayerSummary p in basePlayers)
+            return ordered;
+        }
+
+        private static PlayerSummary CreateFallbackPlayer(int userId)
+        {
+            return new PlayerSummary
+            {
+                UserId = userId,
+                DisplayName = string.Format(CultureInfo.CurrentCulture, FallbackPlayerNameFormat, userId),
+                Avatar = null
+            };
+        }
+
+        private static void AppendMissingPlayers(PlayerSummary[] basePlayers, List<PlayerSummary> ordered)
+        {
+            var existingIds = new HashSet<int>(ordered.Select(p => p != null ? p.UserId : 0));
+
+            foreach (PlayerSummary p in basePlayers ?? Array.Empty<PlayerSummary>())
             {
                 if (p == null)
                 {
                     continue;
                 }
 
-                if (ordered.Any(x => x.UserId == p.UserId))
+                if (existingIds.Contains(p.UserId))
                 {
                     continue;
                 }
 
                 ordered.Add(p);
             }
+        }
 
-            playersForUi = ordered.ToArray();
-            ui.LstPlayers.ItemsSource = playersForUi;
+        private void ApplyPlayersForUi(List<PlayerSummary> ordered)
+        {
+            playersForUi = (ordered ?? new List<PlayerSummary>()).ToArray();
 
+            if (ui.LstPlayers != null)
+            {
+                ui.LstPlayers.ItemsSource = playersForUi;
+            }
+
+            UpdatePlayersSummaryText();
+        }
+
+        private void UpdatePlayersSummaryText()
+        {
             if (ui.TxtPlayersSummary != null)
             {
-                ui.TxtPlayersSummary.Text = string.Format(CultureInfo.CurrentCulture, "({0})", playersForUi.Length);
+                ui.TxtPlayersSummary.Text = string.Format(
+                    CultureInfo.CurrentCulture,
+                    "({0})",
+                    playersForUi != null ? playersForUi.Length : 0);
             }
         }
 
@@ -286,7 +324,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             var byId = new Dictionary<int, PlayerSummary>();
-
             foreach (PlayerSummary p in playersForUi ?? Array.Empty<PlayerSummary>())
             {
                 if (p != null && p.UserId > 0 && !byId.ContainsKey(p.UserId))
@@ -296,7 +333,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             var ordered = new List<PlayerSummary>();
-
             foreach (int userId in orderedAliveUserIds)
             {
                 if (userId <= 0)
@@ -329,10 +365,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             playersForUi = ordered.ToArray();
             ui.LstPlayers.ItemsSource = playersForUi;
 
-            if (ui.TxtPlayersSummary != null)
-            {
-                ui.TxtPlayersSummary.Text = string.Format(CultureInfo.CurrentCulture, "({0})", playersForUi.Length);
-            }
+            UpdatePlayersSummaryText();
         }
 
         public void TryHighlightPlayerInList(int userId)
@@ -394,7 +427,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return real.DisplayName;
             }
 
-            return string.Format(CultureInfo.CurrentCulture, "Jugador {0}", userId);
+            return string.Format(CultureInfo.CurrentCulture, FallbackPlayerNameFormat, userId);
         }
 
         private static void Shuffle(List<PlayerSummary> list, int seed)
@@ -409,6 +442,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             for (int i = list.Count - 1; i > 0; i--)
             {
                 int j = random.Next(i + 1);
+
                 PlayerSummary temp = list[i];
                 list[i] = list[j];
                 list[j] = temp;

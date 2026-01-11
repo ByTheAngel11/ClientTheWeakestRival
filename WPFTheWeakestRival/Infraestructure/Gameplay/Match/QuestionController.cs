@@ -21,6 +21,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string DarknessTurnLabel = "A oscuras";
 
         private const string LightningInProgressText = "Reto relámpago en curso";
+        private const string SurpriseExamMyTurnText = "Examen sorpresa: responde";
 
         private const int MIN_SECONDS = 0;
 
@@ -30,7 +31,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private readonly QuestionTimerController timer;
 
         private int remainingSeconds;
-
         private int currentTurnTimeLimitSeconds;
 
         private int? pendingNextTurnTimeLimitSeconds;
@@ -87,10 +87,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         /// </summary>
         public void ScheduleNextTurnTimeLimitOverride(int seconds, int? sourceTurnUserId, int? targetUserId)
         {
-            if (seconds < MIN_SECONDS)
-            {
-                seconds = MIN_SECONDS;
-            }
+            seconds = NormalizeSeconds(seconds);
 
             if (pendingNextTurnTimeLimitSeconds.HasValue)
             {
@@ -104,11 +101,20 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (targetUserId.HasValue && targetUserId.Value > 0)
             {
                 pendingNextTurnTimeLimitTargetUserId = targetUserId.Value;
+                return;
             }
-            else if (!pendingNextTurnTimeLimitTargetUserId.HasValue && sourceTurnUserId.HasValue && sourceTurnUserId.Value > 0)
+
+            if (!pendingNextTurnTimeLimitTargetUserId.HasValue &&
+                sourceTurnUserId.HasValue &&
+                sourceTurnUserId.Value > 0)
             {
                 pendingNextTurnTimeLimitSourceUserId = sourceTurnUserId.Value;
             }
+        }
+
+        private static int NormalizeSeconds(int seconds)
+        {
+            return seconds < MIN_SECONDS ? MIN_SECONDS : seconds;
         }
 
         private int? TryConsumeNextTurnTimeLimitOverride(int targetUserId)
@@ -123,22 +129,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return null;
             }
 
-            bool shouldApply;
-
-            if (pendingNextTurnTimeLimitTargetUserId.HasValue)
-            {
-                shouldApply = targetUserId == pendingNextTurnTimeLimitTargetUserId.Value;
-            }
-            else if (pendingNextTurnTimeLimitSourceUserId.HasValue)
-            {
-                shouldApply = targetUserId != pendingNextTurnTimeLimitSourceUserId.Value;
-            }
-            else
-            {
-                shouldApply = true;
-            }
-
-            if (!shouldApply)
+            if (!ShouldApplyPendingOverride(targetUserId))
             {
                 return null;
             }
@@ -152,6 +143,21 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             return seconds;
         }
 
+        private bool ShouldApplyPendingOverride(int targetUserId)
+        {
+            if (pendingNextTurnTimeLimitTargetUserId.HasValue)
+            {
+                return targetUserId == pendingNextTurnTimeLimitTargetUserId.Value;
+            }
+
+            if (pendingNextTurnTimeLimitSourceUserId.HasValue)
+            {
+                return targetUserId != pendingNextTurnTimeLimitSourceUserId.Value;
+            }
+
+            return true;
+        }
+
         public void SetDarknessActive(bool isActive)
         {
             state.IsDarknessActive = isActive;
@@ -163,25 +169,29 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (isActive)
             {
-                if (ui.TxtTurnPlayerName != null)
-                {
-                    ui.TxtTurnPlayerName.Text = DarknessUnknownName;
-                }
-
-                if (ui.TxtTurnLabel != null)
-                {
-                    ui.TxtTurnLabel.Text = DarknessTurnLabel;
-                }
-
-                if (ui.TurnBannerBackground != null)
-                {
-                    ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
-                }
-
+                ApplyDarknessTurnIdentity();
                 return;
             }
 
             RestoreTurnIdentityFromLobby();
+        }
+
+        private void ApplyDarknessTurnIdentity()
+        {
+            if (ui.TxtTurnPlayerName != null)
+            {
+                ui.TxtTurnPlayerName.Text = DarknessUnknownName;
+            }
+
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = DarknessTurnLabel;
+            }
+
+            if (ui.TurnBannerBackground != null)
+            {
+                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
+            }
         }
 
         private void RestoreTurnIdentityFromLobby()
@@ -246,10 +256,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             int targetUserId = targetPlayer != null ? targetPlayer.UserId : 0;
             bool isTargetEliminated = targetUserId > 0 && state.IsEliminated(targetUserId);
-
             bool isTargetMe = targetUserId == state.MyUserId;
-            state.IsMyTurn = isTargetMe && !isTargetEliminated;
 
+            state.IsMyTurn = isTargetMe && !isTargetEliminated;
             state.CurrentQuestion = question;
             state.CurrentTurnUserId = targetUserId;
 
@@ -257,6 +266,23 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             highlightPlayer?.Invoke(targetUserId);
 
+            UpdateChainAndBankUi(currentChain, banked);
+            ApplyTurnIdentityUi(targetPlayer);
+            ApplyBankButtonState();
+
+            if (state.IsMyTurn)
+            {
+                StartMyTurnTimer(timeLimitOverrideSeconds);
+                ShowQuestionForMyTurn(question);
+                return;
+            }
+
+            StartOtherTurnUi();
+            ShowWaitingTurnUi();
+        }
+
+        private void UpdateChainAndBankUi(decimal currentChain, decimal banked)
+        {
             if (ui.TxtChain != null)
             {
                 ui.TxtChain.Text = currentChain.ToString(MatchConstants.POINTS_FORMAT);
@@ -266,97 +292,142 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 ui.TxtBanked.Text = banked.ToString(MatchConstants.POINTS_FORMAT);
             }
+        }
 
+        private void ApplyTurnIdentityUi(GameplayServiceProxy.PlayerSummary targetPlayer)
+        {
             if (state.IsDarknessActive)
             {
                 if (ui.TurnAvatar != null) ui.TurnAvatar.Visibility = Visibility.Collapsed;
                 if (ui.TxtTurnPlayerName != null) ui.TxtTurnPlayerName.Text = DarknessUnknownName;
                 if (ui.TxtTurnLabel != null) ui.TxtTurnLabel.Text = DarknessTurnLabel;
-            }
-            else
-            {
-                if (ui.TurnAvatar != null)
-                {
-                    AvatarAppearance appearance = AvatarMapper.FromGameplayDto(targetPlayer != null ? targetPlayer.Avatar : null);
-                    ui.TurnAvatar.Appearance = appearance;
-                    ui.TurnAvatar.Visibility = Visibility.Visible;
-                }
-
-                if (ui.TxtTurnPlayerName != null)
-                {
-                    ui.TxtTurnPlayerName.Text = !string.IsNullOrWhiteSpace(targetPlayer != null ? targetPlayer.DisplayName : null)
-                        ? targetPlayer.DisplayName
-                        : MatchConstants.DEFAULT_PLAYER_NAME;
-                }
+                return;
             }
 
-            if (ui.BtnBank != null)
+            ApplyNormalTurnIdentity(targetPlayer);
+        }
+
+        private void ApplyNormalTurnIdentity(GameplayServiceProxy.PlayerSummary targetPlayer)
+        {
+            if (ui.TurnAvatar != null)
             {
-                ui.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
+                AvatarAppearance appearance = AvatarMapper.FromGameplayDto(targetPlayer != null ? targetPlayer.Avatar : null);
+                ui.TurnAvatar.Appearance = appearance;
+                ui.TurnAvatar.Visibility = Visibility.Visible;
             }
 
-            if (state.IsMyTurn)
+            if (ui.TxtTurnPlayerName != null)
             {
-                if (!state.IsDarknessActive)
-                {
-                    if (ui.TxtTurnLabel != null)
-                    {
-                        ui.TxtTurnLabel.Text = state.IsSurpriseExamActive
-                            ? "Examen sorpresa: responde"
-                            : MatchConstants.TURN_MY_TURN_TEXT;
-                    }
+                string displayName = targetPlayer != null ? targetPlayer.DisplayName : null;
 
-                    if (ui.TurnBannerBackground != null)
-                    {
-                        ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.MyTurn");
-                    }
-                }
-
-                int limitSeconds = state.IsSurpriseExamActive
-                    ? MatchConstants.SURPRISE_EXAM_TIME_SECONDS
-                    : MatchConstants.QUESTION_TIME_SECONDS;
-
-                if (!state.IsSurpriseExamActive && timeLimitOverrideSeconds.HasValue)
-                {
-                    limitSeconds = timeLimitOverrideSeconds.Value;
-                }
-
-                currentTurnTimeLimitSeconds = limitSeconds;
-
-                remainingSeconds = limitSeconds;
-                UpdateTimerText();
-                timer.Start(limitSeconds);
+                ui.TxtTurnPlayerName.Text = !string.IsNullOrWhiteSpace(displayName)
+                    ? displayName
+                    : MatchConstants.DEFAULT_PLAYER_NAME;
             }
-            else
+        }
+
+        private void ApplyBankButtonState()
+        {
+            if (ui.BtnBank == null)
             {
-                currentTurnTimeLimitSeconds = 0;
-
-                if (!state.IsDarknessActive)
-                {
-                    if (ui.TxtTurnLabel != null)
-                    {
-                        ui.TxtTurnLabel.Text = MatchConstants.TURN_OTHER_PLAYER_TEXT;
-                    }
-
-                    if (ui.TurnBannerBackground != null)
-                    {
-                        ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
-                    }
-                }
-
-                timer.Stop();
-                SetTimerText(MatchConstants.DEFAULT_TIMER_TEXT);
+                return;
             }
 
-            if (!state.IsMyTurn)
+            ui.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
+        }
+
+        private void StartMyTurnTimer(int? timeLimitOverrideSeconds)
+        {
+            if (!state.IsDarknessActive)
             {
+                ApplyMyTurnLabelAndBanner();
+            }
+
+            int limitSeconds = ResolveTimeLimitSeconds(timeLimitOverrideSeconds);
+
+            currentTurnTimeLimitSeconds = limitSeconds;
+            remainingSeconds = limitSeconds;
+
+            UpdateTimerText();
+
+            timer.Stop();
+            timer.Start(limitSeconds);
+        }
+
+        private void ApplyMyTurnLabelAndBanner()
+        {
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = state.IsSurpriseExamActive
+                    ? SurpriseExamMyTurnText
+                    : MatchConstants.TURN_MY_TURN_TEXT;
+            }
+
+            if (ui.TurnBannerBackground != null)
+            {
+                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.MyTurn");
+            }
+        }
+
+        private int ResolveTimeLimitSeconds(int? timeLimitOverrideSeconds)
+        {
+            if (state.IsSurpriseExamActive)
+            {
+                return MatchConstants.SURPRISE_EXAM_TIME_SECONDS;
+            }
+
+            int limitSeconds = MatchConstants.QUESTION_TIME_SECONDS;
+
+            if (timeLimitOverrideSeconds.HasValue)
+            {
+                limitSeconds = timeLimitOverrideSeconds.Value;
+            }
+
+            return limitSeconds;
+        }
+
+        private void StartOtherTurnUi()
+        {
+            currentTurnTimeLimitSeconds = 0;
+
+            if (!state.IsDarknessActive)
+            {
+                ApplyOtherTurnLabelAndBanner();
+            }
+
+            timer.Stop();
+            SetTimerText(MatchConstants.DEFAULT_TIMER_TEXT);
+        }
+
+        private void ApplyOtherTurnLabelAndBanner()
+        {
+            if (ui.TxtTurnLabel != null)
+            {
+                ui.TxtTurnLabel.Text = MatchConstants.TURN_OTHER_PLAYER_TEXT;
+            }
+
+            if (ui.TurnBannerBackground != null)
+            {
+                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
+            }
+        }
+
+        private void ShowWaitingTurnUi()
+        {
+            InitializeEmptyUi();
+
+            if (ui.TxtQuestion != null)
+            {
+                ui.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_TURN_TEXT;
+            }
+        }
+
+        private void ShowQuestionForMyTurn(GameplayServiceProxy.QuestionWithAnswersDto question)
+        {
+            if (question == null)
+            {
+                Logger.Warn("OnNextQuestion: question is null for my turn.");
                 InitializeEmptyUi();
-
-                if (ui.TxtQuestion != null)
-                {
-                    ui.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_TURN_TEXT;
-                }
-
                 return;
             }
 
@@ -434,9 +505,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 : MatchConstants.QUESTION_TIME_SECONDS;
 
             currentTurnTimeLimitSeconds = limitSeconds;
-
             remainingSeconds = limitSeconds;
+
             UpdateTimerText();
+
             timer.Start(limitSeconds);
         }
 
@@ -465,6 +537,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     : MatchConstants.DEFAULT_INCORRECT_TEXT;
 
                 ui.TxtAnswerFeedback.Foreground = isCorrect ? Brushes.LawnGreen : Brushes.OrangeRed;
+
                 return;
             }
 
@@ -733,18 +806,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (answers != null && index < answers.Length)
             {
                 GameplayServiceProxy.AnswerDto answer = answers[index];
+
                 button.Content = answer.Text;
                 button.Tag = answer;
                 button.Visibility = Visibility.Visible;
                 button.IsEnabled = true;
                 button.Background = Brushes.Transparent;
+
+                return;
             }
-            else
-            {
-                button.Content = string.Empty;
-                button.Tag = null;
-                button.Visibility = Visibility.Collapsed;
-            }
+
+            button.Content = string.Empty;
+            button.Tag = null;
+            button.Visibility = Visibility.Collapsed;
         }
 
         private void UpdateTimerText()

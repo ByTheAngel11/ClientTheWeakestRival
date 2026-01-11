@@ -29,7 +29,8 @@ namespace WPFTheWeakestRival.Pages
         private readonly FriendServiceClient friendServiceClient;
         private readonly string authToken;
 
-        private readonly ObservableCollection<FriendSearchResultVm> results = new ObservableCollection<FriendSearchResultVm>();
+        private readonly ObservableCollection<FriendSearchResultVm> results =
+            new ObservableCollection<FriendSearchResultVm>();
 
         private CancellationTokenSource debounceCancellation;
         private int lastSearchRequestId;
@@ -62,8 +63,23 @@ namespace WPFTheWeakestRival.Pages
                 return;
             }
 
-            try { old.Cancel(); } catch { }
-            try { old.Dispose(); } catch { }
+            try
+            {
+                old.Cancel();
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("AddFriendPage.CancelAndDisposeDebounce: cancel failed.", ex);
+            }
+
+            try
+            {
+                old.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Logger.Debug("AddFriendPage.CancelAndDisposeDebounce: dispose failed.", ex);
+            }
         }
 
         private static string Localize(string key)
@@ -101,8 +117,8 @@ namespace WPFTheWeakestRival.Pages
 
             var cts = new CancellationTokenSource();
             debounceCancellation = cts;
-            var ct = cts.Token;
 
+            CancellationToken ct = cts.Token;
             var requestId = Interlocked.Increment(ref lastSearchRequestId);
 
             try
@@ -114,12 +130,24 @@ namespace WPFTheWeakestRival.Pages
                     await SearchAsync(txtSearchQuery.Text, requestId);
                 }
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
+                Logger.Debug("AddFriendPage.TxtSearchQueryTextChanged: debounce canceled.", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("AddFriendPage.TxtSearchQueryTextChanged: unexpected error.", ex);
             }
             finally
             {
-                try { cts.Dispose(); } catch { }
+                try
+                {
+                    cts.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug("AddFriendPage.TxtSearchQueryTextChanged: dispose failed.", ex);
+                }
 
                 if (ReferenceEquals(debounceCancellation, cts))
                 {
@@ -130,106 +158,38 @@ namespace WPFTheWeakestRival.Pages
 
         private async Task SearchAsync(string query, int requestId)
         {
-            var trimmedQuery = (query ?? string.Empty).Trim();
-
+            string trimmedQuery = NormalizeQuery(query);
             if (string.IsNullOrWhiteSpace(trimmedQuery))
             {
-                results.Clear();
-                lblStatus.Text = string.Empty;
+                ClearResultsAndStatus();
                 return;
             }
 
             try
             {
-                Mouse.OverrideCursor = Cursors.Wait;
-                lblStatus.Text = Lang.searching;
+                BeginSearchingUi();
 
-                var response = await friendServiceClient.SearchAccountsAsync(new SearchAccountsRequest
-                {
-                    Token = authToken,
-                    Query = trimmedQuery,
-                    MaxResults = MAX_SEARCH_RESULTS
-                });
+                SearchAccountsResponse response = await PerformSearchAsync(trimmedQuery);
 
-                if (requestId != Volatile.Read(ref lastSearchRequestId))
+                if (IsStaleRequest(requestId))
                 {
                     return;
                 }
 
-                results.Clear();
-
-                var serviceResults = response?.Results ?? Array.Empty<SearchAccountItem>();
-
-                for (var i = 0; i < serviceResults.Length; i++)
-                {
-                    var item = serviceResults[i];
-
-                    var vm = new FriendSearchResultVm
-                    {
-                        AccountId = item.AccountId,
-                        DisplayName = string.IsNullOrWhiteSpace(item.DisplayName) ? (item.Email ?? string.Empty) : item.DisplayName,
-                        Email = item.Email ?? string.Empty,
-
-                        HasProfileImage = item.HasProfileImage,
-                        ProfileImageCode = item.ProfileImageCode ?? string.Empty,
-
-                        Avatar = DefaultAvatar(),
-                        IsFriend = item.IsFriend,
-                        HasPendingOutgoing = item.HasPendingOutgoing,
-                        HasPendingIncoming = item.HasPendingIncoming,
-                        PendingIncomingRequestId = item.PendingIncomingRequestId
-                    };
-
-                    results.Add(vm);
-
-                    if (vm.HasProfileImage && !string.IsNullOrWhiteSpace(vm.ProfileImageCode))
-                    {
-                        _ = LoadAvatarAsync(vm);
-                    }
-                }
-
-                lblStatus.Text = results.Count == 0
-                    ? Lang.noResults
-                    : string.Format(Lang.results, results.Count);
+                PopulateResults(response);
+                UpdateStatusFromResultsCount();
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
-                Logger.WarnFormat(
-                    "AddFriendPage.SearchAsync: service fault. Code={0}, Key={1}",
-                    ex.Detail == null ? string.Empty : ex.Detail.Code,
-                    ex.Detail == null ? string.Empty : ex.Detail.Message);
-
-                MessageBox.Show(
-                    ResolveFaultMessage(ex.Detail),
-                    Lang.addFriendSearchTooltip,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                lblStatus.Text = Lang.addFriendServiceError;
+                HandleSearchFault(ex);
             }
             catch (TimeoutException ex)
             {
-                Logger.Error("AddFriendPage.SearchAsync: timeout.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.addFriendSearchTooltip,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-
-                lblStatus.Text = Lang.noConnection;
+                HandleSearchConnectivityError("AddFriendPage.SearchAsync: timeout.", ex);
             }
             catch (CommunicationException ex)
             {
-                Logger.Error("AddFriendPage.SearchAsync: communication error.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.addFriendSearchTooltip,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-
-                lblStatus.Text = Lang.noConnection;
+                HandleSearchConnectivityError("AddFriendPage.SearchAsync: communication error.", ex);
             }
             catch (Exception ex)
             {
@@ -247,6 +207,126 @@ namespace WPFTheWeakestRival.Pages
             {
                 Mouse.OverrideCursor = null;
             }
+        }
+
+        private static string NormalizeQuery(string query)
+        {
+            return (query ?? string.Empty).Trim();
+        }
+
+        private bool IsStaleRequest(int requestId)
+        {
+            return requestId != Volatile.Read(ref lastSearchRequestId);
+        }
+
+        private void ClearResultsAndStatus()
+        {
+            results.Clear();
+            lblStatus.Text = string.Empty;
+        }
+
+        private void BeginSearchingUi()
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
+            lblStatus.Text = Lang.searching;
+        }
+
+        private Task<SearchAccountsResponse> PerformSearchAsync(string trimmedQuery)
+        {
+            var request = new SearchAccountsRequest
+            {
+                Token = authToken,
+                Query = trimmedQuery,
+                MaxResults = MAX_SEARCH_RESULTS
+            };
+
+            return friendServiceClient.SearchAccountsAsync(request);
+        }
+
+        private void PopulateResults(SearchAccountsResponse response)
+        {
+            results.Clear();
+
+            SearchAccountItem[] serviceResults = response?.Results ?? Array.Empty<SearchAccountItem>();
+            foreach (SearchAccountItem item in serviceResults)
+            {
+                FriendSearchResultVm vm = MapToViewModel(item);
+                results.Add(vm);
+
+                TryQueueAvatarLoad(vm);
+            }
+        }
+
+        private static FriendSearchResultVm MapToViewModel(SearchAccountItem item)
+        {
+            string displayName = string.IsNullOrWhiteSpace(item.DisplayName)
+                ? (item.Email ?? string.Empty)
+                : item.DisplayName;
+
+            return new FriendSearchResultVm
+            {
+                AccountId = item.AccountId,
+                DisplayName = displayName,
+                Email = item.Email ?? string.Empty,
+                HasProfileImage = item.HasProfileImage,
+                ProfileImageCode = item.ProfileImageCode ?? string.Empty,
+                Avatar = DefaultAvatar(),
+                IsFriend = item.IsFriend,
+                HasPendingOutgoing = item.HasPendingOutgoing,
+                HasPendingIncoming = item.HasPendingIncoming,
+                PendingIncomingRequestId = item.PendingIncomingRequestId
+            };
+        }
+
+        private void TryQueueAvatarLoad(FriendSearchResultVm vm)
+        {
+            if (vm == null)
+            {
+                return;
+            }
+
+            if (!vm.HasProfileImage || string.IsNullOrWhiteSpace(vm.ProfileImageCode))
+            {
+                return;
+            }
+
+            _ = LoadAvatarAsync(vm);
+        }
+
+        private void UpdateStatusFromResultsCount()
+        {
+            lblStatus.Text = results.Count == 0
+                ? Lang.noResults
+                : string.Format(Lang.results, results.Count);
+        }
+
+        private void HandleSearchFault(FaultException<FriendService.ServiceFault> ex)
+        {
+            Logger.WarnFormat(
+                "AddFriendPage.SearchAsync: service fault. Code={0}, Key={1}",
+                ex.Detail == null ? string.Empty : ex.Detail.Code,
+                ex.Detail == null ? string.Empty : ex.Detail.Message);
+
+            MessageBox.Show(
+                ResolveFaultMessage(ex.Detail),
+                Lang.addFriendSearchTooltip,
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            lblStatus.Text = Lang.addFriendServiceError;
+        }
+
+        private void HandleSearchConnectivityError(string logMessage, Exception ex)
+        {
+            Logger.Error(logMessage, ex);
+
+            MessageBox.Show(
+                Lang.noConnection,
+                Lang.addFriendSearchTooltip,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            lblStatus.Text = Lang.noConnection;
         }
 
         private async Task LoadAvatarAsync(FriendSearchResultVm vm)

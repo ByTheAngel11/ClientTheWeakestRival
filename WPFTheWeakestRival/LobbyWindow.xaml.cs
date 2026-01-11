@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,7 +19,6 @@ using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Properties.Langs;
 using WPFTheWeakestRival.Pages;
-
 using LobbyContracts = WPFTheWeakestRival.LobbyService;
 
 namespace WPFTheWeakestRival
@@ -51,17 +51,18 @@ namespace WPFTheWeakestRival
 
         private const string ERROR_COPY_CODE_NO_CODE = "No hay un código de lobby para copiar.";
         private const string ERROR_COPY_CODE_GENERIC = "Ocurrió un error al copiar el código al portapapeles.";
+
         private const string ERROR_START_MATCH_GENERIC = "Ocurrió un error al iniciar la partida.";
+
         private const string FAULT_REPORT_COOLDOWN = "REPORT_COOLDOWN";
 
         private const byte ACCOUNT_STATUS_SUSPENDED = 3;
         private const byte ACCOUNT_STATUS_BANNED = 4;
-
         private const string SANCTION_END_TIME_FORMAT = "g";
+
         private const string FRIEND_ENDPOINT_CONFIGURATION_NAME = "WSHttpBinding_IFriendService";
 
         private const string INVITE_MENU_HEADER = "Invitar al lobby";
-
         private const string ERROR_INVITE_NO_CODE = "No hay un código de lobby disponible para invitar.";
         private const string ERROR_INVITE_GENERIC = "Ocurrió un error al enviar la invitación.";
         private const string INFO_INVITE_SENT = "Invitación enviada.";
@@ -78,6 +79,7 @@ namespace WPFTheWeakestRival
 
         private Guid? currentLobbyId;
         private string currentAccessCode = string.Empty;
+
         private string myDisplayName = DEFAULT_DISPLAY_NAME;
 
         private readonly ObservableCollection<ChatLine> chatLines = new ObservableCollection<ChatLine>();
@@ -89,11 +91,13 @@ namespace WPFTheWeakestRival
 
         private bool isPrivate = true;
         private int maxPlayers = 4;
+
         private decimal startingScore = 0m;
         private decimal maxScore = 100m;
         private decimal pointsCorrect = 10m;
         private decimal pointsWrong = -5m;
         private decimal pointsEliminationGain = 5m;
+
         private bool isTiebreakCoinflipAllowed = true;
 
         private bool isOpeningMatchWindow;
@@ -131,7 +135,6 @@ namespace WPFTheWeakestRival
                 lstFriends.ItemsSource = friendItems;
                 lstFriends.PreviewMouseRightButtonDown += LstFriendsPreviewMouseRightButtonDown;
                 lstFriends.ContextMenuOpening += LstFriendsContextMenuOpening;
-
                 UpdateFriendDrawerUi();
             }
 
@@ -174,13 +177,20 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            if (Dispatcher.CheckAccess())
+            try
             {
-                action();
-                return;
-            }
+                if (Dispatcher.CheckAccess())
+                {
+                    action();
+                    return;
+                }
 
-            Dispatcher.BeginInvoke(action);
+                Dispatcher.BeginInvoke(action);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyWindow.Ui error.", ex);
+            }
         }
 
         public void InitializeExistingLobby(Guid lobbyId, string accessCode, string lobbyName)
@@ -188,6 +198,27 @@ namespace WPFTheWeakestRival
             currentLobbyId = lobbyId;
             currentAccessCode = accessCode ?? string.Empty;
             UpdateLobbyHeader(lobbyName, currentAccessCode);
+        }
+
+        public void InitializeExistingLobby(LobbyContracts.LobbyInfo info)
+        {
+            if (info == null)
+            {
+                return;
+            }
+
+            currentLobbyId = info.LobbyId;
+
+            currentAccessCode = string.IsNullOrWhiteSpace(info.AccessCode)
+                ? string.Empty
+                : info.AccessCode;
+
+            UpdateLobbyHeader(info.LobbyName, currentAccessCode);
+
+            LobbyAvatarHelper.RebuildLobbyPlayers(
+                lobbyPlayers,
+                info.Players,
+                MapPlayerToLobbyItem);
         }
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
@@ -224,7 +255,6 @@ namespace WPFTheWeakestRival
             {
                 isPrivate = page.IsPrivate;
                 maxPlayers = page.MaxPlayers;
-
                 startingScore = page.StartingScore;
                 maxScore = page.MaxScore;
                 pointsCorrect = page.PointsPerCorrect;
@@ -268,7 +298,6 @@ namespace WPFTheWeakestRival
             {
                 EasingFunction = new QuadraticEase()
             };
-
             overlayBlur.BeginAnimation(BlurEffect.RadiusProperty, blurAnimation);
 
             try
@@ -319,22 +348,20 @@ namespace WPFTheWeakestRival
             {
                 EasingFunction = new QuadraticEase()
             };
-
             overlayBlur.BeginAnimation(BlurEffect.RadiusProperty, blurAnimation);
         }
 
         private void BtnSendFriendRequestClick(object sender, RoutedEventArgs e)
         {
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
             try
             {
-                var page = new AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+                var page = new AddFriendPage(new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME), token);
 
                 var friendFrame = new Frame
                 {
@@ -357,6 +384,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Error opening AddFriendPage dialog from lobby.", ex);
+
                 MessageBox.Show(
                     Lang.addFriendServiceError,
                     Lang.addFriendTitle,
@@ -367,16 +395,15 @@ namespace WPFTheWeakestRival
 
         private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
         {
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
             try
             {
-                var page = new FriendRequestsPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+                var page = new FriendRequestsPage(new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME), token);
 
                 var friendRequestsFrame = new Frame
                 {
@@ -399,6 +426,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Error opening FriendRequestsPage dialog from lobby.", ex);
+
                 MessageBox.Show(
                     Lang.addFriendServiceError,
                     Lang.btnRequests,
@@ -425,10 +453,9 @@ namespace WPFTheWeakestRival
 
         private void BtnModifyProfileClick(object sender, RoutedEventArgs e)
         {
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
@@ -459,12 +486,12 @@ namespace WPFTheWeakestRival
                 };
 
                 profileWindow.ShowDialog();
-
                 RefreshProfileButtonAvatar();
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
                 Logger.Warn("Auth fault while opening ModifyProfilePage from lobby.", ex);
+
                 MessageBox.Show(
                     ex.Detail.Code + ": " + ex.Detail.Message,
                     Lang.profileTitle,
@@ -474,6 +501,7 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error while opening ModifyProfilePage from lobby.", ex);
+
                 MessageBox.Show(
                     Lang.noConnection,
                     Lang.profileTitle,
@@ -483,6 +511,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error while opening ModifyProfilePage from lobby.", ex);
+
                 MessageBox.Show(
                     Lang.UiGenericError,
                     Lang.profileTitle,
@@ -526,13 +555,13 @@ namespace WPFTheWeakestRival
                 var value = prop.GetValue(profile, null) as byte[];
                 return value ?? Array.Empty<byte>();
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Warn("TryGetProfileBytes error.", ex);
                 return Array.Empty<byte>();
             }
         }
 
-        // FIX: sin URL; solo bytes + default. Y sin ex.Message al usuario.
         private void RefreshProfileButtonAvatar()
         {
             var token = LoginWindow.AppSession.CurrentToken?.Token;
@@ -580,10 +609,9 @@ namespace WPFTheWeakestRival
 
         private async void BtnStartMatchClick(object sender, RoutedEventArgs e)
         {
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
@@ -606,6 +634,7 @@ namespace WPFTheWeakestRival
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
                 Logger.Warn("Fault al iniciar partida desde Lobby.", ex);
+
                 MessageBox.Show(
                     ex.Detail.Code + ": " + ex.Detail.Message,
                     Lang.lobbyTitle,
@@ -615,6 +644,7 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Error de comunicación al iniciar partida desde Lobby.", ex);
+
                 MessageBox.Show(
                     Lang.noConnection,
                     Lang.lobbyTitle,
@@ -624,6 +654,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Error inesperado al iniciar partida desde Lobby.", ex);
+
                 MessageBox.Show(
                     ERROR_START_MATCH_GENERIC,
                     Lang.lobbyTitle,
@@ -699,16 +730,16 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
             try
             {
                 AppendLine(myDisplayName, messageText);
+
                 lastSentText = messageText;
                 lastSentUtc = DateTime.UtcNow;
 
@@ -722,6 +753,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Error sending chat message in lobby.", ex);
+
                 MessageBox.Show(
                     Lang.chatSendFailed,
                     Lang.chatTitle,
@@ -757,6 +789,7 @@ namespace WPFTheWeakestRival
                 }
 
                 currentLobbyId = info.LobbyId;
+
                 if (!string.IsNullOrWhiteSpace(info.AccessCode))
                 {
                     currentAccessCode = info.AccessCode;
@@ -863,7 +896,7 @@ namespace WPFTheWeakestRival
 
             if (txtRequestsCount != null)
             {
-                txtRequestsCount.Text = pendingRequestsCount.ToString();
+                txtRequestsCount.Text = pendingRequestsCount.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -897,6 +930,7 @@ namespace WPFTheWeakestRival
             try
             {
                 var token = LoginWindow.AppSession.CurrentToken?.Token;
+
                 if (!string.IsNullOrWhiteSpace(token) && currentLobbyId.HasValue)
                 {
                     await AppServices.Lobby.LeaveLobbyAsync(token);
@@ -921,6 +955,7 @@ namespace WPFTheWeakestRival
                         Lang.lobbyTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
+
                     return;
                 }
 
@@ -929,6 +964,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Error copying lobby access code to clipboard.", ex);
+
                 MessageBox.Show(
                     ERROR_COPY_CODE_GENERIC,
                     Lang.lobbyTitle,
@@ -960,8 +996,8 @@ namespace WPFTheWeakestRival
                     {
                         var token = LoginWindow.AppSession.CurrentToken?.Token ?? string.Empty;
                         var session = LoginWindow.AppSession.CurrentToken;
-                        var myUserId = session != null ? session.UserId : 0;
 
+                        var myUserId = session != null ? session.UserId : 0;
                         var isHost = false;
 
                         var matchWindow = new MatchWindow(match, token, myUserId, isHost, this);
@@ -1015,121 +1051,34 @@ namespace WPFTheWeakestRival
             }
         }
 
-        public void InitializeExistingLobby(LobbyContracts.LobbyInfo info)
-        {
-            if (info == null)
-            {
-                return;
-            }
-
-            currentLobbyId = info.LobbyId;
-            currentAccessCode = string.IsNullOrWhiteSpace(info.AccessCode)
-                ? string.Empty
-                : info.AccessCode;
-
-            UpdateLobbyHeader(info.LobbyName, currentAccessCode);
-
-            LobbyAvatarHelper.RebuildLobbyPlayers(
-                lobbyPlayers,
-                info.Players,
-                MapPlayerToLobbyItem);
-        }
-
         private async void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                var menuItem = sender as MenuItem;
-                if (menuItem == null)
+                LobbyPlayerItem targetPlayer = TryGetReportTargetPlayer(sender);
+                if (targetPlayer == null)
                 {
                     return;
                 }
 
-                var targetPlayer = menuItem.CommandParameter as LobbyPlayerItem;
-                if (targetPlayer == null || targetPlayer.IsMe)
-                {
-                    return;
-                }
-
-                var session = LoginWindow.AppSession.CurrentToken;
-                string token = session != null ? (session.Token ?? string.Empty) : string.Empty;
-
+                string token = GetSessionTokenOrShowMessage();
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    MessageBox.Show(Lang.noValidSessionCode);
                     return;
                 }
 
-                var dialog = new WPFTheWeakestRival.Windows.ReportPlayerWindow(targetPlayer.DisplayName)
-                {
-                    Owner = this
-                };
-
+                var dialog = CreateReportDialog(targetPlayer.DisplayName);
                 bool? dialogResult = dialog.ShowDialog();
                 if (dialogResult != true)
                 {
                     return;
                 }
 
-                var client = new ReportService.ReportServiceClient("WSHttpBinding_IReportService");
-                try
-                {
-                    var request = new ReportService.SubmitPlayerReportRequest
-                    {
-                        Token = token,
-                        ReportedAccountId = targetPlayer.AccountId,
-                        LobbyId = currentLobbyId,
-                        ReasonCode = (ReportService.ReportReasonCode)dialog.SelectedReasonCode,
-                        Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? string.Empty : dialog.Comment
-                    };
-
-                    ReportService.SubmitPlayerReportResponse response =
-                        await Task.Run(() => client.SubmitPlayerReport(request));
-
-                    if (response != null && response.SanctionApplied)
-                    {
-                        if (response.SanctionType == ACCOUNT_STATUS_SUSPENDED && response.SanctionEndAtUtc.HasValue)
-                        {
-                            string localEnd = response.SanctionEndAtUtc.Value
-                                .ToLocalTime()
-                                .ToString(SANCTION_END_TIME_FORMAT);
-
-                            MessageBox.Show(
-                                string.Format(Lang.reportSanctionTemporary, localEnd),
-                                Lang.reportPlayer,
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
-
-                            return;
-                        }
-
-                        if (response.SanctionType == ACCOUNT_STATUS_BANNED)
-                        {
-                            MessageBox.Show(
-                                Lang.reportSanctionPermanent,
-                                Lang.reportPlayer,
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Warning);
-
-                            return;
-                        }
-                    }
-
-                    MessageBox.Show(
-                        Lang.reportSent,
-                        Lang.reportPlayer,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                }
-                finally
-                {
-                    try { client.Close(); }
-                    catch { client.Abort(); }
-                }
+                await SubmitReportAsync(token, targetPlayer, dialog);
             }
             catch (FaultException<ReportService.ServiceFault> ex)
             {
-                if (ex.Detail != null && string.Equals(ex.Detail.Code, FAULT_REPORT_COOLDOWN, StringComparison.Ordinal))
+                if (IsReportCooldownFault(ex))
                 {
                     MessageBox.Show(
                         Lang.reportCooldown,
@@ -1168,6 +1117,128 @@ namespace WPFTheWeakestRival
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private static bool IsReportCooldownFault(FaultException<ReportService.ServiceFault> ex)
+        {
+            return ex != null &&
+                ex.Detail != null &&
+                string.Equals(ex.Detail.Code, FAULT_REPORT_COOLDOWN, StringComparison.Ordinal);
+        }
+
+        private LobbyPlayerItem TryGetReportTargetPlayer(object sender)
+        {
+            var menuItem = sender as MenuItem;
+            if (menuItem == null)
+            {
+                return null;
+            }
+
+            var targetPlayer = menuItem.CommandParameter as LobbyPlayerItem;
+            if (targetPlayer == null || targetPlayer.IsMe)
+            {
+                return null;
+            }
+
+            return targetPlayer;
+        }
+
+        private WPFTheWeakestRival.Windows.ReportPlayerWindow CreateReportDialog(string displayName)
+        {
+            return new WPFTheWeakestRival.Windows.ReportPlayerWindow(displayName)
+            {
+                Owner = this
+            };
+        }
+
+        private async Task SubmitReportAsync(
+            string token,
+            LobbyPlayerItem targetPlayer,
+            WPFTheWeakestRival.Windows.ReportPlayerWindow dialog)
+        {
+            var client = new ReportService.ReportServiceClient("WSHttpBinding_IReportService");
+
+            try
+            {
+                var request = BuildReportRequest(token, targetPlayer, dialog);
+
+                ReportService.SubmitPlayerReportResponse response =
+                    await Task.Run(() => client.SubmitPlayerReport(request));
+
+                ShowReportResult(response);
+            }
+            finally
+            {
+                CloseClientSafely(client, "ReportServiceClient");
+            }
+        }
+
+        private ReportService.SubmitPlayerReportRequest BuildReportRequest(
+            string token,
+            LobbyPlayerItem targetPlayer,
+            WPFTheWeakestRival.Windows.ReportPlayerWindow dialog)
+        {
+            return new ReportService.SubmitPlayerReportRequest
+            {
+                Token = token,
+                ReportedAccountId = targetPlayer.AccountId,
+                LobbyId = currentLobbyId,
+                ReasonCode = (ReportService.ReportReasonCode)dialog.SelectedReasonCode,
+                Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? string.Empty : dialog.Comment
+            };
+        }
+
+        private void ShowReportResult(ReportService.SubmitPlayerReportResponse response)
+        {
+            if (response != null && response.SanctionApplied)
+            {
+                if (TryShowSanctionMessage(response))
+                {
+                    return;
+                }
+            }
+
+            MessageBox.Show(
+                Lang.reportSent,
+                Lang.reportPlayer,
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private bool TryShowSanctionMessage(ReportService.SubmitPlayerReportResponse response)
+        {
+            if (response == null)
+            {
+                return false;
+            }
+
+            if (response.SanctionType == ACCOUNT_STATUS_SUSPENDED && response.SanctionEndAtUtc.HasValue)
+            {
+                string localEnd = response.SanctionEndAtUtc.Value
+                    .ToLocalTime()
+                    .ToString(SANCTION_END_TIME_FORMAT, CultureInfo.CurrentCulture);
+
+                MessageBox.Show(
+                    string.Format(CultureInfo.CurrentCulture, Lang.reportSanctionTemporary, localEnd),
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                return true;
+            }
+
+            if (response.SanctionType == ACCOUNT_STATUS_BANNED)
+            {
+                MessageBox.Show(
+                    Lang.reportSanctionPermanent,
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return true;
+            }
+
+            return false;
         }
 
         private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -1270,22 +1341,25 @@ namespace WPFTheWeakestRival
         {
             var menuItem = sender as MenuItem;
             var friend = menuItem?.CommandParameter as FriendItem;
-
             if (friend == null)
             {
                 return;
             }
 
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
             if (!currentLobbyId.HasValue || string.IsNullOrWhiteSpace(currentAccessCode))
             {
-                MessageBox.Show(ERROR_INVITE_NO_CODE, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    ERROR_INVITE_NO_CODE,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
                 return;
             }
 
@@ -1302,7 +1376,11 @@ namespace WPFTheWeakestRival
 
                 await Task.Run(() => client.SendLobbyInviteEmail(request));
 
-                MessageBox.Show(INFO_INVITE_SENT, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    INFO_INVITE_SENT,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
@@ -1328,25 +1406,15 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Unexpected error while sending lobby invite email.", ex);
 
-                MessageBox.Show(ERROR_INVITE_GENERIC, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    ERROR_INVITE_GENERIC,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             finally
             {
-                try
-                {
-                    if (client.State == CommunicationState.Faulted)
-                    {
-                        client.Abort();
-                    }
-                    else
-                    {
-                        client.Close();
-                    }
-                }
-                catch
-                {
-                    try { client.Abort(); } catch { }
-                }
+                CloseClientSafely(client, "FriendServiceClient.SendLobbyInviteEmail");
             }
         }
 
@@ -1409,7 +1477,6 @@ namespace WPFTheWeakestRival
         {
             var menuItem = sender as MenuItem;
             var friend = menuItem?.CommandParameter as FriendItem;
-
             if (friend == null)
             {
                 return;
@@ -1422,13 +1489,13 @@ namespace WPFTheWeakestRival
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
+
                 return;
             }
 
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
+            string token = GetSessionTokenOrShowMessage();
             if (string.IsNullOrWhiteSpace(token))
             {
-                MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
 
@@ -1439,10 +1506,12 @@ namespace WPFTheWeakestRival
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
+
                 return;
             }
 
             var client = new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME);
+
             try
             {
                 var request = new SendLobbyInviteEmailRequest
@@ -1463,6 +1532,7 @@ namespace WPFTheWeakestRival
             catch (FaultException<FriendService.ServiceFault> ex)
             {
                 Logger.Warn("Friend invite fault.", ex);
+
                 MessageBox.Show(
                     ex.Detail != null ? ex.Detail.Message : ERROR_INVITE_GENERIC,
                     Lang.lobbyTitle,
@@ -1472,6 +1542,7 @@ namespace WPFTheWeakestRival
             catch (CommunicationException ex)
             {
                 Logger.Error("Communication error sending lobby invite.", ex);
+
                 MessageBox.Show(
                     Lang.noConnection,
                     Lang.lobbyTitle,
@@ -1481,6 +1552,7 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Unexpected error sending lobby invite.", ex);
+
                 MessageBox.Show(
                     ERROR_INVITE_GENERIC,
                     Lang.lobbyTitle,
@@ -1489,8 +1561,73 @@ namespace WPFTheWeakestRival
             }
             finally
             {
-                try { client.Close(); }
-                catch { client.Abort(); }
+                CloseClientSafely(client, "FriendServiceClient.SendLobbyInviteEmail");
+            }
+        }
+
+        private string GetSessionTokenOrShowMessage()
+        {
+            var token = LoginWindow.AppSession.CurrentToken?.Token;
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                MessageBox.Show(Lang.noValidSessionCode);
+                return string.Empty;
+            }
+
+            return token;
+        }
+
+        private static void CloseClientSafely(ICommunicationObject client, string context)
+        {
+            if (client == null)
+            {
+                return;
+            }
+
+            try
+            {
+                if (client.State == CommunicationState.Faulted)
+                {
+                    client.Abort();
+                    return;
+                }
+
+                client.Close();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.WarnFormat("CloseClientSafely communication error. Context={0}", context);
+                Logger.Warn("CloseClientSafely communication exception detail.", ex);
+
+                TryAbort(client, context);
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.WarnFormat("CloseClientSafely timeout. Context={0}", context);
+                Logger.Warn("CloseClientSafely timeout exception detail.", ex);
+
+                TryAbort(client, context);
+            }
+            catch (Exception ex)
+            {
+                Logger.WarnFormat("CloseClientSafely unexpected error. Context={0}", context);
+                Logger.Warn("CloseClientSafely unexpected exception detail.", ex);
+
+                TryAbort(client, context);
+            }
+        }
+
+        private static void TryAbort(ICommunicationObject client, string context)
+        {
+            try
+            {
+                client.Abort();
+            }
+            catch (Exception ex)
+            {
+                Logger.WarnFormat("Abort failed. Context={0}", context);
+                Logger.Warn("Abort exception detail.", ex);
             }
         }
     }

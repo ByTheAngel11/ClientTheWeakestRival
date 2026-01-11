@@ -16,6 +16,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private const string ERROR_TOKEN_REQUIRED = "Token requerido.";
         private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
+
         private const string LOG_UI_ERROR = "LobbyHub.Ui error.";
         private const string LOG_CHANNEL_FAULTED_CREATE = "CreateLobbyAsync called with channel Faulted.";
         private const string LOG_CHANNEL_FAULTED_JOIN = "JoinByCodeAsync called with channel Faulted.";
@@ -26,9 +27,11 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private readonly LobbyServiceClient client;
         private readonly Dispatcher dispatcher;
+
         private bool isStoppedOrDisposed;
 
         public Guid? CurrentLobbyId { get; private set; }
+
         public string CurrentAccessCode { get; private set; } = string.Empty;
 
         public event Action<LobbyInfo> LobbyUpdated;
@@ -58,10 +61,7 @@ namespace WPFTheWeakestRival.Infrastructure
             string lobbyName,
             byte maxPlayers = DEFAULT_MAX_PLAYERS)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
-            }
+            EnsureToken(token);
 
             if (isStoppedOrDisposed)
             {
@@ -122,10 +122,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public async Task<JoinByCodeResponse> JoinByCodeAsync(string token, string accessCode)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
-            }
+            EnsureToken(token);
 
             if (isStoppedOrDisposed)
             {
@@ -138,9 +135,8 @@ namespace WPFTheWeakestRival.Infrastructure
                 return new JoinByCodeResponse();
             }
 
-            if (client.State == CommunicationState.Faulted)
+            if (IsClientFaulted(LOG_CHANNEL_FAULTED_JOIN))
             {
-                Logger.Warn(LOG_CHANNEL_FAULTED_JOIN);
                 return new JoinByCodeResponse();
             }
 
@@ -150,18 +146,17 @@ namespace WPFTheWeakestRival.Infrastructure
                 AccessCode = normalizedCode
             };
 
+            return await TryJoinByCodeAsync(request, normalizedCode).ConfigureAwait(false);
+        }
+
+        private async Task<JoinByCodeResponse> TryJoinByCodeAsync(JoinByCodeRequest request, string normalizedCode)
+        {
             try
             {
                 JoinByCodeResponse response =
                     await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
 
-                if (response != null && response.Lobby != null)
-                {
-                    CurrentLobbyId = response.Lobby.LobbyId;
-                    CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
-                        ? normalizedCode
-                        : response.Lobby.AccessCode;
-                }
+                UpdateLobbyContextFromJoinResponse(response, normalizedCode);
 
                 return response ?? new JoinByCodeResponse();
             }
@@ -189,6 +184,20 @@ namespace WPFTheWeakestRival.Infrastructure
                 Logger.Error("JoinByCodeAsync unexpected error.", ex);
                 return new JoinByCodeResponse();
             }
+        }
+
+        private void UpdateLobbyContextFromJoinResponse(JoinByCodeResponse response, string normalizedCode)
+        {
+            if (response == null || response.Lobby == null)
+            {
+                return;
+            }
+
+            CurrentLobbyId = response.Lobby.LobbyId;
+
+            CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
+                ? normalizedCode
+                : response.Lobby.AccessCode;
         }
 
         public async Task LeaveLobbyAsync(string token)
@@ -308,10 +317,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public async Task<StartLobbyMatchResponse> StartLobbyMatchAsync(string token)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
-            }
+            EnsureToken(token);
 
             if (isStoppedOrDisposed)
             {
@@ -562,6 +568,29 @@ namespace WPFTheWeakestRival.Infrastructure
             return (accessCode ?? string.Empty)
                 .Trim()
                 .ToUpperInvariant();
+        }
+
+        private bool IsClientFaulted(string logMessage)
+        {
+            if (client.State != CommunicationState.Faulted)
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(logMessage))
+            {
+                Logger.Warn(logMessage);
+            }
+
+            return true;
+        }
+
+        private static void EnsureToken(string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
+            }
         }
     }
 }

@@ -95,6 +95,23 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             Type t = dto.GetType();
 
+            int[] fromKnown = TryGetArrayFromKnownNames(dto, t, names);
+            if (fromKnown.Length > 0)
+            {
+                return fromKnown;
+            }
+
+            int[] fromHeuristic = TryGetArrayFromHeuristic(dto, t);
+            if (fromHeuristic.Length > 0)
+            {
+                return fromHeuristic;
+            }
+
+            return Array.Empty<int>();
+        }
+
+        private static int[] TryGetArrayFromKnownNames(object dto, Type t, string[] names)
+        {
             foreach (string name in names)
             {
                 PropertyInfo p = t.GetProperty(name);
@@ -104,46 +121,75 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 }
 
                 object value = p.GetValue(dto, null);
-
-                int[] asIntArray = value as int[];
-                if (asIntArray != null)
+                int[] extracted = ExtractIntArray(value);
+                if (extracted.Length > 0)
                 {
-                    return asIntArray;
-                }
-
-                IEnumerable<int> asEnumerable = value as IEnumerable<int>;
-                if (asEnumerable != null)
-                {
-                    return asEnumerable.ToArray();
+                    return extracted;
                 }
             }
 
+            return Array.Empty<int>();
+        }
+
+        private static int[] TryGetArrayFromHeuristic(object dto, Type t)
+        {
             foreach (PropertyInfo p in t.GetProperties())
             {
-                if (p.PropertyType != typeof(int[]) &&
-                    !typeof(IEnumerable<int>).IsAssignableFrom(p.PropertyType))
+                if (!IsIntSequenceType(p.PropertyType))
                 {
                     continue;
                 }
 
                 string n = p.Name ?? string.Empty;
-                if (n.IndexOf("Order", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    n.IndexOf("Alive", StringComparison.OrdinalIgnoreCase) >= 0)
+                if (!LooksLikeOrderPropertyName(n))
                 {
-                    object value = p.GetValue(dto, null);
-
-                    int[] asIntArray = value as int[];
-                    if (asIntArray != null)
-                    {
-                        return asIntArray;
-                    }
-
-                    IEnumerable<int> asEnumerable = value as IEnumerable<int>;
-                    if (asEnumerable != null)
-                    {
-                        return asEnumerable.ToArray();
-                    }
+                    continue;
                 }
+
+                object value = p.GetValue(dto, null);
+                int[] extracted = ExtractIntArray(value);
+                if (extracted.Length > 0)
+                {
+                    return extracted;
+                }
+            }
+
+            return Array.Empty<int>();
+        }
+
+        private static bool IsIntSequenceType(Type type)
+        {
+            return type == typeof(int[]) || typeof(IEnumerable<int>).IsAssignableFrom(type);
+        }
+
+        private static bool LooksLikeOrderPropertyName(string propertyName)
+        {
+            if (string.IsNullOrWhiteSpace(propertyName))
+            {
+                return false;
+            }
+
+            return propertyName.IndexOf("Order", StringComparison.OrdinalIgnoreCase) >= 0
+                || propertyName.IndexOf("Alive", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private static int[] ExtractIntArray(object value)
+        {
+            if (value == null)
+            {
+                return Array.Empty<int>();
+            }
+
+            int[] asIntArray = value as int[];
+            if (asIntArray != null)
+            {
+                return asIntArray;
+            }
+
+            IEnumerable<int> asEnumerable = value as IEnumerable<int>;
+            if (asEnumerable != null)
+            {
+                return asEnumerable.ToArray();
             }
 
             return Array.Empty<int>();
