@@ -670,4 +670,7 @@
   <data name="Report.SubmitPlayerReport.Validation.CommentTooLong" xml:space="preserve">
     <value>The report could not be sent: the comment exceeds the allowed limit.</value>
   </data>
+  <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
+    <value>The report could not be sent: Unexpected error</value>
+  </data>
 </root>
