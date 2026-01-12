@@ -663,4 +663,121 @@
   <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
     <value>The report could not be sent: Unexpected error</value>
   </data>
+  <data name="Email.SendVerificationCode.Socket.10051" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10065" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.11001" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10060" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10061" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10054" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Error de correo: el destinatario no está disponible. No se pudo enviar el código de verificación." xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Configuration" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendVerificationCode.Unexpected" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10051" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10065" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.11001" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10060" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10061" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10054" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Unexpected" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña." xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10065" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.11001" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10060" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10061" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10054" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.GeneralFailure" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.InvalidRecipient" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Error de correo: la dirección del destinatario no es válida." xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
