@@ -124,6 +124,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a There is no account registered with that email..
+        /// </summary>
+        public static string Auth_Email_NotRegistered {
+            get {
+                return ResourceManager.GetString("Auth.Email.NotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a This email is already registered..
+        /// </summary>
+        public static string Auth_Email_Taken {
+            get {
+                return ResourceManager.GetString("Auth.Email.Taken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a There is already an active session for this user..
         /// </summary>
         public static string Auth_IssueToken_AlreadyLoggedIn {

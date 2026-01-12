@@ -801,4 +801,10 @@
   <data name="Auth.Account.Banned" xml:space="preserve">
     <value>Il tuo account è stato bloccato.</value>
   </data>
+  <data name="Auth.Email.Taken" xml:space="preserve">
+    <value>Questa email è già registrata.</value>
+  </data>
+  <data name="Auth.Email.NotRegistered" xml:space="preserve">
+    <value>Non esiste alcun account registrato con quell'e-mail.</value>
+  </data>
 </root>
