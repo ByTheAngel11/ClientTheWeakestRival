@@ -780,4 +780,16 @@
   <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
     <value>Errore di posta: l'indirizzo del destinatario non è valido.</value>
   </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Errore di configurazione: stringa di connessione al server non trovata.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Richiesta non valida</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>Esiste già una sessione attiva per questo utente.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Si è verificato un errore imprevisto. Riprova più tardi.</value>
+  </data>
 </root>

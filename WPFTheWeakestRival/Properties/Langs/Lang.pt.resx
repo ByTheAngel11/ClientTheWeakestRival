@@ -780,4 +780,16 @@
   <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
     <value>Erro de email: o endereço do destinatário é inválido.</value>
   </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Erro de configuração: cadeia de conexão do servidor não encontrada.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Solicitação inválida</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>Já existe uma sessão ativa para este usuário.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Ocorreu um erro inesperado. Tente mais tarde.</value>
+  </data>
 </root>

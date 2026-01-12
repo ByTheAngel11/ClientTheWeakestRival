@@ -780,4 +780,16 @@
   <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
     <value>Error de correo: ocurrió un problema inesperado. No se pudo enviar la invitación a la sala.</value>
   </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Error de configuración: no se encontró la cadena de conexión del servidor.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Solicitud inválida</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>Ya hay una sesión activa para este usuario.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Ocurrió un error inesperado. Intenta más tarde.</value>
+  </data>
 </root>

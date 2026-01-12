@@ -780,4 +780,16 @@
   <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
     <value>Mail error: An unexpected problem occurred. The invitation to the room could not be sent.</value>
   </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Configuration error: Server connection string not found.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Invalid request</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>There is already an active session for this user.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>An unexpected error occurred. Try later.</value>
+  </data>
 </root>

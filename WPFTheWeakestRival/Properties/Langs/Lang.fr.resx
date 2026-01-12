@@ -780,4 +780,16 @@
   <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
     <value>Erreur de courrier : l'adresse du destinataire n'est pas valide.</value>
   </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Erreur de configuration : chaîne de connexion au serveur introuvable.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Demande invalide</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>Il existe déjà une session active pour cet utilisateur.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Une erreur inattendue s'est produite. Essayez plus tard.</value>
+  </data>
 </root>

@@ -97,6 +97,51 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a There is already an active session for this user..
+        /// </summary>
+        public static string Auth_IssueToken_AlreadyLoggedIn {
+            get {
+                return ResourceManager.GetString("Auth.IssueToken.AlreadyLoggedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Invalid request.
+        /// </summary>
+        public static string Auth_IssueToken_InvalidUserId {
+            get {
+                return ResourceManager.GetString("Auth.IssueToken.InvalidUserId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Configuration error: Server connection string not found..
+        /// </summary>
+        public static string Auth_ResolveConnectionString_Configuration {
+            get {
+                return ResourceManager.GetString("Auth.ResolveConnectionString.Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An unexpected error occurred. Try later..
+        /// </summary>
+        public static string Auth_Unexpected {
+            get {
+                return ResourceManager.GetString("Auth.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient address is invalid..
+        /// </summary>
+        public static string BORRAR {
+            get {
+                return ResourceManager.GetString("BORRAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Select an image.
         /// </summary>
         public static string btnChooseImage {
@@ -331,7 +376,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Recipient address is invalid..
         /// </summary>
         public static string Email_SendLobbyInvite_InvalidRecipient {
             get {
@@ -340,7 +385,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The server does not allow sending from this application. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Smtp_ClientNotPermitted {
             get {
@@ -349,7 +394,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail Error: General failure to communicate with the mail server. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Smtp_GeneralFailure {
             get {
@@ -358,7 +403,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Recipient is not available. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Smtp_MailboxUnavailable {
             get {
@@ -367,7 +412,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The server requires TLS security to send mail. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Smtp_MustIssueStartTlsFirst {
             get {
@@ -376,7 +421,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The connection to the mail server was interrupted. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Socket_10054 {
             get {
@@ -385,7 +430,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: timeout connecting to the mail server. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Socket_10060 {
             get {
@@ -394,7 +439,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server refused the connection. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Socket_10061 {
             get {
@@ -403,7 +448,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server could not be reached (host unreachable). The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Socket_10065 {
             get {
@@ -412,7 +457,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server (DNS) could not be resolved. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Socket_11001 {
             get {
@@ -421,7 +466,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: An unexpected problem occurred. The invitation to the room could not be sent..
         /// </summary>
         public static string Email_SendLobbyInvite_Unexpected {
             get {
@@ -430,7 +475,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
         /// </summary>
         public static string Email_SendPasswordResetCode_Configuration {
             get {
@@ -439,7 +484,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Recipient address is invalid..
         /// </summary>
         public static string Email_SendPasswordResetCode_InvalidRecipient {
             get {
@@ -448,7 +493,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The server does not allow sending from this application. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Smtp_ClientNotPermitted {
             get {
@@ -457,7 +502,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail Error: General failure to communicate with the mail server. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Smtp_GeneralFailure {
             get {
@@ -466,7 +511,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Recipient is not available. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Smtp_MailboxUnavailable {
             get {
@@ -475,7 +520,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The server requires TLS security to send mail. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Smtp_MustIssueStartTlsFirst {
             get {
@@ -484,7 +529,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: no internet connection (network inaccessible). The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Socket_10051 {
             get {
@@ -493,7 +538,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The connection to the mail server was interrupted. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Socket_10054 {
             get {
@@ -502,7 +547,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: timeout connecting to the mail server. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Socket_10060 {
             get {
@@ -511,7 +556,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server refused the connection. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Socket_10061 {
             get {
@@ -520,7 +565,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server could not be reached (host unreachable). The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Socket_10065 {
             get {
@@ -529,7 +574,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server (DNS) could not be resolved. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Socket_11001 {
             get {
@@ -538,7 +583,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: An unexpected problem occurred. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendPasswordResetCode_Unexpected {
             get {
@@ -547,7 +592,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
         /// </summary>
         public static string Email_SendVerificationCode_Configuration {
             get {
@@ -556,7 +601,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The server does not allow sending from this application. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Smtp_ClientNotPermitted {
             get {
@@ -565,7 +610,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail Error: General failure to communicate with the mail server. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Smtp_GeneralFailure {
             get {
@@ -574,7 +619,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Recipient is not available. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Smtp_MailboxUnavailable {
             get {
@@ -583,7 +628,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The server requires TLS security to send mail. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Smtp_MustIssueStartTlsFirst {
             get {
@@ -592,7 +637,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: no internet connection (network inaccessible). The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Socket_10051 {
             get {
@@ -601,7 +646,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The connection to the mail server was interrupted. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Socket_10054 {
             get {
@@ -610,7 +655,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: timeout connecting to the mail server. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Socket_10060 {
             get {
@@ -619,7 +664,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server refused the connection. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Socket_10061 {
             get {
@@ -628,7 +673,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server could not be reached (host unreachable). The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Socket_10065 {
             get {
@@ -637,7 +682,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: The mail server (DNS) could not be resolved. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Socket_11001 {
             get {
@@ -646,7 +691,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: An unexpected problem occurred. The password reset code could not be sent..
         /// </summary>
         public static string Email_SendVerificationCode_Unexpected {
             get {
@@ -673,7 +718,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
         /// </summary>
         public static string Error_de_correo__la_dirección_del_destinatario_no_es_válida_ {
             get {
@@ -682,7 +727,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Mail error: no internet connection (network inaccessible). The invitation to the room could not be sent..
         /// </summary>
         public static string Error_de_correo__ocurrió_un_problema_inesperado__No_se_pudo_enviar_el_código_para_restablecer_la_contraseña_ {
             get {
@@ -1327,15 +1372,6 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string nowFriends {
             get {
                 return ResourceManager.GetString("nowFriends", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Busca una cadena traducida similar a .
-        /// </summary>
-        public static string OTRA {
-            get {
-                return ResourceManager.GetString("OTRA", resourceCulture);
             }
         }
         
