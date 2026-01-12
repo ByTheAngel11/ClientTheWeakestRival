@@ -10,8 +10,9 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Globalization;
-using WPFTheWeakestRival.Properties.Langs;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Infrastructure.Faults;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
@@ -23,6 +24,7 @@ namespace WPFTheWeakestRival
 
         private const string CONTENT_TYPE_PNG = "image/png";
         private const string CONTENT_TYPE_JPEG = "image/jpeg";
+        private const string REGISTER_ERROR = "registerError";
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(RegistrationWindow));
 
@@ -326,7 +328,11 @@ namespace WPFTheWeakestRival
                 catch (FaultException<ServiceFault> fx)
                 {
                     authClient.Abort();
-                    MessageBox.Show(fx.Detail.Message, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(
+                    ResolveFaultMessage(fx.Detail),
+                    Localize(REGISTER_ERROR),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 }
                 catch (EndpointNotFoundException ex)
                 {
@@ -391,6 +397,24 @@ namespace WPFTheWeakestRival
         {
             new LoginWindow().Show();
             Close();
+        }
+
+        private static string Localize(string key)
+        {
+            var safeKey = (key ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(safeKey))
+            {
+                return string.Empty;
+            }
+
+            var value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            return string.IsNullOrWhiteSpace(value) ? safeKey : value;
+        }
+
+        private static string ResolveFaultMessage(AuthService.ServiceFault fault)
+        {
+            var key = fault == null ? string.Empty : (fault.Message ?? string.Empty);
+            return FaultKeyMessageResolver.Resolve(key, Localize);
         }
     }
 }
