@@ -30,7 +30,6 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- BARRA SUPERIOR -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -38,7 +37,6 @@
                 <ColumnDefinition Width="220"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Código de la partida -->
             <TextBlock x:Name="txtMatchCodeSmall"
                        Grid.Column="0"
                        Margin="4,0"
@@ -47,7 +45,6 @@
                        FontSize="12"
                        Text="Código:"/>
 
-            <!-- Fase actual -->
             <TextBlock x:Name="txtPhase"
                        Grid.Column="1"
                        Margin="0,0"
@@ -82,7 +79,6 @@
             </Border>
         </Grid>
 
-        <!-- CONTENIDO PRINCIPAL -->
         <Grid Grid.Row="1" Margin="0,8,0,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="180"/>
@@ -90,7 +86,6 @@
                 <ColumnDefinition Width="220"/>
             </Grid.ColumnDefinitions>
 
-            <!-- COLUMNA IZQUIERDA -->
             <Grid Grid.Column="0" Margin="4,0,12,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -211,7 +206,6 @@
                 </StackPanel>
             </Grid>
 
-            <!-- COLUMNA CENTRAL -->
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -317,7 +311,6 @@
                            Foreground="Gray"/>
             </Grid>
 
-            <!-- COLUMNA DERECHA -->
             <Grid Grid.Column="2" Margin="12,0,4,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -415,7 +408,6 @@
             </Grid>
         </Grid>
 
-        <!-- OVERLAY INTRO VIDEO -->
         <Grid x:Name="IntroOverlay"
               Grid.Row="1"
               Background="#CC000000"
@@ -522,7 +514,6 @@
             </Border>
         </Grid>
 
-        <!-- BOTÓN CERRAR -->
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"

@@ -1,6 +1,6 @@
-﻿// MatchSessionState.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using WPFTheWeakestRival.LobbyService;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
@@ -11,6 +11,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         NormalRound,
         Duel,
         SpecialEvent,
+        Final,
         Finished
     }
 
@@ -61,6 +62,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public int? DarknessSeed { get; set; }
 
+        public bool HasAnnouncedFinalPhase { get; set; }
+
         public void AddEliminated(int userId)
         {
             if (userId <= 0)
@@ -79,6 +82,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public bool IsEliminated(int userId)
         {
             return userId > 0 && eliminatedUserIds.Contains(userId);
+        }
+
+        public int GetAlivePlayersCount()
+        {
+            PlayerSummary[] players = Match != null ? (Match.Players ?? Array.Empty<PlayerSummary>()) : Array.Empty<PlayerSummary>();
+
+            return players
+                .Where(p => p != null && p.UserId > 0 && !IsEliminated(p.UserId))
+                .Select(p => p.UserId)
+                .Distinct()
+                .Count();
+        }
+
+        public bool IsInFinalPhase()
+        {
+            return CurrentPhase == MatchPhase.Final;
         }
     }
 }

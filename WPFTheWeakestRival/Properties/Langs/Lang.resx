@@ -663,4 +663,13 @@
   <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
     <value>The report could not be sent: Unexpected error</value>
   </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>You have no friends yet</value>
+  </data>
+  <data name="commonAccept" xml:space="preserve">
+    <value>Acept</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
 </root>

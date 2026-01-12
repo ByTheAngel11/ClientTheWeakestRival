@@ -21,13 +21,11 @@
         </Style>
     </Page.Resources>
 
-    <!-- Capa exterior para centrar dentro de la tablet -->
     <Grid Background="Transparent">
         <Grid Width="640"
               Height="360"
               HorizontalAlignment="Center"
               VerticalAlignment="Center">
-            <!-- Layout interno -->
             <Grid Margin="24">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -37,20 +35,17 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Título -->
                 <TextBlock Text="{loc:Loc btnRequests}"
                            FontSize="22"
                            Foreground="White"
                            FontWeight="Bold"/>
 
-                <!-- Contenido principal -->
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Recibidas -->
                     <Border Grid.Column="0"
                             Margin="0,0,8,0"
                             BorderBrush="#40000000"

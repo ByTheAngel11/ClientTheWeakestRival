@@ -304,11 +304,29 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Acept.
+        /// </summary>
+        public static string commonAccept {
+            get {
+                return ResourceManager.GetString("commonAccept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Close.
         /// </summary>
         public static string commonClose {
             get {
                 return ResourceManager.GetString("commonClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Reject.
+        /// </summary>
+        public static string commonReject {
+            get {
+                return ResourceManager.GetString("commonReject", resourceCulture);
             }
         }
         
@@ -943,6 +961,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a You have no friends yet.
+        /// </summary>
+        public static string noFriends {
+            get {
+                return ResourceManager.GetString("noFriends", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a No Lobby.
         /// </summary>
         public static string noLobby {
@@ -1375,7 +1402,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a The report could not be sent: Unexpected error.
         /// </summary>
         public static string Report_SubmitPlayerReport_Unexpected {
             get {

@@ -7,17 +7,12 @@ namespace WPFTheWeakestRival.Wildcards
     public static class WildcardActionManager
     {
         private const decimal DUPLICATE_SCORE_FACTOR = 2m;
-        private const int SABOTAGE_SECONDS_LOST = 15;
-        private const int EXTRA_TIME_SECONDS = 15;
 
         private const string CODE_CHANGE_QUESTION = "CHANGE_QUESTION";
         private const string CODE_PASS_QUESTION = "PASS_QUESTION";
-        private const string CODE_SHIELD = "SHIELD";
         private const string CODE_FORCED_BANK = "FORCED_BANK";
         private const string CODE_DUPLICATE_SCORE = "DUPLICATE_SCORE";
         private const string CODE_BLOCK_WILDCARDS = "BLOCK_WILDCARDS";
-        private const string CODE_SABOTAGE = "SABOTAGE";
-        private const string CODE_EXTRA_TIME = "EXTRA_TIME";
 
         public static void ApplyWildcardAction(
             PlayerWildcardDto wildcard,
@@ -57,10 +52,6 @@ namespace WPFTheWeakestRival.Wildcards
                     context.PassQuestionToOtherPlayer();
                     break;
 
-                case CODE_SHIELD:
-                    context.ApplyShieldForCurrentRound();
-                    break;
-
                 case CODE_FORCED_BANK:
                     context.ForceBankChainBeforeTurn();
                     break;
@@ -72,15 +63,6 @@ namespace WPFTheWeakestRival.Wildcards
                 case CODE_BLOCK_WILDCARDS:
                     context.BlockOtherPlayerWildcardsOneRound();
                     break;
-
-                case CODE_SABOTAGE:
-                    context.ApplySabotageLessTimeNextPlayer(SABOTAGE_SECONDS_LOST);
-                    break;
-
-                case CODE_EXTRA_TIME:
-                    context.AddExtraTimeToCurrentQuestion(EXTRA_TIME_SECONDS);
-                    break;
-
                 default:
                     logger.WarnFormat("Unknown wildcard code '{0}'. No action applied.", code);
                     break;

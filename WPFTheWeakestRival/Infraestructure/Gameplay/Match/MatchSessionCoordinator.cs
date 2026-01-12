@@ -39,6 +39,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private const int SabotageTimeSeconds = 15;
 
+        private const int FinalPlayersCount = 2;
+        private const string FinalPhaseLabelText = "Final 1 vs 1";
+
+        private const string GenericPlayerNameTemplate = "Jugador {0}";
+        private const string RevealVoteTemplate = "Votaste por: {0}";
+
+        private const string VotePhaseLogTemplate = "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}";
+        private const string SpecialEventLogTemplate = "OnSpecialEvent. MatchId={0}, Name='{1}', Desc='{2}'";
+
+        private const string LightningSuccessTemplate = "¡Has completado el reto relámpago! Respuestas correctas: {0}.";
+        private const string LightningFailTemplate = "Reto relámpago finalizado. Respuestas correctas: {0}.";
+        private const string MatchFinishedLabelText = "Partida finalizada";
+
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
 
@@ -248,9 +261,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             decimal chain,
             decimal banked)
         {
-            state.CurrentPhase = state.IsSurpriseExamActive || state.IsDarknessActive
-                ? MatchPhase.SpecialEvent
-                : MatchPhase.NormalRound;
+            DetectAndApplyFinalPhaseIfApplicable();
+
+            if (!state.IsInFinalPhase())
+            {
+                state.CurrentPhase = state.IsSurpriseExamActive || state.IsDarknessActive
+                    ? MatchPhase.SpecialEvent
+                    : MatchPhase.NormalRound;
+            }
 
             UpdatePhaseLabel();
 
@@ -266,8 +284,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleVotePhaseStartedAsync(Guid matchId, TimeSpan timeLimit)
         {
+            DetectAndApplyFinalPhaseIfApplicable();
+
+            if (state.IsInFinalPhase() || state.IsMatchFinished)
+            {
+                return;
+            }
+
             Logger.InfoFormat(
-                "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}",
+                VotePhaseLogTemplate,
                 matchId,
                 timeLimit.TotalSeconds);
 
@@ -295,13 +320,48 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             dialogs.ShowEliminationMessage(eliminated);
             questions.OnEliminated(isMe);
 
+            DetectAndApplyFinalPhaseIfApplicable();
+
             RefreshWildcardUseState();
+        }
+
+        private void DetectAndApplyFinalPhaseIfApplicable()
+        {
+            if (state.IsMatchFinished)
+            {
+                return;
+            }
+
+            int alivePlayers = state.GetAlivePlayersCount();
+
+            if (alivePlayers == FinalPlayersCount)
+            {
+                if (!state.IsInFinalPhase())
+                {
+                    state.CurrentPhase = MatchPhase.Final;
+                    UpdatePhaseLabel();
+                }
+
+                if (!state.HasAnnouncedFinalPhase)
+                {
+                    state.HasAnnouncedFinalPhase = true;
+
+                    try
+                    {
+                        overlay.ShowSpecialEvent(FinalPhaseLabelText, string.Empty);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn("DetectAndApplyFinalPhaseIfApplicable overlay error.", ex);
+                    }
+                }
+            }
         }
 
         private async Task HandleSpecialEventAsync(Guid matchId, string eventName, string description)
         {
             Logger.InfoFormat(
-                "OnSpecialEvent. MatchId={0}, Name='{1}', Desc='{2}'",
+                SpecialEventLogTemplate,
                 matchId,
                 eventName ?? string.Empty,
                 description ?? string.Empty);
@@ -441,21 +501,25 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 case SpecialEventKind.SurpriseExamStarted:
                     questions.SetSurpriseExamActive(true);
+                    state.IsSurpriseExamActive = true;
                     await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.SurpriseExamResolved:
                     questions.SetSurpriseExamActive(false);
+                    state.IsSurpriseExamActive = false;
                     await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.BombQuestion:
                     questions.SetBombQuestionUi(true);
+                    state.IsBombQuestionActive = true;
                     RefreshWildcardUseState();
                     return;
 
                 case SpecialEventKind.BombApplied:
                     questions.SetBombQuestionUi(false);
+                    state.IsBombQuestionActive = false;
                     RefreshWildcardUseState();
                     return;
 
@@ -664,7 +728,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (!state.IsMatchFinished)
             {
-                state.CurrentPhase = MatchPhase.NormalRound;
+                DetectAndApplyFinalPhaseIfApplicable();
+
+                if (!state.IsInFinalPhase())
+                {
+                    state.CurrentPhase = MatchPhase.NormalRound;
+                }
+
                 UpdatePhaseLabel();
             }
         }
@@ -687,10 +757,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 string name = voted != null && !string.IsNullOrWhiteSpace(voted.DisplayName)
                     ? voted.DisplayName
-                    : string.Format(CultureInfo.CurrentCulture, "Jugador {0}", votedUserId.Value);
+                    : string.Format(CultureInfo.CurrentCulture, GenericPlayerNameTemplate, votedUserId.Value);
 
                 MessageBox.Show(
-                    string.Format(CultureInfo.CurrentCulture, "Votaste por: {0}", name),
+                    string.Format(CultureInfo.CurrentCulture, RevealVoteTemplate, name),
                     MatchConstants.GAME_MESSAGE_TITLE,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -766,6 +836,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.CurrentPhase = coinFlip.ShouldEnableDuel ? MatchPhase.Duel : MatchPhase.NormalRound;
 
+            DetectAndApplyFinalPhaseIfApplicable();
+
+            if (state.IsInFinalPhase())
+            {
+                state.CurrentPhase = MatchPhase.Final;
+            }
+
             UpdatePhaseLabel();
 
             overlay.ShowCoinFlip(coinFlip);
@@ -775,6 +852,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleDuelCandidatesAsync(GameplayServiceProxy.DuelCandidatesDto duelCandidates)
         {
+            DetectAndApplyFinalPhaseIfApplicable();
+
+            if (state.IsInFinalPhase() || state.IsMatchFinished)
+            {
+                return;
+            }
+
             if (duelCandidates == null || duelCandidates.Candidates == null || duelCandidates.Candidates.Length == 0)
             {
                 Logger.Warn("OnServerDuelCandidates: sin candidatos.");
@@ -824,7 +908,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.FinalWinner = winner;
             state.IsMyTurn = false;
 
-            timer.Stop();
+            try
+            {
+                timer.Stop();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("HandleMatchFinished timer stop error.", ex);
+            }
 
             if (ui.BtnBank != null) ui.BtnBank.IsEnabled = false;
             if (ui.BtnAnswer1 != null) ui.BtnAnswer1.IsEnabled = false;
@@ -838,7 +929,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (ui.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = "Partida finalizada";
+                ui.TxtTurnLabel.Text = MatchFinishedLabelText;
             }
 
             state.CurrentPhase = MatchPhase.Finished;
@@ -901,8 +992,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.IsMyTurn = false;
 
             string message = isSuccess
-                ? string.Format(CultureInfo.CurrentCulture, "¡Has completado el reto relámpago! Respuestas correctas: {0}.", correctAnswers)
-                : string.Format(CultureInfo.CurrentCulture, "Reto relámpago finalizado. Respuestas correctas: {0}.", correctAnswers);
+                ? string.Format(CultureInfo.CurrentCulture, LightningSuccessTemplate, correctAnswers)
+                : string.Format(CultureInfo.CurrentCulture, LightningFailTemplate, correctAnswers);
 
             MessageBox.Show(
                 message,
@@ -915,7 +1006,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 await wildcards.LoadAsync();
             }
 
-            state.CurrentPhase = MatchPhase.NormalRound;
+            DetectAndApplyFinalPhaseIfApplicable();
+
+            if (!state.IsMatchFinished)
+            {
+                state.CurrentPhase = state.IsInFinalPhase() ? MatchPhase.Final : MatchPhase.NormalRound;
+            }
+
             UpdatePhaseLabel();
 
             RefreshWildcardUseState();
@@ -926,6 +1023,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             turns.ApplyTurnOrder(turnOrder);
 
             SyncMyTurnFromTurnOrder(turnOrder);
+
+            DetectAndApplyFinalPhaseIfApplicable();
 
             RefreshWildcardUseState();
 
@@ -945,6 +1044,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             turns.ApplyTurnOrder(turnOrder);
 
             SyncMyTurnFromTurnOrder(turnOrder);
+
+            DetectAndApplyFinalPhaseIfApplicable();
 
             RefreshWildcardUseState();
 
@@ -1008,7 +1109,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (!state.IsMatchFinished)
             {
-                state.CurrentPhase = MatchPhase.NormalRound;
+                DetectAndApplyFinalPhaseIfApplicable();
+
+                state.CurrentPhase = state.IsInFinalPhase()
+                    ? MatchPhase.Final
+                    : MatchPhase.NormalRound;
+
                 UpdatePhaseLabel();
             }
         }
@@ -1063,6 +1169,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     phaseDetail = MatchConstants.PHASE_SPECIAL_EVENT_TEXT;
                     break;
 
+                case MatchPhase.Final:
+                    phaseDetail = FinalPhaseLabelText;
+                    break;
+
                 case MatchPhase.Finished:
                     phaseDetail = MatchConstants.PHASE_FINISHED_TEXT;
                     break;
@@ -1097,6 +1207,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private bool CanUseWildcardNow()
         {
             if (state.IsMatchFinished)
+            {
+                return false;
+            }
+
+            if (state.IsInFinalPhase())
             {
                 return false;
             }

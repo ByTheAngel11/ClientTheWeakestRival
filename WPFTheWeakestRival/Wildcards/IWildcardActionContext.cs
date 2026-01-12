@@ -13,12 +13,9 @@ namespace WPFTheWeakestRival.Wildcards
 
         void ChangeCurrentQuestion();          
         void PassQuestionToOtherPlayer();      
-        void ApplyShieldForCurrentRound();    
         void ForceBankChainBeforeTurn();       
         void EnableScoreMultiplier(decimal factor); 
         void BlockOtherPlayerWildcardsOneRound();   
         void SwapTurnOrderWithTargetPlayer(int targetUserId); 
-        void ApplySabotageLessTimeNextPlayer(int secondsLost); 
-        void AddExtraTimeToCurrentQuestion(int seconds);
     }
 }

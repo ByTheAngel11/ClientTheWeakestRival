@@ -757,15 +757,6 @@
     <Resource Include="Assets\Wildcards\FORCED_BANK.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\Wildcards\PASS_Q.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Wildcards\SABOTAGE.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Wildcards\SHIELD.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Connected Services\ReportService\item.disco" />
   </ItemGroup>
   <ItemGroup>

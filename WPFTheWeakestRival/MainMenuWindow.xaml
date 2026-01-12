@@ -320,13 +320,10 @@
 
                 <Grid Grid.Column="0" Margin="198,10,198,6" Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
-                        <!-- zona grande central para el avatar -->
                         <RowDefinition Height="*"/>
-                        <!-- fila para el botón -->
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- AVATAR CENTRADO Y MÁS GRANDE -->
                     <Viewbox Grid.Row="0"
              Stretch="Uniform"
                         HorizontalAlignment="Center"
@@ -338,7 +335,6 @@
                                 UseLayoutRounding="True"/>
                     </Viewbox>
 
-                    <!-- BOTÓN JUGAR ABAJO IZQUIERDA -->
                     <Button Grid.Row="1"
             x:Name="btnPlay"
             Style="{StaticResource ChalkBoardButtonStyle}"
