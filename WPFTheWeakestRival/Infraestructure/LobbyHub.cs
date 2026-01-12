@@ -25,6 +25,11 @@ namespace WPFTheWeakestRival.Infrastructure
         private const int ReconnectIntervalSeconds = 2;
         private const int ReconnectTestTimeoutSeconds = 3;
 
+        private const string EndpointLobbyNetTcp = "NetTcpBinding_ILobbyService";
+        private const string EndpointLobbyWsDualLegacy = "WSDualHttpBinding_ILobbyService";
+
+        private const string LogEndpointRemapped = "LobbyHub endpoint remapped from {0} to {1}.";
+
         private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(ReconnectIntervalSeconds);
         private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(ReconnectTestTimeoutSeconds);
 
@@ -65,7 +70,7 @@ namespace WPFTheWeakestRival.Infrastructure
             }
 
             dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
-            this.endpointName = endpointName.Trim();
+            this.endpointName = ResolveEndpointName(endpointName);
 
             RecreateClient();
         }
@@ -798,6 +803,19 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 throw new ArgumentException(ErrorTokenRequired, nameof(token));
             }
+        }
+
+        private static string ResolveEndpointName(string requestedEndpointName)
+        {
+            string safeName = (requestedEndpointName ?? string.Empty).Trim();
+
+            if (string.Equals(safeName, EndpointLobbyWsDualLegacy, StringComparison.Ordinal))
+            {
+                Logger.WarnFormat(LogEndpointRemapped, safeName, EndpointLobbyNetTcp);
+                return EndpointLobbyNetTcp;
+            }
+
+            return safeName;
         }
     }
 }
