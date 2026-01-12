@@ -43,6 +43,7 @@ namespace WPFTheWeakestRival.Infrastructure
         private DispatcherTimer reconnectTimer;
 
         private bool isStoppedOrDisposed;
+        private bool isReconnectInProgress;
 
         private readonly string endpointName;
 
@@ -663,39 +664,85 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private void StartReconnectLoop()
         {
+            if (isStoppedOrDisposed || !CanUseDispatcher())
+            {
+                return;
+            }
+
+            if (!dispatcher.CheckAccess())
+            {
+                dispatcher.BeginInvoke(new Action(StartReconnectLoop), UiDispatcherPriority);
+                return;
+            }
+
             lock (reconnectSyncRoot)
             {
-                if (reconnectTimer != null && reconnectTimer.IsEnabled)
-                {
-                    return;
-                }
-
                 if (reconnectTimer == null)
                 {
-                    reconnectTimer = new DispatcherTimer
+                    reconnectTimer = new DispatcherTimer(UiDispatcherPriority, dispatcher)
                     {
                         Interval = ReconnectInterval
                     };
 
-                    reconnectTimer.Tick += async (_, __) => await TryReconnectAsync().ConfigureAwait(false);
+                    reconnectTimer.Tick += ReconnectTimer_Tick;
                 }
 
-                reconnectTimer.Start();
+                if (!reconnectTimer.IsEnabled)
+                {
+                    reconnectTimer.Start();
+                }
             }
         }
 
         private void StopReconnectLoop()
         {
+            if (!CanUseDispatcher())
+            {
+                return;
+            }
+
+            if (!dispatcher.CheckAccess())
+            {
+                dispatcher.BeginInvoke(new Action(StopReconnectLoop), UiDispatcherPriority);
+                return;
+            }
+
             lock (reconnectSyncRoot)
             {
-                if (reconnectTimer == null)
+                if (reconnectTimer != null && reconnectTimer.IsEnabled)
+                {
+                    reconnectTimer.Stop();
+                }
+            }
+        }
+
+        private async void ReconnectTimer_Tick(object sender, EventArgs e)
+        {
+            if (isStoppedOrDisposed)
+            {
+                StopReconnectLoop();
+                return;
+            }
+
+            lock (reconnectSyncRoot)
+            {
+                if (isReconnectInProgress)
                 {
                     return;
                 }
 
-                if (reconnectTimer.IsEnabled)
+                isReconnectInProgress = true;
+            }
+
+            try
+            {
+                await TryReconnectAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                lock (reconnectSyncRoot)
                 {
-                    reconnectTimer.Stop();
+                    isReconnectInProgress = false;
                 }
             }
         }
@@ -816,6 +863,11 @@ namespace WPFTheWeakestRival.Infrastructure
             }
 
             return safeName;
+        }
+
+        private bool CanUseDispatcher()
+        {
+            return dispatcher != null && !dispatcher.HasShutdownStarted && !dispatcher.HasShutdownFinished;
         }
     }
 }

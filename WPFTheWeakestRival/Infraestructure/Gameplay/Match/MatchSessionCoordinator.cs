@@ -58,6 +58,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string ReconnectingTitle = "Reconectando…";
         private const string ReconnectingDescription = "Intentando recuperar la conexión con el servidor.";
 
+        private const string ContextVotePhaseStarted = "MatchSessionCoordinator.VotePhaseStarted";
+        private const string ContextSpecialEvent = "MatchSessionCoordinator.SpecialEvent";
+        private const string ContextDuelCandidates = "MatchSessionCoordinator.DuelCandidates";
+        private const string ContextLightningFinished = "MatchSessionCoordinator.LightningFinished";
+        private const string ContextTurnOrderInitialized = "MatchSessionCoordinator.TurnOrderInitialized";
+        private const string ContextTurnOrderChanged = "MatchSessionCoordinator.TurnOrderChanged";
+
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
 
@@ -91,12 +98,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             InitializeUi();
 
-            await wildcards.LoadAsync().ConfigureAwait(false);
+            await wildcards.LoadAsync();
 
             InitializeGameplayClient();
 
-            await JoinMatchAsync().ConfigureAwait(false);
-            await EnsureMatchStartedAsync().ConfigureAwait(false);
+            await JoinMatchAsync();
+            await EnsureMatchStartedAsync();
 
             RefreshWildcardUseState();
         }
@@ -152,20 +159,20 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 }
             };
 
-            callbackBridge.VotePhaseStarted += async (matchId, timeLimit) =>
-                await HandleVotePhaseStartedAsync(matchId, timeLimit).ConfigureAwait(false);
+            callbackBridge.VotePhaseStarted += (matchId, timeLimit) =>
+                RunAsync(() => HandleVotePhaseStartedAsync(matchId, timeLimit), ContextVotePhaseStarted);
 
             callbackBridge.Elimination += (matchId, eliminated) =>
                 HandleElimination(eliminated);
 
-            callbackBridge.SpecialEvent += async (matchId, name, description) =>
-                await HandleSpecialEventAsync(matchId, name, description).ConfigureAwait(false);
+            callbackBridge.SpecialEvent += (matchId, name, description) =>
+                RunAsync(() => HandleSpecialEventAsync(matchId, name, description), ContextSpecialEvent);
 
             callbackBridge.CoinFlipResolved += (matchId, coinFlip) =>
                 HandleCoinFlip(coinFlip);
 
-            callbackBridge.DuelCandidates += async (matchId, duelCandidates) =>
-                await HandleDuelCandidatesAsync(duelCandidates).ConfigureAwait(false);
+            callbackBridge.DuelCandidates += (matchId, duelCandidates) =>
+                RunAsync(() => HandleDuelCandidatesAsync(duelCandidates), ContextDuelCandidates);
 
             callbackBridge.MatchFinished += (matchId, winner) =>
                 HandleMatchFinished(winner);
@@ -176,22 +183,56 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             callbackBridge.LightningChallengeQuestion += (m, r, qi, qq) =>
                 HandleLightningChallengeQuestion(qq);
 
-            callbackBridge.LightningChallengeFinished += async (m, r, ca, ok) =>
-                await HandleLightningChallengeFinishedAsync(ca, ok).ConfigureAwait(false);
+            callbackBridge.LightningChallengeFinished += (m, r, ca, ok) =>
+                RunAsync(() => HandleLightningChallengeFinishedAsync(ca, ok), ContextLightningFinished);
 
-            callbackBridge.TurnOrderInitialized += async (matchId, turnOrder) =>
-                await HandleTurnOrderInitializedAsync(turnOrder).ConfigureAwait(false);
+            callbackBridge.TurnOrderInitialized += (matchId, turnOrder) =>
+                RunAsync(() => HandleTurnOrderInitializedAsync(turnOrder), ContextTurnOrderInitialized);
 
-            callbackBridge.TurnOrderChanged += async (matchId, turnOrder, reason) =>
-                await HandleTurnOrderChangedAsync(turnOrder, reason).ConfigureAwait(false);
+            callbackBridge.TurnOrderChanged += (matchId, turnOrder, reason) =>
+                RunAsync(() => HandleTurnOrderChangedAsync(turnOrder, reason), ContextTurnOrderChanged);
 
             gameplay = new GameplayClientProxy(hub);
-
 
             questions = new QuestionController(ui, state, gameplay, timer);
             questions.InitializeEmptyUi();
 
             dialogs = new MatchDialogController(ui, state, gameplay);
+        }
+
+        private static void RunAsync(Func<Task> action, string context)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            try
+            {
+                Task task = action();
+                if (task == null)
+                {
+                    return;
+                }
+
+                task.ContinueWith(
+                    t =>
+                    {
+                        try
+                        {
+                            Logger.Warn(context, t.Exception);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.GC.KeepAlive(ex);
+                        }
+                    },
+                    TaskContinuationOptions.OnlyOnFaulted);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(context, ex);
+            }
         }
 
         private async Task JoinMatchAsync()
@@ -204,7 +245,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     MatchId = state.Match.MatchId
                 };
 
-                _ = await hub.JoinMatchAsync(request).ConfigureAwait(false);
+                _ = await hub.JoinMatchAsync(request);
             }
             catch (Exception ex)
             {
@@ -233,7 +274,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     ExpectedPlayerUserIds = BuildExpectedPlayerIds()
                 };
 
-                await gameplay.StartMatchAsync(request).ConfigureAwait(false);
+                await gameplay.StartMatchAsync(request);
             }
             catch (FaultException<WildcardFault> ex)
             {
@@ -421,7 +462,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             int voteDurationSeconds = (int)Math.Ceiling(timeLimit.TotalSeconds);
 
-            await dialogs.ShowVoteAndSendAsync(voteDurationSeconds).ConfigureAwait(false);
+            await dialogs.ShowVoteAndSendAsync(voteDurationSeconds);
         }
 
         private void HandleElimination(GameplayServiceProxy.PlayerSummary eliminated)
@@ -494,7 +535,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             SpecialEventInfo info = SpecialEventInfo.Create(eventName, description);
 
-            bool handledVoteReveal = await TryHandleDarkModeVoteRevealAsync(info).ConfigureAwait(false);
+            bool handledVoteReveal = await TryHandleDarkModeVoteRevealAsync(info);
             if (handledVoteReveal)
             {
                 return;
@@ -503,7 +544,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ShowGenericSpecialEventOverlay(info);
 
             SpecialEventKind kind = DetermineSpecialEventKind(info);
-            await ApplySpecialEventAsync(kind, info).ConfigureAwait(false);
+            await ApplySpecialEventAsync(kind, info);
         }
 
         private async Task<bool> TryHandleDarkModeVoteRevealAsync(SpecialEventInfo info)
@@ -522,7 +563,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             overlay.ShowSpecialEvent(DarkModeVoteRevealTitle, DarkModeVoteRevealDescription);
             TryRevealDarknessVote();
 
-            await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS).ConfigureAwait(false);
+            await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
 
             return true;
         }
@@ -609,29 +650,29 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 case SpecialEventKind.DarkModeStart:
                     BeginDarknessMode();
-                    await AutoHideAndRefreshWildcardsAsync().ConfigureAwait(false);
+                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.DarkModeEnd:
                     EndDarknessMode(revealVote: false);
-                    await AutoHideAndRefreshWildcardsAsync().ConfigureAwait(false);
+                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.LegacyDarknessEnd:
                     EndDarknessMode(revealVote: true);
-                    await AutoHideAndRefreshWildcardsAsync().ConfigureAwait(false);
+                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.SurpriseExamStarted:
                     questions.SetSurpriseExamActive(true);
                     state.IsSurpriseExamActive = true;
-                    await AutoHideAndRefreshWildcardsAsync().ConfigureAwait(false);
+                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.SurpriseExamResolved:
                     questions.SetSurpriseExamActive(false);
                     state.IsSurpriseExamActive = false;
-                    await AutoHideAndRefreshWildcardsAsync().ConfigureAwait(false);
+                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.BombQuestion:
@@ -648,11 +689,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 case SpecialEventKind.Sabotage:
                     ApplySabotageTimeOverride(info);
-                    await AutoHideAndRefreshWildcardsAsync().ConfigureAwait(false);
+                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.WildcardGranted:
-                    await wildcards.LoadAsync().ConfigureAwait(false);
+                    await wildcards.LoadAsync();
                     RefreshWildcardUseState();
                     return;
 
@@ -682,7 +723,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task AutoHideAndRefreshWildcardsAsync()
         {
-            await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS).ConfigureAwait(false);
+            await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
             RefreshWildcardUseState();
         }
 
@@ -1017,7 +1058,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.CurrentPhase = MatchPhase.Duel;
             UpdatePhaseLabel();
 
-            await dialogs.ShowDuelSelectionAndSendAsync(weakestRivalUserId, items).ConfigureAwait(false);
+            await dialogs.ShowDuelSelectionAndSendAsync(weakestRivalUserId, items);
         }
 
         private void HandleMatchFinished(GameplayServiceProxy.PlayerSummary winner)
@@ -1126,7 +1167,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (isSuccess)
             {
-                await wildcards.LoadAsync().ConfigureAwait(false);
+                await wildcards.LoadAsync();
             }
 
             DetectAndApplyFinalPhaseIfApplicable();
@@ -1159,7 +1200,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             await turns.PlayTurnIntroAsync(
                 turnOrder,
                 (t, d) => overlay.ShowSpecialEvent(t, d),
-                () => overlay.HideSpecialEvent()).ConfigureAwait(false);
+                () => overlay.HideSpecialEvent());
         }
 
         private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
@@ -1181,19 +1222,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 MatchConstants.TURN_ORDER_CHANGED_TITLE,
                 string.IsNullOrWhiteSpace(reasonCode) ? string.Empty : reasonCode);
 
-            await Task.Delay(MatchConstants.TURN_INTRO_FINAL_DELAY_MS).ConfigureAwait(false);
+            await Task.Delay(MatchConstants.TURN_INTRO_FINAL_DELAY_MS);
 
             overlay.HideSpecialEvent();
         }
 
         public async Task OnAnswerButtonClickAsync(System.Windows.Controls.Button button)
         {
-            await questions.SubmitAnswerFromButtonAsync(button).ConfigureAwait(false);
+            await questions.SubmitAnswerFromButtonAsync(button);
         }
 
         public async Task OnBankClickAsync()
         {
-            await questions.BankAsync().ConfigureAwait(false);
+            await questions.BankAsync();
         }
 
         public void OnWildcardPrev()
@@ -1210,7 +1251,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             bool canUse = CanUseWildcardNow();
 
-            await wildcards.UseSelectedAsync(canUse).ConfigureAwait(false);
+            await wildcards.UseSelectedAsync(canUse);
 
             RefreshWildcardUseState();
         }
