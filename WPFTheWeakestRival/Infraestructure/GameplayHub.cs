@@ -18,6 +18,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         private const int RECONNECT_INTERVAL_SECONDS = 2;
         private const int RECONNECT_TEST_TIMEOUT_SECONDS = 3;
 
+        private const string ENDPOINT_GAMEPLAY_NETTCP = "NetTcpBinding_IGameplayService";
+        private const string ENDPOINT_GAMEPLAY_WSDUAL_LEGACY = "WSDualHttpBinding_IGameplayService";
+
+        private const string LOG_ENDPOINT_REMAPPED = "GameplayHub endpoint remapped from {0} to {1}.";
+
         private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
         private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
 
@@ -49,7 +54,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
             dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
 
-            this.endpointName = endpointName.Trim();
+            this.endpointName = ResolveEndpointName(endpointName);
 
             callbackBridge = new GameplayCallbackBridge(dispatcher);
 
@@ -401,12 +406,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                     return;
                 }
 
-                reconnectTimer = new DispatcherTimer
+                if (reconnectTimer == null)
                 {
-                    Interval = ReconnectInterval
-                };
+                    reconnectTimer = new DispatcherTimer
+                    {
+                        Interval = ReconnectInterval
+                    };
 
-                reconnectTimer.Tick += async (_, __) => await TryReconnectAsync().ConfigureAwait(false);
+                    reconnectTimer.Tick += async (_, __) => await TryReconnectAsync().ConfigureAwait(false);
+                }
+
                 reconnectTimer.Start();
             }
         }
@@ -484,6 +493,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             }
 
             return true;
+        }
+
+        private static string ResolveEndpointName(string requestedEndpointName)
+        {
+            string safeName = (requestedEndpointName ?? string.Empty).Trim();
+
+            if (string.Equals(safeName, ENDPOINT_GAMEPLAY_WSDUAL_LEGACY, StringComparison.Ordinal))
+            {
+                Logger.WarnFormat(LOG_ENDPOINT_REMAPPED, safeName, ENDPOINT_GAMEPLAY_NETTCP);
+                return ENDPOINT_GAMEPLAY_NETTCP;
+            }
+
+            return safeName;
         }
     }
 }
