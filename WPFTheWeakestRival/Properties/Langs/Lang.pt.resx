@@ -564,16 +564,6 @@
   <data name="tittleImageSelector" xml:space="preserve">
     <value>Selecione uma imagem</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="profileLoadFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="profileUpdateFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="logoutFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="profileLoadFailed" xml:space="preserve">
     <value>Falha ao carregar o perfil</value>
   </data>
@@ -672,5 +662,122 @@
   </data>
   <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
     <value>O relatório não pôde ser enviado: Erro inesperado</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10051" xml:space="preserve">
+    <value>Erro de email: sem conexão com a Internet (rede inacessível). O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10065" xml:space="preserve">
+    <value>Erro de email: O servidor de email não pôde ser acessado (host inacessível). O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.11001" xml:space="preserve">
+    <value>Erro de correio: O servidor de correio (DNS) não pôde ser resolvido. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10060" xml:space="preserve">
+    <value>Erro de email: tempo limite de conexão com o servidor de email. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10061" xml:space="preserve">
+    <value>Erro de correio: O servidor de correio recusou a conexão. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10054" xml:space="preserve">
+    <value>Erro de correio: A conexão com o servidor de correio foi interrompida. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Erro de correio: Falha geral na comunicação com o servidor de correio. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Erro de correio: O servidor não permite envio deste aplicativo. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Erro de correio: o servidor requer segurança TLS para enviar correio. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Erro de email: O destinatário não está disponível. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="BORRAR" xml:space="preserve">
+    <value>Erro de email: o endereço do destinatário é inválido.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Configuration" xml:space="preserve">
+    <value>Erro de email: configuração de servidor de email inválida.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Unexpected" xml:space="preserve">
+    <value>Erro de correio: ocorreu um problema inesperado. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10051" xml:space="preserve">
+    <value>Erro de email: sem conexão com a Internet (rede inacessível). O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10065" xml:space="preserve">
+    <value>Erro de email: O servidor de email não pôde ser acessado (host inacessível). O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.11001" xml:space="preserve">
+    <value>Erro de correio: O servidor de correio (DNS) não pôde ser resolvido. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10060" xml:space="preserve">
+    <value>Erro de email: tempo limite de conexão com o servidor de email. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10061" xml:space="preserve">
+    <value>Erro de correio: O servidor de correio recusou a conexão. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10054" xml:space="preserve">
+    <value>Erro de correio: A conexão com o servidor de correio foi interrompida. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Erro de correio: Falha geral na comunicação com o servidor de correio. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Erro de correio: O servidor não permite envio deste aplicativo. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Erro de correio: o servidor requer segurança TLS para enviar correio. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Erro de email: O destinatário não está disponível. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
+    <value>Erro de email: configuração de servidor de email inválida.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Unexpected" xml:space="preserve">
+    <value>Erro de correio: ocorreu um problema inesperado. O código de redefinição de senha não pôde ser enviado.</value>
+  </data>
+  <data name="Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña." xml:space="preserve">
+    <value>Erro de email: sem conexão com a Internet (rede inacessível). O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10065" xml:space="preserve">
+    <value>Erro de email: O servidor de email não pôde ser acessado (host inacessível). O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.11001" xml:space="preserve">
+    <value>Erro de correio: O servidor de correio (DNS) não pôde ser resolvido. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10060" xml:space="preserve">
+    <value>Erro de email: tempo limite de conexão com o servidor de email. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10061" xml:space="preserve">
+    <value>Erro de correio: O servidor de correio recusou a conexão. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10054" xml:space="preserve">
+    <value>Erro de correio: A conexão com o servidor de correio foi interrompida. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Erro de correio: Falha geral na comunicação com o servidor de correio. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Erro de correio: O servidor não permite envio deste aplicativo. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Erro de correio: o servidor requer segurança TLS para enviar correio. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Erro de email: O destinatário não está disponível. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.InvalidRecipient" xml:space="preserve">
+    <value>Erro de email: o endereço do destinatário é inválido.</value>
+  </data>
+  <data name="Error de correo: la dirección del destinatario no es válida." xml:space="preserve">
+    <value>Erro de email: configuração de servidor de email inválida.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
+    <value>Erro de correio: ocorreu um problema inesperado. O convite para a sala não pôde ser enviado.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Erro de email: o endereço do destinatário é inválido.</value>
   </data>
 </root>

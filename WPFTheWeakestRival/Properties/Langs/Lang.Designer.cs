@@ -331,6 +331,330 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_InvalidRecipient {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.InvalidRecipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_ClientNotPermitted {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.ClientNotPermitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_GeneralFailure {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.GeneralFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_MailboxUnavailable {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.MailboxUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_MustIssueStartTlsFirst {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10054 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10054", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10060 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10061 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10061", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10065 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_11001 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendLobbyInvite_Unexpected {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Configuration {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_InvalidRecipient {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.InvalidRecipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_ClientNotPermitted {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.ClientNotPermitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_GeneralFailure {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.GeneralFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_MailboxUnavailable {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.MailboxUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_MustIssueStartTlsFirst {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10051 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10051", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10054 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10054", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10060 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10061 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10061", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10065 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_11001 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Unexpected {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Configuration {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_ClientNotPermitted {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.ClientNotPermitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_GeneralFailure {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.GeneralFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_MailboxUnavailable {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.MailboxUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_MustIssueStartTlsFirst {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10051 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10051", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10054 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10054", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10060 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10061 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10061", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10065 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_11001 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Email_SendVerificationCode_Unexpected {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a email@example.com.
         /// </summary>
         public static string emailPlaceholder {
@@ -345,6 +669,25 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string en {
             get {
                 return ResourceManager.GetString("en", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Error_de_correo__la_dirección_del_destinatario_no_es_válida_ {
+            get {
+                return ResourceManager.GetString("Error de correo: la dirección del destinatario no es válida.", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string Error_de_correo__ocurrió_un_problema_inesperado__No_se_pudo_enviar_el_código_para_restablecer_la_contraseña_ {
+            get {
+                return ResourceManager.GetString("Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para" +
+                        " restablecer la contraseña.", resourceCulture);
             }
         }
         
@@ -988,6 +1331,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string OTRA {
+            get {
+                return ResourceManager.GetString("OTRA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Enter your password.
         /// </summary>
         public static string passwordPlaceHolder {
@@ -1375,7 +1727,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a The report could not be sent: Unexpected error.
         /// </summary>
         public static string Report_SubmitPlayerReport_Unexpected {
             get {

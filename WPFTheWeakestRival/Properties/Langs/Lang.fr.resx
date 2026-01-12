@@ -564,16 +564,6 @@
   <data name="tittleImageSelector" xml:space="preserve">
     <value>Sélectionnez une image</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="profileLoadFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="profileUpdateFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="logoutFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="profileLoadFailed" xml:space="preserve">
     <value>Échec du chargement du profil</value>
   </data>
@@ -672,5 +662,122 @@
   </data>
   <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
     <value>Le rapport n'a pas pu être envoyé : erreur inattendue</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10051" xml:space="preserve">
+    <value>Erreur mail : pas de connexion internet (réseau inaccessible). Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10065" xml:space="preserve">
+    <value>Erreur de messagerie : le serveur de messagerie n'a pas pu être atteint (hôte inaccessible). Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.11001" xml:space="preserve">
+    <value>Erreur de messagerie : le serveur de messagerie (DNS) n'a pas pu être résolu. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10060" xml:space="preserve">
+    <value>Erreur de messagerie : délai de connexion au serveur de messagerie. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10061" xml:space="preserve">
+    <value>Erreur de messagerie : Le serveur de messagerie a refusé la connexion. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10054" xml:space="preserve">
+    <value>Erreur de messagerie : La connexion au serveur de messagerie a été interrompue. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Erreur de messagerie : échec général de communication avec le serveur de messagerie. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Erreur de courrier : Le serveur n'autorise pas l'envoi depuis cette application. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Erreur de courrier : le serveur nécessite la sécurité TLS pour envoyer du courrier. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Erreur de courrier : le destinataire n'est pas disponible. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="BORRAR" xml:space="preserve">
+    <value>Erreur de courrier : l'adresse du destinataire n'est pas valide.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Configuration" xml:space="preserve">
+    <value>Erreur de messagerie : configuration du serveur de messagerie invalide.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Unexpected" xml:space="preserve">
+    <value>Erreur de courrier : un problème inattendu s'est produit. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10051" xml:space="preserve">
+    <value>Erreur mail : pas de connexion internet (réseau inaccessible). Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10065" xml:space="preserve">
+    <value>Erreur de messagerie : le serveur de messagerie n'a pas pu être atteint (hôte inaccessible). Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.11001" xml:space="preserve">
+    <value>Erreur de messagerie : le serveur de messagerie (DNS) n'a pas pu être résolu. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10060" xml:space="preserve">
+    <value>Erreur de messagerie : délai de connexion au serveur de messagerie. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10061" xml:space="preserve">
+    <value>Erreur de messagerie : Le serveur de messagerie a refusé la connexion. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10054" xml:space="preserve">
+    <value>Erreur de messagerie : La connexion au serveur de messagerie a été interrompue. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Erreur de messagerie : échec général de communication avec le serveur de messagerie. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Erreur de courrier : Le serveur n'autorise pas l'envoi depuis cette application. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Erreur de courrier : le serveur nécessite la sécurité TLS pour envoyer du courrier. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Erreur de courrier : le destinataire n'est pas disponible. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
+    <value>Erreur de messagerie : configuration du serveur de messagerie invalide.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Unexpected" xml:space="preserve">
+    <value>Erreur de courrier : un problème inattendu s'est produit. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
+  </data>
+  <data name="Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña." xml:space="preserve">
+    <value>Erreur mail : pas de connexion internet (réseau inaccessible). L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10065" xml:space="preserve">
+    <value>Erreur de messagerie : le serveur de messagerie n'a pas pu être atteint (hôte inaccessible). L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.11001" xml:space="preserve">
+    <value>Erreur de messagerie : le serveur de messagerie (DNS) n'a pas pu être résolu. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10060" xml:space="preserve">
+    <value>Erreur de messagerie : délai de connexion au serveur de messagerie. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10061" xml:space="preserve">
+    <value>Erreur de messagerie : Le serveur de messagerie a refusé la connexion. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10054" xml:space="preserve">
+    <value>Erreur de messagerie : La connexion au serveur de messagerie a été interrompue. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Erreur de messagerie : échec général de communication avec le serveur de messagerie. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Erreur de courrier : Le serveur n'autorise pas l'envoi depuis cette application. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Erreur de courrier : le serveur nécessite la sécurité TLS pour envoyer du courrier. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Erreur de courrier : le destinataire n'est pas disponible. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.InvalidRecipient" xml:space="preserve">
+    <value>Erreur de courrier : l'adresse du destinataire n'est pas valide.</value>
+  </data>
+  <data name="Error de correo: la dirección del destinatario no es válida." xml:space="preserve">
+    <value>Erreur de messagerie : configuration du serveur de messagerie invalide.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
+    <value>Erreur de courrier : un problème inattendu s'est produit. L'invitation à la salle n'a pas pu être envoyée.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Erreur de courrier : l'adresse du destinataire n'est pas valide.</value>
   </data>
 </root>
