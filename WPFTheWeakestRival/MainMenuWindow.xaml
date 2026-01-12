@@ -251,20 +251,6 @@
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center">
-                    <Button x:Name="btnSettings"
-                            Style="{StaticResource TopBarIconButtonStyle}"
-                            Height="51" Width="57"
-                            Margin="0,0,12,0"
-                            Click="BtnSettingsClick"
-                            ToolTip="{loc:Loc settings}">
-                        <Image Source="{StaticResource SettingsIcon}"
-                               Width="52"
-                               Height="51"
-                               Stretch="Uniform"
-                               SnapsToDevicePixels="True"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
-                    </Button>
-
                     <Button x:Name="btnPersonalization"
                             Style="{StaticResource TopBarIconButtonStyle}"
                             Height="51"
