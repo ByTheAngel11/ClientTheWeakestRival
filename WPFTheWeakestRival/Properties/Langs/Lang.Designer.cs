@@ -97,6 +97,33 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Your account was blocked..
+        /// </summary>
+        public static string Auth_Account_Banned {
+            get {
+                return ResourceManager.GetString("Auth.Account.Banned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your account is not active..
+        /// </summary>
+        public static string Auth_Account_NotActive {
+            get {
+                return ResourceManager.GetString("Auth.Account.NotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your account is suspended..
+        /// </summary>
+        public static string Auth_Account_Suspended {
+            get {
+                return ResourceManager.GetString("Auth.Account.Suspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a There is already an active session for this user..
         /// </summary>
         public static string Auth_IssueToken_AlreadyLoggedIn {

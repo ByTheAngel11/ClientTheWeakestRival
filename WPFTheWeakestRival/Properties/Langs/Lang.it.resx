@@ -792,4 +792,13 @@
   <data name="Auth.Unexpected" xml:space="preserve">
     <value>Si è verificato un errore imprevisto. Riprova più tardi.</value>
   </data>
+  <data name="Auth.Account.NotActive" xml:space="preserve">
+    <value>Il tuo account non è attivo.</value>
+  </data>
+  <data name="Auth.Account.Suspended" xml:space="preserve">
+    <value>Il tuo account è sospeso.</value>
+  </data>
+  <data name="Auth.Account.Banned" xml:space="preserve">
+    <value>Il tuo account è stato bloccato.</value>
+  </data>
 </root>
