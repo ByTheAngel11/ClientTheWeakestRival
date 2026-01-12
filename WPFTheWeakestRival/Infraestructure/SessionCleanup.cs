@@ -12,6 +12,9 @@ namespace WPFTheWeakestRival.Infrastructure
         private const string CTX_SHUTDOWN = "SessionCleanup.Shutdown";
         private const string CTX_LOGOUT = "SessionCleanup.LogoutServerBestEffort";
 
+        private const string CTX_CLOSE_CLIENT_SAFE = "SessionCleanup.CloseClientSafe";
+        private const string CTX_ABORT_CLIENT_SAFE = "SessionCleanup.AbortClientSafe";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(SessionCleanup));
 
         public static void Shutdown()
@@ -28,15 +31,32 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             string token = string.Empty;
 
+            token = GetTokenBestEffort(context);
+
+            StopServicesBestEffort(context);
+
+            LogoutServerBestEffort(token);
+
+            ResetServicesBestEffort(context);
+
+            ClearSessionBestEffort(context);
+        }
+
+        private static string GetTokenBestEffort(string context)
+        {
             try
             {
-                token = LoginWindow.AppSession.CurrentToken?.Token ?? string.Empty;
+                return LoginWindow.AppSession.CurrentToken?.Token ?? string.Empty;
             }
             catch (Exception ex)
             {
                 Logger.Warn(context, ex);
+                return string.Empty;
             }
+        }
 
+        private static void StopServicesBestEffort(string context)
+        {
             try
             {
                 AppServices.StopAll();
@@ -45,9 +65,10 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 Logger.Warn(context, ex);
             }
+        }
 
-            LogoutServerBestEffort(token);
-
+        private static void ResetServicesBestEffort(string context)
+        {
             try
             {
                 AppServices.ResetAll();
@@ -56,7 +77,10 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 Logger.Warn(context, ex);
             }
+        }
 
+        private static void ClearSessionBestEffort(string context)
+        {
             try
             {
                 LoginWindow.AppSession.CurrentToken = null;
@@ -90,7 +114,7 @@ namespace WPFTheWeakestRival.Infrastructure
             catch (Exception ex)
             {
                 Logger.Warn(CTX_LOGOUT, ex);
-                AbortClientSafe(client);
+                AbortClientSafe(client, CTX_LOGOUT, ex);
             }
         }
 
@@ -106,26 +130,34 @@ namespace WPFTheWeakestRival.Infrastructure
                 if (client.State == CommunicationState.Faulted)
                 {
                     client.Abort();
+                    return;
                 }
-                else
-                {
-                    client.Close();
-                }
+
+                client.Close();
             }
-            catch
+            catch (Exception ex)
             {
-                try { client.Abort(); } catch { }
+                Logger.Warn(CTX_CLOSE_CLIENT_SAFE, ex);
+                AbortClientSafe(client, CTX_CLOSE_CLIENT_SAFE, ex);
             }
         }
 
-        private static void AbortClientSafe(ICommunicationObject client)
+        private static void AbortClientSafe(ICommunicationObject client, string context, Exception rootException)
         {
             if (client == null)
             {
                 return;
             }
 
-            try { client.Abort(); } catch { }
+            try
+            {
+                client.Abort();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(context ?? CTX_ABORT_CLIENT_SAFE, ex);
+                System.GC.KeepAlive(rootException);
+            }
         }
     }
 }

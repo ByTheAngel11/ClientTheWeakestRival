@@ -224,7 +224,7 @@ namespace WPFTheWeakestRival
 
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
-            var page = new MatchSettingsPage(
+            var defaults = new MatchSettingsDefaults(
                 isPrivate,
                 maxPlayers,
                 startingScore,
@@ -233,6 +233,8 @@ namespace WPFTheWeakestRival
                 pointsWrong,
                 pointsEliminationGain,
                 isTiebreakCoinflipAllowed);
+
+            var page = new MatchSettingsPage(defaults);
 
             var settingsFrame = new Frame
             {
@@ -251,7 +253,7 @@ namespace WPFTheWeakestRival
                 ResizeMode = ResizeMode.NoResize
             };
 
-            var dialogResult = settingsWindow.ShowDialog();
+            bool? dialogResult = settingsWindow.ShowDialog();
             if (dialogResult == true)
             {
                 isPrivate = page.IsPrivate;
@@ -264,6 +266,7 @@ namespace WPFTheWeakestRival
                 isTiebreakCoinflipAllowed = page.AllowTiebreakCoinflip;
             }
         }
+
 
         private void BtnFriendsClick(object sender, RoutedEventArgs e)
         {

@@ -8,6 +8,20 @@ namespace WPFTheWeakestRival.Pages
 {
     public partial class MatchSettingsPage : Page
     {
+        private const string DIALOG_TITLE_SETTINGS = "Configuración";
+
+        private const int MAX_PLAYERS_MIN = 1;
+        private const int MAX_PLAYERS_MAX = 16;
+
+        private const string DECIMAL_FORMAT = "0.##";
+
+        private const string MESSAGE_INVALID_MAX_PLAYERS = "Máx. jugadores debe ser un número entre 1 y 16.";
+        private const string MESSAGE_INVALID_STARTING_SCORE = "Puntaje inicial no es válido.";
+        private const string MESSAGE_INVALID_MAX_SCORE = "Puntaje máximo no es válido.";
+        private const string MESSAGE_INVALID_POINTS_CORRECT = "Puntos por acierto no son válidos.";
+        private const string MESSAGE_INVALID_POINTS_WRONG = "Puntos por fallo no son válidos.";
+        private const string MESSAGE_INVALID_POINTS_ELIMINATION = "Puntos por eliminación no son válidos.";
+
         public bool IsPrivate { get; private set; }
         public int MaxPlayers { get; private set; }
 
@@ -18,113 +32,129 @@ namespace WPFTheWeakestRival.Pages
         public decimal PointsPerEliminationGain { get; private set; }
         public bool AllowTiebreakCoinflip { get; private set; }
 
-        public MatchSettingsPage(
-            bool isPrivate,
-            int maxPlayers,
-            decimal startingScore,
-            decimal maxScore,
-            decimal pointsPerCorrect,
-            decimal pointsPerWrong,
-            decimal pointsPerEliminationGain,
-            bool allowTiebreakCoinflip)
+        public MatchSettingsPage(MatchSettingsDefaults defaults)
         {
+            if (defaults == null)
+            {
+                throw new ArgumentNullException(nameof(defaults));
+            }
+
             InitializeComponent();
 
-            // apply max length to numeric/decimal fields
+            ApplyTextLimits();
+
+            LoadDefaults(defaults);
+        }
+
+        private void ApplyTextLimits()
+        {
             UiValidationHelper.ApplyMaxLength(txtMaxPlayers, UiValidationHelper.NUMBER_TEXT_MAX_LENGTH);
             UiValidationHelper.ApplyMaxLength(txtStartingScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
             UiValidationHelper.ApplyMaxLength(txtMaxScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
             UiValidationHelper.ApplyMaxLength(txtPointsCorrect, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
             UiValidationHelper.ApplyMaxLength(txtPointsWrong, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
             UiValidationHelper.ApplyMaxLength(txtPointsElimination, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+        }
 
-            chkPrivate.IsChecked = isPrivate;
-            txtMaxPlayers.Text = maxPlayers.ToString(CultureInfo.InvariantCulture);
+        private void LoadDefaults(MatchSettingsDefaults defaults)
+        {
+            chkPrivate.IsChecked = defaults.IsPrivate;
 
-            txtStartingScore.Text = startingScore.ToString("0.##", CultureInfo.InvariantCulture);
-            txtMaxScore.Text = maxScore.ToString("0.##", CultureInfo.InvariantCulture);
-            txtPointsCorrect.Text = pointsPerCorrect.ToString("0.##", CultureInfo.InvariantCulture);
-            txtPointsWrong.Text = pointsPerWrong.ToString("0.##", CultureInfo.InvariantCulture);
-            txtPointsElimination.Text = pointsPerEliminationGain.ToString("0.##", CultureInfo.InvariantCulture);
-            chkCoinflip.IsChecked = allowTiebreakCoinflip;
+            txtMaxPlayers.Text = defaults.MaxPlayers.ToString(CultureInfo.InvariantCulture);
+
+            txtStartingScore.Text = defaults.StartingScore.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            txtMaxScore.Text = defaults.MaxScore.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+
+            txtPointsCorrect.Text = defaults.PointsPerCorrect.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            txtPointsWrong.Text = defaults.PointsPerWrong.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            txtPointsElimination.Text = defaults.PointsPerEliminationGain.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+
+            chkCoinflip.IsChecked = defaults.AllowTiebreakCoinflip;
         }
 
         private void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            if (!int.TryParse((txtMaxPlayers.Text ?? string.Empty).Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var maxPlayers) ||
-                maxPlayers <= 0 || maxPlayers > 16)
+            if (!TryReadMaxPlayers(out int maxPlayers))
             {
-                MessageBox.Show("Máx. jugadores debe ser un número entre 1 y 16.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtMaxPlayers.Focus();
-                txtMaxPlayers.SelectAll();
+                ShowValidationErrorAndFocus(txtMaxPlayers, MESSAGE_INVALID_MAX_PLAYERS);
                 return;
             }
 
-            if (!TryParseDecimal(txtStartingScore.Text, out var startingScore))
+            if (!TryReadDecimal(txtStartingScore, out decimal startingScore))
             {
-                MessageBox.Show("Puntaje inicial no es válido.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtStartingScore.Focus();
-                txtStartingScore.SelectAll();
+                ShowValidationErrorAndFocus(txtStartingScore, MESSAGE_INVALID_STARTING_SCORE);
                 return;
             }
 
-            if (!TryParseDecimal(txtMaxScore.Text, out var maxScore))
+            if (!TryReadDecimal(txtMaxScore, out decimal maxScore))
             {
-                MessageBox.Show("Puntaje máximo no es válido.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtMaxScore.Focus();
-                txtMaxScore.SelectAll();
+                ShowValidationErrorAndFocus(txtMaxScore, MESSAGE_INVALID_MAX_SCORE);
                 return;
             }
 
-            if (!TryParseDecimal(txtPointsCorrect.Text, out var pointsCorrect))
+            if (!TryReadDecimal(txtPointsCorrect, out decimal pointsCorrect))
             {
-                MessageBox.Show("Puntos por acierto no son válidos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtPointsCorrect.Focus();
-                txtPointsCorrect.SelectAll();
+                ShowValidationErrorAndFocus(txtPointsCorrect, MESSAGE_INVALID_POINTS_CORRECT);
                 return;
             }
 
-            if (!TryParseDecimal(txtPointsWrong.Text, out var pointsWrong))
+            if (!TryReadDecimal(txtPointsWrong, out decimal pointsWrong))
             {
-                MessageBox.Show("Puntos por fallo no son válidos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtPointsWrong.Focus();
-                txtPointsWrong.SelectAll();
+                ShowValidationErrorAndFocus(txtPointsWrong, MESSAGE_INVALID_POINTS_WRONG);
                 return;
             }
 
-            if (!TryParseDecimal(txtPointsElimination.Text, out var pointsElimination))
+            if (!TryReadDecimal(txtPointsElimination, out decimal pointsElimination))
             {
-                MessageBox.Show("Puntos por eliminación no son válidos.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtPointsElimination.Focus();
-                txtPointsElimination.SelectAll();
+                ShowValidationErrorAndFocus(txtPointsElimination, MESSAGE_INVALID_POINTS_ELIMINATION);
                 return;
             }
 
-            IsPrivate = chkPrivate.IsChecked == true;
+            IsPrivate = chkPrivate.IsChecked.GetValueOrDefault();
             MaxPlayers = maxPlayers;
+
             StartingScore = startingScore;
             MaxScore = maxScore;
+
             PointsPerCorrect = pointsCorrect;
             PointsPerWrong = pointsWrong;
             PointsPerEliminationGain = pointsElimination;
-            AllowTiebreakCoinflip = chkCoinflip.IsChecked == true;
 
-            var win = Window.GetWindow(this);
-            if (win != null)
-            {
-                win.DialogResult = true;
-                win.Close();
-            }
+            AllowTiebreakCoinflip = chkCoinflip.IsChecked.GetValueOrDefault();
+
+            CloseDialog(true);
         }
 
         private void BtnCancelClick(object sender, RoutedEventArgs e)
         {
-            var win = Window.GetWindow(this);
-            if (win != null)
+            CloseDialog(false);
+        }
+
+        private static bool TryReadDecimal(TextBox textBox, out decimal value)
+        {
+            if (textBox == null)
             {
-                win.DialogResult = false;
-                win.Close();
+                value = default(decimal);
+                return false;
             }
+
+            return TryParseDecimal(textBox.Text, out value);
+        }
+
+        private bool TryReadMaxPlayers(out int maxPlayers)
+        {
+            bool parsed = int.TryParse(
+                (txtMaxPlayers.Text ?? string.Empty).Trim(),
+                NumberStyles.Integer,
+                CultureInfo.InvariantCulture,
+                out maxPlayers);
+
+            if (!parsed)
+            {
+                return false;
+            }
+
+            return maxPlayers >= MAX_PLAYERS_MIN && maxPlayers <= MAX_PLAYERS_MAX;
         }
 
         private static bool TryParseDecimal(string text, out decimal value)
@@ -134,6 +164,67 @@ namespace WPFTheWeakestRival.Pages
                 NumberStyles.Number,
                 CultureInfo.InvariantCulture,
                 out value);
+        }
+
+        private static void ShowValidationErrorAndFocus(TextBox textBox, string message)
+        {
+            MessageBox.Show(message, DIALOG_TITLE_SETTINGS, MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            if (textBox != null)
+            {
+                textBox.Focus();
+                textBox.SelectAll();
+            }
+        }
+
+        private void CloseDialog(bool dialogResult)
+        {
+            Window win = Window.GetWindow(this);
+            if (win == null)
+            {
+                return;
+            }
+
+            win.DialogResult = dialogResult;
+            win.Close();
+        }
+    }
+
+    public sealed class MatchSettingsDefaults
+    {
+        public bool IsPrivate { get; }
+        public int MaxPlayers { get; }
+
+        public decimal StartingScore { get; }
+        public decimal MaxScore { get; }
+
+        public decimal PointsPerCorrect { get; }
+        public decimal PointsPerWrong { get; }
+        public decimal PointsPerEliminationGain { get; }
+
+        public bool AllowTiebreakCoinflip { get; }
+
+        public MatchSettingsDefaults(
+            bool isPrivate,
+            int maxPlayers,
+            decimal startingScore,
+            decimal maxScore,
+            decimal pointsPerCorrect,
+            decimal pointsPerWrong,
+            decimal pointsPerEliminationGain,
+            bool allowTiebreakCoinflip)
+        {
+            IsPrivate = isPrivate;
+            MaxPlayers = maxPlayers;
+
+            StartingScore = startingScore;
+            MaxScore = maxScore;
+
+            PointsPerCorrect = pointsPerCorrect;
+            PointsPerWrong = pointsPerWrong;
+            PointsPerEliminationGain = pointsPerEliminationGain;
+
+            AllowTiebreakCoinflip = allowTiebreakCoinflip;
         }
     }
 }
