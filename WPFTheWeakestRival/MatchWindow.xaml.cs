@@ -38,38 +38,55 @@ namespace WPFTheWeakestRival
             state = new MatchSessionState(match, token, myUserId, isHost);
 
             var ui = new MatchWindowUiRefs(
-                window: this,
-                txtMatchCodeSmall: txtMatchCodeSmall,
-                lstPlayers: lstPlayers,
-                txtPlayersSummary: txtPlayersSummary,
-                txtChain: txtChain,
-                txtBanked: txtBanked,
-                txtTurnPlayerName: txtTurnPlayerName,
-                txtTurnLabel: txtTurnLabel,
-                txtTimer: txtTimer,
-                txtQuestion: txtQuestion,
-                txtAnswerFeedback: txtAnswerFeedback,
-                txtPhase: txtPhase,
-                txtWildcardName: txtWildcardName,
-                txtWildcardDescription: txtWildcardDescription,
-                imgWildcardIcon: imgWildcardIcon,
-                btnWildcardPrev: btnWildcardPrev,
-                btnWildcardNext: btnWildcardNext,
-                btnUseWildcard: btnUseWildcard,
-                btnAnswer1: btnAnswer1,
-                btnAnswer2: btnAnswer2,
-                btnAnswer3: btnAnswer3,
-                btnAnswer4: btnAnswer4,
-                btnBank: btnBank,
-                turnBannerBackground: TurnBannerBackground,
-                turnAvatar: TurnAvatar,
-                introOverlay: IntroOverlay,
-                introVideo: introVideo,
-                coinFlipOverlay: CoinFlipOverlay,
-                coinFlipResultText: CoinFlipResultText,
-                specialEventOverlay: SpecialEventOverlay,
-                specialEventTitleText: SpecialEventTitleText,
-                specialEventDescriptionText: SpecialEventDescriptionText);
+                new MatchWindowUiRefsArgs
+                {
+                    Window = this,
+
+                    TxtMatchCodeSmall = txtMatchCodeSmall,
+                    LstPlayers = lstPlayers,
+                    TxtPlayersSummary = txtPlayersSummary,
+
+                    TxtChain = txtChain,
+                    TxtBanked = txtBanked,
+
+                    TxtTurnPlayerName = txtTurnPlayerName,
+                    TxtTurnLabel = txtTurnLabel,
+                    TxtTimer = txtTimer,
+
+                    TxtQuestion = txtQuestion,
+                    TxtAnswerFeedback = txtAnswerFeedback,
+
+                    TxtPhase = txtPhase,
+
+                    TxtWildcardName = txtWildcardName,
+                    TxtWildcardDescription = txtWildcardDescription,
+                    ImgWildcardIcon = imgWildcardIcon,
+
+                    BtnWildcardPrev = btnWildcardPrev,
+                    BtnWildcardNext = btnWildcardNext,
+                    BtnUseWildcard = btnUseWildcard,
+
+                    BtnAnswer1 = btnAnswer1,
+                    BtnAnswer2 = btnAnswer2,
+                    BtnAnswer3 = btnAnswer3,
+                    BtnAnswer4 = btnAnswer4,
+
+                    BtnBank = btnBank,
+
+                    TurnBannerBackground = TurnBannerBackground,
+                    TurnAvatar = TurnAvatar,
+
+                    IntroOverlay = IntroOverlay,
+                    IntroVideo = introVideo,
+
+                    CoinFlipOverlay = CoinFlipOverlay,
+                    CoinFlipResultText = CoinFlipResultText,
+
+                    SpecialEventOverlay = SpecialEventOverlay,
+                    SpecialEventTitleText = SpecialEventTitleText,
+                    SpecialEventDescriptionText = SpecialEventDescriptionText
+                });
+
 
             coordinator = new MatchSessionCoordinator(ui, state);
 
