@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -48,21 +49,27 @@ namespace WPFTheWeakestRival.Infrastructure
         private const double DEFAULT_DRAWER_INITIAL_TRANSLATION_X = 340.0;
 
         public Func<bool> CanClearEffect { get; set; }
+
         public double BlurInRadius { get; set; } = 3.0;
+
         public int AnimInMs { get; set; } = 180;
+
         public int AnimOutMs { get; set; } = 160;
+
         public double DrawerInitialTranslationX { get; set; } = DEFAULT_DRAWER_INITIAL_TRANSLATION_X;
     }
 
     public sealed class FriendsDrawer : IDisposable
     {
+        private const double BLUR_OUT_RADIUS = 0.0;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(FriendsDrawer));
 
         private readonly FriendManager manager;
         private readonly FriendsDrawerView view;
         private readonly FriendsDrawerOptions options;
 
-        private readonly BlurEffect blurEffect = new BlurEffect { Radius = 0 };
+        private readonly BlurEffect blurEffect = new BlurEffect { Radius = BLUR_OUT_RADIUS };
         private readonly ObservableCollection<FriendItem> items = new ObservableCollection<FriendItem>();
 
         public FriendsDrawer(FriendManager manager, FriendsDrawerView view, FriendsDrawerOptions options = null)
@@ -83,6 +90,7 @@ namespace WPFTheWeakestRival.Infrastructure
             }
 
             view.BlurTarget.Effect = blurEffect;
+
             blurEffect.BeginAnimation(
                 BlurEffect.RadiusProperty,
                 new DoubleAnimation(blurEffect.Radius, options.BlurInRadius, TimeSpan.FromMilliseconds(options.AnimInMs))
@@ -111,7 +119,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             blurEffect.BeginAnimation(
                 BlurEffect.RadiusProperty,
-                new DoubleAnimation(blurEffect.Radius, 0.0, TimeSpan.FromMilliseconds(options.AnimOutMs))
+                new DoubleAnimation(blurEffect.Radius, BLUR_OUT_RADIUS, TimeSpan.FromMilliseconds(options.AnimOutMs))
                 {
                     EasingFunction = new QuadraticEase()
                 });
@@ -120,6 +128,7 @@ namespace WPFTheWeakestRival.Infrastructure
         private void CloseStoryboardCompleted(object sender, EventArgs e)
         {
             view.CloseStoryboard.Completed -= CloseStoryboardCompleted;
+
             view.DrawerHost.Visibility = Visibility.Collapsed;
 
             if (options.CanClearEffect == null || options.CanClearEffect())
@@ -134,17 +143,17 @@ namespace WPFTheWeakestRival.Infrastructure
 
             if (list != null)
             {
-                foreach (var item in list)
+                foreach (FriendItem item in list)
                 {
                     items.Add(item);
                 }
             }
 
-            var pending = Math.Max(0, pendingCount);
+            int pending = Math.Max(0, pendingCount);
 
             view.EmptyPanel.Visibility = items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             view.FriendsList.Visibility = items.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-            view.RequestsCountText.Text = pending.ToString();
+            view.RequestsCountText.Text = pending.ToString(CultureInfo.InvariantCulture);
         }
 
         public void Dispose()

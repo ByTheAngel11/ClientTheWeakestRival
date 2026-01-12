@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using WPFTheWeakestRival.Controls;
 
@@ -6,85 +7,58 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
     internal sealed class MatchWindowUiRefs
     {
-        public MatchWindowUiRefs(
-            Window window,
-            TextBlock txtMatchCodeSmall,
-            ListBox lstPlayers,
-            TextBlock txtPlayersSummary,
-            TextBlock txtChain,
-            TextBlock txtBanked,
-            TextBlock txtTurnPlayerName,
-            TextBlock txtTurnLabel,
-            TextBlock txtTimer,
-            TextBlock txtQuestion,
-            TextBlock txtAnswerFeedback,
-            TextBlock txtPhase,
-            TextBlock txtWildcardName,
-            TextBlock txtWildcardDescription,
-            Image imgWildcardIcon,
-            Button btnWildcardPrev,
-            Button btnWildcardNext,
-            Button btnUseWildcard,
-            Button btnAnswer1,
-            Button btnAnswer2,
-            Button btnAnswer3,
-            Button btnAnswer4,
-            Button btnBank,
-            Border turnBannerBackground,
-            AvatarControl turnAvatar,
-            UIElement introOverlay,
-            MediaElement introVideo,
-            UIElement coinFlipOverlay,
-            TextBlock coinFlipResultText,
-            UIElement specialEventOverlay,
-            TextBlock specialEventTitleText,
-            TextBlock specialEventDescriptionText)
+        public MatchWindowUiRefs(MatchWindowUiRefsArgs args)
         {
-            Window = window;
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
 
-            TxtMatchCodeSmall = txtMatchCodeSmall;
-            LstPlayers = lstPlayers;
-            TxtPlayersSummary = txtPlayersSummary;
+            Window = args.Window ?? throw new ArgumentNullException(nameof(args.Window));
 
-            TxtChain = txtChain;
-            TxtBanked = txtBanked;
+            TxtMatchCodeSmall = args.TxtMatchCodeSmall ?? throw new ArgumentNullException(nameof(args.TxtMatchCodeSmall));
+            LstPlayers = args.LstPlayers ?? throw new ArgumentNullException(nameof(args.LstPlayers));
+            TxtPlayersSummary = args.TxtPlayersSummary ?? throw new ArgumentNullException(nameof(args.TxtPlayersSummary));
 
-            TxtTurnPlayerName = txtTurnPlayerName;
-            TxtTurnLabel = txtTurnLabel;
-            TxtTimer = txtTimer;
+            TxtChain = args.TxtChain ?? throw new ArgumentNullException(nameof(args.TxtChain));
+            TxtBanked = args.TxtBanked ?? throw new ArgumentNullException(nameof(args.TxtBanked));
 
-            TxtQuestion = txtQuestion;
-            TxtAnswerFeedback = txtAnswerFeedback;
+            TxtTurnPlayerName = args.TxtTurnPlayerName ?? throw new ArgumentNullException(nameof(args.TxtTurnPlayerName));
+            TxtTurnLabel = args.TxtTurnLabel ?? throw new ArgumentNullException(nameof(args.TxtTurnLabel));
+            TxtTimer = args.TxtTimer ?? throw new ArgumentNullException(nameof(args.TxtTimer));
 
-            TxtPhase = txtPhase;
+            TxtQuestion = args.TxtQuestion ?? throw new ArgumentNullException(nameof(args.TxtQuestion));
+            TxtAnswerFeedback = args.TxtAnswerFeedback ?? throw new ArgumentNullException(nameof(args.TxtAnswerFeedback));
 
-            TxtWildcardName = txtWildcardName;
-            TxtWildcardDescription = txtWildcardDescription;
-            ImgWildcardIcon = imgWildcardIcon;
+            TxtPhase = args.TxtPhase ?? throw new ArgumentNullException(nameof(args.TxtPhase));
 
-            BtnWildcardPrev = btnWildcardPrev;
-            BtnWildcardNext = btnWildcardNext;
-            BtnUseWildcard = btnUseWildcard;
+            TxtWildcardName = args.TxtWildcardName ?? throw new ArgumentNullException(nameof(args.TxtWildcardName));
+            TxtWildcardDescription = args.TxtWildcardDescription ?? throw new ArgumentNullException(nameof(args.TxtWildcardDescription));
+            ImgWildcardIcon = args.ImgWildcardIcon ?? throw new ArgumentNullException(nameof(args.ImgWildcardIcon));
 
-            BtnAnswer1 = btnAnswer1;
-            BtnAnswer2 = btnAnswer2;
-            BtnAnswer3 = btnAnswer3;
-            BtnAnswer4 = btnAnswer4;
+            BtnWildcardPrev = args.BtnWildcardPrev ?? throw new ArgumentNullException(nameof(args.BtnWildcardPrev));
+            BtnWildcardNext = args.BtnWildcardNext ?? throw new ArgumentNullException(nameof(args.BtnWildcardNext));
+            BtnUseWildcard = args.BtnUseWildcard ?? throw new ArgumentNullException(nameof(args.BtnUseWildcard));
 
-            BtnBank = btnBank;
+            BtnAnswer1 = args.BtnAnswer1 ?? throw new ArgumentNullException(nameof(args.BtnAnswer1));
+            BtnAnswer2 = args.BtnAnswer2 ?? throw new ArgumentNullException(nameof(args.BtnAnswer2));
+            BtnAnswer3 = args.BtnAnswer3 ?? throw new ArgumentNullException(nameof(args.BtnAnswer3));
+            BtnAnswer4 = args.BtnAnswer4 ?? throw new ArgumentNullException(nameof(args.BtnAnswer4));
 
-            TurnBannerBackground = turnBannerBackground;
-            TurnAvatar = turnAvatar;
+            BtnBank = args.BtnBank ?? throw new ArgumentNullException(nameof(args.BtnBank));
 
-            IntroOverlay = introOverlay;
-            IntroVideo = introVideo;
+            TurnBannerBackground = args.TurnBannerBackground ?? throw new ArgumentNullException(nameof(args.TurnBannerBackground));
+            TurnAvatar = args.TurnAvatar ?? throw new ArgumentNullException(nameof(args.TurnAvatar));
 
-            CoinFlipOverlay = coinFlipOverlay;
-            CoinFlipResultText = coinFlipResultText;
+            IntroOverlay = args.IntroOverlay ?? throw new ArgumentNullException(nameof(args.IntroOverlay));
+            IntroVideo = args.IntroVideo ?? throw new ArgumentNullException(nameof(args.IntroVideo));
 
-            SpecialEventOverlay = specialEventOverlay;
-            SpecialEventTitleText = specialEventTitleText;
-            SpecialEventDescriptionText = specialEventDescriptionText;
+            CoinFlipOverlay = args.CoinFlipOverlay ?? throw new ArgumentNullException(nameof(args.CoinFlipOverlay));
+            CoinFlipResultText = args.CoinFlipResultText ?? throw new ArgumentNullException(nameof(args.CoinFlipResultText));
+
+            SpecialEventOverlay = args.SpecialEventOverlay ?? throw new ArgumentNullException(nameof(args.SpecialEventOverlay));
+            SpecialEventTitleText = args.SpecialEventTitleText ?? throw new ArgumentNullException(nameof(args.SpecialEventTitleText));
+            SpecialEventDescriptionText = args.SpecialEventDescriptionText ?? throw new ArgumentNullException(nameof(args.SpecialEventDescriptionText));
         }
 
         public Window Window { get; }
@@ -132,5 +106,54 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public UIElement SpecialEventOverlay { get; }
         public TextBlock SpecialEventTitleText { get; }
         public TextBlock SpecialEventDescriptionText { get; }
+    }
+
+    internal sealed class MatchWindowUiRefsArgs
+    {
+        public Window Window { get; set; }
+
+        public TextBlock TxtMatchCodeSmall { get; set; }
+        public ListBox LstPlayers { get; set; }
+        public TextBlock TxtPlayersSummary { get; set; }
+
+        public TextBlock TxtChain { get; set; }
+        public TextBlock TxtBanked { get; set; }
+
+        public TextBlock TxtTurnPlayerName { get; set; }
+        public TextBlock TxtTurnLabel { get; set; }
+        public TextBlock TxtTimer { get; set; }
+
+        public TextBlock TxtQuestion { get; set; }
+        public TextBlock TxtAnswerFeedback { get; set; }
+
+        public TextBlock TxtPhase { get; set; }
+
+        public TextBlock TxtWildcardName { get; set; }
+        public TextBlock TxtWildcardDescription { get; set; }
+        public Image ImgWildcardIcon { get; set; }
+
+        public Button BtnWildcardPrev { get; set; }
+        public Button BtnWildcardNext { get; set; }
+        public Button BtnUseWildcard { get; set; }
+
+        public Button BtnAnswer1 { get; set; }
+        public Button BtnAnswer2 { get; set; }
+        public Button BtnAnswer3 { get; set; }
+        public Button BtnAnswer4 { get; set; }
+
+        public Button BtnBank { get; set; }
+
+        public Border TurnBannerBackground { get; set; }
+        public AvatarControl TurnAvatar { get; set; }
+
+        public UIElement IntroOverlay { get; set; }
+        public MediaElement IntroVideo { get; set; }
+
+        public UIElement CoinFlipOverlay { get; set; }
+        public TextBlock CoinFlipResultText { get; set; }
+
+        public UIElement SpecialEventOverlay { get; set; }
+        public TextBlock SpecialEventTitleText { get; set; }
+        public TextBlock SpecialEventDescriptionText { get; set; }
     }
 }

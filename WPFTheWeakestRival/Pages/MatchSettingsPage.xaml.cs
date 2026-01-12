@@ -41,40 +41,55 @@ namespace WPFTheWeakestRival.Pages
 
             InitializeComponent();
 
-            ApplyTextLimits();
+            ApplyTextLimits(this);
 
-            LoadDefaults(defaults);
+            LoadDefaults(this, defaults);
         }
 
-        private void ApplyTextLimits()
+        private static void ApplyTextLimits(MatchSettingsPage page)
         {
-            UiValidationHelper.ApplyMaxLength(txtMaxPlayers, UiValidationHelper.NUMBER_TEXT_MAX_LENGTH);
-            UiValidationHelper.ApplyMaxLength(txtStartingScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
-            UiValidationHelper.ApplyMaxLength(txtMaxScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
-            UiValidationHelper.ApplyMaxLength(txtPointsCorrect, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
-            UiValidationHelper.ApplyMaxLength(txtPointsWrong, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
-            UiValidationHelper.ApplyMaxLength(txtPointsElimination, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            if (page == null)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
+
+            UiValidationHelper.ApplyMaxLength(page.txtMaxPlayers, UiValidationHelper.NUMBER_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(page.txtStartingScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(page.txtMaxScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(page.txtPointsCorrect, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(page.txtPointsWrong, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(page.txtPointsElimination, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
         }
 
-        private void LoadDefaults(MatchSettingsDefaults defaults)
+        private static void LoadDefaults(MatchSettingsPage page, MatchSettingsDefaults defaults)
         {
-            chkPrivate.IsChecked = defaults.IsPrivate;
+            if (page == null)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
 
-            txtMaxPlayers.Text = defaults.MaxPlayers.ToString(CultureInfo.InvariantCulture);
+            if (defaults == null)
+            {
+                throw new ArgumentNullException(nameof(defaults));
+            }
 
-            txtStartingScore.Text = defaults.StartingScore.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
-            txtMaxScore.Text = defaults.MaxScore.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            page.chkPrivate.IsChecked = defaults.IsPrivate;
 
-            txtPointsCorrect.Text = defaults.PointsPerCorrect.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
-            txtPointsWrong.Text = defaults.PointsPerWrong.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
-            txtPointsElimination.Text = defaults.PointsPerEliminationGain.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            page.txtMaxPlayers.Text = defaults.MaxPlayers.ToString(CultureInfo.InvariantCulture);
 
-            chkCoinflip.IsChecked = defaults.AllowTiebreakCoinflip;
+            page.txtStartingScore.Text = defaults.StartingScore.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            page.txtMaxScore.Text = defaults.MaxScore.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+
+            page.txtPointsCorrect.Text = defaults.PointsPerCorrect.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            page.txtPointsWrong.Text = defaults.PointsPerWrong.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            page.txtPointsElimination.Text = defaults.PointsPerEliminationGain.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+
+            page.chkCoinflip.IsChecked = defaults.AllowTiebreakCoinflip;
         }
 
         private void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            if (!TryReadMaxPlayers(out int maxPlayers))
+            if (!TryReadMaxPlayers(this, out int maxPlayers))
             {
                 ShowValidationErrorAndFocus(txtMaxPlayers, MESSAGE_INVALID_MAX_PLAYERS);
                 return;
@@ -141,10 +156,15 @@ namespace WPFTheWeakestRival.Pages
             return TryParseDecimal(textBox.Text, out value);
         }
 
-        private bool TryReadMaxPlayers(out int maxPlayers)
+        private static bool TryReadMaxPlayers(MatchSettingsPage page, out int maxPlayers)
         {
+            if (page == null)
+            {
+                throw new ArgumentNullException(nameof(page));
+            }
+
             bool parsed = int.TryParse(
-                (txtMaxPlayers.Text ?? string.Empty).Trim(),
+                (page.txtMaxPlayers.Text ?? string.Empty).Trim(),
                 NumberStyles.Integer,
                 CultureInfo.InvariantCulture,
                 out maxPlayers);
