@@ -97,6 +97,96 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Your account was blocked..
+        /// </summary>
+        public static string Auth_Account_Banned {
+            get {
+                return ResourceManager.GetString("Auth.Account.Banned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your account is not active..
+        /// </summary>
+        public static string Auth_Account_NotActive {
+            get {
+                return ResourceManager.GetString("Auth.Account.NotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your account is suspended..
+        /// </summary>
+        public static string Auth_Account_Suspended {
+            get {
+                return ResourceManager.GetString("Auth.Account.Suspended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a There is no account registered with that email..
+        /// </summary>
+        public static string Auth_Email_NotRegistered {
+            get {
+                return ResourceManager.GetString("Auth.Email.NotRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a This email is already registered..
+        /// </summary>
+        public static string Auth_Email_Taken {
+            get {
+                return ResourceManager.GetString("Auth.Email.Taken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a There is already an active session for this user..
+        /// </summary>
+        public static string Auth_IssueToken_AlreadyLoggedIn {
+            get {
+                return ResourceManager.GetString("Auth.IssueToken.AlreadyLoggedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Invalid request.
+        /// </summary>
+        public static string Auth_IssueToken_InvalidUserId {
+            get {
+                return ResourceManager.GetString("Auth.IssueToken.InvalidUserId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Configuration error: Server connection string not found..
+        /// </summary>
+        public static string Auth_ResolveConnectionString_Configuration {
+            get {
+                return ResourceManager.GetString("Auth.ResolveConnectionString.Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An unexpected error occurred. Try later..
+        /// </summary>
+        public static string Auth_Unexpected {
+            get {
+                return ResourceManager.GetString("Auth.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient address is invalid..
+        /// </summary>
+        public static string BORRAR {
+            get {
+                return ResourceManager.GetString("BORRAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Select an image.
         /// </summary>
         public static string btnChooseImage {
@@ -349,6 +439,330 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient address is invalid..
+        /// </summary>
+        public static string Email_SendLobbyInvite_InvalidRecipient {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.InvalidRecipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The server does not allow sending from this application. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_ClientNotPermitted {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.ClientNotPermitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail Error: General failure to communicate with the mail server. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_GeneralFailure {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.GeneralFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient is not available. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_MailboxUnavailable {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.MailboxUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The server requires TLS security to send mail. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Smtp_MustIssueStartTlsFirst {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The connection to the mail server was interrupted. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10054 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10054", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: timeout connecting to the mail server. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10060 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server refused the connection. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10061 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10061", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server could not be reached (host unreachable). The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_10065 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.10065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server (DNS) could not be resolved. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Socket_11001 {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Socket.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: An unexpected problem occurred. The invitation to the room could not be sent..
+        /// </summary>
+        public static string Email_SendLobbyInvite_Unexpected {
+            get {
+                return ResourceManager.GetString("Email.SendLobbyInvite.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Configuration {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient address is invalid..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_InvalidRecipient {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.InvalidRecipient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The server does not allow sending from this application. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_ClientNotPermitted {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.ClientNotPermitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail Error: General failure to communicate with the mail server. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_GeneralFailure {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.GeneralFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient is not available. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_MailboxUnavailable {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.MailboxUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The server requires TLS security to send mail. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Smtp_MustIssueStartTlsFirst {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: no internet connection (network inaccessible). The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10051 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10051", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The connection to the mail server was interrupted. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10054 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10054", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: timeout connecting to the mail server. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10060 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server refused the connection. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10061 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10061", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server could not be reached (host unreachable). The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_10065 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.10065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server (DNS) could not be resolved. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Socket_11001 {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Socket.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: An unexpected problem occurred. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendPasswordResetCode_Unexpected {
+            get {
+                return ResourceManager.GetString("Email.SendPasswordResetCode.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
+        /// </summary>
+        public static string Email_SendVerificationCode_Configuration {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Configuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The server does not allow sending from this application. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_ClientNotPermitted {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.ClientNotPermitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail Error: General failure to communicate with the mail server. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_GeneralFailure {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.GeneralFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Recipient is not available. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_MailboxUnavailable {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.MailboxUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The server requires TLS security to send mail. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Smtp_MustIssueStartTlsFirst {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: no internet connection (network inaccessible). The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10051 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10051", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The connection to the mail server was interrupted. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10054 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10054", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: timeout connecting to the mail server. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10060 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10060", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server refused the connection. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10061 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10061", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server could not be reached (host unreachable). The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_10065 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.10065", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: The mail server (DNS) could not be resolved. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Socket_11001 {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Socket.11001", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: An unexpected problem occurred. The password reset code could not be sent..
+        /// </summary>
+        public static string Email_SendVerificationCode_Unexpected {
+            get {
+                return ResourceManager.GetString("Email.SendVerificationCode.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a email@example.com.
         /// </summary>
         public static string emailPlaceholder {
@@ -363,6 +777,25 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string en {
             get {
                 return ResourceManager.GetString("en", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
+        /// </summary>
+        public static string Error_de_correo__la_dirección_del_destinatario_no_es_válida_ {
+            get {
+                return ResourceManager.GetString("Error de correo: la dirección del destinatario no es válida.", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Mail error: no internet connection (network inaccessible). The invitation to the room could not be sent..
+        /// </summary>
+        public static string Error_de_correo__ocurrió_un_problema_inesperado__No_se_pudo_enviar_el_código_para_restablecer_la_contraseña_ {
+            get {
+                return ResourceManager.GetString("Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para" +
+                        " restablecer la contraseña.", resourceCulture);
             }
         }
         

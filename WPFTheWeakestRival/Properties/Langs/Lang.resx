@@ -663,13 +663,148 @@
   <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
     <value>The report could not be sent: Unexpected error</value>
   </data>
-  <data name="noFriends" xml:space="preserve">
-    <value>You have no friends yet</value>
+  <data name="Email.SendVerificationCode.Socket.10051" xml:space="preserve">
+    <value>Mail error: no internet connection (network inaccessible). The password reset code could not be sent.</value>
   </data>
-  <data name="commonAccept" xml:space="preserve">
-    <value>Acept</value>
+  <data name="Email.SendVerificationCode.Socket.10065" xml:space="preserve">
+    <value>Mail error: The mail server could not be reached (host unreachable). The password reset code could not be sent.</value>
   </data>
-  <data name="commonReject" xml:space="preserve">
-    <value>Reject</value>
+  <data name="Email.SendVerificationCode.Socket.11001" xml:space="preserve">
+    <value>Mail error: The mail server (DNS) could not be resolved. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10060" xml:space="preserve">
+    <value>Mail error: timeout connecting to the mail server. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10061" xml:space="preserve">
+    <value>Mail error: The mail server refused the connection. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10054" xml:space="preserve">
+    <value>Mail error: The connection to the mail server was interrupted. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Mail Error: General failure to communicate with the mail server. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Mail error: The server does not allow sending from this application. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Mail error: The server requires TLS security to send mail. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Mail error: Recipient is not available. The password reset code could not be sent.</value>
+  </data>
+  <data name="BORRAR" xml:space="preserve">
+    <value>Mail error: Recipient address is invalid.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Configuration" xml:space="preserve">
+    <value>Mail error: Invalid mail server configuration.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Unexpected" xml:space="preserve">
+    <value>Mail error: An unexpected problem occurred. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10051" xml:space="preserve">
+    <value>Mail error: no internet connection (network inaccessible). The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10065" xml:space="preserve">
+    <value>Mail error: The mail server could not be reached (host unreachable). The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.11001" xml:space="preserve">
+    <value>Mail error: The mail server (DNS) could not be resolved. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10060" xml:space="preserve">
+    <value>Mail error: timeout connecting to the mail server. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10061" xml:space="preserve">
+    <value>Mail error: The mail server refused the connection. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10054" xml:space="preserve">
+    <value>Mail error: The connection to the mail server was interrupted. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Mail Error: General failure to communicate with the mail server. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Mail error: The server does not allow sending from this application. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Mail error: The server requires TLS security to send mail. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Mail error: Recipient is not available. The password reset code could not be sent.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Mail error: Recipient address is invalid.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
+    <value>Mail error: Invalid mail server configuration.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Unexpected" xml:space="preserve">
+    <value>Mail error: An unexpected problem occurred. The password reset code could not be sent.</value>
+  </data>
+  <data name="Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña." xml:space="preserve">
+    <value>Mail error: no internet connection (network inaccessible). The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10065" xml:space="preserve">
+    <value>Mail error: The mail server could not be reached (host unreachable). The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.11001" xml:space="preserve">
+    <value>Mail error: The mail server (DNS) could not be resolved. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10060" xml:space="preserve">
+    <value>Mail error: timeout connecting to the mail server. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10061" xml:space="preserve">
+    <value>Mail error: The mail server refused the connection. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10054" xml:space="preserve">
+    <value>Mail error: The connection to the mail server was interrupted. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Mail Error: General failure to communicate with the mail server. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Mail error: The server does not allow sending from this application. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Mail error: The server requires TLS security to send mail. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Mail error: Recipient is not available. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.InvalidRecipient" xml:space="preserve">
+    <value>Mail error: Recipient address is invalid.</value>
+  </data>
+  <data name="Error de correo: la dirección del destinatario no es válida." xml:space="preserve">
+    <value>Mail error: Invalid mail server configuration.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
+    <value>Mail error: An unexpected problem occurred. The invitation to the room could not be sent.</value>
+  </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Configuration error: Server connection string not found.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Invalid request</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>There is already an active session for this user.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>An unexpected error occurred. Try later.</value>
+  </data>
+  <data name="Auth.Account.NotActive" xml:space="preserve">
+    <value>Your account is not active.</value>
+  </data>
+  <data name="Auth.Account.Suspended" xml:space="preserve">
+    <value>Your account is suspended.</value>
+  </data>
+  <data name="Auth.Account.Banned" xml:space="preserve">
+    <value>Your account was blocked.</value>
+  </data>
+  <data name="Auth.Email.Taken" xml:space="preserve">
+    <value>This email is already registered.</value>
+  </data>
+  <data name="Auth.Email.NotRegistered" xml:space="preserve">
+    <value>There is no account registered with that email.</value>
   </data>
 </root>

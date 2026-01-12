@@ -663,20 +663,148 @@
   <data name="Report.SubmitPlayerReport.Unexpected" xml:space="preserve">
     <value>No se pudo enviar el informe: error inesperado</value>
   </data>
-  <data name="noFriends" xml:space="preserve">
-    <value>Aún no tienes amigos</value>
+  <data name="Email.SendVerificationCode.Socket.10051" xml:space="preserve">
+    <value>Error de correo: no hay conexión a internet (red inaccesible). No se pudo enviar el código para restablecer la contraseña.</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="commonAccept" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Email.SendVerificationCode.Socket.10065" xml:space="preserve">
+    <value>Error de correo: no se pudo alcanzar el servidor de correo (host inaccesible). No se pudo enviar el código para restablecer la contraseña.</value>
   </data>
-  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="Email.SendVerificationCode.Socket.11001" xml:space="preserve">
+    <value>Error de correo: no se pudo resolver el servidor de correo (DNS). No se pudo enviar el código para restablecer la contraseña.</value>
   </data>
-  <data name="commonAccept" xml:space="preserve">
-    <value>Aceptar</value>
+  <data name="Email.SendVerificationCode.Socket.10060" xml:space="preserve">
+    <value>Error de correo: tiempo de espera al conectar con el servidor de correo. No se pudo enviar el código para restablecer la contraseña.</value>
   </data>
-  <data name="commonReject" xml:space="preserve">
-    <value>Rechazar</value>
+  <data name="Email.SendVerificationCode.Socket.10061" xml:space="preserve">
+    <value>Error de correo: el servidor de correo rechazó la conexión. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Socket.10054" xml:space="preserve">
+    <value>Error de correo: la conexión con el servidor de correo se interrumpió. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Error de correo: falla general al comunicarse con el servidor de correo. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Error de correo: el servidor no permite el envío desde esta aplicación. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Error de correo: el servidor requiere seguridad TLS para enviar el correo. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Error de correo: el destinatario no está disponible. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Error de correo: la dirección del destinatario no es válida.</value>
+  </data>
+  <data name="BORRAR" xml:space="preserve">
+    <value>Error de correo: la dirección del destinatario no es válida.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Configuration" xml:space="preserve">
+    <value>Error de correo: configuración inválida del servidor de correo.</value>
+  </data>
+  <data name="Email.SendVerificationCode.Unexpected" xml:space="preserve">
+    <value>Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10051" xml:space="preserve">
+    <value>Error de correo: no hay conexión a internet (red inaccesible). No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10065" xml:space="preserve">
+    <value>Error de correo: no se pudo alcanzar el servidor de correo (host inaccesible). No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.11001" xml:space="preserve">
+    <value>Error de correo: no se pudo resolver el servidor de correo (DNS). No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10060" xml:space="preserve">
+    <value>Error de correo: tiempo de espera al conectar con el servidor de correo. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10061" xml:space="preserve">
+    <value>Error de correo: el servidor de correo rechazó la conexión. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Socket.10054" xml:space="preserve">
+    <value>Error de correo: la conexión con el servidor de correo se interrumpió. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Error de correo: falla general al comunicarse con el servidor de correo. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Error de correo: el servidor no permite el envío desde esta aplicación. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Error de correo: el servidor requiere seguridad TLS para enviar el correo. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Error de correo: el destinatario no está disponible. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
+    <value>Error de correo: configuración inválida del servidor de correo.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.Unexpected" xml:space="preserve">
+    <value>Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para restablecer la contraseña." xml:space="preserve">
+    <value>Error de correo: no hay conexión a internet (red inaccesible). No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10065" xml:space="preserve">
+    <value>Error de correo: no se pudo alcanzar el servidor de correo (host inaccesible). No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.11001" xml:space="preserve">
+    <value>Error de correo: no se pudo resolver el servidor de correo (DNS). No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10060" xml:space="preserve">
+    <value>Error de correo: tiempo de espera al conectar con el servidor de correo. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10061" xml:space="preserve">
+    <value>Error de correo: el servidor de correo rechazó la conexión. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Socket.10054" xml:space="preserve">
+    <value>Error de correo: la conexión con el servidor de correo se interrumpió. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.GeneralFailure" xml:space="preserve">
+    <value>Error de correo: falla general al comunicarse con el servidor de correo. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.ClientNotPermitted" xml:space="preserve">
+    <value>Error de correo: el servidor no permite el envío desde esta aplicación. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MustIssueStartTlsFirst" xml:space="preserve">
+    <value>Error de correo: el servidor requiere seguridad TLS para enviar el correo. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Smtp.MailboxUnavailable" xml:space="preserve">
+    <value>Error de correo: el destinatario no está disponible. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.InvalidRecipient" xml:space="preserve">
+    <value>Error de correo: la dirección del destinatario no es válida.</value>
+  </data>
+  <data name="Error de correo: la dirección del destinatario no es válida." xml:space="preserve">
+    <value>Error de correo: configuración inválida del servidor de correo.</value>
+  </data>
+  <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
+    <value>Error de correo: ocurrió un problema inesperado. No se pudo enviar la invitación a la sala.</value>
+  </data>
+  <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
+    <value>Error de configuración: no se encontró la cadena de conexión del servidor.</value>
+  </data>
+  <data name="Auth.IssueToken.InvalidUserId" xml:space="preserve">
+    <value>Solicitud inválida</value>
+  </data>
+  <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
+    <value>Ya hay una sesión activa para este usuario.</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Ocurrió un error inesperado. Intenta más tarde.</value>
+  </data>
+  <data name="Auth.Account.NotActive" xml:space="preserve">
+    <value>Tu cuenta no está activa.</value>
+  </data>
+  <data name="Auth.Account.Suspended" xml:space="preserve">
+    <value>Tu cuenta está suspendida.</value>
+  </data>
+  <data name="Auth.Account.Banned" xml:space="preserve">
+    <value>Tu cuenta fue bloqueada.</value>
+  </data>
+  <data name="Auth.Email.Taken" xml:space="preserve">
+    <value>Este correo ya está registrado.</value>
+  </data>
+  <data name="Auth.Email.NotRegistered" xml:space="preserve">
+    <value>No existe una cuenta registrada con ese correo.</value>
   </data>
 </root>

@@ -198,7 +198,7 @@
     <Compile Include="Pages\VotePage.xaml.cs">
       <DependentUpon>VotePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Langs\Lang4.Designer.cs">
+    <Compile Include="Properties\Langs\Lang.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Lang.resx</DependentUpon>
@@ -330,7 +330,7 @@
     <EmbeddedResource Include="Properties\Langs\Lang.pt.resx" />
     <EmbeddedResource Include="Properties\Langs\Lang.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Lang4.Designer.cs</LastGenOutput>
+      <LastGenOutput>Lang.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.en.resx" />
     <EmbeddedResource Include="Properties\Resources.es.resx" />
