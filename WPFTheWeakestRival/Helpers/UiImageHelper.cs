@@ -7,6 +7,33 @@ namespace WPFTheWeakestRival.Helpers
 {
     public static class UiImageHelper
     {
+        private const string DEFAULT_AVATAR_PACK_URI =
+            "pack://application:,,,/Assets/Images/Avatars/default.png";
+
+        private const string PROFILE_IMAGES_PACK_URI_FORMAT =
+            "pack://application:,,,/Assets/Images/Profiles/{0}.png";
+
+        public static ImageSource TryCreateFromProfileCode(string profileImageCode, int decodeWidth = 0)
+        {
+            string safeCode = (profileImageCode ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(safeCode))
+            {
+                return null;
+            }
+
+            if (Uri.TryCreate(safeCode, UriKind.RelativeOrAbsolute, out _))
+            {
+                ImageSource fromUri = TryCreateFromUrlOrPath(safeCode, decodeWidth);
+                if (fromUri != null)
+                {
+                    return fromUri;
+                }
+            }
+
+            string packUri = string.Format(PROFILE_IMAGES_PACK_URI_FORMAT, safeCode);
+            return TryCreateFromUrlOrPath(packUri, decodeWidth);
+        }
+
         public static ImageSource TryCreateFromUrlOrPath(string sourcePathOrUri, int decodeWidth = 0)
         {
             if (string.IsNullOrWhiteSpace(sourcePathOrUri))
@@ -16,8 +43,7 @@ namespace WPFTheWeakestRival.Helpers
 
             try
             {
-                Uri candidateUri;
-                if (!Uri.TryCreate(sourcePathOrUri, UriKind.RelativeOrAbsolute, out candidateUri))
+                if (!Uri.TryCreate(sourcePathOrUri, UriKind.RelativeOrAbsolute, out Uri candidateUri))
                 {
                     return null;
                 }
@@ -38,12 +64,13 @@ namespace WPFTheWeakestRival.Helpers
                 }
                 else
                 {
-                    string uriScheme = candidateUri.Scheme.ToLowerInvariant();
+                    string uriScheme = (candidateUri.Scheme ?? string.Empty).ToLowerInvariant();
+
                     bool isAllowedScheme =
-                        uriScheme == Uri.UriSchemeHttp ||
-                        uriScheme == Uri.UriSchemeHttps ||
-                        uriScheme == Uri.UriSchemeFile ||
-                        uriScheme == "pack";
+                        string.Equals(uriScheme, Uri.UriSchemeHttp, StringComparison.Ordinal) ||
+                        string.Equals(uriScheme, Uri.UriSchemeHttps, StringComparison.Ordinal) ||
+                        string.Equals(uriScheme, Uri.UriSchemeFile, StringComparison.Ordinal) ||
+                        string.Equals(uriScheme, "pack", StringComparison.Ordinal);
 
                     if (!isAllowedScheme)
                     {
@@ -66,31 +93,11 @@ namespace WPFTheWeakestRival.Helpers
                 bitmap.UriSource = resolvedUri;
                 bitmap.EndInit();
                 bitmap.Freeze();
+
                 return bitmap;
             }
-            catch (FileNotFoundException ex)
+            catch (Exception)
             {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
-            catch (NotSupportedException ex)
-            {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
-            catch (IOException ex)
-            {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
-            catch (UriFormatException ex)
-            {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
                 return null;
             }
         }
@@ -112,56 +119,28 @@ namespace WPFTheWeakestRival.Helpers
                     bitmap.BeginInit();
                     bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
+
                     if (decodeWidth > 0)
                     {
                         bitmap.DecodePixelWidth = decodeWidth;
                     }
+
                     bitmap.StreamSource = memoryStream;
                     bitmap.EndInit();
                     bitmap.Freeze();
+
                     return bitmap;
                 }
             }
-            catch (NotSupportedException ex)
+            catch (Exception)
             {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
-            catch (IOException ex)
-            {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
                 return null;
             }
         }
 
         public static ImageSource DefaultAvatar(int decodeWidth = 24)
         {
-            try
-            {
-                var avatarPackUri = new Uri("pack://application:,,,/Assets/Images/Avatars/default.png", UriKind.Absolute);
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                if (decodeWidth > 0)
-                {
-                    bitmap.DecodePixelWidth = decodeWidth;
-                }
-                bitmap.UriSource = avatarPackUri;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine(ex);
-                return null;
-            }
+            return TryCreateFromUrlOrPath(DEFAULT_AVATAR_PACK_URI, decodeWidth);
         }
     }
 }

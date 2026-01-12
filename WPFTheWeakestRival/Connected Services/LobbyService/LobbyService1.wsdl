@@ -10,9 +10,9 @@
   </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
-      <xsd:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd0" namespace="http://tempuri.org/" />
-      <xsd:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
-      <xsd:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://172.20.10.2:8082/lobby/?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://172.20.10.2:8082/lobby/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
+      <xsd:import schemaLocation="http://172.20.10.2:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="ILobbyService_JoinLobby_InputMessage">
@@ -42,6 +42,12 @@
   <wsdl:message name="ILobbyService_SendChatMessage_InputMessage">
     <wsdl:part name="parameters" element="tns:SendChatMessage" />
   </wsdl:message>
+  <wsdl:message name="ILobbyService_SendChatMessage_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SendChatMessageResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILobbyService_SendChatMessage_ServiceFaultFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q3:ServiceFault" />
+  </wsdl:message>
   <wsdl:message name="ILobbyService_GetMyProfile_InputMessage">
     <wsdl:part name="parameters" element="tns:GetMyProfile" />
   </wsdl:message>
@@ -49,7 +55,7 @@
     <wsdl:part name="parameters" element="tns:GetMyProfileResponse" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_GetMyProfile_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q3:ServiceFault" />
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q4:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_UpdateAccount_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdateAccount" />
@@ -58,7 +64,7 @@
     <wsdl:part name="parameters" element="tns:UpdateAccountResponse" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_UpdateAccount_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q4:ServiceFault" />
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q5:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_CreateLobby_InputMessage">
     <wsdl:part name="parameters" element="tns:CreateLobby" />
@@ -67,7 +73,7 @@
     <wsdl:part name="parameters" element="tns:CreateLobbyResponse" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_CreateLobby_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q5:ServiceFault" />
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q6:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_JoinByCode_InputMessage">
     <wsdl:part name="parameters" element="tns:JoinByCode" />
@@ -76,7 +82,7 @@
     <wsdl:part name="parameters" element="tns:JoinByCodeResponse" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_JoinByCode_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q6:ServiceFault" />
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q7:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_StartLobbyMatch_InputMessage">
     <wsdl:part name="parameters" element="tns:StartLobbyMatch" />
@@ -85,7 +91,7 @@
     <wsdl:part name="parameters" element="tns:StartLobbyMatchResponse" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_StartLobbyMatch_ServiceFaultFault_FaultMessage">
-    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q7:ServiceFault" />
+    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" name="detail" element="q8:ServiceFault" />
   </wsdl:message>
   <wsdl:message name="ILobbyService_UpdateAvatar_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdateAvatar" />
@@ -128,6 +134,8 @@
     </wsdl:operation>
     <wsdl:operation name="SendChatMessage">
       <wsdl:input wsaw:Action="http://tempuri.org/ILobbyService/SendChatMessage" message="tns:ILobbyService_SendChatMessage_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILobbyService/SendChatMessageResponse" message="tns:ILobbyService_SendChatMessage_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/ILobbyService/SendChatMessageServiceFaultFault" name="ServiceFaultFault" message="tns:ILobbyService_SendChatMessage_ServiceFaultFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetMyProfile">
       <wsdl:input wsaw:Action="http://tempuri.org/ILobbyService/GetMyProfile" message="tns:ILobbyService_GetMyProfile_InputMessage" />
@@ -218,6 +226,12 @@
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceFaultFault">
+        <soap12:fault use="literal" name="ServiceFaultFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="GetMyProfile">
       <soap12:operation soapAction="http://tempuri.org/ILobbyService/GetMyProfile" style="document" />
@@ -327,9 +341,9 @@
   </wsdl:binding>
   <wsdl:service name="LobbyService">
     <wsdl:port name="NetTcpBinding_ILobbyService" binding="tns:NetTcpBinding_ILobbyService">
-      <soap12:address location="net.tcp://localhost:8092/lobby/" />
+      <soap12:address location="net.tcp://172.20.10.2:8092/lobby/" />
       <wsa10:EndpointReference>
-        <wsa10:Address>net.tcp://localhost:8092/lobby/</wsa10:Address>
+        <wsa10:Address>net.tcp://172.20.10.2:8092/lobby/</wsa10:Address>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>

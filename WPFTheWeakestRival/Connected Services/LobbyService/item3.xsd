@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
-  <xs:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:import schemaLocation="http://172.20.10.2:8082/lobby/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" />
+  <xs:import schemaLocation="http://172.20.10.2:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:element name="JoinLobby">
     <xs:complexType>
       <xs:sequence>
@@ -49,6 +49,13 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="SendChatMessageResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="SendChatMessageResult" nillable="true" type="q7:BasicResponse" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetMyProfile">
     <xs:complexType>
       <xs:sequence>
@@ -59,70 +66,70 @@
   <xs:element name="GetMyProfileResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetMyProfileResult" nillable="true" type="q7:UpdateAccountResponse" />
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="GetMyProfileResult" nillable="true" type="q8:UpdateAccountResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="UpdateAccount">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q8:UpdateAccountRequest" />
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q9:UpdateAccountRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="UpdateAccountResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="UpdateAccountResult" nillable="true" type="q9:UpdateAccountResponse" />
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="UpdateAccountResult" nillable="true" type="q10:UpdateAccountResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CreateLobby">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q10:CreateLobbyRequest" />
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q11:CreateLobbyRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CreateLobbyResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="CreateLobbyResult" nillable="true" type="q11:CreateLobbyResponse" />
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="CreateLobbyResult" nillable="true" type="q12:CreateLobbyResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="JoinByCode">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q12:JoinByCodeRequest" />
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q13:JoinByCodeRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="JoinByCodeResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="JoinByCodeResult" nillable="true" type="q13:JoinByCodeResponse" />
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="JoinByCodeResult" nillable="true" type="q14:JoinByCodeResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="StartLobbyMatch">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q14:StartLobbyMatchRequest" />
+        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q15:StartLobbyMatchRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="StartLobbyMatchResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="StartLobbyMatchResult" nillable="true" type="q15:StartLobbyMatchResponse" />
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="StartLobbyMatchResult" nillable="true" type="q16:StartLobbyMatchResponse" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="UpdateAvatar">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q16:UpdateAvatarRequest" />
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="request" nillable="true" type="q17:UpdateAvatarRequest" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -134,42 +141,42 @@
   <xs:element name="OnLobbyUpdated">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="lobby" nillable="true" type="q17:LobbyInfo" />
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="lobby" nillable="true" type="q18:LobbyInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnPlayerJoined">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="player" nillable="true" type="q18:PlayerSummary" />
+        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="player" nillable="true" type="q19:PlayerSummary" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnPlayerLeft">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="playerId" type="q19:guid" />
+        <xs:element xmlns:q20="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="playerId" type="q20:guid" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnChatMessageReceived">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="message" nillable="true" type="q20:ChatMessage" />
+        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="message" nillable="true" type="q21:ChatMessage" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnMatchStarted">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="match" nillable="true" type="q21:MatchInfo" />
+        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="match" nillable="true" type="q22:MatchInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="ForcedLogout">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="notification" nillable="true" type="q22:ForcedLogoutNotification" />
+        <xs:element xmlns:q23="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" minOccurs="0" name="notification" nillable="true" type="q23:ForcedLogoutNotification" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

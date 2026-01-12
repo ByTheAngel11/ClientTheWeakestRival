@@ -11,24 +11,38 @@ namespace WPFTheWeakestRival.Infrastructure
     [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public sealed class LobbyHub : ILobbyServiceCallback, IDisposable, IStoppable
     {
-        private const byte DEFAULT_MAX_PLAYERS = 8;
-        private const byte MIN_ALLOWED_MAX_PLAYERS = 1;
+        private const byte DefaultMaxPlayers = 8;
+        private const byte MinAllowedMaxPlayers = 1;
 
-        private const string ERROR_TOKEN_REQUIRED = "Token requerido.";
-        private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
+        private const string ErrorTokenRequired = "Token requerido.";
+        private const string ErrorEndpointRequired = "Endpoint name cannot be null or whitespace.";
 
-        private const string LOG_UI_ERROR = "LobbyHub.Ui error.";
-        private const string LOG_CHANNEL_FAULTED_CREATE = "CreateLobbyAsync called with channel Faulted.";
-        private const string LOG_CHANNEL_FAULTED_JOIN = "JoinByCodeAsync called with channel Faulted.";
-        private const string LOG_CHANNEL_FAULTED_START = "StartLobbyMatchAsync called with channel Faulted.";
+        private const string LogUiError = "LobbyHub.Ui error.";
+        private const string LogChannelFaultedCreate = "CreateLobbyAsync called with channel Faulted.";
+        private const string LogChannelFaultedJoin = "JoinByCodeAsync called with channel Faulted.";
+        private const string LogChannelFaultedStart = "StartLobbyMatchAsync called with channel Faulted.";
+
+        private const int ReconnectIntervalSeconds = 2;
+        private const int ReconnectTestTimeoutSeconds = 3;
+
+        private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(ReconnectIntervalSeconds);
+        private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(ReconnectTestTimeoutSeconds);
 
         private static readonly DispatcherPriority UiDispatcherPriority = DispatcherPriority.Send;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyHub));
 
-        private readonly LobbyServiceClient client;
         private readonly Dispatcher dispatcher;
+        private readonly object reconnectSyncRoot = new object();
+
+        private LobbyServiceClient client;
+        private DispatcherTimer reconnectTimer;
 
         private bool isStoppedOrDisposed;
+
+        private readonly string endpointName;
+
+        private string lastToken = string.Empty;
+        private string lastAccessCode = string.Empty;
 
         public Guid? CurrentLobbyId { get; private set; }
 
@@ -41,36 +55,37 @@ namespace WPFTheWeakestRival.Infrastructure
         public event Action<MatchInfo> MatchStarted;
         public event Action<ForcedLogoutNotification> ForcedLogout;
 
+        public event Action<Exception> ChatSendFailed;
+
         public LobbyHub(string endpointName)
         {
             if (string.IsNullOrWhiteSpace(endpointName))
             {
-                throw new ArgumentException(ERROR_ENDPOINT_REQUIRED, nameof(endpointName));
+                throw new ArgumentException(ErrorEndpointRequired, nameof(endpointName));
             }
 
             dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
+            this.endpointName = endpointName.Trim();
 
-            var instanceContext = new InstanceContext(this);
-            client = new LobbyServiceClient(instanceContext, endpointName);
+            RecreateClient();
         }
 
         public LobbyServiceClient RawClient => client;
 
-        public async Task<CreateLobbyResponse> CreateLobbyAsync(
-            string token,
-            string lobbyName,
-            byte maxPlayers = DEFAULT_MAX_PLAYERS)
+        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token, string lobbyName, byte maxPlayers = DefaultMaxPlayers)
         {
             EnsureToken(token);
+
+            lastToken = token ?? string.Empty;
 
             if (isStoppedOrDisposed)
             {
                 return new CreateLobbyResponse();
             }
 
-            if (client.State == CommunicationState.Faulted)
+            if (IsClientFaulted(LogChannelFaultedCreate))
             {
-                Logger.Warn(LOG_CHANNEL_FAULTED_CREATE);
+                StartReconnectLoop();
                 return new CreateLobbyResponse();
             }
 
@@ -90,7 +105,10 @@ namespace WPFTheWeakestRival.Infrastructure
                 {
                     CurrentLobbyId = response.Lobby.LobbyId;
                     CurrentAccessCode = response.Lobby.AccessCode ?? string.Empty;
+                    lastAccessCode = CurrentAccessCode ?? string.Empty;
                 }
+
+                StopReconnectLoop();
 
                 return response ?? new CreateLobbyResponse();
             }
@@ -106,11 +124,13 @@ namespace WPFTheWeakestRival.Infrastructure
             catch (CommunicationException ex)
             {
                 Logger.Warn("CreateLobbyAsync communication error.", ex);
+                OnChannelDead("CreateLobbyAsync communication error.");
                 return new CreateLobbyResponse();
             }
             catch (TimeoutException ex)
             {
                 Logger.Warn("CreateLobbyAsync timeout.", ex);
+                OnChannelDead("CreateLobbyAsync timeout.");
                 return new CreateLobbyResponse();
             }
             catch (Exception ex)
@@ -124,6 +144,8 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             EnsureToken(token);
 
+            lastToken = token ?? string.Empty;
+
             if (isStoppedOrDisposed)
             {
                 return new JoinByCodeResponse();
@@ -135,8 +157,11 @@ namespace WPFTheWeakestRival.Infrastructure
                 return new JoinByCodeResponse();
             }
 
-            if (IsClientFaulted(LOG_CHANNEL_FAULTED_JOIN))
+            lastAccessCode = normalizedCode;
+
+            if (IsClientFaulted(LogChannelFaultedJoin))
             {
+                StartReconnectLoop();
                 return new JoinByCodeResponse();
             }
 
@@ -158,6 +183,8 @@ namespace WPFTheWeakestRival.Infrastructure
 
                 UpdateLobbyContextFromJoinResponse(response, normalizedCode);
 
+                StopReconnectLoop();
+
                 return response ?? new JoinByCodeResponse();
             }
             catch (FaultException<ServiceFault> ex)
@@ -172,11 +199,13 @@ namespace WPFTheWeakestRival.Infrastructure
             catch (CommunicationException ex)
             {
                 Logger.Warn("JoinByCodeAsync communication error.", ex);
+                OnChannelDead("JoinByCodeAsync communication error.");
                 return new JoinByCodeResponse();
             }
             catch (TimeoutException ex)
             {
                 Logger.Warn("JoinByCodeAsync timeout.", ex);
+                OnChannelDead("JoinByCodeAsync timeout.");
                 return new JoinByCodeResponse();
             }
             catch (Exception ex)
@@ -198,6 +227,8 @@ namespace WPFTheWeakestRival.Infrastructure
             CurrentAccessCode = string.IsNullOrWhiteSpace(response.Lobby.AccessCode)
                 ? normalizedCode
                 : response.Lobby.AccessCode;
+
+            lastAccessCode = CurrentAccessCode ?? string.Empty;
         }
 
         public async Task LeaveLobbyAsync(string token)
@@ -207,6 +238,8 @@ namespace WPFTheWeakestRival.Infrastructure
                 ResetLobbyContext();
                 return;
             }
+
+            lastToken = token ?? string.Empty;
 
             if (isStoppedOrDisposed)
             {
@@ -219,6 +252,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 if (client.State == CommunicationState.Faulted)
                 {
                     ResetLobbyContext();
+                    StartReconnectLoop();
                     return;
                 }
 
@@ -233,14 +267,17 @@ namespace WPFTheWeakestRival.Infrastructure
             catch (CommunicationObjectFaultedException ex)
             {
                 Logger.Warn("CommunicationObjectFaultedException while leaving lobby.", ex);
+                OnChannelDead("LeaveLobbyAsync channel faulted.");
             }
             catch (CommunicationException ex)
             {
                 Logger.Warn("CommunicationException while leaving lobby.", ex);
+                OnChannelDead("LeaveLobbyAsync communication error.");
             }
             catch (TimeoutException ex)
             {
                 Logger.Warn("TimeoutException while leaving lobby.", ex);
+                OnChannelDead("LeaveLobbyAsync timeout.");
             }
             catch (Exception ex)
             {
@@ -252,7 +289,7 @@ namespace WPFTheWeakestRival.Infrastructure
             }
         }
 
-        public Task SendMessageAsync(string token, Guid lobbyId, string message)
+        public async Task SendMessageAsync(string token, Guid lobbyId, string message)
         {
             bool hasValidToken = !string.IsNullOrWhiteSpace(token);
             bool hasValidLobbyId = lobbyId != Guid.Empty;
@@ -260,8 +297,10 @@ namespace WPFTheWeakestRival.Infrastructure
 
             if (!hasValidToken || !hasValidLobbyId || !hasValidMessage || isStoppedOrDisposed)
             {
-                return Task.CompletedTask;
+                return;
             }
+
+            lastToken = token ?? string.Empty;
 
             var request = new SendLobbyMessageRequest
             {
@@ -270,7 +309,41 @@ namespace WPFTheWeakestRival.Infrastructure
                 Message = message
             };
 
-            return Task.Run(() => SendChatMessageInternal(request));
+            try
+            {
+                if (client.State == CommunicationState.Faulted)
+                {
+                    var ex = new CommunicationException("El cliente de lobby está en estado 'Faulted'.");
+                    Logger.Warn("SendMessageAsync: channel faulted.", ex);
+                    RaiseChatSendFailed(ex);
+                    StartReconnectLoop();
+                    throw ex;
+                }
+
+                await client.SendChatMessageAsync(request).ConfigureAwait(false);
+
+                StopReconnectLoop();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("SendMessageAsync communication error.", ex);
+                RaiseChatSendFailed(ex);
+                StartReconnectLoop();
+                throw;
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("SendMessageAsync timeout.", ex);
+                RaiseChatSendFailed(ex);
+                StartReconnectLoop();
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("SendMessageAsync unexpected error.", ex);
+                RaiseChatSendFailed(ex);
+                throw;
+            }
         }
 
         public UpdateAccountResponse GetMyProfile(string token)
@@ -280,10 +353,13 @@ namespace WPFTheWeakestRival.Infrastructure
                 return new UpdateAccountResponse();
             }
 
+            lastToken = token ?? string.Empty;
+
             try
             {
                 if (client.State == CommunicationState.Faulted)
                 {
+                    StartReconnectLoop();
                     return new UpdateAccountResponse();
                 }
 
@@ -301,11 +377,13 @@ namespace WPFTheWeakestRival.Infrastructure
             catch (CommunicationException ex)
             {
                 Logger.Warn("GetMyProfile communication error.", ex);
+                OnChannelDead("GetMyProfile communication error.");
                 return new UpdateAccountResponse();
             }
             catch (TimeoutException ex)
             {
                 Logger.Warn("GetMyProfile timeout.", ex);
+                OnChannelDead("GetMyProfile timeout.");
                 return new UpdateAccountResponse();
             }
             catch (Exception ex)
@@ -319,6 +397,8 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             EnsureToken(token);
 
+            lastToken = token ?? string.Empty;
+
             if (isStoppedOrDisposed)
             {
                 return new StartLobbyMatchResponse();
@@ -326,7 +406,8 @@ namespace WPFTheWeakestRival.Infrastructure
 
             if (client.State == CommunicationState.Faulted)
             {
-                Logger.Warn(LOG_CHANNEL_FAULTED_START);
+                Logger.Warn(LogChannelFaultedStart);
+                StartReconnectLoop();
                 return new StartLobbyMatchResponse();
             }
 
@@ -339,6 +420,8 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 StartLobbyMatchResponse response =
                     await Task.Run(() => client.StartLobbyMatch(request)).ConfigureAwait(false);
+
+                StopReconnectLoop();
 
                 return response ?? new StartLobbyMatchResponse();
             }
@@ -354,11 +437,13 @@ namespace WPFTheWeakestRival.Infrastructure
             catch (CommunicationException ex)
             {
                 Logger.Warn("StartLobbyMatchAsync communication error.", ex);
+                OnChannelDead("StartLobbyMatchAsync communication error.");
                 return new StartLobbyMatchResponse();
             }
             catch (TimeoutException ex)
             {
                 Logger.Warn("StartLobbyMatchAsync timeout.", ex);
+                OnChannelDead("StartLobbyMatchAsync timeout.");
                 return new StartLobbyMatchResponse();
             }
             catch (Exception ex)
@@ -379,6 +464,7 @@ namespace WPFTheWeakestRival.Infrastructure
                     if (!string.IsNullOrWhiteSpace(lobby.AccessCode))
                     {
                         CurrentAccessCode = lobby.AccessCode;
+                        lastAccessCode = lobby.AccessCode ?? string.Empty;
                     }
                 }
 
@@ -441,13 +527,15 @@ namespace WPFTheWeakestRival.Infrastructure
 
             isStoppedOrDisposed = true;
 
+            StopReconnectLoop();
+
             try
             {
-                if (client.State == CommunicationState.Faulted)
+                if (client != null && client.State == CommunicationState.Faulted)
                 {
                     client.Abort();
                 }
-                else
+                else if (client != null)
                 {
                     client.Close();
                 }
@@ -497,7 +585,19 @@ namespace WPFTheWeakestRival.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Warn(LOG_UI_ERROR, ex);
+                Logger.Warn(LogUiError, ex);
+            }
+        }
+
+        private void RaiseChatSendFailed(Exception ex)
+        {
+            try
+            {
+                Ui(() => ChatSendFailed?.Invoke(ex));
+            }
+            catch (Exception raiseEx)
+            {
+                Logger.Warn("LobbyHub.RaiseChatSendFailed failed.", raiseEx);
             }
         }
 
@@ -505,7 +605,10 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             try
             {
-                client.Abort();
+                if (client != null)
+                {
+                    client.Abort();
+                }
             }
             catch (Exception ex)
             {
@@ -513,33 +616,138 @@ namespace WPFTheWeakestRival.Infrastructure
             }
         }
 
-        private void SendChatMessageInternal(SendLobbyMessageRequest request)
+        private void RecreateClient()
         {
-            if (request == null || isStoppedOrDisposed)
+            SafeAbort();
+
+            var instanceContext = new InstanceContext(this);
+            client = new LobbyServiceClient(instanceContext, endpointName);
+
+            AttachChannelEvents();
+        }
+
+        private void AttachChannelEvents()
+        {
+            try
+            {
+                ICommunicationObject channel = client.InnerChannel;
+
+                channel.Faulted += (_, __) => OnChannelDead("LobbyHub channel faulted.");
+                channel.Closed += (_, __) => OnChannelDead("LobbyHub channel closed.");
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("AttachChannelEvents failed.", ex);
+            }
+        }
+
+        private void OnChannelDead(string reason)
+        {
+            if (isStoppedOrDisposed)
+            {
+                return;
+            }
+
+            var ex = new CommunicationException(reason);
+            Logger.Warn("LobbyHub channel dead.", ex);
+
+            RaiseChatSendFailed(ex);
+
+            StartReconnectLoop();
+        }
+
+        private void StartReconnectLoop()
+        {
+            lock (reconnectSyncRoot)
+            {
+                if (reconnectTimer != null && reconnectTimer.IsEnabled)
+                {
+                    return;
+                }
+
+                if (reconnectTimer == null)
+                {
+                    reconnectTimer = new DispatcherTimer
+                    {
+                        Interval = ReconnectInterval
+                    };
+
+                    reconnectTimer.Tick += async (_, __) => await TryReconnectAsync().ConfigureAwait(false);
+                }
+
+                reconnectTimer.Start();
+            }
+        }
+
+        private void StopReconnectLoop()
+        {
+            lock (reconnectSyncRoot)
+            {
+                if (reconnectTimer == null)
+                {
+                    return;
+                }
+
+                if (reconnectTimer.IsEnabled)
+                {
+                    reconnectTimer.Stop();
+                }
+            }
+        }
+
+        private async Task TryReconnectAsync()
+        {
+            if (isStoppedOrDisposed)
+            {
+                StopReconnectLoop();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(lastToken))
             {
                 return;
             }
 
             try
             {
-                if (client.State == CommunicationState.Faulted)
+                bool mustRecreate = client == null || client.State == CommunicationState.Faulted;
+                if (mustRecreate)
                 {
-                    return;
+                    RecreateClient();
                 }
 
-                client.SendChatMessage(request);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Warn("SendChatMessage communication error.", ex);
-            }
-            catch (TimeoutException ex)
-            {
-                Logger.Warn("SendChatMessage timeout.", ex);
+                try
+                {
+                    client.InnerChannel.OperationTimeout = ReconnectTestTimeout;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Setting OperationTimeout failed.", ex);
+                }
+
+                _ = await Task.Run(() => client.GetMyProfile(lastToken)).ConfigureAwait(false);
+
+                if (!string.IsNullOrWhiteSpace(lastAccessCode))
+                {
+                    var request = new JoinByCodeRequest
+                    {
+                        Token = lastToken,
+                        AccessCode = lastAccessCode
+                    };
+
+                    JoinByCodeResponse response =
+                        await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
+
+                    UpdateLobbyContextFromJoinResponse(response, lastAccessCode);
+                }
+
+                Logger.Info("LobbyHub reconnected successfully.");
+                StopReconnectLoop();
             }
             catch (Exception ex)
             {
-                Logger.Error("SendChatMessage unexpected error.", ex);
+                Logger.Warn("LobbyHub reconnect attempt failed.", ex);
+                SafeAbort();
             }
         }
 
@@ -547,6 +755,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             CurrentLobbyId = null;
             CurrentAccessCode = string.Empty;
+            lastAccessCode = string.Empty;
         }
 
         private static string NormalizeLobbyName(string lobbyName)
@@ -558,21 +767,19 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private static byte NormalizeMaxPlayers(byte requestedMaxPlayers)
         {
-            return requestedMaxPlayers < MIN_ALLOWED_MAX_PLAYERS
-                ? DEFAULT_MAX_PLAYERS
+            return requestedMaxPlayers < MinAllowedMaxPlayers
+                ? DefaultMaxPlayers
                 : requestedMaxPlayers;
         }
 
         private static string NormalizeAccessCode(string accessCode)
         {
-            return (accessCode ?? string.Empty)
-                .Trim()
-                .ToUpperInvariant();
+            return (accessCode ?? string.Empty).Trim().ToUpperInvariant();
         }
 
         private bool IsClientFaulted(string logMessage)
         {
-            if (client.State != CommunicationState.Faulted)
+            if (client == null || client.State != CommunicationState.Faulted)
             {
                 return false;
             }
@@ -589,7 +796,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
+                throw new ArgumentException(ErrorTokenRequired, nameof(token));
             }
         }
     }

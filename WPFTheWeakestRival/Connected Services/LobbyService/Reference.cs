@@ -240,11 +240,9 @@ namespace WPFTheWeakestRival.LobbyService {
         
         private string EmailField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private byte[] AvatarBytesField;
+        private bool HasProfileImageField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string AvatarContentTypeField;
+        private string ProfileImageCodeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private WPFTheWeakestRival.LobbyService.AvatarAppearanceDto AvatarField;
@@ -298,33 +296,33 @@ namespace WPFTheWeakestRival.LobbyService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=3)]
-        public byte[] AvatarBytes {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public bool HasProfileImage {
             get {
-                return this.AvatarBytesField;
+                return this.HasProfileImageField;
             }
             set {
-                if ((object.ReferenceEquals(this.AvatarBytesField, value) != true)) {
-                    this.AvatarBytesField = value;
-                    this.RaisePropertyChanged("AvatarBytes");
+                if ((this.HasProfileImageField.Equals(value) != true)) {
+                    this.HasProfileImageField = value;
+                    this.RaisePropertyChanged("HasProfileImage");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=4)]
-        public string AvatarContentType {
+        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
+        public string ProfileImageCode {
             get {
-                return this.AvatarContentTypeField;
+                return this.ProfileImageCodeField;
             }
             set {
-                if ((object.ReferenceEquals(this.AvatarContentTypeField, value) != true)) {
-                    this.AvatarContentTypeField = value;
-                    this.RaisePropertyChanged("AvatarContentType");
+                if ((object.ReferenceEquals(this.ProfileImageCodeField, value) != true)) {
+                    this.ProfileImageCodeField = value;
+                    this.RaisePropertyChanged("ProfileImageCode");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=5)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
         public WPFTheWeakestRival.LobbyService.AvatarAppearanceDto Avatar {
             get {
                 return this.AvatarField;
@@ -835,6 +833,67 @@ namespace WPFTheWeakestRival.LobbyService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true, Order=2)]
+        public string Message {
+            get {
+                return this.MessageField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.MessageField, value) != true)) {
+                    this.MessageField = value;
+                    this.RaisePropertyChanged("Message");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="BasicResponse", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+    [System.SerializableAttribute()]
+    public partial class BasicResponse : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsSuccessField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string MessageField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsSuccess {
+            get {
+                return this.IsSuccessField;
+            }
+            set {
+                if ((this.IsSuccessField.Equals(value) != true)) {
+                    this.IsSuccessField = value;
+                    this.RaisePropertyChanged("IsSuccess");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string Message {
             get {
                 return this.MessageField;
@@ -2186,11 +2245,12 @@ namespace WPFTheWeakestRival.LobbyService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/ListLobbies", ReplyAction="http://tempuri.org/ILobbyService/ListLobbiesResponse")]
         System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.ListLobbiesResponse> ListLobbiesAsync(WPFTheWeakestRival.LobbyService.ListLobbiesRequest request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILobbyService/SendChatMessage")]
-        void SendChatMessage(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/SendChatMessage", ReplyAction="http://tempuri.org/ILobbyService/SendChatMessageResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/SendChatMessageServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
+        WPFTheWeakestRival.LobbyService.BasicResponse SendChatMessage(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILobbyService/SendChatMessage")]
-        System.Threading.Tasks.Task SendChatMessageAsync(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/SendChatMessage", ReplyAction="http://tempuri.org/ILobbyService/SendChatMessageResponse")]
+        System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.BasicResponse> SendChatMessageAsync(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILobbyService/GetMyProfile", ReplyAction="http://tempuri.org/ILobbyService/GetMyProfileResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(WPFTheWeakestRival.LobbyService.ServiceFault), Action="http://tempuri.org/ILobbyService/GetMyProfileServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data")]
@@ -2308,11 +2368,11 @@ namespace WPFTheWeakestRival.LobbyService {
             return base.Channel.ListLobbiesAsync(request);
         }
         
-        public void SendChatMessage(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request) {
-            base.Channel.SendChatMessage(request);
+        public WPFTheWeakestRival.LobbyService.BasicResponse SendChatMessage(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request) {
+            return base.Channel.SendChatMessage(request);
         }
         
-        public System.Threading.Tasks.Task SendChatMessageAsync(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request) {
+        public System.Threading.Tasks.Task<WPFTheWeakestRival.LobbyService.BasicResponse> SendChatMessageAsync(WPFTheWeakestRival.LobbyService.SendLobbyMessageRequest request) {
             return base.Channel.SendChatMessageAsync(request);
         }
         

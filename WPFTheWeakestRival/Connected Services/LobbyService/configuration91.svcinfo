@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="9.1" CheckSum="1/0nXgNxzmP2zQ8q6nvf3ZPY5jQUE++FhUlSMNJxjzs=">
+<SavedWcfConfigurationInformation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="9.1" CheckSum="L1xuRP9hLW9qA62ulxuDN5RceS6I0hMh6PGO4mC3QNw=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="netTcpBinding" name="NetTcpBinding_ILobbyService">
       <properties>
@@ -121,10 +121,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="NetTcpBinding_ILobbyService" contract="LobbyService.ILobbyService" bindingType="netTcpBinding" address="net.tcp://localhost:8092/lobby/" bindingConfiguration="NetTcpBinding_ILobbyService">
+    <endpoint name="NetTcpBinding_ILobbyService" contract="LobbyService.ILobbyService" bindingType="netTcpBinding" address="net.tcp://172.20.10.2:8092/lobby/" bindingConfiguration="NetTcpBinding_ILobbyService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>net.tcp://localhost:8092/lobby/</serializedValue>
+          <serializedValue>net.tcp://172.20.10.2:8092/lobby/</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

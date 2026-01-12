@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/ServicesTheWeakestRival.Contracts.Data" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:import schemaLocation="http://172.20.10.2:8082/lobby/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:complexType name="JoinLobbyRequest">
     <xs:sequence>
       <xs:element name="Token" nillable="true" type="xs:string" />
@@ -35,27 +35,9 @@
       <xs:element name="AccountId" type="xs:int" />
       <xs:element name="DisplayName" nillable="true" type="xs:string" />
       <xs:element name="Email" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="AvatarBytes" nillable="true" type="xs:base64Binary">
-        <xs:annotation>
-          <xs:appinfo>
-            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:element>
-      <xs:element minOccurs="0" name="AvatarContentType" nillable="true" type="xs:string">
-        <xs:annotation>
-          <xs:appinfo>
-            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:element>
-      <xs:element minOccurs="0" name="Avatar" nillable="true" type="tns:AvatarAppearanceDto">
-        <xs:annotation>
-          <xs:appinfo>
-            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:element>
+      <xs:element name="HasProfileImage" type="xs:boolean" />
+      <xs:element name="ProfileImageCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Avatar" nillable="true" type="tns:AvatarAppearanceDto" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="AccountMini" nillable="true" type="tns:AccountMini" />
@@ -163,6 +145,13 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SendLobbyMessageRequest" nillable="true" type="tns:SendLobbyMessageRequest" />
+  <xs:complexType name="BasicResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="IsSuccess" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BasicResponse" nillable="true" type="tns:BasicResponse" />
   <xs:complexType name="UpdateAccountResponse">
     <xs:sequence>
       <xs:element name="UserId" type="xs:int" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows.Media;
 using WPFTheWeakestRival.Models;
 using LobbyAccountMini = WPFTheWeakestRival.LobbyService.AccountMini;
@@ -10,6 +11,7 @@ namespace WPFTheWeakestRival.Helpers
     public static class LobbyAvatarHelper
     {
         private const int DEFAULT_AVATAR_SIZE = 40;
+        private const string DEFAULT_PLAYER_NAME_FORMAT = "Jugador {0}";
 
         public static LobbyPlayerItem BuildFromAccountMini(LobbyAccountMini account)
         {
@@ -22,8 +24,8 @@ namespace WPFTheWeakestRival.Helpers
             {
                 AccountId = account.AccountId,
                 DisplayName = string.IsNullOrWhiteSpace(account.DisplayName)
-                    ? string.Format("Jugador {0}", account.AccountId)
-                    : account.DisplayName,
+                    ? string.Format(CultureInfo.CurrentCulture, DEFAULT_PLAYER_NAME_FORMAT, account.AccountId)
+                    : account.DisplayName.Trim(),
                 IsMe = false
             };
 
@@ -82,7 +84,12 @@ namespace WPFTheWeakestRival.Helpers
                 return null;
             }
 
-            return UiImageHelper.TryCreateFromBytes(account.AvatarBytes, DEFAULT_AVATAR_SIZE);
+            if (!HasProfilePhoto(account))
+            {
+                return null;
+            }
+
+            return UiImageHelper.TryCreateFromProfileCode(account.ProfileImageCode, DEFAULT_AVATAR_SIZE);
         }
 
         private static bool HasProfilePhoto(LobbyAccountMini account)
@@ -92,8 +99,12 @@ namespace WPFTheWeakestRival.Helpers
                 return false;
             }
 
-            byte[] bytes = account.AvatarBytes;
-            return bytes != null && bytes.Length > 0;
+            if (!account.HasProfileImage)
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(account.ProfileImageCode);
         }
 
         private static AvatarAppearance MapAvatarAppearance(

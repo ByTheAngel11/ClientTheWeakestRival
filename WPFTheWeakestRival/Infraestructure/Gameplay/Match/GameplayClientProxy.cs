@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ServiceModel;
 using System.Threading.Tasks;
 using log4net;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
@@ -10,22 +9,43 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GameplayClientProxy));
 
-        private readonly GameplayServiceProxy.GameplayServiceClient client;
+        private const string ERROR_HUB_REQUIRED = "GameplayHub is required.";
+        private const string ERROR_CLIENT_NOT_AVAILABLE = "Gameplay client is not available.";
+
+        private readonly WPFTheWeakestRival.Infrastructure.Gameplay.GameplayHub hub;
         private bool isDisposed;
 
-        public GameplayClientProxy(GameplayServiceProxy.GameplayServiceClient client)
+        public GameplayClientProxy(WPFTheWeakestRival.Infrastructure.Gameplay.GameplayHub hub)
         {
-            this.client = client ?? throw new ArgumentNullException(nameof(client));
+            if (hub == null)
+            {
+                throw new ArgumentNullException(nameof(hub), ERROR_HUB_REQUIRED);
+            }
+
+            this.hub = hub;
         }
 
-        public GameplayServiceProxy.GameplayServiceClient Client => client;
+        private GameplayServiceProxy.GameplayServiceClient Client
+        {
+            get
+            {
+                GameplayServiceProxy.GameplayServiceClient client = hub.RawClient;
+                if (client == null)
+                {
+                    throw new InvalidOperationException(ERROR_CLIENT_NOT_AVAILABLE);
+                }
 
-        public Task JoinMatchAsync(GameplayServiceProxy.GameplayJoinMatchRequest request)
+                return client;
+            }
+        }
+
+        public Task<GameplayServiceProxy.GameplayJoinMatchResponse> JoinMatchAsync(
+            GameplayServiceProxy.GameplayJoinMatchRequest request)
         {
             ValidateNotDisposed();
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return client.JoinMatchAsync(request);
+            return hub.JoinMatchAsync(request);
         }
 
         public Task StartMatchAsync(GameplayServiceProxy.GameplayStartMatchRequest request)
@@ -33,15 +53,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ValidateNotDisposed();
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return client.StartMatchAsync(request);
+            return Client.StartMatchAsync(request);
         }
 
-        public Task SubmitAnswerAsync(GameplayServiceProxy.SubmitAnswerRequest request)
+        public Task<GameplayServiceProxy.SubmitAnswerResponse> SubmitAnswerAsync(
+            GameplayServiceProxy.SubmitAnswerRequest request)
         {
             ValidateNotDisposed();
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return client.SubmitAnswerAsync(request);
+            return Client.SubmitAnswerAsync(request);
         }
 
         public Task<GameplayServiceProxy.BankResponse> BankAsync(GameplayServiceProxy.BankRequest request)
@@ -49,7 +70,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ValidateNotDisposed();
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return client.BankAsync(request);
+            return Client.BankAsync(request);
         }
 
         public Task CastVoteAsync(GameplayServiceProxy.CastVoteRequest request)
@@ -57,7 +78,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ValidateNotDisposed();
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return client.CastVoteAsync(request);
+            return Client.CastVoteAsync(request);
         }
 
         public Task ChooseDuelOpponentAsync(GameplayServiceProxy.ChooseDuelOpponentRequest request)
@@ -65,7 +86,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ValidateNotDisposed();
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return client.ChooseDuelOpponentAsync(request);
+            return Client.ChooseDuelOpponentAsync(request);
         }
 
         private void ValidateNotDisposed()
@@ -80,31 +101,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             try
             {
-                if (client == null)
-                {
-                    return;
-                }
-
-                if (client.State == CommunicationState.Faulted)
-                {
-                    client.Abort();
-                    return;
-                }
-
-                client.Close();
+                hub.Stop();
             }
             catch (Exception ex)
             {
                 Logger.Warn("GameplayClientProxy.CloseSafely error.", ex);
-
-                try
-                {
-                    client.Abort();
-                }
-                catch (Exception abortEx)
-                {
-                    Logger.Warn("GameplayClientProxy.Abort error.", abortEx);
-                }
             }
         }
 

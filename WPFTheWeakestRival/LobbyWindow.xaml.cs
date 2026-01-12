@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Navigation;
+using System.Windows.Threading;
 using log4net;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.FriendService;
@@ -86,6 +87,12 @@ namespace WPFTheWeakestRival
         private string lastSentText = string.Empty;
         private DateTime lastSentUtc = DateTime.MinValue;
 
+        private readonly ObservableCollection<PendingMessage> pendingMessages =
+            new ObservableCollection<PendingMessage>();
+
+        private readonly DispatcherTimer pendingRetryTimer;
+        private bool isRetryingPending;
+
         private readonly ObservableCollection<FriendItem> friendItems = new ObservableCollection<FriendItem>();
         private int pendingRequestsCount;
 
@@ -107,6 +114,14 @@ namespace WPFTheWeakestRival
             public string Author { get; set; } = string.Empty;
             public string Text { get; set; } = string.Empty;
             public string Time { get; set; } = string.Empty;
+        }
+
+        private sealed class PendingMessage
+        {
+            public string Token { get; set; } = string.Empty;
+            public Guid LobbyId { get; set; }
+            public string Text { get; set; } = string.Empty;
+            public DateTime QueuedUtc { get; set; } = DateTime.UtcNow;
         }
 
         public LobbyWindow()
@@ -149,11 +164,30 @@ namespace WPFTheWeakestRival
             AppServices.Lobby.ChatMessageReceived += OnChatMessageReceivedFromHub;
             AppServices.Lobby.MatchStarted += OnMatchStartedFromHub;
             AppServices.Lobby.ForcedLogout += OnForcedLogoutFromHub;
+            AppServices.Lobby.ChatSendFailed += OnChatSendFailed;
 
             AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
             AppServices.Friends.Start();
 
             RefreshProfileButtonAvatar();
+
+            pendingRetryTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(5)
+            };
+            pendingRetryTimer.Tick += async (_, __) => await RetryPendingMessagesAsync();
+
+            pendingMessages.CollectionChanged += (_, __) =>
+            {
+                if (pendingMessages.Count > 0 && !pendingRetryTimer.IsEnabled)
+                {
+                    pendingRetryTimer.Start();
+                }
+                else if (pendingMessages.Count == 0 && pendingRetryTimer.IsEnabled)
+                {
+                    pendingRetryTimer.Stop();
+                }
+            };
 
             Loaded += async (_, __) =>
             {
@@ -222,6 +256,16 @@ namespace WPFTheWeakestRival
                 MapPlayerToLobbyItem);
         }
 
+        private void OnChatSendFailed(Exception ex)
+        {
+            if (ex == null)
+            {
+                return;
+            }
+
+            Ui(() => AppendSystemLine(Lang.noConnection));
+        }
+
         private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
             var defaults = new MatchSettingsDefaults(
@@ -266,7 +310,6 @@ namespace WPFTheWeakestRival
                 isTiebreakCoinflipAllowed = page.AllowTiebreakCoinflip;
             }
         }
-
 
         private void BtnFriendsClick(object sender, RoutedEventArgs e)
         {
@@ -762,11 +805,94 @@ namespace WPFTheWeakestRival
             {
                 Logger.Error("Error sending chat message in lobby.", ex);
 
+                EnqueuePendingMessage(token, currentLobbyId.Value, messageText);
+
                 MessageBox.Show(
-                    Lang.chatSendFailed,
+                    Lang.noConnection,
                     Lang.chatTitle,
                     MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    MessageBoxImage.Information);
+
+                if (txtChatInput != null)
+                {
+                    txtChatInput.Text = string.Empty;
+                }
+            }
+        }
+
+        private void EnqueuePendingMessage(string token, Guid lobbyId, string text)
+        {
+            try
+            {
+                var pm = new PendingMessage
+                {
+                    Token = token ?? string.Empty,
+                    LobbyId = lobbyId,
+                    Text = text ?? string.Empty,
+                    QueuedUtc = DateTime.UtcNow
+                };
+
+                pendingMessages.Add(pm);
+                AppendSystemLine(Lang.noConnection);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Error enqueueing pending chat message.", ex);
+            }
+        }
+
+        private async Task RetryPendingMessagesAsync()
+        {
+            if (isRetryingPending)
+            {
+                return;
+            }
+
+            if (pendingMessages.Count == 0)
+            {
+                if (pendingRetryTimer.IsEnabled)
+                {
+                    pendingRetryTimer.Stop();
+                }
+
+                return;
+            }
+
+            isRetryingPending = true;
+
+            try
+            {
+                var copy = new PendingMessage[pendingMessages.Count];
+                pendingMessages.CopyTo(copy, 0);
+
+                foreach (var pm in copy)
+                {
+                    try
+                    {
+                        if (pm == null)
+                        {
+                            continue;
+                        }
+
+                        if (!currentLobbyId.HasValue || currentLobbyId.Value != pm.LobbyId)
+                        {
+                            pendingMessages.Remove(pm);
+                            continue;
+                        }
+
+                        await AppServices.Lobby.SendMessageAsync(pm.Token, pm.LobbyId, pm.Text);
+
+                        pendingMessages.Remove(pm);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn("Reintento de mensaje pendiente falló.", ex);
+                    }
+                }
+            }
+            finally
+            {
+                isRetryingPending = false;
             }
         }
 
@@ -918,6 +1044,7 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.ChatMessageReceived -= OnChatMessageReceivedFromHub;
                 AppServices.Lobby.MatchStarted -= OnMatchStartedFromHub;
                 AppServices.Lobby.ForcedLogout -= OnForcedLogoutFromHub;
+                AppServices.Lobby.ChatSendFailed -= OnChatSendFailed;
 
                 AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
 
@@ -925,6 +1052,18 @@ namespace WPFTheWeakestRival
                 {
                     lstFriends.PreviewMouseRightButtonDown -= LstFriendsPreviewMouseRightButtonDown;
                     lstFriends.ContextMenuOpening -= LstFriendsContextMenuOpening;
+                }
+
+                try
+                {
+                    if (pendingRetryTimer != null && pendingRetryTimer.IsEnabled)
+                    {
+                        pendingRetryTimer.Stop();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("Error stopping pendingRetryTimer on unload.", ex);
                 }
             }
             catch (Exception ex)
@@ -1056,216 +1195,6 @@ namespace WPFTheWeakestRival
             catch (Exception ex)
             {
                 Logger.Error("Error handling OnMatchStartedFromHub in LobbyWindow.", ex);
-            }
-        }
-
-        private async void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                LobbyPlayerItem targetPlayer = TryGetReportTargetPlayer(sender);
-                if (targetPlayer == null)
-                {
-                    return;
-                }
-
-                string token = GetSessionTokenOrShowMessage();
-                if (string.IsNullOrWhiteSpace(token))
-                {
-                    return;
-                }
-
-                var dialog = CreateReportDialog(targetPlayer.DisplayName);
-                bool? dialogResult = dialog.ShowDialog();
-                if (dialogResult != true)
-                {
-                    return;
-                }
-
-                await SubmitReportAsync(token, targetPlayer, dialog);
-            }
-            catch (FaultException<ReportService.ServiceFault> ex)
-            {
-                if (IsReportCooldownFault(ex))
-                {
-                    MessageBox.Show(
-                        Lang.reportCooldown,
-                        Lang.reportPlayer,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-
-                    return;
-                }
-
-                Logger.Warn("Report fault in lobby.", ex);
-
-                MessageBox.Show(
-                    Lang.reportFailed,
-                    Lang.reportPlayer,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while submitting report.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.reportPlayer,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Unexpected error while submitting report.", ex);
-
-                MessageBox.Show(
-                    Lang.reportUnexpectedError,
-                    Lang.reportPlayer,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-        }
-
-        private static bool IsReportCooldownFault(FaultException<ReportService.ServiceFault> ex)
-        {
-            return ex != null &&
-                ex.Detail != null &&
-                string.Equals(ex.Detail.Code, FAULT_REPORT_COOLDOWN, StringComparison.Ordinal);
-        }
-
-        private static LobbyPlayerItem TryGetReportTargetPlayer(object sender)
-        {
-            var menuItem = sender as MenuItem;
-            if (menuItem == null)
-            {
-                return null;
-            }
-
-            var targetPlayer = menuItem.CommandParameter as LobbyPlayerItem;
-            if (targetPlayer == null || targetPlayer.IsMe)
-            {
-                return null;
-            }
-
-            return targetPlayer;
-        }
-
-        private WPFTheWeakestRival.Windows.ReportPlayerWindow CreateReportDialog(string displayName)
-        {
-            return new WPFTheWeakestRival.Windows.ReportPlayerWindow(displayName)
-            {
-                Owner = this
-            };
-        }
-
-        private async Task SubmitReportAsync(
-            string token,
-            LobbyPlayerItem targetPlayer,
-            WPFTheWeakestRival.Windows.ReportPlayerWindow dialog)
-        {
-            var client = new ReportService.ReportServiceClient("WSHttpBinding_IReportService");
-
-            try
-            {
-                var request = BuildReportRequest(token, targetPlayer, dialog);
-
-                ReportService.SubmitPlayerReportResponse response =
-                    await Task.Run(() => client.SubmitPlayerReport(request));
-
-                ShowReportResult(response);
-            }
-            finally
-            {
-                CloseClientSafely(client, "ReportServiceClient");
-            }
-        }
-
-        private ReportService.SubmitPlayerReportRequest BuildReportRequest(
-            string token,
-            LobbyPlayerItem targetPlayer,
-            WPFTheWeakestRival.Windows.ReportPlayerWindow dialog)
-        {
-            return new ReportService.SubmitPlayerReportRequest
-            {
-                Token = token,
-                ReportedAccountId = targetPlayer.AccountId,
-                LobbyId = currentLobbyId,
-                ReasonCode = (ReportService.ReportReasonCode)dialog.SelectedReasonCode,
-                Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? string.Empty : dialog.Comment
-            };
-        }
-
-        private void ShowReportResult(ReportService.SubmitPlayerReportResponse response)
-        {
-            if (response != null && response.SanctionApplied && TryShowSanctionMessage(response))
-            {
-                return;
-            }
-
-            MessageBox.Show(
-                Lang.reportSent,
-                Lang.reportPlayer,
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-        }
-
-        private static bool TryShowSanctionMessage(ReportService.SubmitPlayerReportResponse response)
-        {
-            if (response == null)
-            {
-                return false;
-            }
-
-            if (response.SanctionType == ACCOUNT_STATUS_SUSPENDED && response.SanctionEndAtUtc.HasValue)
-            {
-                string localEnd = response.SanctionEndAtUtc.Value
-                    .ToLocalTime()
-                    .ToString(SANCTION_END_TIME_FORMAT, CultureInfo.CurrentCulture);
-
-                MessageBox.Show(
-                    string.Format(CultureInfo.CurrentCulture, Lang.reportSanctionTemporary, localEnd),
-                    Lang.reportPlayer,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
-                return true;
-            }
-
-            if (response.SanctionType == ACCOUNT_STATUS_BANNED)
-            {
-                MessageBox.Show(
-                    Lang.reportSanctionPermanent,
-                    Lang.reportPlayer,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            try
-            {
-                var element = sender as FrameworkElement;
-                if (element == null)
-                {
-                    return;
-                }
-
-                var player = element.DataContext as LobbyPlayerItem;
-                if (player != null && player.IsMe)
-                {
-                    e.Handled = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error while opening lobby player context menu.", ex);
-                e.Handled = true;
             }
         }
 
@@ -1423,6 +1352,70 @@ namespace WPFTheWeakestRival
             }
         }
 
+
+        private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            try
+            {
+                var element = sender as FrameworkElement;
+                var item = element?.DataContext as LobbyPlayerItem;
+
+                if (item == null)
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                if (item.IsMe)
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                if (!currentLobbyId.HasValue || currentLobbyId.Value == Guid.Empty)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("LobbyPlayerContextMenuOpening error.", ex);
+                e.Handled = true;
+            }
+        }
+
+        private void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var menuItem = sender as MenuItem;
+                var target = menuItem?.CommandParameter as LobbyPlayerItem;
+
+                if (target == null || target.IsMe)
+                {
+                    return;
+                }
+
+
+                MessageBox.Show(
+                    Lang.UiGenericError,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("MenuItemReportPlayerClick error.", ex);
+
+                MessageBox.Show(
+                    Lang.UiGenericError,
+                    Lang.lobbyTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
         private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
         {
             while (current != null)
@@ -1436,138 +1429,6 @@ namespace WPFTheWeakestRival
             }
 
             return null;
-        }
-
-        private void FriendItemContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            try
-            {
-                var element = sender as FrameworkElement;
-                var friend = element?.DataContext as FriendItem;
-
-                if (friend == null)
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                if (element.ContextMenu == null)
-                {
-                    element.ContextMenu = new ContextMenu();
-                }
-
-                element.ContextMenu.Items.Clear();
-
-                var inviteItem = new MenuItem
-                {
-                    Header = INVITE_MENU_HEADER,
-                    CommandParameter = friend,
-                    IsEnabled =
-                        !string.IsNullOrWhiteSpace(currentAccessCode) &&
-                        friend.AccountId > 0
-                };
-
-                inviteItem.Click += MenuItemInviteLobbyByEmailClick;
-
-                element.ContextMenu.Items.Add(inviteItem);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error opening friend context menu.", ex);
-                e.Handled = true;
-            }
-        }
-
-        private async void MenuItemInviteLobbyByEmailClick(object sender, RoutedEventArgs e)
-        {
-            var menuItem = sender as MenuItem;
-            var friend = menuItem?.CommandParameter as FriendItem;
-            if (friend == null)
-            {
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(currentAccessCode))
-            {
-                MessageBox.Show(
-                    ERROR_INVITE_NO_CODE,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
-                return;
-            }
-
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            if (friend.AccountId <= 0)
-            {
-                MessageBox.Show(
-                    ERROR_INVITE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                return;
-            }
-
-            var client = new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME);
-
-            try
-            {
-                var request = new SendLobbyInviteEmailRequest
-                {
-                    Token = token,
-                    TargetAccountId = friend.AccountId,
-                    LobbyCode = currentAccessCode
-                };
-
-                var response = await Task.Run(() => client.SendLobbyInviteEmail(request));
-
-                MessageBox.Show(
-                    response != null && response.Sent ? INFO_INVITE_SENT : ERROR_INVITE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-            }
-            catch (FaultException<FriendService.ServiceFault> ex)
-            {
-                Logger.Warn("Friend invite fault.", ex);
-
-                MessageBox.Show(
-                    ex.Detail != null ? ex.Detail.Message : ERROR_INVITE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error sending lobby invite.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Unexpected error sending lobby invite.", ex);
-
-                MessageBox.Show(
-                    ERROR_INVITE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            finally
-            {
-                CloseClientSafely(client, "FriendServiceClient.SendLobbyInviteEmail");
-            }
         }
 
         private static string GetSessionTokenOrShowMessage()

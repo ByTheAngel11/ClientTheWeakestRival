@@ -22,11 +22,11 @@
     <MetadataSource Address="http://localhost:8082/lobby/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="b1158172-cef9-464c-ab5b-67c11d02e274" SourceId="1" SourceUrl="http://localhost:8082/lobby/?disco" />
-    <MetadataFile FileName="LobbyService.wsdl" MetadataType="Wsdl" ID="c4115a57-364d-4ed1-9d70-80ef1a0b997d" SourceId="1" SourceUrl="http://localhost:8082/lobby/?wsdl" />
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="14328cb1-b9fa-434d-ae76-f5eb27180022" SourceId="1" SourceUrl="http://localhost:8082/lobby/?xsd=xsd2" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="ea9e1d37-b44f-4588-928a-67a6bb72e73e" SourceId="1" SourceUrl="http://localhost:8082/lobby/?xsd=xsd1" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="f5b4a209-0466-45df-84b0-aef452929889" SourceId="1" SourceUrl="http://localhost:8082/lobby/?xsd=xsd0" />
+    <MetadataFile FileName="LobbyService1.wsdl" MetadataType="Wsdl" ID="a4d42fed-0341-4114-aee3-75aa0a81c41e" SourceId="1" SourceUrl="http://172.20.10.2:8082/lobby/?wsdl" />
+    <MetadataFile FileName="item1.disco" MetadataType="Disco" ID="d35e8fc1-09f5-4618-935a-6e46624242db" SourceId="1" SourceUrl="http://172.20.10.2:8082/lobby/?disco" />
+    <MetadataFile FileName="item3.xsd" MetadataType="Schema" ID="0e174cb3-848d-4815-962b-e28138f7d5f4" SourceId="1" SourceUrl="http://172.20.10.2:8082/lobby/?xsd=xsd0" />
+    <MetadataFile FileName="item31.xsd" MetadataType="Schema" ID="68e70cdb-9a9b-4ddd-9753-1d69b0308b97" SourceId="1" SourceUrl="http://172.20.10.2:8082/lobby/?xsd=xsd1" />
+    <MetadataFile FileName="item32.xsd" MetadataType="Schema" ID="a55924b3-eaf6-4d6f-a2c5-d4dc2711bb80" SourceId="1" SourceUrl="http://172.20.10.2:8082/lobby/?xsd=xsd2" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
