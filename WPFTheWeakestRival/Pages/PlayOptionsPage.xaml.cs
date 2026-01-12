@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival.Pages
 {
@@ -13,6 +14,8 @@ namespace WPFTheWeakestRival.Pages
         public PlayOptionsPage()
         {
             InitializeComponent();
+
+            UiValidationHelper.ApplyMaxLength(txtCode, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
         }
 
         private void BtnCreateClick(object sender, RoutedEventArgs e)

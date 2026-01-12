@@ -9,6 +9,7 @@ using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Globalization;
 using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival
 {
@@ -36,6 +37,10 @@ namespace WPFTheWeakestRival
         public LoginWindow()
         {
             InitializeComponent();
+
+            UiValidationHelper.ApplyMaxLength(txtEmail, UiValidationHelper.EMAIL_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(pwdPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtPasswordVisible, UiValidationHelper.PASSWORD_MAX_LENGTH);
 
             string current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
 
@@ -151,7 +156,7 @@ namespace WPFTheWeakestRival
 
             try
             {
-                string email = txtEmail.Text?.Trim();
+                string email = UiValidationHelper.TrimOrEmpty(txtEmail.Text);
                 string password = pwdPassword.Password ?? string.Empty;
 
                 if (string.IsNullOrWhiteSpace(email))

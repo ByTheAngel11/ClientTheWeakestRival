@@ -308,7 +308,6 @@ namespace WPFTheWeakestRival
                 return true;
             }
 
-            // Si pesa mucho, re-encode a JPEG y baja resolución.
             if (TryDownscaleToJpegUnderLimit(filePath, RESIZE_W_PRIMARY, JPEG_QUALITY_PRIMARY, out bytes))
             {
                 contentType = CONTENT_TYPE_JPEG;

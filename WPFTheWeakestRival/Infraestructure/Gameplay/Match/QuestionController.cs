@@ -80,11 +80,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
         }
 
-        /// <summary>
-        /// Programa un override de tiempo para el "siguiente turno".
-        /// - Si targetUserId viene, se aplica solo a ese usuario.
-        /// - Si no viene y sourceTurnUserId viene, se aplica al primer turno cuyo targetUserId != sourceTurnUserId.
-        /// </summary>
         public void ScheduleNextTurnTimeLimitOverride(int seconds, int? sourceTurnUserId, int? targetUserId)
         {
             seconds = NormalizeSeconds(seconds);
@@ -822,11 +817,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             button.Background = Brushes.Transparent;
         }
 
-        private static void SetAnswerButtonContent(GameplayServiceProxy.AnswerDto[] answers, int index, Button button)
-        {
-            // (No usada; solo para evitar overloads accidentales si copias/pegas.)
-        }
-
+        
         private static void SetAnswerButtonContent(Button button, GameplayServiceProxy.AnswerDto[] answers, int index)
         {
             if (button == null)

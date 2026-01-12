@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using WPFTheWeakestRival.AuthService;
+using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival
 {
@@ -60,6 +61,11 @@ namespace WPFTheWeakestRival
                 : DEFAULT_RESEND_COOLDOWN_SECONDS;
 
             txtCode.Focus();
+
+            UiValidationHelper.ApplyMaxLength(txtEmail, UiValidationHelper.EMAIL_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtCode, UiValidationHelper.CODE_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(pwdNewPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(pwdConfirmPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
 
             Loaded += ForgotPasswordWindow_Loaded;
             Closing += ForgotPasswordWindow_Closing;
@@ -359,7 +365,7 @@ namespace WPFTheWeakestRival
 
             return new ResetFields(
                 GetTrimmedEmail(window.txtEmail.Text),
-                GetTrimmedEmail(window.txtCode.Text),
+                UiValidationHelper.TrimOrEmpty(window.txtCode.Text),
                 window.pwdNewPassword.Password ?? string.Empty,
                 window.pwdConfirmPassword.Password ?? string.Empty);
         }

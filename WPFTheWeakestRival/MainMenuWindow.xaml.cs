@@ -195,12 +195,6 @@ namespace WPFTheWeakestRival
             }
         }
 
-
-        private void BtnSettingsClick(object sender, RoutedEventArgs e)
-        {
-            // Reservado
-        }
-
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Escape)

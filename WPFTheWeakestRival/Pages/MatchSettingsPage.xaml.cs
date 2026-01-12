@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival.Pages
 {
@@ -29,6 +30,14 @@ namespace WPFTheWeakestRival.Pages
         {
             InitializeComponent();
 
+            // apply max length to numeric/decimal fields
+            UiValidationHelper.ApplyMaxLength(txtMaxPlayers, UiValidationHelper.NUMBER_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtStartingScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtMaxScore, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtPointsCorrect, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtPointsWrong, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtPointsElimination, UiValidationHelper.GENERIC_TEXT_MAX_LENGTH);
+
             chkPrivate.IsChecked = isPrivate;
             txtMaxPlayers.Text = maxPlayers.ToString(CultureInfo.InvariantCulture);
 
@@ -42,7 +51,7 @@ namespace WPFTheWeakestRival.Pages
 
         private void BtnAcceptClick(object sender, RoutedEventArgs e)
         {
-            if (!int.TryParse(txtMaxPlayers.Text.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var maxPlayers) ||
+            if (!int.TryParse((txtMaxPlayers.Text ?? string.Empty).Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var maxPlayers) ||
                 maxPlayers <= 0 || maxPlayers > 16)
             {
                 MessageBox.Show("Máx. jugadores debe ser un número entre 1 y 16.", "Configuración", MessageBoxButton.OK, MessageBoxImage.Warning);

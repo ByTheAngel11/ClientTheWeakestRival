@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Globalization;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival
 {
@@ -31,6 +32,11 @@ namespace WPFTheWeakestRival
         public RegistrationWindow()
         {
             InitializeComponent();
+
+            UiValidationHelper.ApplyMaxLength(txtUsername, UiValidationHelper.DISPLAY_NAME_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtEmail, UiValidationHelper.EMAIL_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(pstPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(pstConfirmPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
 
             var current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
             switch (current)
@@ -194,7 +200,6 @@ namespace WPFTheWeakestRival
                 return CONTENT_TYPE_JPEG;
             }
 
-            // fallback por firma
             if (MatchesSignature(bytes, CONTENT_TYPE_PNG))
             {
                 return CONTENT_TYPE_PNG;
@@ -261,10 +266,16 @@ namespace WPFTheWeakestRival
 
             try
             {
-                string displayName = txtUsername.Text?.Trim();
-                string email = txtEmail.Text?.Trim();
+                string displayName = UiValidationHelper.TrimOrEmpty(txtUsername.Text);
+                string email = UiValidationHelper.TrimOrEmpty(txtEmail.Text);
                 string password = pstPassword.Password ?? string.Empty;
                 string confirmPassword = pstConfirmPassword.Password ?? string.Empty;
+
+                if (displayName.Length == 0)
+                {
+                    MessageBox.Show("El nombre no puede estar vacío.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
                 if (!UsernameHasNoSpaces(displayName))
                 {

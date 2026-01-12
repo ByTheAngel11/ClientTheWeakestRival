@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Threading;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Helpers;
 
 namespace WPFTheWeakestRival
 {
@@ -45,6 +46,9 @@ namespace WPFTheWeakestRival
 
             txtCode.Focus();
             StartResendCooldown(this.resendCooldownSeconds);
+
+            UiValidationHelper.ApplyMaxLength(txtEmail, UiValidationHelper.EMAIL_MAX_LENGTH);
+            UiValidationHelper.ApplyMaxLength(txtCode, UiValidationHelper.CODE_MAX_LENGTH);
         }
 
         private void StartResendCooldown(int seconds)
@@ -154,8 +158,8 @@ namespace WPFTheWeakestRival
 
             try
             {
-                string email = (txtEmail.Text ?? string.Empty).Trim();
-                string code = (txtCode.Text ?? string.Empty).Trim();
+                string email = UiValidationHelper.TrimOrEmpty(txtEmail.Text);
+                string code = UiValidationHelper.TrimOrEmpty(txtCode.Text);
 
                 if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(code))
                 {
@@ -174,7 +178,6 @@ namespace WPFTheWeakestRival
                     Password = password,
                     DisplayName = displayName,
 
-                    // NUEVO: ya no existe ProfileImageUrl
                     ProfileImageBytes = profileImageBytes,
                     ProfileImageContentType = profileImageContentType
                 };
