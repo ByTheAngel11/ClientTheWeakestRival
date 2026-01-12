@@ -11,6 +11,9 @@ namespace WPFTheWeakestRival
     public partial class EmailVerificationWindow : Window
     {
         private const int DEFAULT_RESEND_COOLDOWN_SECONDS = 60;
+        // Mantener los tokens de código que provienen del servicio para las comparaciones
+        private const string CODE_INVALID = "Codigo invalido";
+        private const string CODE_EXPIRED = "Codigo expirado";
 
         private readonly string displayName;
         private readonly string password;
@@ -125,8 +128,10 @@ namespace WPFTheWeakestRival
             {
                 authClient.Abort();
 
+                string friendly = MapErrorCodeToDescription(fx.Detail.Code);
+
                 MessageBox.Show(
-                    $"{fx.Detail.Code}: {fx.Detail.Message}",
+                    $"{friendly}: {fx.Detail.Message}",
                     "Auth",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -217,18 +222,20 @@ namespace WPFTheWeakestRival
                 {
                     authClient.Abort();
 
+                    string friendly = MapErrorCodeToDescription(fx.Detail.Code);
+
                     MessageBox.Show(
-                        $"{fx.Detail.Code}: {fx.Detail.Message}",
+                        $"{friendly}: {fx.Detail.Message}",
                         "Auth",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
 
-                    if (string.Equals(fx.Detail.Code, "CODE_INVALID", StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(fx.Detail.Code, CODE_INVALID, StringComparison.OrdinalIgnoreCase))
                     {
                         txtCode.SelectAll();
                         txtCode.Focus();
                     }
-                    else if (string.Equals(fx.Detail.Code, "CODE_EXPIRED", StringComparison.OrdinalIgnoreCase))
+                    else if (string.Equals(fx.Detail.Code, CODE_EXPIRED, StringComparison.OrdinalIgnoreCase))
                     {
                         txtCode.Clear();
                         btnResend.Focus();
@@ -249,6 +256,23 @@ namespace WPFTheWeakestRival
             {
                 btnConfirm.IsEnabled = true;
             }
+        }
+
+        private string MapErrorCodeToDescription(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return "Error desconocido";
+
+            if (string.Equals(code, CODE_INVALID, StringComparison.OrdinalIgnoreCase))
+                return "Código inválido - El código ingresado no es correcto";
+
+            if (string.Equals(code, CODE_EXPIRED, StringComparison.OrdinalIgnoreCase))
+                return "Código expirado - El código ha caducado";
+
+            if (string.Equals(code, "TOO_SOON", StringComparison.OrdinalIgnoreCase))
+                return "Demasiado pronto - Debes esperar antes de reenviar el código";
+
+            return code;
         }
 
         private void CancelClick(object sender, RoutedEventArgs e)
