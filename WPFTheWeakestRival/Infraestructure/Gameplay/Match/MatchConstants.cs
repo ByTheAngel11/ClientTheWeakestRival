@@ -12,6 +12,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public const int QUESTION_TIME_SECONDS = 30;
         public const int TIMER_INTERVAL_SECONDS = 1;
 
+        internal const string MATCH_FINISHED_LABEL_TEXT = "Partida finalizada";
+        internal const string EXIT_TO_LOBBY_PROMPT = "La partida aún no ha terminado. ¿Deseas salir al lobby?";
+
         public const string TIMER_FORMAT = @"mm\:ss";
         public const string POINTS_FORMAT = "0.00";
 
