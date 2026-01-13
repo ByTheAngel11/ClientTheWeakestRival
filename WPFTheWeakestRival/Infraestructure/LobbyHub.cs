@@ -891,7 +891,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
 
                 Logger.Info("LobbyHub reconnected successfully.");
-                RaiseReconnectStopped(); 
+                RaiseReconnectStopped();
                 StopReconnectLoop();
             }
             catch (CommunicationException ex)
@@ -910,7 +910,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 SafeAbort();
             }
         }
-        
+
 
         private void ResetLobbyContext()
         {
@@ -1040,6 +1040,24 @@ namespace WPFTheWeakestRival.Infrastructure
             }
 
             StartReconnectLoop();
+        }
+
+        private static bool IsDatabaseFault(ServiceFault fault)
+        {
+            if (fault == null)
+            {
+                return false;
+            }
+
+            string code = (fault.Code ?? string.Empty).Trim();
+            string message = (fault.Message ?? string.Empty).Trim();
+
+            if (string.Equals(code, FaultCodeDatabase, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return message.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void RaiseDatabaseErrorDetected(ServiceFault fault)

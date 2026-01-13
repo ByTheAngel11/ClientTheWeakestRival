@@ -35,11 +35,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (ui.LstPlayers != null)
             {
+                ui.LstPlayers.DisplayMemberPath = nameof(PlayerSummary.DisplayName);
                 ui.LstPlayers.ItemsSource = playersForUi;
             }
 
             UpdatePlayersSummaryText();
         }
+
 
         public void EnableDarknessMode(int seed)
         {
