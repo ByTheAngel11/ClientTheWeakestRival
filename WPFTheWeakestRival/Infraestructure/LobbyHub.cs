@@ -24,6 +24,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private const int ReconnectIntervalSeconds = 2;
         private const int ReconnectTestTimeoutSeconds = 3;
+        private const int MaxReconnectAttempts = 3;
 
         private const string EndpointLobbyNetTcp = "NetTcpBinding_ILobbyService";
         private const string EndpointLobbyWsDualLegacy = "WSDualHttpBinding_ILobbyService";
@@ -60,7 +61,13 @@ namespace WPFTheWeakestRival.Infrastructure
         public event Action<ChatMessage> ChatMessageReceived;
         public event Action<MatchInfo> MatchStarted;
         public event Action<ForcedLogoutNotification> ForcedLogout;
+        public event Action ReconnectStarted;
+        public event Action ReconnectStopped;
+        public event Action<int> ReconnectAttempted;
+        public event Action ReconnectExhausted;
 
+
+        private int reconnectAttemptCount;
         public event Action<Exception> ChatSendFailed;
 
         public LobbyHub(string endpointName)
@@ -684,12 +691,14 @@ namespace WPFTheWeakestRival.Infrastructure
                         Interval = ReconnectInterval
                     };
 
-                    reconnectTimer.Tick += ReconnectTimer_Tick;
+                    reconnectTimer.Tick += ReconnectTimerTick;
                 }
 
                 if (!reconnectTimer.IsEnabled)
                 {
+                    reconnectAttemptCount = 0;
                     reconnectTimer.Start();
+                    RaiseReconnectStarted();
                 }
             }
         }
@@ -712,11 +721,12 @@ namespace WPFTheWeakestRival.Infrastructure
                 if (reconnectTimer != null && reconnectTimer.IsEnabled)
                 {
                     reconnectTimer.Stop();
+                    RaiseReconnectStopped();
                 }
             }
         }
 
-        private async void ReconnectTimer_Tick(object sender, EventArgs e)
+        private async void ReconnectTimerTick(object sender, EventArgs e)
         {
             if (isStoppedOrDisposed)
             {
@@ -724,15 +734,29 @@ namespace WPFTheWeakestRival.Infrastructure
                 return;
             }
 
+            int attempt;
+
             lock (reconnectSyncRoot)
             {
                 if (isReconnectInProgress)
                 {
                     return;
                 }
+                reconnectAttemptCount++;
+                attempt = reconnectAttemptCount;
+
+                if (attempt > MaxReconnectAttempts)
+                {
+                    StopReconnectLoop();
+                    RaiseReconnectExhausted();
+                    return;
+                }
 
                 isReconnectInProgress = true;
+                
             }
+
+            RaiseReconnectAttempted(attempt);
 
             try
             {
@@ -869,5 +893,70 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             return dispatcher != null && !dispatcher.HasShutdownStarted && !dispatcher.HasShutdownFinished;
         }
+
+        private void RaiseReconnectStarted()
+        {
+            try
+            {
+                Ui(() => ReconnectStarted?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyHub.RaiseReconnectStarted failed.", ex);
+            }
+        }
+
+        private void RaiseReconnectStopped()
+        {
+            try
+            {
+                Ui(() => ReconnectStopped?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyHub.RaiseReconnectStopped failed.", ex);
+            }
+        }
+
+        private void RaiseReconnectAttempted(int attempt)
+        {
+            try
+            {
+                Ui(() => ReconnectAttempted?.Invoke(attempt));
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyHub.RaiseReconnectAttempted failed.", ex);
+            }
+        }
+
+        private void RaiseReconnectExhausted()
+        {
+            try
+            {
+                Ui(() => ReconnectExhausted?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyHub.RaiseReconnectExhausted failed.", ex);
+            }
+        }
+
+        public void ContinueReconnectCycle()
+        {
+            if (isStoppedOrDisposed)
+            {
+                return;
+            }
+
+            lock (reconnectSyncRoot)
+            {
+                reconnectAttemptCount = 0;
+            }
+
+            StartReconnectLoop();
+        }
+
+
     }
 }

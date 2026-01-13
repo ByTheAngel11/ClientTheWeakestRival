@@ -714,5 +714,46 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <!-- Prueba para ver si avisa cuando se esta reconectando -->
+
+        <Grid x:Name="grdReconnectOverlay"
+      Visibility="Collapsed"
+      Background="#80000000">
+
+            <Border Padding="18"
+            CornerRadius="12"
+            Background="#FF1E1E1E"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <Image x:Name="imgReconnect"
+                   Width="64"
+                   Height="64"
+                   Stretch="Uniform"
+                   Margin="0,0,0,10"
+                   Source="/Assets/reconnecting.png" />
+
+                    <TextBlock x:Name="txtReconnectStatus"
+                       Text="Reconectando..."
+                       FontSize="16"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+                    <ProgressBar x:Name="prgReconnect"
+                         Width="240"
+                         Height="10"
+                         IsIndeterminate="True"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+
+
     </Grid>
+    
+    
+    
 </Window>

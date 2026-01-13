@@ -61,12 +61,32 @@ namespace WPFTheWeakestRival
         private const byte ACCOUNT_STATUS_BANNED = 4;
         private const string SANCTION_END_TIME_FORMAT = "g";
 
+        private const string RECONNECT_STATUS_START = "Reconectando...";
+        private const string RECONNECT_STATUS_ATTEMPT_FORMAT = "Reconectando... intento {0}";
+
         private const string FRIEND_ENDPOINT_CONFIGURATION_NAME = "WSHttpBinding_IFriendService";
 
         private const string INVITE_MENU_HEADER = "Invitar al lobby";
         private const string ERROR_INVITE_NO_CODE = "No hay un código de lobby disponible para invitar.";
         private const string ERROR_INVITE_GENERIC = "Ocurrió un error al enviar la invitación.";
         private const string INFO_INVITE_SENT = "Invitación enviada.";
+        private const string ReconnectExhaustedMessage =
+            "No se pudo reconectar con el servidor. ¿Deseas volver a intentar? (Sí) \n\n" +
+            "Si seleccionas No, regresarás al inicio de sesión.";
+
+        private const string WaitingLineMessage =
+            "Sin conexión. En espera...";
+
+        private const int RECONNECT_CYCLE_DELAY_SECONDS = 5;
+
+        private const string RECONNECT_EXHAUSTED_MESSAGE =
+            "No se pudo reconectar con el servidor.\n\n¿Quieres quedarte en espera?\n\n" +
+            "Sí: me quedo y seguiré intentando.\n" +
+            "No: regresar al inicio de sesión.";
+
+        private const string WAITING_LINE_MESSAGE = "Sin conexión. En espera...";
+
+
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyWindow));
 
@@ -108,6 +128,13 @@ namespace WPFTheWeakestRival
         private bool isTiebreakCoinflipAllowed = true;
 
         private bool isOpeningMatchWindow;
+
+        private bool isNavigatingToLogin;
+
+        private readonly DispatcherTimer reconnectCycleTimer;
+        private bool isAutoWaitingForReconnect;
+
+
 
         private sealed class ChatLine
         {
@@ -165,6 +192,17 @@ namespace WPFTheWeakestRival
             AppServices.Lobby.MatchStarted += OnMatchStartedFromHub;
             AppServices.Lobby.ForcedLogout += OnForcedLogoutFromHub;
             AppServices.Lobby.ChatSendFailed += OnChatSendFailed;
+            AppServices.Lobby.ReconnectStarted += OnReconnectStartedFromHub;
+            AppServices.Lobby.ReconnectAttempted += OnReconnectAttemptedFromHub;
+            AppServices.Lobby.ReconnectStopped += OnReconnectStoppedFromHub;
+            AppServices.Lobby.ReconnectExhausted += OnReconnectExhaustedFromHub;
+
+            reconnectCycleTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(RECONNECT_CYCLE_DELAY_SECONDS)
+            };
+            reconnectCycleTimer.Tick += (_, __) => OnReconnectCycleDelayElapsed();
+
 
             AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
             AppServices.Friends.Start();
@@ -203,7 +241,6 @@ namespace WPFTheWeakestRival
 
             Unloaded += OnWindowUnloaded;
         }
-
         private void Ui(Action action)
         {
             if (action == null)
@@ -1045,6 +1082,16 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.MatchStarted -= OnMatchStartedFromHub;
                 AppServices.Lobby.ForcedLogout -= OnForcedLogoutFromHub;
                 AppServices.Lobby.ChatSendFailed -= OnChatSendFailed;
+                AppServices.Lobby.ReconnectStarted -= OnReconnectStartedFromHub;
+                AppServices.Lobby.ReconnectAttempted -= OnReconnectAttemptedFromHub;
+                AppServices.Lobby.ReconnectStopped -= OnReconnectStoppedFromHub;
+                AppServices.Lobby.ReconnectExhausted -= OnReconnectExhaustedFromHub;
+
+                if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
+                {
+                    reconnectCycleTimer.Stop();
+                }
+
 
                 AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
 
@@ -1500,5 +1547,193 @@ namespace WPFTheWeakestRival
                     ex);
             }
         }
+
+
+        private void OnReconnectStartedFromHub()
+        {
+            Ui(() => ShowReconnectOverlay(RECONNECT_STATUS_START));
+        }
+
+        private void OnReconnectAttemptedFromHub(int attempt)
+        {
+            Ui(() => ShowReconnectOverlay(string.Format(CultureInfo.InvariantCulture, RECONNECT_STATUS_ATTEMPT_FORMAT, attempt)));
+        }
+
+        private void OnReconnectStoppedFromHub()
+        {
+            Ui(() =>
+            {
+                isAutoWaitingForReconnect = false;
+
+                if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
+                {
+                    reconnectCycleTimer.Stop();
+                }
+
+                HideReconnectOverlay();
+            });
+        }
+
+
+        private void ShowReconnectOverlay(string status)
+        {
+            if (txtReconnectStatus != null)
+            {
+                txtReconnectStatus.Text = status ?? string.Empty;
+            }
+
+            if (grdReconnectOverlay != null)
+            {
+                grdReconnectOverlay.Visibility = Visibility.Visible;
+                grdReconnectOverlay.IsHitTestVisible = true;
+            }
+        }
+
+        private void HideReconnectOverlay()
+        {
+            if (grdReconnectOverlay != null)
+            {
+                grdReconnectOverlay.Visibility = Visibility.Collapsed;
+                grdReconnectOverlay.IsHitTestVisible = false;
+            }
+        }
+
+        private void NavigateToLogin()
+        {
+            Ui(() =>
+            {
+                if (isNavigatingToLogin)
+                {
+                    return;
+                }
+
+                isNavigatingToLogin = true;
+
+                Window previousMainWindow = Application.Current?.MainWindow;
+                Window ownerWindow = Owner;
+
+                try
+                {
+                    Application.Current.ShutdownMode = ShutdownMode.OnLastWindowClose;
+
+                    var loginWindow = new LoginWindow();
+
+                    Application.Current.MainWindow = loginWindow;
+
+                    loginWindow.Show();
+                    loginWindow.Activate();
+
+                    if (previousMainWindow != null &&
+                        !ReferenceEquals(previousMainWindow, loginWindow) &&
+                        !ReferenceEquals(previousMainWindow, this))
+                    {
+                        previousMainWindow.Hide();
+                        previousMainWindow.Close();
+                    }
+
+                    if (ownerWindow != null &&
+                        !ReferenceEquals(ownerWindow, loginWindow) &&
+                        !ReferenceEquals(ownerWindow, this) &&
+                        ownerWindow.IsVisible)
+                    {
+                        ownerWindow.Hide();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Error navigating to LoginWindow.", ex);
+                }
+                finally
+                {
+                    try
+                    {
+                        Hide();
+                        Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn("Error closing LobbyWindow during navigation to login.", ex);
+                    }
+                }
+            });
+        }
+
+
+        private void OnReconnectExhaustedFromHub()
+        {
+            Ui(() =>
+            {
+                try
+                {
+                    if (isAutoWaitingForReconnect)
+                    {
+                        StartNextReconnectCycle();
+                        return;
+                    }
+
+                    MessageBoxResult result = MessageBox.Show(
+                        RECONNECT_EXHAUSTED_MESSAGE,
+                        Lang.lobbyTitle,
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        isAutoWaitingForReconnect = true;
+                        AppendSystemLine(WAITING_LINE_MESSAGE);
+
+                        ShowReconnectOverlay(WAITING_LINE_MESSAGE); // si ya tienes overlay
+                        StartNextReconnectCycle();
+                        return;
+                    }
+
+                    NavigateToLogin();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Error handling reconnect exhausted prompt.", ex);
+                }
+            });
+        }
+
+        private void StartNextReconnectCycle()
+        {
+            try
+            {
+                if (reconnectCycleTimer != null)
+                {
+                    if (reconnectCycleTimer.IsEnabled)
+                    {
+                        reconnectCycleTimer.Stop();
+                    }
+
+                    reconnectCycleTimer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Error scheduling next reconnect cycle.", ex);
+            }
+        }
+
+        private void OnReconnectCycleDelayElapsed()
+        {
+            try
+            {
+                if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
+                {
+                    reconnectCycleTimer.Stop();
+                }
+
+                AppServices.Lobby.ContinueReconnectCycle();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Error continuing reconnect cycle.", ex);
+            }
+        }
+
+
+
     }
 }
