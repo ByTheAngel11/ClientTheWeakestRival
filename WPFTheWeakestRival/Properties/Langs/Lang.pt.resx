@@ -732,6 +732,9 @@
   <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
     <value>Erro de email: O destinatário não está disponível. O código de redefinição de senha não pôde ser enviado.</value>
   </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Erro de email: o endereço do destinatário é inválido.</value>
+  </data>
   <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
     <value>Erro de email: configuração de servidor de email inválida.</value>
   </data>
@@ -777,9 +780,6 @@
   <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
     <value>Erro de correio: ocorreu um problema inesperado. O convite para a sala não pôde ser enviado.</value>
   </data>
-  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
-    <value>Erro de email: o endereço do destinatário é inválido.</value>
-  </data>
   <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
     <value>Erro de configuração: cadeia de conexão do servidor não encontrada.</value>
   </data>
@@ -806,5 +806,24 @@
   </data>
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>Não há nenhuma conta registrada com esse e-mail.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="noFriends" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonAcept" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>Você ainda não tem amigos</value>
+  </data>
+  <data name="commonAcept" xml:space="preserve">
+    <value>Aceitar</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Rejeitar</value>
   </data>
 </root>

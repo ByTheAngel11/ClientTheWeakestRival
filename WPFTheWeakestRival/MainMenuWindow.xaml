@@ -1,5 +1,4 @@
-﻿<!-- MainMenuWindow.xaml -->
-<Window x:Class="WPFTheWeakestRival.MainMenuWindow"
+﻿<Window x:Class="WPFTheWeakestRival.MainMenuWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"

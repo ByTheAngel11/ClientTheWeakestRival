@@ -1,10 +1,8 @@
 ﻿using log4net;
 using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.LobbyService;
@@ -17,6 +15,12 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
     {
         private const string ErrorCopyCodeNoCode = "No hay un código de lobby para copiar.";
         private const string ErrorCopyCodeGeneric = "Ocurrió un error al copiar el código al portapapeles.";
+
+        private const string LogPlayerDeltaIgnoredTemplate =
+            "Player delta ignored (UI updates via LobbyUpdated snapshot). Event={0}.";
+
+        private const string PlayerDeltaEventJoined = "PlayerJoined";
+        private const string PlayerDeltaEventLeft = "PlayerLeft";
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
@@ -196,12 +200,28 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             }
         }
 
-        private void OnPlayerJoinedFromHub(PlayerSummary _)
+        private void OnPlayerJoinedFromHub(PlayerSummary player)
         {
+            try
+            {
+                logger.DebugFormat(LogPlayerDeltaIgnoredTemplate, PlayerDeltaEventJoined);
+            }
+            catch (Exception ex)
+            {
+                GC.KeepAlive(ex);
+            }
         }
 
-        private void OnPlayerLeftFromHub(Guid _)
+        private void OnPlayerLeftFromHub(Guid playerIdOrLobbyId)
         {
+            try
+            {
+                logger.DebugFormat(LogPlayerDeltaIgnoredTemplate, PlayerDeltaEventLeft);
+            }
+            catch (Exception ex)
+            {
+                GC.KeepAlive(ex);
+            }
         }
 
         private static LobbyPlayerItem MapPlayerToLobbyItem(AccountMini account)
