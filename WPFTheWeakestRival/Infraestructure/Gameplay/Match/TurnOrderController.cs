@@ -39,6 +39,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ui.LstPlayers.ItemsSource = playersForUi;
             }
 
+            EnsureFallbackNames();
+
             UpdatePlayersSummaryText();
         }
 
@@ -304,6 +306,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ui.LstPlayers.ItemsSource = playersForUi;
             }
 
+            // Ensure fallback display names are set based on position
+            EnsureFallbackNames();
+
             UpdatePlayersSummaryText();
         }
 
@@ -430,6 +435,35 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             return string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, userId);
+        }
+
+        private void EnsureFallbackNames()
+        {
+            if (playersForUi == null || playersForUi.Length == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < playersForUi.Length; i++)
+            {
+                var p = playersForUi[i];
+                if (p == null)
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(p.DisplayName))
+                {
+                    try
+                    {
+                        p.DisplayName = string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, i + 1);
+                    }
+                    catch
+                    {
+                        p.DisplayName = string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, p.UserId);
+                    }
+                }
+            }
         }
 
         private static void Shuffle(List<PlayerSummary> list, int seed)
