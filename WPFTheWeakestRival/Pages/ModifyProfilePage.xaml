@@ -7,7 +7,6 @@
       Width="660" Height="360"
       MinWidth="640" MinHeight="340">
 
-    <!-- Grid raíz con fondo -->
     <Grid Grid.IsSharedSizeScope="True">
         <Grid.Background>
             <ImageBrush ImageSource="pack://application:,,,/Assets/Backgrounds/ModifyProfileBackground.png"
@@ -16,17 +15,12 @@
                         AlignmentY="Center" />
         </Grid.Background>
 
-        <!-- Distribución general: encabezado / contenido / footer -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- header sobre la franja azul -->
             <RowDefinition Height="*"/>
-            <!-- zona crema central -->
             <RowDefinition Height="Auto"/>
-            <!-- botones sobre la parte superior de la franja inferior -->
         </Grid.RowDefinitions>
 
-        <!-- Título (lo bajo un poco para centrarlo en la franja superior) -->
         <TextBlock Grid.Row="0"
                    Text="{loc:Loc modifyProfileTitle}"
                    FontSize="22"
@@ -35,19 +29,14 @@
                    VerticalAlignment="Center"
                    Foreground="White"/>
 
-        <!-- Contenido en la zona central crema -->
         <Grid Grid.Row="1"
               Margin="32,20,32,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
-                <!-- preview -->
                 <ColumnDefinition Width="24"/>
-                <!-- separación -->
                 <ColumnDefinition Width="*"/>
-                <!-- formulario -->
             </Grid.ColumnDefinitions>
-
-            <!-- Vista previa compacta -->
+            
             <Border Grid.Column="0"
                     BorderBrush="#DDD"
                     BorderThickness="1"
@@ -63,7 +52,6 @@
                        RenderOptions.BitmapScalingMode="HighQuality"/>
             </Border>
 
-            <!-- Formulario: etiquetas y campos alineados -->
             <Grid Grid.Column="2" Margin="0,38,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -78,7 +66,6 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Email -->
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
                            Text="{loc:Loc lblEmail}"
@@ -90,7 +77,6 @@
                          MinWidth="240"
                          Height="26"/>
 
-                <!-- Display name -->
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
                            Text="{loc:Loc registerDisplayName}"
@@ -102,7 +88,6 @@
                          MinWidth="240"
                          Height="26"/>
 
-                <!-- URL + botones -->
                 <TextBlock Grid.Row="4"
                            Grid.Column="0"
                            Text="{loc:Loc profileAvatar}"
@@ -115,7 +100,6 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- TextBox oculto para mantener la lógica existente -->
                     <TextBox x:Name="txtAvatarUrl"
                              Grid.Column="0"
                              Visibility="Collapsed"/>
@@ -134,7 +118,6 @@
             </Grid>
         </Grid>
 
-        <!-- Acciones compactas alineadas justo encima de la franja inferior -->
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
@@ -154,7 +137,6 @@
                     Click="BtnSaveClick"/>
         </StackPanel>
 
-        <!-- Cerrar sesión alineado a la izquierda -->
         <Button Name="btnLogout"
                 Grid.Row="2"
                 Content="{loc:Loc btnLogout}"

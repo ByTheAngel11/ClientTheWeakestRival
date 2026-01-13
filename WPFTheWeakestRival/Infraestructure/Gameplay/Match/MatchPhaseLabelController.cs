@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Globalization;
+using log4net;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
     internal sealed class MatchPhaseLabelController
     {
         private const string FinalPhaseLabelText = "Final 1 vs 1";
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchPhaseLabelController));
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -49,8 +52,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 overlay.ShowSpecialEvent(FinalPhaseLabelText, string.Empty);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Warn("MatchPhaseLabelController.ShowSpecialEvent error.", ex);
             }
         }
 

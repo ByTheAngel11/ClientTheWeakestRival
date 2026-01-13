@@ -109,7 +109,6 @@
                         </DockPanel>
                     </Border>
 
-                    <!-- Enviadas -->
                     <Border Grid.Column="1"
                             Margin="8,0,0,0"
                             BorderBrush="#40000000"
@@ -172,7 +171,6 @@
                     </Border>
                 </Grid>
 
-                <!-- Cerrar -->
                 <StackPanel Grid.Row="4"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">

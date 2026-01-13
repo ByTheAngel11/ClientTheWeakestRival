@@ -12,12 +12,23 @@ namespace WPFTheWeakestRival.Pages
 {
     public partial class LeaderboardPage : Page
     {
-        private const int DEFAULT_TOP = 10;
+        private const int DefaultTop = 10;
 
-        private const string WINDOW_TITLE = "Marcadores";
-        private const string MSG_LOAD_FAILED = "No se pudo cargar el marcador.";
-        private const string MSG_NO_CONNECTION = "Sin conexión con el servidor.";
-        private const string MSG_GENERIC_ERROR = "Ocurrió un error al cargar el marcador.";
+        private const string DialogTitle = "Marcadores";
+
+        private const string MsgServerUnavailable =
+            "No se encuentra el servidor o no hay conexión.";
+
+        private const string MsgDatabaseError =
+            "El servidor no pudo acceder a la base de datos.";
+
+        private const string MsgLoadFailed =
+            "No se pudo cargar el marcador por error en base de datos.";
+
+        private const string MsgGenericError =
+            "Ocurrió un error al cargar el marcador.";
+
+        private const string DbFaultToken = "DB";
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LeaderboardPage));
 
@@ -56,8 +67,13 @@ namespace WPFTheWeakestRival.Pages
             {
                 LeaderboardEntries.Clear();
 
-                GetLeaderboardResponse response = await Task.Run(() =>
-                    statsClient.GetLeaderboard(new GetLeaderboardRequest { Top = DEFAULT_TOP }));
+                var request = new GetLeaderboardRequest
+                {
+                    Top = DefaultTop
+                };
+
+                GetLeaderboardResponse response =
+                    await Task.Run(() => statsClient.GetLeaderboard(request));
 
                 LeaderboardEntry[] entries = response?.Entries ?? Array.Empty<LeaderboardEntry>();
 
@@ -77,24 +93,73 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<ServiceFault> ex)
             {
-                Logger.Warn("LeaderboardPage.LoadLeaderboardAsync: stats fault.", ex);
-                MessageBox.Show(MSG_LOAD_FAILED, WINDOW_TITLE, MessageBoxButton.OK, MessageBoxImage.Warning);
+                string code = ex.Detail != null ? ex.Detail.Code : string.Empty;
+                string message = ex.Detail != null ? ex.Detail.Message : ex.Message;
+
+                Logger.WarnFormat(
+                    "LeaderboardPage.LoadLeaderboardAsync fault. Code={0}, Message={1}",
+                    code ?? string.Empty,
+                    message ?? string.Empty);
+
+                if (IsDatabaseFault(ex.Detail))
+                {
+                    MessageBox.Show(
+                        MsgDatabaseError,
+                        DialogTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    return;
+                }
+
+                MessageBox.Show(
+                    MsgLoadFailed,
+                    DialogTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
             catch (CommunicationException ex)
             {
                 Logger.Error("LeaderboardPage.LoadLeaderboardAsync: communication error.", ex);
-                MessageBox.Show(MSG_NO_CONNECTION, WINDOW_TITLE, MessageBoxButton.OK, MessageBoxImage.Error);
+
+                MessageBox.Show(
+                    MsgServerUnavailable,
+                    DialogTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             catch (TimeoutException ex)
             {
                 Logger.Error("LeaderboardPage.LoadLeaderboardAsync: timeout.", ex);
-                MessageBox.Show(MSG_NO_CONNECTION, WINDOW_TITLE, MessageBoxButton.OK, MessageBoxImage.Error);
+
+                MessageBox.Show(
+                    MsgServerUnavailable,
+                    DialogTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
                 Logger.Error("LeaderboardPage.LoadLeaderboardAsync: unexpected error.", ex);
-                MessageBox.Show(MSG_GENERIC_ERROR, WINDOW_TITLE, MessageBoxButton.OK, MessageBoxImage.Error);
+
+                MessageBox.Show(
+                    MsgGenericError,
+                    DialogTitle,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
+        }
+
+        private static bool IsDatabaseFault(ServiceFault fault)
+        {
+            if (fault == null)
+            {
+                return false;
+            }
+
+            string code = fault.Code ?? string.Empty;
+
+            return code.IndexOf(DbFaultToken, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
@@ -121,7 +186,7 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (Exception ex)
             {
-                Logger.Warn(context + ": WCF client close failed. Aborting.", ex);
+                Logger.Warn(string.Concat(context, ": WCF client close failed. Aborting."), ex);
 
                 try
                 {
@@ -129,7 +194,7 @@ namespace WPFTheWeakestRival.Pages
                 }
                 catch (Exception abortEx)
                 {
-                    Logger.Warn(context + ": WCF client abort failed.", abortEx);
+                    Logger.Warn(string.Concat(context, ": WCF client abort failed."), abortEx);
                 }
             }
         }
