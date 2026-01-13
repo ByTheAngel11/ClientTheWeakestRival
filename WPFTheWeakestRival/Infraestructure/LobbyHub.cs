@@ -846,8 +846,7 @@ namespace WPFTheWeakestRival.Infrastructure
                         UpdateLobbyContextFromJoinResponse(response, lastAccessCode);
                     }
                 }
-                // REEMPLAZA tu catch (FaultException<ServiceFault> ex) dentro de TryReconnectAsync()
-                // (el que está justo debajo del GetMyProfile / JoinByCode del reconnect)
+               
 
                 catch (FaultException<ServiceFault> ex)
                 {
