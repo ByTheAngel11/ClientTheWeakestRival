@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Threading;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
+using System.Net.NetworkInformation;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
@@ -30,6 +31,9 @@ namespace WPFTheWeakestRival.Infrastructure
         private const string EndpointLobbyWsDualLegacy = "WSDualHttpBinding_ILobbyService";
 
         private const string LogEndpointRemapped = "LobbyHub endpoint remapped from {0} to {1}.";
+
+        private const string FaultCodeDatabase = "Error de base de datos";
+        private const string FaultMessageDatabaseMarker = "base de datos";
 
         private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(ReconnectIntervalSeconds);
         private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(ReconnectTestTimeoutSeconds);
@@ -65,6 +69,7 @@ namespace WPFTheWeakestRival.Infrastructure
         public event Action ReconnectStopped;
         public event Action<int> ReconnectAttempted;
         public event Action ReconnectExhausted;
+        public event Action<ServiceFault> DatabaseErrorDetected;
 
 
         private int reconnectAttemptCount;
@@ -721,7 +726,6 @@ namespace WPFTheWeakestRival.Infrastructure
                 if (reconnectTimer != null && reconnectTimer.IsEnabled)
                 {
                     reconnectTimer.Stop();
-                    RaiseReconnectStopped();
                 }
             }
         }
@@ -773,6 +777,11 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private async Task TryReconnectAsync()
         {
+            if (!NetworkInterface.GetIsNetworkAvailable())
+            {
+                return;
+            }
+
             if (isStoppedOrDisposed)
             {
                 StopReconnectLoop();
@@ -786,7 +795,10 @@ namespace WPFTheWeakestRival.Infrastructure
 
             try
             {
-                bool mustRecreate = client == null || client.State == CommunicationState.Faulted;
+                bool mustRecreate =
+                    client == null ||
+                    client.State != CommunicationState.Opened;
+
                 if (mustRecreate)
                 {
                     RecreateClient();
@@ -801,24 +813,62 @@ namespace WPFTheWeakestRival.Infrastructure
                     Logger.Warn("Setting OperationTimeout failed.", ex);
                 }
 
-                _ = await Task.Run(() => client.GetMyProfile(lastToken)).ConfigureAwait(false);
-
-                if (!string.IsNullOrWhiteSpace(lastAccessCode))
+                try
                 {
-                    var request = new JoinByCodeRequest
+                    _ = await Task.Run(() => client.GetMyProfile(lastToken)).ConfigureAwait(false);
+
+                    if (!string.IsNullOrWhiteSpace(lastAccessCode))
                     {
-                        Token = lastToken,
-                        AccessCode = lastAccessCode
-                    };
+                        var request = new JoinByCodeRequest
+                        {
+                            Token = lastToken,
+                            AccessCode = lastAccessCode
+                        };
 
-                    JoinByCodeResponse response =
-                        await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
+                        JoinByCodeResponse response =
+                            await Task.Run(() => client.JoinByCode(request)).ConfigureAwait(false);
 
-                    UpdateLobbyContextFromJoinResponse(response, lastAccessCode);
+                        UpdateLobbyContextFromJoinResponse(response, lastAccessCode);
+                    }
+                }
+                catch (FaultException<ServiceFault> ex)
+                {
+                    string faultCode = ex.Detail != null ? (ex.Detail.Code ?? string.Empty) : string.Empty;
+                    string faultMessage = ex.Detail != null ? (ex.Detail.Message ?? string.Empty) : (ex.Message ?? string.Empty);
+
+                    Logger.WarnFormat(
+                        "LobbyHub reconnect fault. Code={0}, Message={1}",
+                        faultCode,
+                        faultMessage);
+
+                    bool isDatabaseFault =
+                        string.Equals(faultCode.Trim(), FaultCodeDatabase, StringComparison.OrdinalIgnoreCase) ||
+                        faultMessage.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    if (isDatabaseFault)
+                    {
+                        StopReconnectLoop();
+                        RaiseDatabaseErrorDetected(ex.Detail);
+                        return;
+                    }
+
+                    StopReconnectLoop();
+                    return;
                 }
 
                 Logger.Info("LobbyHub reconnected successfully.");
+                RaiseReconnectStopped(); 
                 StopReconnectLoop();
+            }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("LobbyHub reconnect attempt communication error.", ex);
+                SafeAbort();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("LobbyHub reconnect attempt timeout.", ex);
+                SafeAbort();
             }
             catch (Exception ex)
             {
@@ -826,6 +876,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 SafeAbort();
             }
         }
+        
 
         private void ResetLobbyContext()
         {
@@ -957,6 +1008,35 @@ namespace WPFTheWeakestRival.Infrastructure
             StartReconnectLoop();
         }
 
+        private static bool IsDatabaseFault(ServiceFault fault)
+        {
+            if (fault == null)
+            {
+                return false;
+            }
+
+            string code = (fault.Code ?? string.Empty).Trim();
+            string message = (fault.Message ?? string.Empty).Trim();
+
+            if (string.Equals(code, FaultCodeDatabase, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return message.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void RaiseDatabaseErrorDetected(ServiceFault fault)
+        {
+            try
+            {
+                Ui(() => DatabaseErrorDetected?.Invoke(fault));
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyHub.RaiseDatabaseErrorDetected failed.", ex);
+            }
+        }
 
     }
 }

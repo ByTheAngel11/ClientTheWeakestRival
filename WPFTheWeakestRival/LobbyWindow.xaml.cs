@@ -196,6 +196,7 @@ namespace WPFTheWeakestRival
             AppServices.Lobby.ReconnectAttempted += OnReconnectAttemptedFromHub;
             AppServices.Lobby.ReconnectStopped += OnReconnectStoppedFromHub;
             AppServices.Lobby.ReconnectExhausted += OnReconnectExhaustedFromHub;
+            AppServices.Lobby.DatabaseErrorDetected += OnDatabaseErrorDetectedFromHub;
 
             reconnectCycleTimer = new DispatcherTimer
             {
@@ -1086,6 +1087,8 @@ namespace WPFTheWeakestRival
                 AppServices.Lobby.ReconnectAttempted -= OnReconnectAttemptedFromHub;
                 AppServices.Lobby.ReconnectStopped -= OnReconnectStoppedFromHub;
                 AppServices.Lobby.ReconnectExhausted -= OnReconnectExhaustedFromHub;
+                AppServices.Lobby.DatabaseErrorDetected -= OnDatabaseErrorDetectedFromHub;
+
 
                 if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
                 {
@@ -1732,7 +1735,33 @@ namespace WPFTheWeakestRival
                 Logger.Warn("Error continuing reconnect cycle.", ex);
             }
         }
+        private void OnDatabaseErrorDetectedFromHub(LobbyService.ServiceFault fault)
+        {
+            Ui(() =>
+            {
+                try
+                {
+                    isAutoWaitingForReconnect = false;
 
+                    if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
+                    {
+                        reconnectCycleTimer.Stop();
+                    }
+
+                    HideReconnectOverlay();
+
+                    MessageBox.Show(
+                        "Error de base de datos.",
+                        Lang.lobbyTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Error showing database error message in lobby.", ex);
+                }
+            });
+        }
 
 
     }
