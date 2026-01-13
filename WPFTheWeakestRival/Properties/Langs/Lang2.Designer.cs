@@ -241,6 +241,33 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string btnGameSaveBank {
+            get {
+                return ResourceManager.GetString("btnGameSaveBank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string btnGameSkipIntro {
+            get {
+                return ResourceManager.GetString("btnGameSkipIntro", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string btnGameUseLifeline {
+            get {
+                return ResourceManager.GetString("btnGameUseLifeline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Choose an image.
         /// </summary>
         public static string btnImageChooser {
@@ -1153,9 +1180,27 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a .
         /// </summary>
+        public static string lblGameCoinFlipInProgress {
+            get {
+                return ResourceManager.GetString("lblGameCoinFlipInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
         public static string lblGameCurrentChain {
             get {
                 return ResourceManager.GetString("lblGameCurrentChain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a .
+        /// </summary>
+        public static string lblGameLifeline {
+            get {
+                return ResourceManager.GetString("lblGameLifeline", resourceCulture);
             }
         }
         

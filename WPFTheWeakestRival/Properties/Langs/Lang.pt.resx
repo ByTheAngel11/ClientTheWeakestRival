@@ -826,4 +826,49 @@
   <data name="commonReject" xml:space="preserve">
     <value>Rejeitar</value>
   </data>
+  <data name="wndMatchTitle" xml:space="preserve">
+    <value>Partida</value>
+  </data>
+  <data name="lblGameMatchCodePrefix" xml:space="preserve">
+    <value>Código:</value>
+  </data>
+  <data name="lblGamePhaseDefault" xml:space="preserve">
+    <value>Fase:</value>
+  </data>
+  <data name="lblGameTime" xml:space="preserve">
+    <value>TEMPO</value>
+  </data>
+  <data name="lblGameCurrentChain" xml:space="preserve">
+    <value>CADEIA ATUAL</value>
+  </data>
+  <data name="lblGameBank" xml:space="preserve">
+    <value>BANCO</value>
+  </data>
+  <data name="lblGamePlayers" xml:space="preserve">
+    <value>Jogadores</value>
+  </data>
+  <data name="lblGamePlayer" xml:space="preserve">
+    <value>Jogador</value>
+  </data>
+  <data name="lblGameWaitingForMatchStart" xml:space="preserve">
+    <value>Aguardando o início do jogo...</value>
+  </data>
+  <data name="btnGameSaveBank" xml:space="preserve">
+    <value>SALVAR NO BANCO</value>
+  </data>
+  <data name="lblGameLifeline" xml:space="preserve">
+    <value>CURINGA</value>
+  </data>
+  <data name="btnGameUseLifeline" xml:space="preserve">
+    <value>VESTIR</value>
+  </data>
+  <data name="btnGameSkipIntro" xml:space="preserve">
+    <value>Saltar</value>
+  </data>
+  <data name="lblGameCoinFlipInProgress" xml:space="preserve">
+    <value>Voou...</value>
+  </data>
+  <data name="btnGlobalClose" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
 </root>

@@ -241,6 +241,42 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a SAVE TO BANK.
+        /// </summary>
+        public static string btnGameSaveBank {
+            get {
+                return ResourceManager.GetString("btnGameSaveBank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Hop.
+        /// </summary>
+        public static string btnGameSkipIntro {
+            get {
+                return ResourceManager.GetString("btnGameSkipIntro", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a WEAR.
+        /// </summary>
+        public static string btnGameUseLifeline {
+            get {
+                return ResourceManager.GetString("btnGameUseLifeline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Close.
+        /// </summary>
+        public static string btnGlobalClose {
+            get {
+                return ResourceManager.GetString("btnGlobalClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Choose an image.
         /// </summary>
         public static string btnImageChooser {
@@ -1142,7 +1178,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a BANK.
         /// </summary>
         public static string lblGameBank {
             get {
@@ -1151,7 +1187,16 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Flown....
+        /// </summary>
+        public static string lblGameCoinFlipInProgress {
+            get {
+                return ResourceManager.GetString("lblGameCoinFlipInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a CURRENT CHAIN.
         /// </summary>
         public static string lblGameCurrentChain {
             get {
@@ -1160,7 +1205,16 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a WILDCARD.
+        /// </summary>
+        public static string lblGameLifeline {
+            get {
+                return ResourceManager.GetString("lblGameLifeline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Code:.
         /// </summary>
         public static string lblGameMatchCodePrefix {
             get {
@@ -1169,7 +1223,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Phase:.
         /// </summary>
         public static string lblGamePhaseDefault {
             get {
@@ -1178,7 +1232,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Player.
         /// </summary>
         public static string lblGamePlayer {
             get {
@@ -1187,7 +1241,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Players.
         /// </summary>
         public static string lblGamePlayers {
             get {
@@ -1196,7 +1250,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a TIME.
         /// </summary>
         public static string lblGameTime {
             get {
@@ -1205,7 +1259,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Waiting for the start of the game....
         /// </summary>
         public static string lblGameWaitingForMatchStart {
             get {
@@ -2231,7 +2285,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a .
+        ///   Busca una cadena traducida similar a Match.
         /// </summary>
         public static string wndMatchTitle {
             get {
