@@ -1,9 +1,12 @@
 ﻿using log4net;
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using WPFTheWeakestRival.Infraestructure.Lobby;
+using WPFTheWeakestRival.Infrastructure;
 
 namespace WPFTheWeakestRival
 {
@@ -19,9 +22,18 @@ namespace WPFTheWeakestRival
         private readonly LobbyMatchController matchController;
         private readonly LobbyReconnectController reconnectController;
 
+        private bool isDisposed;
+
         public LobbyWindow()
         {
             InitializeComponent();
+
+            RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
+
+            if (imgAvatar != null)
+            {
+                RenderOptions.SetBitmapScalingMode(imgAvatar, BitmapScalingMode.HighQuality);
+            }
 
             runtimeState = new LobbyRuntimeState();
 
@@ -90,6 +102,14 @@ namespace WPFTheWeakestRival
             playersController.InitializeExistingLobby(info);
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            TryLeaveLobby();
+            DisposeControllers();
+
+            base.OnClosed(e);
+        }
+
         private void LobbyWindowLoaded(object sender, RoutedEventArgs e)
         {
             friendsController.OnLoaded();
@@ -98,6 +118,18 @@ namespace WPFTheWeakestRival
 
         private void LobbyWindowUnloaded(object sender, RoutedEventArgs e)
         {
+            DisposeControllers();
+        }
+
+        private void DisposeControllers()
+        {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            isDisposed = true;
+
             try
             {
                 reconnectController.Dispose();
@@ -108,7 +140,29 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Warn("LobbyWindow unload dispose error.", ex);
+                Logger.Warn("LobbyWindow dispose error.", ex);
+            }
+        }
+
+        private static void TryLeaveLobby()
+        {
+            try
+            {
+                string token = LoginWindow.AppSession.CurrentToken?.Token;
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    return;
+                }
+
+                Task leaveTask = AppServices.Lobby.LeaveLobbyAsync(token);
+
+                _ = leaveTask.ContinueWith(
+                    t => Logger.Warn("Error leaving lobby on close.", t.Exception),
+                    TaskContinuationOptions.OnlyOnFaulted);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("Unexpected error leaving lobby on close.", ex);
             }
         }
 

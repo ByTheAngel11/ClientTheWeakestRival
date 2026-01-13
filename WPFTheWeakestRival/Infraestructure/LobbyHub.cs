@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Threading;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
+using System.Net.NetworkInformation;
+using System.Globalization;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
@@ -18,22 +20,30 @@ namespace WPFTheWeakestRival.Infrastructure
         private const string ERROR_TOKEN_REQUIRED = "Token requerido.";
         private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
 
-        private const string LOG_UI_ERROR = "LobbyHub.Ui error.";
-        private const string LOG_CHANNEL_FAULTED_CREATE = "CreateLobbyAsync called with channel Faulted.";
-        private const string LOG_CHANNEL_FAULTED_JOIN = "JoinByCodeAsync called with channel Faulted.";
-        private const string LOG_CHANNEL_FAULTED_START = "StartLobbyMatchAsync called with channel Faulted.";
+        private const string LogUiError = "LobbyHub.Ui error.";
+        private const string LogChannelFaultedCreate = "CreateLobbyAsync called with channel Faulted.";
+        private const string LogChannelFaultedJoin = "JoinByCodeAsync called with channel Faulted.";
+        private const string LogChannelFaultedStart = "StartLobbyMatchAsync called with channel Faulted.";
+        private const string ReconnectFaultDialogTitle = "Lobby";
+        private const string ReconnectFaultDialogFormat = "{0}: {1}";
+        private const string ReconnectFaultDialogGeneric = "Ocurrió un error durante la reconexión.";
 
-        private const int RECONNECT_INTERVAL_SECONDS = 2;
-        private const int RECONNECT_TEST_TIMEOUT_SECONDS = 3;
-        private const int MAX_RECONNECT_ATTEMPTS = 3;
+        private bool hasShownReconnectFaultDialog;
+
+        private const int ReconnectIntervalSeconds = 2;
+        private const int ReconnectTestTimeoutSeconds = 3;
+        private const int MaxReconnectAttempts = 3;
 
         private const string ENDPOINT_LOBBY_NET_TCP = "NetTcpBinding_ILobbyService";
         private const string ENDPOINT_LOBBY_WS_DUAL_LEGACY = "WSDualHttpBinding_ILobbyService";
 
         private const string LOG_ENDPOINT_REMAPPED = "LobbyHub endpoint remapped from {0} to {1}.";
 
-        private const string FAULT_CODE_DATABASE = "Error de base de datos";
-        private const string FAULT_MESSAGE_DATABASE_MARKER = "base de datos";
+        private const string FaultCodeDatabase = "Error de base de datos";
+        private const string FaultMessageDatabaseMarker = "base de datos";
+
+        private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(ReconnectIntervalSeconds);
+        private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(ReconnectTestTimeoutSeconds);
 
         private static readonly TimeSpan RECONNECT_INTERVAL = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
         private static readonly TimeSpan RECONNECT_TEST_TIMEOUT = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
@@ -710,6 +720,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 if (!reconnectTimer.IsEnabled)
                 {
                     reconnectAttemptCount = 0;
+                    hasShownReconnectFaultDialog = false;
                     reconnectTimer.Start();
                     RaiseReconnectStarted();
                 }
@@ -839,6 +850,9 @@ namespace WPFTheWeakestRival.Infrastructure
                         UpdateLobbyContextFromJoinResponse(response, lastAccessCode);
                     }
                 }
+                // REEMPLAZA tu catch (FaultException<ServiceFault> ex) dentro de TryReconnectAsync()
+                // (el que está justo debajo del GetMyProfile / JoinByCode del reconnect)
+
                 catch (FaultException<ServiceFault> ex)
                 {
                     string faultCode = ex.Detail != null ? (ex.Detail.Code ?? string.Empty) : string.Empty;
@@ -850,22 +864,39 @@ namespace WPFTheWeakestRival.Infrastructure
                         faultMessage);
 
                     bool isDatabaseFault =
-                        string.Equals(faultCode.Trim(), FAULT_CODE_DATABASE, StringComparison.OrdinalIgnoreCase) ||
-                        faultMessage.IndexOf(FAULT_MESSAGE_DATABASE_MARKER, StringComparison.OrdinalIgnoreCase) >= 0;
+                        string.Equals(faultCode.Trim(), FaultCodeDatabase, StringComparison.OrdinalIgnoreCase) ||
+                        faultMessage.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    StopReconnectLoop();
 
                     if (isDatabaseFault)
                     {
-                        StopReconnectLoop();
+                        RaiseReconnectStopped();
                         RaiseDatabaseErrorDetected(ex.Detail);
                         return;
                     }
 
-                    StopReconnectLoop();
+                    bool mustShow;
+
+                    lock (reconnectSyncRoot)
+                    {
+                        mustShow = !hasShownReconnectFaultDialog;
+                        hasShownReconnectFaultDialog = true;
+                    }
+
+                    RaiseReconnectStopped();
+
+                    if (mustShow)
+                    {
+                        ShowReconnectFaultDialog(faultCode, faultMessage);
+                    }
+
                     return;
                 }
 
+
                 Logger.Info("LobbyHub reconnected successfully.");
-                RaiseReconnectStopped();
+                RaiseReconnectStopped(); 
                 StopReconnectLoop();
             }
             catch (CommunicationException ex)
@@ -884,6 +915,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 SafeAbort();
             }
         }
+        
 
         private void ResetLobbyContext()
         {
@@ -1015,6 +1047,24 @@ namespace WPFTheWeakestRival.Infrastructure
             StartReconnectLoop();
         }
 
+        private static bool IsDatabaseFault(ServiceFault fault)
+        {
+            if (fault == null)
+            {
+                return false;
+            }
+
+            string code = (fault.Code ?? string.Empty).Trim();
+            string message = (fault.Message ?? string.Empty).Trim();
+
+            if (string.Equals(code, FaultCodeDatabase, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return message.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
         private void RaiseDatabaseErrorDetected(ServiceFault fault)
         {
             try
@@ -1025,6 +1075,38 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 Logger.Warn("LobbyHub.RaiseDatabaseErrorDetected failed.", ex);
             }
+
+        }
+
+        private void ShowReconnectFaultDialog(string faultCode, string faultMessage)
+        {
+            string safeCode = (faultCode ?? string.Empty).Trim();
+            string safeMessage = (faultMessage ?? string.Empty).Trim();
+
+            string text =
+                string.IsNullOrWhiteSpace(safeCode) && string.IsNullOrWhiteSpace(safeMessage)
+                    ? ReconnectFaultDialogGeneric
+                    : string.IsNullOrWhiteSpace(safeCode)
+                        ? safeMessage
+                        : string.IsNullOrWhiteSpace(safeMessage)
+                            ? safeCode
+                            : string.Format(CultureInfo.InvariantCulture, ReconnectFaultDialogFormat, safeCode, safeMessage);
+
+            Ui(() =>
+            {
+                try
+                {
+                    MessageBox.Show(
+                        text,
+                        ReconnectFaultDialogTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("ShowReconnectFaultDialog failed.", ex);
+                }
+            });
         }
     }
 }
