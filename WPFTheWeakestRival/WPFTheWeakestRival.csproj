@@ -174,7 +174,6 @@
     <Compile Include="Models\LeaderboardRow.cs" />
     <Compile Include="Models\LobbyPlayerItem.cs" />
     <Compile Include="Models\PlayerVoteItem.cs" />
-    <Compile Include="ModifyProfilePage.xaml.cs" />
     <Compile Include="Pages\DuelSelectionPage.xaml.cs">
       <DependentUpon>DuelSelectionPage.xaml</DependentUpon>
     </Compile>
@@ -752,9 +751,6 @@
     <Resource Include="Assets\Wildcards\DOUBLE.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\Wildcards\EXTRA_TIME.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Assets\Wildcards\FORCED_BANK.png" />
   </ItemGroup>
   <ItemGroup>
@@ -780,6 +776,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\LobbyService\item1.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\PASS_Q.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
