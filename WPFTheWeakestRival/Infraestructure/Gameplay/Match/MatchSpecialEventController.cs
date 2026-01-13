@@ -103,66 +103,83 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private (string title, string description) LocalizeSpecialEvent(string eventName, string description)
         {
-            string title = string.IsNullOrWhiteSpace(eventName) ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT : eventName;
-            string desc = string.IsNullOrWhiteSpace(description) ? string.Empty : description;
+            string title = string.IsNullOrWhiteSpace(eventName)
+                ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT
+                : eventName;
+
+            string desc = string.IsNullOrWhiteSpace(description)
+                ? string.Empty
+                : description;
 
             CultureInfo culture = LocalizationManager.Current.Culture;
 
             if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE) ||
                 IsCode(description, MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE))
             {
-                return (Lang.specialEventBombQuestionTitle, Lang.specialEventBombQuestionDesc);
+                return (Lang.msgSpecialEventBombQuestionTitle, Lang.msgSpecialEventBombQuestionDesc);
             }
 
             if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE) ||
                 IsCode(description, MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE))
             {
-                return (Lang.specialEventBombAppliedTitle, string.Empty);
+                return (Lang.msgSpecialEventBombAppliedTitle, string.Empty);
             }
 
             if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE) ||
                 IsCode(description, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE))
             {
-                return (Lang.specialEventSurpriseExamTitle, Lang.specialEventSurpriseExamDesc);
+                return (Lang.msgSpecialEventSurpriseExamTitle, Lang.msgSpecialEventSurpriseExamDesc);
             }
 
             if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE) ||
                 IsCode(description, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE))
             {
-                return (Lang.specialEventSurpriseExamResolvedTitle, string.Empty);
+                return (Lang.msgSpecialEventSurpriseExamResolvedTitle, string.Empty);
             }
 
             if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE) ||
                 IsCode(description, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE))
             {
-                return (Lang.specialEventLightningWildcardTitle, string.Empty);
+                return (Lang.msgSpecialEventLightningWildcardTitle, string.Empty);
             }
 
             if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE) ||
                 IsCode(description, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE))
             {
-                return (Lang.specialEventExtraWildcardTitle, string.Empty);
+                return (Lang.msgSpecialEventExtraWildcardTitle, string.Empty);
             }
 
             if (IsSabotageEvent(eventName, description))
             {
-                string sabotageDesc = string.Format(culture, Lang.specialEventSabotageDescFormat, SABOTAGE_TIME_SECONDS);
-                return (Lang.specialEventSabotageTitle, sabotageDesc);
+                string sabotageDesc = string.Format(culture, Lang.msgSpecialEventSabotageDescFormat, SABOTAGE_TIME_SECONDS);
+                return (Lang.msgSpecialEventSabotageTitle, sabotageDesc);
             }
 
             if (darknessController.IsDarkModeStartEvent(eventName, description))
             {
-                return (Lang.specialEventDarknessTitle, string.Empty);
+                return (Lang.msgSpecialEventDarknessTitle, string.Empty);
             }
 
             if (darknessController.IsDarkModeEndEvent(eventName, description) ||
                 darknessController.IsLegacyDarknessEndEvent(eventName, description))
             {
-                return (Lang.specialEventDarknessEndedTitle, string.Empty);
+                return (Lang.msgSpecialEventDarknessEndedTitle, string.Empty);
+            }
+
+            if (!string.IsNullOrWhiteSpace(eventName) &&
+                eventName == eventName.ToUpperInvariant() &&
+                eventName.Contains("_"))
+            {
+                title = eventName.Replace('_', ' ').ToLowerInvariant();
+                if (title.Length > 1)
+                {
+                    title = char.ToUpperInvariant(title[0]) + title.Substring(1);
+                }
             }
 
             return (title, desc);
         }
+
 
 
         private async Task<bool> TryHandleVoteRevealAsync(string eventName, string description)

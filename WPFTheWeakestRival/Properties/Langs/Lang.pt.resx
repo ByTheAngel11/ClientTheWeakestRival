@@ -807,16 +807,6 @@
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>Não há nenhuma conta registrada com esse e-mail.</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="noFriends" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="commonAcept" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="noFriends" xml:space="preserve">
     <value>Você ainda não tem amigos</value>
   </data>
@@ -870,5 +860,78 @@
   </data>
   <data name="btnGlobalClose" xml:space="preserve">
     <value>Fechar</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="msgSpecialEventBombQuestionTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventBombQuestionDesc" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventBombAppliedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventSurpriseExamTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventSurpriseExamDesc" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventSurpriseExamResolvedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventLightningWildcardTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventExtraWildcardTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventSabotageTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventSabotageDescFormat" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventDarknessTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventDarknessEndedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventBombQuestionTitle" xml:space="preserve">
+    <value>Pergunta sobre bomba”</value>
+  </data>
+  <data name="msgSpecialEventBombQuestionDesc" xml:space="preserve">
+    <value>Pergunta sobre bomba: correto +0,50 para banco, errado -0,50</value>
+  </data>
+  <data name="msgSpecialEventBombAppliedTitle" xml:space="preserve">
+    <value>Bomba de perguntas aplicada</value>
+  </data>
+  <data name="msgSpecialEventSurpriseExamTitle" xml:space="preserve">
+    <value>Exame surpresa</value>
+  </data>
+  <data name="msgSpecialEventSurpriseExamDesc" xml:space="preserve">
+    <value>Responda rapidamente.</value>
+  </data>
+  <data name="msgSpecialEventSurpriseExamResolvedTitle" xml:space="preserve">
+    <value>Exame surpresa resolvido”</value>
+  </data>
+  <data name="msgSpecialEventLightningWildcardTitle" xml:space="preserve">
+    <value>Curinga relâmpago concedido</value>
+  </data>
+  <data name="msgSpecialEventExtraWildcardTitle" xml:space="preserve">
+    <value>Curinga extra concedido</value>
+  </data>
+  <data name="msgSpecialEventSabotageTitle" xml:space="preserve">
+    <value>Sabotar</value>
+  </data>
+  <data name="msgSpecialEventSabotageDescFormat" xml:space="preserve">
+    <value>Tempo de turno reduzido para {0} segundos.</value>
+  </data>
+  <data name="msgSpecialEventDarknessTitle" xml:space="preserve">
+    <value>Escuridão</value>
+  </data>
+  <data name="msgSpecialEventDarknessEndedTitle" xml:space="preserve">
+    <value>A escuridão acabou</value>
   </data>
 </root>
