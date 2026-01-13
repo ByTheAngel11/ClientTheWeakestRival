@@ -66,7 +66,6 @@ namespace WPFTheWeakestRival.Infrastructure
         public event Action<int> ReconnectAttempted;
         public event Action ReconnectExhausted;
 
-
         private int reconnectAttemptCount;
         public event Action<Exception> ChatSendFailed;
 
@@ -118,7 +117,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 {
                     CurrentLobbyId = response.Lobby.LobbyId;
                     CurrentAccessCode = response.Lobby.AccessCode ?? string.Empty;
-                    lastAccessCode = CurrentAccessCode ?? string.Empty;
+                    lastAccessCode = CurrentAccessCode;
                 }
 
                 StopReconnectLoop();
@@ -241,7 +240,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 ? normalizedCode
                 : response.Lobby.AccessCode;
 
-            lastAccessCode = CurrentAccessCode ?? string.Empty;
+            lastAccessCode = CurrentAccessCode;
         }
 
         public async Task LeaveLobbyAsync(string token)
@@ -542,16 +541,22 @@ namespace WPFTheWeakestRival.Infrastructure
 
             StopReconnectLoop();
 
+            LobbyServiceClient localClient = client;
+
             try
             {
-                if (client != null && client.State == CommunicationState.Faulted)
+                if (localClient == null)
                 {
-                    client.Abort();
+                    return;
                 }
-                else if (client != null)
+
+                if (localClient.State == CommunicationState.Faulted)
                 {
-                    client.Close();
+                    localClient.Abort();
+                    return;
                 }
+
+                localClient.Close();
             }
             catch (CommunicationException ex)
             {
@@ -618,10 +623,13 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             try
             {
-                if (client != null)
+                LobbyServiceClient localClient = client;
+                if (localClient == null)
                 {
-                    client.Abort();
+                    return;
                 }
+
+                localClient.Abort();
             }
             catch (Exception ex)
             {
@@ -742,6 +750,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 {
                     return;
                 }
+
                 reconnectAttemptCount++;
                 attempt = reconnectAttemptCount;
 
@@ -753,7 +762,6 @@ namespace WPFTheWeakestRival.Infrastructure
                 }
 
                 isReconnectInProgress = true;
-                
             }
 
             RaiseReconnectAttempted(attempt);
@@ -891,7 +899,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private bool CanUseDispatcher()
         {
-            return dispatcher != null && !dispatcher.HasShutdownStarted && !dispatcher.HasShutdownFinished;
+            return !dispatcher.HasShutdownStarted && !dispatcher.HasShutdownFinished;
         }
 
         private void RaiseReconnectStarted()
@@ -956,7 +964,5 @@ namespace WPFTheWeakestRival.Infrastructure
 
             StartReconnectLoop();
         }
-
-
     }
 }

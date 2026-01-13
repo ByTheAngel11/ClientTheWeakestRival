@@ -138,7 +138,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             lightningController = new LightningChallengeController(
                 ui,
                 state,
-                overlay,
                 wildcards,
                 questions,
                 timer,
