@@ -795,5 +795,8 @@
   <ItemGroup>
     <Resource Include="Assets\reconnecting.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Wildcards\PASS_Q.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
