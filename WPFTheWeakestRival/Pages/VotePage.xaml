@@ -12,7 +12,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Título + tiempo -->
         <StackPanel Orientation="Horizontal"
                     Grid.Row="0">
             <TextBlock Text="VOTACIÓN - ELIGE AL RIVAL MÁS DÉBIL"
@@ -31,7 +30,6 @@
                        Foreground="White" />
         </StackPanel>
 
-        <!-- Lista de jugadores -->
         <ListBox x:Name="LstVotePlayers"
                  Grid.Row="2"
                  Margin="0,4,0,4"
@@ -60,7 +58,6 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <!-- Botones -->
         <StackPanel Grid.Row="4"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">

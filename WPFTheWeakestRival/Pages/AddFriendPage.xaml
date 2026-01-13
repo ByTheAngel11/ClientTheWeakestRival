@@ -124,7 +124,6 @@
 
                                             <StackPanel Orientation="Horizontal"
                                                         VerticalAlignment="Center">
-                                                <!-- Aceptar solicitud -->
                                                 <Button Style="{StaticResource HoverScaleButton}"
                                                         Content="{loc:Loc addFriendAccept}"
                                                         Visibility="{Binding ShowAccept, Converter={StaticResource BoolToVis}}"
@@ -143,7 +142,6 @@
                     </ScrollViewer>
                 </Border>
 
-                <!-- Cerrar -->
                 <StackPanel Grid.Row="5"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"

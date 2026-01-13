@@ -11,7 +11,6 @@ namespace WPFTheWeakestRival
     public partial class EmailVerificationWindow : Window
     {
         private const int DEFAULT_RESEND_COOLDOWN_SECONDS = 60;
-        // Mantener los tokens de código que provienen del servicio para las comparaciones
         private const string CODE_INVALID = "Codigo invalido";
         private const string CODE_EXPIRED = "Codigo expirado";
 

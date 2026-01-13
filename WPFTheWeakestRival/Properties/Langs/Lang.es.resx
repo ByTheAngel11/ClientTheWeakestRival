@@ -693,9 +693,6 @@
   <data name="Email.SendVerificationCode.Smtp.MailboxUnavailable" xml:space="preserve">
     <value>Error de correo: el destinatario no está disponible. No se pudo enviar el código para restablecer la contraseña.</value>
   </data>
-  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
-    <value>Error de correo: la dirección del destinatario no es válida.</value>
-  </data>
   <data name="BORRAR" xml:space="preserve">
     <value>Error de correo: la dirección del destinatario no es válida.</value>
   </data>
@@ -734,6 +731,9 @@
   </data>
   <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
     <value>Error de correo: el destinatario no está disponible. No se pudo enviar el código para restablecer la contraseña.</value>
+  </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Error de correo: la dirección del destinatario no es válida.</value>
   </data>
   <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
     <value>Error de correo: configuración inválida del servidor de correo.</value>
@@ -806,5 +806,24 @@
   </data>
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>No existe una cuenta registrada con ese correo.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="noFriends" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonAcept" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>Aún no tienes amigos</value>
+  </data>
+  <data name="commonAcept" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Rechazar</value>
   </data>
 </root>

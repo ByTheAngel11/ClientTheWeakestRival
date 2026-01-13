@@ -396,9 +396,9 @@ namespace WPFTheWeakestRival.Properties.Langs {
         /// <summary>
         ///   Busca una cadena traducida similar a Acept.
         /// </summary>
-        public static string commonAccept {
+        public static string commonAcept {
             get {
-                return ResourceManager.GetString("commonAccept", resourceCulture);
+                return ResourceManager.GetString("commonAcept", resourceCulture);
             }
         }
         

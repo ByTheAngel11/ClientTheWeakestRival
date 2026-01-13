@@ -6,10 +6,9 @@ using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
+using WPFTheWeakestRival.Infrastructure.Gameplay;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
-using WPFTheWeakestRival.Infrastructure.Gameplay;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 using WildcardFault = WPFTheWeakestRival.WildcardService.ServiceFault;
 
@@ -19,44 +18,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchSessionCoordinator));
 
-        private const string LegacyDarknessStartCode = "DARKNESS_STARTED";
-        private const string LegacyDarknessEndCode = "DARKNESS_ENDED";
-
-        private const string DarkModeStartCode = "DARK_MODE_STARTED";
-        private const string DarkModeEndCode = "DARK_MODE_ENDED";
-        private const string DarkModeVoteRevealCode = "DARK_MODE_VOTE_REVEAL";
-
-        private const string DarknessKeywordEs = "oscuras";
-        private const string DarknessUnknownName = "???";
-        private const string DarknessTurnLabel = "A oscuras";
-
-        private const string DarkModeVoteRevealTitle = "A oscuras";
-        private const string DarkModeVoteRevealDescription = "Voto revelado.";
-
-        private const string SabotageCode = "SABOTAGE";
-        private const string SabotageUsedCode = "SABOTAGE_USED";
-        private const string SabotageAppliedCode = "SABOTAGE_APPLIED";
-        private const string SabotageKeywordEs = "sabotaje";
-
-        private const int SabotageTimeSeconds = 15;
-
-        private const int FinalPlayersCount = 2;
-        private const string FinalPhaseLabelText = "Final 1 vs 1";
-
-        private const string GenericPlayerNameTemplate = "Jugador {0}";
-        private const string RevealVoteTemplate = "Votaste por: {0}";
-
-        private const string VotePhaseLogTemplate = "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}";
-        private const string SpecialEventLogTemplate = "OnSpecialEvent. MatchId={0}, Name='{1}', Desc='{2}'";
-
-        private const string LightningSuccessTemplate = "¡Has completado el reto relámpago! Respuestas correctas: {0}.";
-        private const string LightningFailTemplate = "Reto relámpago finalizado. Respuestas correctas: {0}.";
-        private const string MatchFinishedLabelText = "Partida finalizada";
-
         private const string GameplayEndpointName = "WSDualHttpBinding_IGameplayService";
 
         private const string ReconnectingTitle = "Reconectando…";
         private const string ReconnectingDescription = "Intentando recuperar la conexión con el servidor.";
+
+        private const string VotePhaseLogTemplate = "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}";
 
         private const string ContextVotePhaseStarted = "MatchSessionCoordinator.VotePhaseStarted";
         private const string ContextSpecialEvent = "MatchSessionCoordinator.SpecialEvent";
@@ -64,6 +31,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string ContextLightningFinished = "MatchSessionCoordinator.LightningFinished";
         private const string ContextTurnOrderInitialized = "MatchSessionCoordinator.TurnOrderInitialized";
         private const string ContextTurnOrderChanged = "MatchSessionCoordinator.TurnOrderChanged";
+
+        private const int FinalPlayersCount = 2;
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -80,7 +49,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private QuestionController questions;
         private MatchDialogController dialogs;
 
-        private int lightningTimeLimitSeconds;
+        private MatchInputController inputController;
+        private MatchPhaseLabelController phaseController;
+        private MatchDarknessController darknessController;
+        private MatchSpecialEventController specialEventController;
+        private LightningChallengeController lightningController;
+
         private bool isDisposed;
 
         public MatchSessionCoordinator(MatchWindowUiRefs ui, MatchSessionState state)
@@ -128,7 +102,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (ui.TxtTimer != null) ui.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
 
             wildcards.InitializeEmpty();
-            UpdatePhaseLabel();
         }
 
         private void InitializeGameplayClient()
@@ -140,33 +113,67 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             callbackBridge = hub.Callbacks;
 
+            gameplay = new GameplayClientProxy(hub);
+
+            questions = new QuestionController(ui, state, gameplay, timer);
+            questions.InitializeEmptyUi();
+
+            dialogs = new MatchDialogController(ui, state, gameplay);
+
+            phaseController = new MatchPhaseLabelController(ui, state, overlay);
+            darknessController = new MatchDarknessController(ui, state, turns, questions);
+
+            inputController = new MatchInputController(ui, state, wildcards, CanUseWildcardNow);
+
+            specialEventController = new MatchSpecialEventController(
+                state,
+                overlay,
+                wildcards,
+                questions,
+                dialogs,
+                phaseController,
+                darknessController,
+                RefreshWildcardUseState);
+
+            lightningController = new LightningChallengeController(
+                ui,
+                state,
+                wildcards,
+                questions,
+                timer,
+                phaseController,
+                inputController,
+                RefreshWildcardUseState);
+
+            BindCallbacks();
+
+            phaseController.UpdatePhaseLabel();
+            RefreshWildcardUseState();
+        }
+
+        private void BindCallbacks()
+        {
             callbackBridge.NextQuestion += (matchId, targetPlayer, question, chain, banked) =>
                 HandleNextQuestion(targetPlayer, question, chain, banked);
 
             callbackBridge.AnswerEvaluated += (matchId, player, result) =>
             {
-                if (questions != null)
-                {
-                    questions.OnAnswerEvaluated(player, result);
-                }
+                questions?.OnAnswerEvaluated(player, result);
             };
 
             callbackBridge.BankUpdated += (matchId, bank) =>
             {
-                if (questions != null)
-                {
-                    questions.OnBankUpdated(bank);
-                }
+                questions?.OnBankUpdated(bank);
             };
 
             callbackBridge.VotePhaseStarted += (matchId, timeLimit) =>
                 RunAsync(() => HandleVotePhaseStartedAsync(matchId, timeLimit), ContextVotePhaseStarted);
 
             callbackBridge.Elimination += (matchId, eliminated) =>
-                HandleElimination(eliminated);
+                specialEventController.HandleElimination(eliminated);
 
             callbackBridge.SpecialEvent += (matchId, name, description) =>
-                RunAsync(() => HandleSpecialEventAsync(matchId, name, description), ContextSpecialEvent);
+                RunAsync(() => specialEventController.HandleSpecialEventAsync(matchId, name, description), ContextSpecialEvent);
 
             callbackBridge.CoinFlipResolved += (matchId, coinFlip) =>
                 HandleCoinFlip(coinFlip);
@@ -178,26 +185,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 HandleMatchFinished(winner);
 
             callbackBridge.LightningChallengeStarted += (m, r, tp, tq, ts) =>
-                HandleLightningChallengeStarted(tp, ts);
+                lightningController.HandleStarted(tp, ts);
 
             callbackBridge.LightningChallengeQuestion += (m, r, qi, qq) =>
-                HandleLightningChallengeQuestion(qq);
+                lightningController.HandleQuestion(qq);
 
             callbackBridge.LightningChallengeFinished += (m, r, ca, ok) =>
-                RunAsync(() => HandleLightningChallengeFinishedAsync(ca, ok), ContextLightningFinished);
+                RunAsync(() => lightningController.HandleFinishedAsync(ca, ok), ContextLightningFinished);
 
             callbackBridge.TurnOrderInitialized += (matchId, turnOrder) =>
                 RunAsync(() => HandleTurnOrderInitializedAsync(turnOrder), ContextTurnOrderInitialized);
 
             callbackBridge.TurnOrderChanged += (matchId, turnOrder, reason) =>
                 RunAsync(() => HandleTurnOrderChangedAsync(turnOrder, reason), ContextTurnOrderChanged);
-
-            gameplay = new GameplayClientProxy(hub);
-
-            questions = new QuestionController(ui, state, gameplay, timer);
-            questions.InitializeEmptyUi();
-
-            dialogs = new MatchDialogController(ui, state, gameplay);
         }
 
         private static void RunAsync(Func<Task> action, string context)
@@ -224,7 +224,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         }
                         catch (Exception ex)
                         {
-                            System.GC.KeepAlive(ex);
+                            GC.KeepAlive(ex);
                         }
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
@@ -328,7 +328,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception logEx)
             {
-                System.GC.KeepAlive(logEx);
+                GC.KeepAlive(logEx);
             }
 
             try
@@ -340,7 +340,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 Logger.Warn("Timer stop failed while reconnecting.", timerEx);
             }
 
-            DisableGameplayInputs();
+            inputController.DisableGameplayInputs();
 
             try
             {
@@ -365,7 +365,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception logEx)
             {
-                System.GC.KeepAlive(logEx);
+                GC.KeepAlive(logEx);
             }
 
             try
@@ -378,45 +378,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             RefreshWildcardUseState();
-            RefreshGameplayInputs();
-        }
-
-        private void DisableGameplayInputs()
-        {
-            state.IsMyTurn = false;
-
-            if (ui.BtnBank != null) ui.BtnBank.IsEnabled = false;
-            if (ui.BtnAnswer1 != null) ui.BtnAnswer1.IsEnabled = false;
-            if (ui.BtnAnswer2 != null) ui.BtnAnswer2.IsEnabled = false;
-            if (ui.BtnAnswer3 != null) ui.BtnAnswer3.IsEnabled = false;
-            if (ui.BtnAnswer4 != null) ui.BtnAnswer4.IsEnabled = false;
-
-            wildcards.RefreshUseState(false);
-        }
-
-        private void RefreshGameplayInputs()
-        {
-            if (state.IsMatchFinished)
-            {
-                DisableGameplayInputs();
-                return;
-            }
-
-            bool canInteract = state.IsMyTurn
-                && !state.IsEliminated(state.MyUserId)
-                && !state.IsInFinalPhase();
-
-            if (ui.BtnBank != null)
-            {
-                ui.BtnBank.IsEnabled = canInteract && !state.IsSurpriseExamActive;
-            }
-
-            if (ui.BtnAnswer1 != null) ui.BtnAnswer1.IsEnabled = canInteract;
-            if (ui.BtnAnswer2 != null) ui.BtnAnswer2.IsEnabled = canInteract;
-            if (ui.BtnAnswer3 != null) ui.BtnAnswer3.IsEnabled = canInteract;
-            if (ui.BtnAnswer4 != null) ui.BtnAnswer4.IsEnabled = canInteract;
-
-            wildcards.RefreshUseState(CanUseWildcardNow());
+            inputController.RefreshGameplayInputs();
         }
 
         private void HandleNextQuestion(
@@ -425,7 +387,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             decimal chain,
             decimal banked)
         {
-            DetectAndApplyFinalPhaseIfApplicable();
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
 
             if (!state.IsInFinalPhase())
             {
@@ -434,7 +396,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     : MatchPhase.NormalRound;
             }
 
-            UpdatePhaseLabel();
+            phaseController.UpdatePhaseLabel();
 
             questions.OnNextQuestion(
                 targetPlayer,
@@ -448,7 +410,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleVotePhaseStartedAsync(Guid matchId, TimeSpan timeLimit)
         {
-            DetectAndApplyFinalPhaseIfApplicable();
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
 
             if (state.IsInFinalPhase() || state.IsMatchFinished)
             {
@@ -463,519 +425,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             int voteDurationSeconds = (int)Math.Ceiling(timeLimit.TotalSeconds);
 
             await dialogs.ShowVoteAndSendAsync(voteDurationSeconds);
-        }
-
-        private void HandleElimination(GameplayServiceProxy.PlayerSummary eliminated)
-        {
-            if (eliminated == null)
-            {
-                return;
-            }
-
-            state.AddEliminated(eliminated.UserId);
-
-            if (state.IsDarknessActive)
-            {
-                EndDarknessMode(revealVote: true);
-            }
-
-            bool isMe = eliminated.UserId == state.MyUserId;
-
-            dialogs.ShowEliminationMessage(eliminated);
-            questions.OnEliminated(isMe);
-
-            DetectAndApplyFinalPhaseIfApplicable();
-
-            RefreshWildcardUseState();
-        }
-
-        private void DetectAndApplyFinalPhaseIfApplicable()
-        {
-            if (state.IsMatchFinished)
-            {
-                return;
-            }
-
-            int alivePlayers = state.GetAlivePlayersCount();
-
-            if (alivePlayers == FinalPlayersCount)
-            {
-                if (!state.IsInFinalPhase())
-                {
-                    state.CurrentPhase = MatchPhase.Final;
-                    UpdatePhaseLabel();
-                }
-
-                if (!state.HasAnnouncedFinalPhase)
-                {
-                    state.HasAnnouncedFinalPhase = true;
-
-                    try
-                    {
-                        overlay.ShowSpecialEvent(FinalPhaseLabelText, string.Empty);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn("DetectAndApplyFinalPhaseIfApplicable overlay error.", ex);
-                    }
-                }
-            }
-        }
-
-        private async Task HandleSpecialEventAsync(Guid matchId, string eventName, string description)
-        {
-            Logger.InfoFormat(
-                SpecialEventLogTemplate,
-                matchId,
-                eventName ?? string.Empty,
-                description ?? string.Empty);
-
-            state.CurrentPhase = MatchPhase.SpecialEvent;
-            UpdatePhaseLabel();
-
-            SpecialEventInfo info = SpecialEventInfo.Create(eventName, description);
-
-            bool handledVoteReveal = await TryHandleDarkModeVoteRevealAsync(info);
-            if (handledVoteReveal)
-            {
-                return;
-            }
-
-            ShowGenericSpecialEventOverlay(info);
-
-            SpecialEventKind kind = DetermineSpecialEventKind(info);
-            await ApplySpecialEventAsync(kind, info);
-        }
-
-        private async Task<bool> TryHandleDarkModeVoteRevealAsync(SpecialEventInfo info)
-        {
-            if (!IsDarkModeVoteRevealEvent(info.EventName, info.Description))
-            {
-                return false;
-            }
-
-            int? revealedUserId = TryParseFirstInt(info.EventName) ?? TryParseFirstInt(info.Description);
-            if (revealedUserId.HasValue && revealedUserId.Value > 0)
-            {
-                state.PendingDarknessVotedUserId = revealedUserId.Value;
-            }
-
-            overlay.ShowSpecialEvent(DarkModeVoteRevealTitle, DarkModeVoteRevealDescription);
-            TryRevealDarknessVote();
-
-            await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
-
-            return true;
-        }
-
-        private void ShowGenericSpecialEventOverlay(SpecialEventInfo info)
-        {
-            string title = string.IsNullOrWhiteSpace(info.EventName)
-                ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT
-                : info.EventName;
-
-            string desc = string.IsNullOrWhiteSpace(info.Description)
-                ? string.Empty
-                : info.Description;
-
-            overlay.ShowSpecialEvent(title, desc);
-        }
-
-        private SpecialEventKind DetermineSpecialEventKind(SpecialEventInfo info)
-        {
-            if (IsDarkModeStartEvent(info.EventName, info.Description))
-            {
-                return SpecialEventKind.DarkModeStart;
-            }
-
-            if (IsDarkModeEndEvent(info.EventName, info.Description))
-            {
-                return SpecialEventKind.DarkModeEnd;
-            }
-
-            if (IsLegacyDarknessEndEvent(info.EventName, info.Description))
-            {
-                return SpecialEventKind.LegacyDarknessEnd;
-            }
-
-            if (string.Equals(
-                info.EventName,
-                MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return SpecialEventKind.SurpriseExamStarted;
-            }
-
-            if (string.Equals(
-                info.EventName,
-                MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return SpecialEventKind.SurpriseExamResolved;
-            }
-
-            if (string.Equals(
-                info.EventName,
-                MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return SpecialEventKind.BombQuestion;
-            }
-
-            if (string.Equals(
-                info.EventName,
-                MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE,
-                StringComparison.OrdinalIgnoreCase))
-            {
-                return SpecialEventKind.BombApplied;
-            }
-
-            if (IsSabotageEvent(info.EventName, info.Description))
-            {
-                return SpecialEventKind.Sabotage;
-            }
-
-            if (string.Equals(info.EventName, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(info.EventName, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase))
-            {
-                return SpecialEventKind.WildcardGranted;
-            }
-
-            return SpecialEventKind.Other;
-        }
-
-        private async Task ApplySpecialEventAsync(SpecialEventKind kind, SpecialEventInfo info)
-        {
-            switch (kind)
-            {
-                case SpecialEventKind.DarkModeStart:
-                    BeginDarknessMode();
-                    await AutoHideAndRefreshWildcardsAsync();
-                    return;
-
-                case SpecialEventKind.DarkModeEnd:
-                    EndDarknessMode(revealVote: false);
-                    await AutoHideAndRefreshWildcardsAsync();
-                    return;
-
-                case SpecialEventKind.LegacyDarknessEnd:
-                    EndDarknessMode(revealVote: true);
-                    await AutoHideAndRefreshWildcardsAsync();
-                    return;
-
-                case SpecialEventKind.SurpriseExamStarted:
-                    questions.SetSurpriseExamActive(true);
-                    state.IsSurpriseExamActive = true;
-                    await AutoHideAndRefreshWildcardsAsync();
-                    return;
-
-                case SpecialEventKind.SurpriseExamResolved:
-                    questions.SetSurpriseExamActive(false);
-                    state.IsSurpriseExamActive = false;
-                    await AutoHideAndRefreshWildcardsAsync();
-                    return;
-
-                case SpecialEventKind.BombQuestion:
-                    questions.SetBombQuestionUi(true);
-                    state.IsBombQuestionActive = true;
-                    RefreshWildcardUseState();
-                    return;
-
-                case SpecialEventKind.BombApplied:
-                    questions.SetBombQuestionUi(false);
-                    state.IsBombQuestionActive = false;
-                    RefreshWildcardUseState();
-                    return;
-
-                case SpecialEventKind.Sabotage:
-                    ApplySabotageTimeOverride(info);
-                    await AutoHideAndRefreshWildcardsAsync();
-                    return;
-
-                case SpecialEventKind.WildcardGranted:
-                    await wildcards.LoadAsync();
-                    RefreshWildcardUseState();
-                    return;
-
-                default:
-                    return;
-            }
-        }
-
-        private void ApplySabotageTimeOverride(SpecialEventInfo info)
-        {
-            int sourceTurnUserId = state.CurrentTurnUserId;
-
-            int? parsedTargetUserId =
-                TryParseFirstInt(info.EventName) ??
-                TryParseFirstInt(info.Description);
-
-            if (questions == null)
-            {
-                return;
-            }
-
-            questions.ScheduleNextTurnTimeLimitOverride(
-                SabotageTimeSeconds,
-                sourceTurnUserId > 0 ? (int?)sourceTurnUserId : null,
-                parsedTargetUserId);
-        }
-
-        private async Task AutoHideAndRefreshWildcardsAsync()
-        {
-            await overlay.AutoHideSpecialEventAsync(MatchConstants.SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS);
-            RefreshWildcardUseState();
-        }
-
-        private enum SpecialEventKind
-        {
-            Other = 0,
-            DarkModeStart = 1,
-            DarkModeEnd = 2,
-            LegacyDarknessEnd = 3,
-            SurpriseExamStarted = 4,
-            SurpriseExamResolved = 5,
-            BombQuestion = 6,
-            BombApplied = 7,
-            Sabotage = 8,
-            WildcardGranted = 9
-        }
-
-        private sealed class SpecialEventInfo
-        {
-            private SpecialEventInfo(string eventName, string description)
-            {
-                EventName = eventName;
-                Description = description;
-            }
-
-            public string EventName { get; }
-            public string Description { get; }
-
-            public static SpecialEventInfo Create(string eventName, string description)
-            {
-                return new SpecialEventInfo(
-                    eventName ?? string.Empty,
-                    description ?? string.Empty);
-            }
-        }
-
-        private static bool IsSabotageEvent(string eventName, string description)
-        {
-            return IsCode(eventName, SabotageCode)
-                || IsCode(description, SabotageCode)
-                || IsCode(eventName, SabotageUsedCode)
-                || IsCode(description, SabotageUsedCode)
-                || IsCode(eventName, SabotageAppliedCode)
-                || IsCode(description, SabotageAppliedCode)
-                || StartsWithCode(eventName, SabotageCode)
-                || StartsWithCode(description, SabotageCode)
-                || ContainsKeyword(eventName, SabotageKeywordEs)
-                || ContainsKeyword(description, SabotageKeywordEs)
-                || ContainsKeyword(eventName, SabotageCode)
-                || ContainsKeyword(description, SabotageCode);
-        }
-
-        private static bool IsDarkModeStartEvent(string eventName, string description)
-        {
-            return IsCode(eventName, DarkModeStartCode)
-                || IsCode(description, DarkModeStartCode)
-                || IsCode(eventName, LegacyDarknessStartCode)
-                || IsCode(description, LegacyDarknessStartCode)
-                || ContainsKeyword(eventName, DarknessKeywordEs)
-                || ContainsKeyword(description, DarknessKeywordEs);
-        }
-
-        private static bool IsDarkModeEndEvent(string eventName, string description)
-        {
-            return IsCode(eventName, DarkModeEndCode)
-                || IsCode(description, DarkModeEndCode);
-        }
-
-        private static bool IsLegacyDarknessEndEvent(string eventName, string description)
-        {
-            return IsCode(eventName, LegacyDarknessEndCode)
-                || IsCode(description, LegacyDarknessEndCode);
-        }
-
-        private static bool IsDarkModeVoteRevealEvent(string eventName, string description)
-        {
-            return StartsWithCode(eventName, DarkModeVoteRevealCode)
-                || StartsWithCode(description, DarkModeVoteRevealCode);
-        }
-
-        private static bool IsCode(string text, string code)
-        {
-            return string.Equals(text != null ? text.Trim() : null, code, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool StartsWithCode(string text, string code)
-        {
-            if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(code))
-            {
-                return false;
-            }
-
-            return text.Trim().StartsWith(code, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool ContainsKeyword(string text, string keyword)
-        {
-            if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(keyword))
-            {
-                return false;
-            }
-
-            return text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        private void BeginDarknessMode()
-        {
-            if (state.IsDarknessActive)
-            {
-                return;
-            }
-
-            state.IsDarknessActive = true;
-
-            int seed = BuildDarknessSeed(state.Match.MatchId, state.CurrentRoundNumber);
-
-            state.DarknessSeed = seed;
-
-            turns.EnableDarknessMode(seed);
-
-            questions.SetDarknessActive(true);
-
-            ApplyDarknessUiImmediate();
-        }
-
-        private void ApplyDarknessUiImmediate()
-        {
-            if (ui.TurnAvatar != null)
-            {
-                ui.TurnAvatar.Visibility = Visibility.Collapsed;
-            }
-
-            if (ui.TxtTurnPlayerName != null)
-            {
-                ui.TxtTurnPlayerName.Text = DarknessUnknownName;
-            }
-
-            if (ui.TxtTurnLabel != null)
-            {
-                ui.TxtTurnLabel.Text = DarknessTurnLabel;
-            }
-
-            if (ui.TurnBannerBackground != null)
-            {
-                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
-            }
-        }
-
-        private void EndDarknessMode(bool revealVote)
-        {
-            if (!state.IsDarknessActive)
-            {
-                return;
-            }
-
-            state.IsDarknessActive = false;
-            state.DarknessSeed = null;
-
-            turns.DisableDarknessMode();
-            questions.SetDarknessActive(false);
-
-            if (revealVote)
-            {
-                TryRevealDarknessVote();
-            }
-
-            if (!state.IsMatchFinished)
-            {
-                DetectAndApplyFinalPhaseIfApplicable();
-
-                if (!state.IsInFinalPhase())
-                {
-                    state.CurrentPhase = MatchPhase.NormalRound;
-                }
-
-                UpdatePhaseLabel();
-            }
-        }
-
-        private void TryRevealDarknessVote()
-        {
-            int? votedUserId = state.PendingDarknessVotedUserId;
-            state.PendingDarknessVotedUserId = null;
-
-            if (!votedUserId.HasValue || votedUserId.Value <= 0)
-            {
-                return;
-            }
-
-            try
-            {
-                PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
-
-                PlayerSummary voted = lobbyPlayers.FirstOrDefault(p => p != null && p.UserId == votedUserId.Value);
-
-                string name = voted != null && !string.IsNullOrWhiteSpace(voted.DisplayName)
-                    ? voted.DisplayName
-                    : string.Format(CultureInfo.CurrentCulture, GenericPlayerNameTemplate, votedUserId.Value);
-
-                MessageBox.Show(
-                    string.Format(CultureInfo.CurrentCulture, RevealVoteTemplate, name),
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("TryRevealDarknessVote error.", ex);
-            }
-        }
-
-        private static int BuildDarknessSeed(Guid matchId, int roundNumber)
-        {
-            return matchId.GetHashCode() ^ roundNumber;
-        }
-
-        private static int? TryParseFirstInt(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return null;
-            }
-
-            string t = text.Trim();
-
-            int i = 0;
-            while (i < t.Length && !char.IsDigit(t[i]))
-            {
-                i++;
-            }
-
-            if (i >= t.Length)
-            {
-                return null;
-            }
-
-            int start = i;
-
-            while (i < t.Length && char.IsDigit(t[i]))
-            {
-                i++;
-            }
-
-            string numberText = t.Substring(start, i - start);
-
-            int value;
-            if (int.TryParse(numberText, NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
-            {
-                return value;
-            }
-
-            return null;
         }
 
         private void HandleCoinFlip(GameplayServiceProxy.CoinFlipResolvedDto coinFlip)
@@ -1000,14 +449,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.CurrentPhase = coinFlip.ShouldEnableDuel ? MatchPhase.Duel : MatchPhase.NormalRound;
 
-            DetectAndApplyFinalPhaseIfApplicable();
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
 
             if (state.IsInFinalPhase())
             {
                 state.CurrentPhase = MatchPhase.Final;
             }
 
-            UpdatePhaseLabel();
+            phaseController.UpdatePhaseLabel();
 
             overlay.ShowCoinFlip(coinFlip);
 
@@ -1016,7 +465,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleDuelCandidatesAsync(GameplayServiceProxy.DuelCandidatesDto duelCandidates)
         {
-            DetectAndApplyFinalPhaseIfApplicable();
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
 
             if (state.IsInFinalPhase() || state.IsMatchFinished)
             {
@@ -1056,7 +505,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             state.CurrentPhase = MatchPhase.Duel;
-            UpdatePhaseLabel();
+            phaseController.UpdatePhaseLabel();
 
             await dialogs.ShowDuelSelectionAndSendAsync(weakestRivalUserId, items);
         }
@@ -1065,7 +514,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (state.IsDarknessActive)
             {
-                EndDarknessMode(revealVote: false);
+                darknessController.EndDarknessMode(revealVote: false);
             }
 
             state.IsMatchFinished = true;
@@ -1081,11 +530,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 Logger.Warn("HandleMatchFinished timer stop error.", ex);
             }
 
-            if (ui.BtnBank != null) ui.BtnBank.IsEnabled = false;
-            if (ui.BtnAnswer1 != null) ui.BtnAnswer1.IsEnabled = false;
-            if (ui.BtnAnswer2 != null) ui.BtnAnswer2.IsEnabled = false;
-            if (ui.BtnAnswer3 != null) ui.BtnAnswer3.IsEnabled = false;
-            if (ui.BtnAnswer4 != null) ui.BtnAnswer4.IsEnabled = false;
+            inputController.DisableGameplayInputs();
 
             RefreshWildcardUseState();
 
@@ -1093,138 +538,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (ui.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = MatchFinishedLabelText;
+                ui.TxtTurnLabel.Text = MatchConstants.MATCH_FINISHED_LABEL_TEXT;
             }
 
             state.CurrentPhase = MatchPhase.Finished;
-            UpdatePhaseLabel();
-        }
-
-        private void HandleLightningChallengeStarted(GameplayServiceProxy.PlayerSummary targetPlayer, int totalTimeSeconds)
-        {
-            state.CurrentPhase = MatchPhase.SpecialEvent;
-            UpdatePhaseLabel();
-
-            int targetUserId = targetPlayer != null ? targetPlayer.UserId : 0;
-
-            bool isTargetMe = targetUserId == state.MyUserId && !state.IsEliminated(state.MyUserId);
-
-            state.IsMyTurn = isTargetMe;
-
-            lightningTimeLimitSeconds = totalTimeSeconds > 0
-                ? totalTimeSeconds
-                : MatchConstants.QUESTION_TIME_SECONDS;
-
-            if (ui.BtnBank != null)
-            {
-                ui.BtnBank.IsEnabled = false;
-            }
-
-            if (ui.TxtTurnLabel != null)
-            {
-                ui.TxtTurnLabel.Text = state.IsMyTurn ? "Reto relámpago: tu turno" : "Reto relámpago en curso";
-            }
-
-            if (ui.TurnBannerBackground != null)
-            {
-                ui.TurnBannerBackground.Background =
-                    (Brush)ui.Window.FindResource(state.IsMyTurn ? "Brush.Turn.MyTurn" : "Brush.Turn.OtherTurn");
-            }
-
-            wildcards.RefreshUseState(false);
-        }
-
-        private void HandleLightningChallengeQuestion(GameplayServiceProxy.QuestionWithAnswersDto question)
-        {
-            state.CurrentPhase = MatchPhase.SpecialEvent;
-            UpdatePhaseLabel();
-
-            questions.OnLightningQuestion(question, lightningTimeLimitSeconds);
-        }
-
-        private async Task HandleLightningChallengeFinishedAsync(int correctAnswers, bool isSuccess)
-        {
-            try
-            {
-                timer.Stop();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("HandleLightningChallengeFinishedAsync timer stop error.", ex);
-            }
-
-            state.IsMyTurn = false;
-
-            string message = isSuccess
-                ? string.Format(CultureInfo.CurrentCulture, LightningSuccessTemplate, correctAnswers)
-                : string.Format(CultureInfo.CurrentCulture, LightningFailTemplate, correctAnswers);
-
-            MessageBox.Show(
-                message,
-                MatchConstants.GAME_MESSAGE_TITLE,
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
-
-            if (isSuccess)
-            {
-                await wildcards.LoadAsync();
-            }
-
-            DetectAndApplyFinalPhaseIfApplicable();
-
-            if (!state.IsMatchFinished)
-            {
-                state.CurrentPhase = state.IsInFinalPhase() ? MatchPhase.Final : MatchPhase.NormalRound;
-            }
-
-            UpdatePhaseLabel();
-
-            RefreshWildcardUseState();
-        }
-
-        private async Task HandleTurnOrderInitializedAsync(object turnOrder)
-        {
-            turns.ApplyTurnOrder(turnOrder);
-
-            SyncMyTurnFromTurnOrder(turnOrder);
-
-            DetectAndApplyFinalPhaseIfApplicable();
-
-            RefreshWildcardUseState();
-
-            if (state.IsDarknessActive)
-            {
-                return;
-            }
-
-            await turns.PlayTurnIntroAsync(
-                turnOrder,
-                (t, d) => overlay.ShowSpecialEvent(t, d),
-                () => overlay.HideSpecialEvent());
-        }
-
-        private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
-        {
-            turns.ApplyTurnOrder(turnOrder);
-
-            SyncMyTurnFromTurnOrder(turnOrder);
-
-            DetectAndApplyFinalPhaseIfApplicable();
-
-            RefreshWildcardUseState();
-
-            if (state.IsDarknessActive)
-            {
-                return;
-            }
-
-            overlay.ShowSpecialEvent(
-                MatchConstants.TURN_ORDER_CHANGED_TITLE,
-                string.IsNullOrWhiteSpace(reasonCode) ? string.Empty : reasonCode);
-
-            await Task.Delay(MatchConstants.TURN_INTRO_FINAL_DELAY_MS);
-
-            overlay.HideSpecialEvent();
+            phaseController.UpdatePhaseLabel();
         }
 
         public async Task OnAnswerButtonClickAsync(System.Windows.Controls.Button button)
@@ -1273,13 +591,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (!state.IsMatchFinished)
             {
-                DetectAndApplyFinalPhaseIfApplicable();
+                phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
 
                 state.CurrentPhase = state.IsInFinalPhase()
                     ? MatchPhase.Final
                     : MatchPhase.NormalRound;
 
-                UpdatePhaseLabel();
+                phaseController.UpdatePhaseLabel();
             }
         }
 
@@ -1288,7 +606,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (!state.IsMatchFinished)
             {
                 MessageBoxResult result = MessageBox.Show(
-                    "La partida aún no ha terminado. ¿Deseas salir al lobby?",
+                    MatchConstants.EXIT_TO_LOBBY_PROMPT,
                     MatchConstants.GAME_MESSAGE_TITLE,
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
@@ -1310,49 +628,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             dialogs.ShowMatchResultAndClose(closeWindow);
         }
 
-        private void UpdatePhaseLabel()
-        {
-            if (ui.TxtPhase == null)
-            {
-                return;
-            }
-
-            string phaseDetail;
-
-            switch (state.CurrentPhase)
-            {
-                case MatchPhase.NormalRound:
-                    phaseDetail = string.Format(CultureInfo.CurrentCulture, MatchConstants.PHASE_ROUND_FORMAT, state.CurrentRoundNumber);
-                    break;
-
-                case MatchPhase.Duel:
-                    phaseDetail = MatchConstants.PHASE_DUEL_TEXT;
-                    break;
-
-                case MatchPhase.SpecialEvent:
-                    phaseDetail = MatchConstants.PHASE_SPECIAL_EVENT_TEXT;
-                    break;
-
-                case MatchPhase.Final:
-                    phaseDetail = FinalPhaseLabelText;
-                    break;
-
-                case MatchPhase.Finished:
-                    phaseDetail = MatchConstants.PHASE_FINISHED_TEXT;
-                    break;
-
-                default:
-                    phaseDetail = string.Empty;
-                    break;
-            }
-
-            ui.TxtPhase.Text = string.Format(
-                CultureInfo.CurrentCulture,
-                "{0}: {1}",
-                MatchConstants.PHASE_TITLE,
-                phaseDetail);
-        }
-
         private void SyncMyTurnFromTurnOrder(object turnOrder)
         {
             var dto = turnOrder as GameplayServiceProxy.TurnOrderDto;
@@ -1367,7 +642,52 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.IsMyTurn = isMyTurnNow;
 
-            RefreshGameplayInputs();
+            inputController.RefreshGameplayInputs();
+        }
+
+        private async Task HandleTurnOrderInitializedAsync(object turnOrder)
+        {
+            turns.ApplyTurnOrder(turnOrder);
+
+            SyncMyTurnFromTurnOrder(turnOrder);
+
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+
+            RefreshWildcardUseState();
+
+            if (state.IsDarknessActive)
+            {
+                return;
+            }
+
+            await turns.PlayTurnIntroAsync(
+                turnOrder,
+                (t, d) => overlay.ShowSpecialEvent(t, d),
+                () => overlay.HideSpecialEvent());
+        }
+
+        private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
+        {
+            turns.ApplyTurnOrder(turnOrder);
+
+            SyncMyTurnFromTurnOrder(turnOrder);
+
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+
+            RefreshWildcardUseState();
+
+            if (state.IsDarknessActive)
+            {
+                return;
+            }
+
+            overlay.ShowSpecialEvent(
+                MatchConstants.TURN_ORDER_CHANGED_TITLE,
+                string.IsNullOrWhiteSpace(reasonCode) ? string.Empty : reasonCode);
+
+            await Task.Delay(MatchConstants.TURN_INTRO_FINAL_DELAY_MS);
+
+            overlay.HideSpecialEvent();
         }
 
         private bool CanUseWildcardNow()

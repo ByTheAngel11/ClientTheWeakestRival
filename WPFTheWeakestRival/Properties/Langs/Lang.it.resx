@@ -732,6 +732,9 @@
   <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
     <value>Errore di posta: il destinatario non è disponibile. Non è stato possibile inviare il codice di reimpostazione della password.</value>
   </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Errore di posta: l'indirizzo del destinatario non è valido.</value>
+  </data>
   <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
     <value>Errore di posta: configurazione del server di posta non valida.</value>
   </data>
@@ -777,9 +780,6 @@
   <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
     <value>Errore di posta: si è verificato un problema imprevisto. Impossibile inviare l'invito alla stanza.</value>
   </data>
-  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
-    <value>Errore di posta: l'indirizzo del destinatario non è valido.</value>
-  </data>
   <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
     <value>Errore di configurazione: stringa di connessione al server non trovata.</value>
   </data>
@@ -806,5 +806,24 @@
   </data>
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>Non esiste alcun account registrato con quell'e-mail.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="noFriends" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonAcept" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>Non hai ancora amici</value>
+  </data>
+  <data name="commonAcept" xml:space="preserve">
+    <value>Accetta</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Rifiutare</value>
   </data>
 </root>

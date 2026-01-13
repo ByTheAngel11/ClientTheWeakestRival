@@ -132,11 +132,16 @@
     <Compile Include="Infraestructure\Gameplay\GameplayCallbackBridge.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\DifficultyMapper.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\GameplayClientProxy.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\LightningChallengeController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchConstants.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchDarknessConstants.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchDarknessController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchDialogController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchInputController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchPhaseLabelController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSessionCoordinator.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSessionState.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchSpecialEventController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchWindowUiRefs.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\OverlayController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\QuestionController.cs" />
@@ -147,6 +152,16 @@
     <Compile Include="Infraestructure\IStoppable.cs" />
     <Compile Include="Infraestructure\LobbyEventBus.cs" />
     <Compile Include="Infraestructure\LobbyHub.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyChatController.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyFriendsController.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyMatchController.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyPlayersController.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyProfileController.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyReconnectController.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyRuntimeState.cs" />
+    <Compile Include="Infraestructure\Lobby\LobbyUiDispatcher.cs" />
+    <Compile Include="Infraestructure\Lobby\LoginNavigator.cs" />
+    <Compile Include="Infraestructure\Lobby\SessionTokenProvider.cs" />
     <Compile Include="Infraestructure\ProfileImageCache.cs" />
     <Compile Include="Infraestructure\SessionCleanup.cs" />
     <Compile Include="Infraestructure\SessionLogoutCoordinator.cs" />
@@ -174,7 +189,6 @@
     <Compile Include="Models\LeaderboardRow.cs" />
     <Compile Include="Models\LobbyPlayerItem.cs" />
     <Compile Include="Models\PlayerVoteItem.cs" />
-    <Compile Include="ModifyProfilePage.xaml.cs" />
     <Compile Include="Pages\DuelSelectionPage.xaml.cs">
       <DependentUpon>DuelSelectionPage.xaml</DependentUpon>
     </Compile>
@@ -750,9 +764,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Wildcards\DOUBLE.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Assets\Wildcards\EXTRA_TIME.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Wildcards\FORCED_BANK.png" />

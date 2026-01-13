@@ -732,6 +732,9 @@
   <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
     <value>Erreur de courrier : le destinataire n'est pas disponible. Le code de réinitialisation du mot de passe n'a pas pu être envoyé.</value>
   </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Erreur de courrier : l'adresse du destinataire n'est pas valide.</value>
+  </data>
   <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
     <value>Erreur de messagerie : configuration du serveur de messagerie invalide.</value>
   </data>
@@ -777,9 +780,6 @@
   <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
     <value>Erreur de courrier : un problème inattendu s'est produit. L'invitation à la salle n'a pas pu être envoyée.</value>
   </data>
-  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
-    <value>Erreur de courrier : l'adresse du destinataire n'est pas valide.</value>
-  </data>
   <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
     <value>Erreur de configuration : chaîne de connexion au serveur introuvable.</value>
   </data>
@@ -806,5 +806,24 @@
   </data>
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>Aucun compte n'est enregistré avec cette adresse e-mail.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="noFriends" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonAcept" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>Tu n'as pas encore d'amis</value>
+  </data>
+  <data name="commonAcept" xml:space="preserve">
+    <value>Accepter</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Rejeter</value>
   </data>
 </root>

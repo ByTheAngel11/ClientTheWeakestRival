@@ -1,522 +1,114 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.ServiceModel;
-using System.Threading.Tasks;
+﻿using log4net;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
-using System.Windows.Navigation;
-using System.Windows.Threading;
-using log4net;
-using WPFTheWeakestRival.AuthService;
-using WPFTheWeakestRival.FriendService;
-using WPFTheWeakestRival.Helpers;
-using WPFTheWeakestRival.Infrastructure;
-using WPFTheWeakestRival.LobbyService;
-using WPFTheWeakestRival.Models;
-using WPFTheWeakestRival.Properties.Langs;
-using WPFTheWeakestRival.Pages;
-using LobbyContracts = WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.Infraestructure.Lobby;
 
 namespace WPFTheWeakestRival
 {
     public partial class LobbyWindow : Window
     {
-        private const int DRAWER_ANIM_IN_MS = 180;
-        private const int DRAWER_ANIM_OUT_MS = 160;
-
-        private const double OVERLAY_BLUR_INITIAL_RADIUS = 0.0;
-        private const double OVERLAY_BLUR_TARGET_RADIUS = 3.0;
-
-        private const int FRIENDS_DRAWER_INITIAL_TRANSLATE_X = 340;
-
-        private const int RECENT_ECHO_WINDOW_SECONDS = 2;
-
-        private const int DEFAULT_AVATAR_SIZE = 80;
-        private const string DEFAULT_DISPLAY_NAME = "Yo";
-        private const string UNKNOWN_AUTHOR_DISPLAY_NAME = "?";
-        private const string CHAT_TIME_FORMAT = "HH:mm";
-
-        private const double SETTINGS_WINDOW_WIDTH = 480;
-        private const double SETTINGS_WINDOW_HEIGHT = 420;
-
-        private const double FRIEND_DIALOG_WINDOW_WIDTH = 600;
-        private const double FRIEND_DIALOG_WINDOW_HEIGHT = 420;
-
-        private const double PROFILE_WINDOW_WIDTH = 720;
-        private const double PROFILE_WINDOW_HEIGHT = 460;
-
-        private const string ERROR_COPY_CODE_NO_CODE = "No hay un código de lobby para copiar.";
-        private const string ERROR_COPY_CODE_GENERIC = "Ocurrió un error al copiar el código al portapapeles.";
-
-        private const string ERROR_START_MATCH_GENERIC = "Ocurrió un error al iniciar la partida.";
-
-        private const string FAULT_REPORT_COOLDOWN = "REPORT_COOLDOWN";
-
-        private const byte ACCOUNT_STATUS_SUSPENDED = 3;
-        private const byte ACCOUNT_STATUS_BANNED = 4;
-        private const string SANCTION_END_TIME_FORMAT = "g";
-
-        private const string RECONNECT_STATUS_START = "Reconectando...";
-        private const string RECONNECT_STATUS_ATTEMPT_FORMAT = "Reconectando... intento {0}";
-
-        private const string FRIEND_ENDPOINT_CONFIGURATION_NAME = "WSHttpBinding_IFriendService";
-
-        private const string INVITE_MENU_HEADER = "Invitar al lobby";
-        private const string ERROR_INVITE_NO_CODE = "No hay un código de lobby disponible para invitar.";
-        private const string ERROR_INVITE_GENERIC = "Ocurrió un error al enviar la invitación.";
-        private const string INFO_INVITE_SENT = "Invitación enviada.";
-        private const string ReconnectExhaustedMessage =
-            "No se pudo reconectar con el servidor. ¿Deseas volver a intentar? (Sí) \n\n" +
-            "Si seleccionas No, regresarás al inicio de sesión.";
-
-        private const string WaitingLineMessage =
-            "Sin conexión. En espera...";
-
-        private const int RECONNECT_CYCLE_DELAY_SECONDS = 5;
-
-        private const string RECONNECT_EXHAUSTED_MESSAGE =
-            "No se pudo reconectar con el servidor.\n\n¿Quieres quedarte en espera?\n\n" +
-            "Sí: me quedo y seguiré intentando.\n" +
-            "No: regresar al inicio de sesión.";
-
-        private const string WAITING_LINE_MESSAGE = "Sin conexión. En espera...";
-
-
-
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyWindow));
 
-        private readonly BlurEffect overlayBlur = new BlurEffect
-        {
-            Radius = OVERLAY_BLUR_INITIAL_RADIUS
-        };
-
-        private readonly ObservableCollection<LobbyPlayerItem> lobbyPlayers =
-            new ObservableCollection<LobbyPlayerItem>();
-
-        private Guid? currentLobbyId;
-        private string currentAccessCode = string.Empty;
-
-        private string myDisplayName = DEFAULT_DISPLAY_NAME;
-
-        private readonly ObservableCollection<ChatLine> chatLines = new ObservableCollection<ChatLine>();
-        private string lastSentText = string.Empty;
-        private DateTime lastSentUtc = DateTime.MinValue;
-
-        private readonly ObservableCollection<PendingMessage> pendingMessages =
-            new ObservableCollection<PendingMessage>();
-
-        private readonly DispatcherTimer pendingRetryTimer;
-        private bool isRetryingPending;
-
-        private readonly ObservableCollection<FriendItem> friendItems = new ObservableCollection<FriendItem>();
-        private int pendingRequestsCount;
-
-        private bool isPrivate = true;
-        private int maxPlayers = 4;
-
-        private decimal startingScore = 0m;
-        private decimal maxScore = 100m;
-        private decimal pointsCorrect = 10m;
-        private decimal pointsWrong = -5m;
-        private decimal pointsEliminationGain = 5m;
-
-        private bool isTiebreakCoinflipAllowed = true;
-
-        private bool isOpeningMatchWindow;
-
-        private bool isNavigatingToLogin;
-
-        private readonly DispatcherTimer reconnectCycleTimer;
-        private bool isAutoWaitingForReconnect;
-
-
-
-        private sealed class ChatLine
-        {
-            public string Author { get; set; } = string.Empty;
-            public string Text { get; set; } = string.Empty;
-            public string Time { get; set; } = string.Empty;
-        }
-
-        private sealed class PendingMessage
-        {
-            public string Token { get; set; } = string.Empty;
-            public Guid LobbyId { get; set; }
-            public string Text { get; set; } = string.Empty;
-            public DateTime QueuedUtc { get; set; } = DateTime.UtcNow;
-        }
+        private readonly LobbyRuntimeState runtimeState;
+        private readonly LobbyChatController chatController;
+        private readonly LobbyFriendsController friendsController;
+        private readonly LobbyPlayersController playersController;
+        private readonly LobbyProfileController profileController;
+        private readonly LobbyMatchController matchController;
+        private readonly LobbyReconnectController reconnectController;
 
         public LobbyWindow()
         {
             InitializeComponent();
 
-            RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.HighQuality);
+            runtimeState = new LobbyRuntimeState();
 
-            if (imgAvatar != null)
-            {
-                RenderOptions.SetBitmapScalingMode(imgAvatar, BitmapScalingMode.HighQuality);
-            }
+            var ui = new LobbyUiDispatcher(this, Logger);
 
-            if (lstChatMessages != null)
-            {
-                lstChatMessages.ItemsSource = chatLines;
-            }
+            chatController = new LobbyChatController(
+                ui,
+                runtimeState,
+                lstChatMessages,
+                txtChatInput);
 
-            if (txtChatInput != null)
-            {
-                txtChatInput.Text = string.Empty;
-            }
+            friendsController = new LobbyFriendsController(
+                ui,
+                runtimeState,
+                this,
+                grdMainArea,
+                friendsDrawerHost,
+                friendsDrawerTT,
+                friendsEmptyPanel,
+                lstFriends,
+                txtRequestsCount,
+                Logger);
 
-            if (lstFriends != null)
-            {
-                lstFriends.ItemsSource = friendItems;
-                lstFriends.PreviewMouseRightButtonDown += LstFriendsPreviewMouseRightButtonDown;
-                lstFriends.ContextMenuOpening += LstFriendsContextMenuOpening;
-                UpdateFriendDrawerUi();
-            }
+            playersController = new LobbyPlayersController(
+                ui,
+                runtimeState,
+                txtLobbyHeader,
+                txtAccessCode,
+                lstLobbyPlayers,
+                Logger);
 
-            if (lstLobbyPlayers != null)
-            {
-                lstLobbyPlayers.ItemsSource = lobbyPlayers;
-            }
+            profileController = new LobbyProfileController(
+                ui,
+                runtimeState,
+                imgAvatar,
+                Logger);
 
-            AppServices.Lobby.LobbyUpdated += OnLobbyUpdatedFromHub;
-            AppServices.Lobby.PlayerJoined += OnPlayerJoinedFromHub;
-            AppServices.Lobby.PlayerLeft += OnPlayerLeftFromHub;
-            AppServices.Lobby.ChatMessageReceived += OnChatMessageReceivedFromHub;
-            AppServices.Lobby.MatchStarted += OnMatchStartedFromHub;
-            AppServices.Lobby.ForcedLogout += OnForcedLogoutFromHub;
-            AppServices.Lobby.ChatSendFailed += OnChatSendFailed;
-            AppServices.Lobby.ReconnectStarted += OnReconnectStartedFromHub;
-            AppServices.Lobby.ReconnectAttempted += OnReconnectAttemptedFromHub;
-            AppServices.Lobby.ReconnectStopped += OnReconnectStoppedFromHub;
-            AppServices.Lobby.ReconnectExhausted += OnReconnectExhaustedFromHub;
-            AppServices.Lobby.DatabaseErrorDetected += OnDatabaseErrorDetectedFromHub;
+            matchController = new LobbyMatchController(
+                ui,
+                runtimeState,
+                this,
+                btnStart,
+                profileController,
+                Logger);
 
-            reconnectCycleTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(RECONNECT_CYCLE_DELAY_SECONDS)
-            };
-            reconnectCycleTimer.Tick += (_, __) => OnReconnectCycleDelayElapsed();
+            reconnectController = new LobbyReconnectController(
+                ui,
+                runtimeState,
+                grdReconnectOverlay,
+                txtReconnectStatus,
+                new LoginNavigator(Logger),
+                chatController,
+                Logger);
 
-
-            AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
-            AppServices.Friends.Start();
-
-            RefreshProfileButtonAvatar();
-
-            pendingRetryTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(5)
-            };
-            pendingRetryTimer.Tick += async (_, __) => await RetryPendingMessagesAsync();
-
-            pendingMessages.CollectionChanged += (_, __) =>
-            {
-                if (pendingMessages.Count > 0 && !pendingRetryTimer.IsEnabled)
-                {
-                    pendingRetryTimer.Start();
-                }
-                else if (pendingMessages.Count == 0 && pendingRetryTimer.IsEnabled)
-                {
-                    pendingRetryTimer.Stop();
-                }
-            };
-
-            Loaded += async (_, __) =>
-            {
-                try
-                {
-                    await AppServices.Friends.ManualRefreshAsync();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("Error refreshing friends list on lobby window load.", ex);
-                }
-            };
-
-            Unloaded += OnWindowUnloaded;
-        }
-        private void Ui(Action action)
-        {
-            if (action == null)
-            {
-                return;
-            }
-
-            try
-            {
-                if (Dispatcher.CheckAccess())
-                {
-                    action();
-                    return;
-                }
-
-                Dispatcher.BeginInvoke(action);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("LobbyWindow.Ui error.", ex);
-            }
+            Loaded += LobbyWindowLoaded;
+            Unloaded += LobbyWindowUnloaded;
         }
 
         public void InitializeExistingLobby(Guid lobbyId, string accessCode, string lobbyName)
         {
-            currentLobbyId = lobbyId;
-            currentAccessCode = accessCode ?? string.Empty;
-
-            UpdateLobbyHeader(txtLobbyHeader, txtAccessCode, lobbyName, currentAccessCode);
+            playersController.InitializeExistingLobby(lobbyId, accessCode, lobbyName);
         }
 
-        public void InitializeExistingLobby(LobbyContracts.LobbyInfo info)
+        public void InitializeExistingLobby(LobbyService.LobbyInfo info)
         {
-            if (info == null)
-            {
-                return;
-            }
-
-            currentLobbyId = info.LobbyId;
-
-            currentAccessCode = string.IsNullOrWhiteSpace(info.AccessCode)
-                ? string.Empty
-                : info.AccessCode;
-
-            UpdateLobbyHeader(txtLobbyHeader, txtAccessCode, info.LobbyName, currentAccessCode);
-
-            LobbyAvatarHelper.RebuildLobbyPlayers(
-                lobbyPlayers,
-                info.Players,
-                MapPlayerToLobbyItem);
+            playersController.InitializeExistingLobby(info);
         }
 
-        private void OnChatSendFailed(Exception ex)
+        private void LobbyWindowLoaded(object sender, RoutedEventArgs e)
         {
-            if (ex == null)
-            {
-                return;
-            }
-
-            Ui(() => AppendSystemLine(Lang.noConnection));
+            friendsController.OnLoaded();
+            profileController.RefreshAvatar();
         }
 
-        private void BtnSettingsClick(object sender, RoutedEventArgs e)
+        private void LobbyWindowUnloaded(object sender, RoutedEventArgs e)
         {
-            var defaults = new MatchSettingsDefaults(
-                isPrivate,
-                maxPlayers,
-                startingScore,
-                maxScore,
-                pointsCorrect,
-                pointsWrong,
-                pointsEliminationGain,
-                isTiebreakCoinflipAllowed);
-
-            var page = new MatchSettingsPage(defaults);
-
-            var settingsFrame = new Frame
-            {
-                Content = page,
-                NavigationUIVisibility = NavigationUIVisibility.Hidden
-            };
-
-            var settingsWindow = new Window
-            {
-                Title = Lang.lblSettings,
-                Content = settingsFrame,
-                Width = SETTINGS_WINDOW_WIDTH,
-                Height = SETTINGS_WINDOW_HEIGHT,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Owner = this,
-                ResizeMode = ResizeMode.NoResize
-            };
-
-            bool? dialogResult = settingsWindow.ShowDialog();
-            if (dialogResult == true)
-            {
-                isPrivate = page.IsPrivate;
-                maxPlayers = page.MaxPlayers;
-                startingScore = page.StartingScore;
-                maxScore = page.MaxScore;
-                pointsCorrect = page.PointsPerCorrect;
-                pointsWrong = page.PointsPerWrong;
-                pointsEliminationGain = page.PointsPerEliminationGain;
-                isTiebreakCoinflipAllowed = page.AllowTiebreakCoinflip;
-            }
-        }
-
-        private void BtnFriendsClick(object sender, RoutedEventArgs e)
-        {
-            _ = OpenFriendsDrawerAsync();
-        }
-
-        private void FriendsDimmerMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            CloseFriendsDrawer();
-        }
-
-        private void BtnCloseFriendsClick(object sender, RoutedEventArgs e)
-        {
-            CloseFriendsDrawer();
-        }
-
-        private async Task OpenFriendsDrawerAsync()
-        {
-            if (friendsDrawerHost.Visibility == Visibility.Visible)
-            {
-                return;
-            }
-
-            if (grdMainArea != null)
-            {
-                grdMainArea.Effect = overlayBlur;
-            }
-
-            var blurAnimation = new DoubleAnimation(
-                overlayBlur.Radius,
-                OVERLAY_BLUR_TARGET_RADIUS,
-                TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
-            {
-                EasingFunction = new QuadraticEase()
-            };
-            overlayBlur.BeginAnimation(BlurEffect.RadiusProperty, blurAnimation);
-
             try
             {
-                await AppServices.Friends.ManualRefreshAsync();
+                reconnectController.Dispose();
+                matchController.Dispose();
+                playersController.Dispose();
+                friendsController.Dispose();
+                chatController.Dispose();
             }
             catch (Exception ex)
             {
-                Logger.Error("Error refreshing friends list while opening friends drawer.", ex);
-            }
-
-            friendsDrawerTT.X = FRIENDS_DRAWER_INITIAL_TRANSLATE_X;
-            friendsDrawerHost.Opacity = 0;
-            friendsDrawerHost.Visibility = Visibility.Visible;
-
-            if (FindResource("sbOpenFriendsDrawer") is Storyboard storyboard)
-            {
-                storyboard.Begin(this, true);
-            }
-        }
-
-        private void CloseFriendsDrawer()
-        {
-            if (friendsDrawerHost.Visibility != Visibility.Visible)
-            {
-                return;
-            }
-
-            if (FindResource("sbCloseFriendsDrawer") is Storyboard storyboard)
-            {
-                storyboard.Completed += (_, __) =>
-                {
-                    friendsDrawerHost.Visibility = Visibility.Collapsed;
-
-                    if (grdMainArea != null)
-                    {
-                        grdMainArea.Effect = null;
-                    }
-                };
-
-                storyboard.Begin(this, true);
-            }
-
-            var blurAnimation = new DoubleAnimation(
-                overlayBlur.Radius,
-                OVERLAY_BLUR_INITIAL_RADIUS,
-                TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
-            {
-                EasingFunction = new QuadraticEase()
-            };
-            overlayBlur.BeginAnimation(BlurEffect.RadiusProperty, blurAnimation);
-        }
-
-        private void BtnSendFriendRequestClick(object sender, RoutedEventArgs e)
-        {
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            try
-            {
-                var page = new AddFriendPage(new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME), token);
-
-                var friendFrame = new Frame
-                {
-                    Content = page,
-                    NavigationUIVisibility = NavigationUIVisibility.Hidden
-                };
-
-                var friendWindow = new Window
-                {
-                    Title = Lang.btnSendRequests,
-                    Content = friendFrame,
-                    Width = FRIEND_DIALOG_WINDOW_WIDTH,
-                    Height = FRIEND_DIALOG_WINDOW_HEIGHT,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = this
-                };
-
-                friendWindow.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error opening AddFriendPage dialog from lobby.", ex);
-
-                MessageBox.Show(
-                    Lang.addFriendServiceError,
-                    Lang.addFriendTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
-        {
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            try
-            {
-                var page = new FriendRequestsPage(new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME), token);
-
-                var friendRequestsFrame = new Frame
-                {
-                    Content = page,
-                    NavigationUIVisibility = NavigationUIVisibility.Hidden
-                };
-
-                var friendRequestsWindow = new Window
-                {
-                    Title = Lang.btnRequests,
-                    Content = friendRequestsFrame,
-                    Width = FRIEND_DIALOG_WINDOW_WIDTH,
-                    Height = FRIEND_DIALOG_WINDOW_HEIGHT,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = this
-                };
-
-                friendRequestsWindow.ShowDialog();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error opening FriendRequestsPage dialog from lobby.", ex);
-
-                MessageBox.Show(
-                    Lang.addFriendServiceError,
-                    Lang.btnRequests,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                Logger.Warn("LobbyWindow unload dispose error.", ex);
             }
         }
 
@@ -527,1242 +119,73 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            if (friendsDrawerHost.Visibility == Visibility.Visible)
+            if (friendsController.IsDrawerOpen)
             {
-                CloseFriendsDrawer();
+                friendsController.CloseDrawer();
                 return;
             }
 
             Close();
         }
 
-        private void BtnModifyProfileClick(object sender, RoutedEventArgs e)
+        private void BtnFriendsClick(object sender, RoutedEventArgs e)
         {
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            try
-            {
-                var page = new ModifyProfilePage(
-                    AppServices.Lobby.RawClient,
-                    new AuthServiceClient("WSHttpBinding_IAuthService"),
-                    token)
-                {
-                    Title = Lang.profileTitle
-                };
-
-                var profileFrame = new Frame
-                {
-                    Content = page,
-                    NavigationUIVisibility = NavigationUIVisibility.Hidden
-                };
-
-                var profileWindow = new Window
-                {
-                    Title = Lang.profileTitle,
-                    Content = profileFrame,
-                    Width = PROFILE_WINDOW_WIDTH,
-                    Height = PROFILE_WINDOW_HEIGHT,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Owner = this
-                };
-
-                profileWindow.ShowDialog();
-                RefreshProfileButtonAvatar();
-            }
-            catch (FaultException<AuthService.ServiceFault> ex)
-            {
-                Logger.Warn("Auth fault while opening ModifyProfilePage from lobby.", ex);
-
-                MessageBox.Show(
-                    ex.Detail.Code + ": " + ex.Detail.Message,
-                    Lang.profileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while opening ModifyProfilePage from lobby.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.profileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Unexpected error while opening ModifyProfilePage from lobby.", ex);
-
-                MessageBox.Show(
-                    Lang.UiGenericError,
-                    Lang.profileTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            friendsController.OpenDrawerAsync();
         }
 
-        private static void SetDefaultAvatar(Image avatarTarget)
+        private void BtnCloseFriendsClick(object sender, RoutedEventArgs e)
         {
-            var defaultAvatar = UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
-
-            if (avatarTarget != null)
-            {
-                avatarTarget.Source = defaultAvatar;
-            }
+            friendsController.CloseDrawer();
         }
 
-        private static byte[] TryGetProfileBytes(object profile)
+        private void FriendsDimmerMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (profile == null)
-            {
-                return Array.Empty<byte>();
-            }
-
-            try
-            {
-                var type = profile.GetType();
-
-                var prop =
-                    type.GetProperty("AvatarBytes") ??
-                    type.GetProperty("ProfileImageBytes") ??
-                    type.GetProperty("ProfilePhotoBytes") ??
-                    type.GetProperty("PhotoBytes");
-
-                if (prop == null || prop.PropertyType != typeof(byte[]))
-                {
-                    return Array.Empty<byte>();
-                }
-
-                var value = prop.GetValue(profile, null) as byte[];
-                return value ?? Array.Empty<byte>();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("TryGetProfileBytes error.", ex);
-                return Array.Empty<byte>();
-            }
+            friendsController.CloseDrawer();
         }
 
-        private void RefreshProfileButtonAvatar()
+        private void BtnSendFriendRequestClick(object sender, RoutedEventArgs e)
         {
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                SetDefaultAvatar(imgAvatar);
-                return;
-            }
-
-            try
-            {
-                var myProfile = AppServices.Lobby.GetMyProfile(token);
-
-                myDisplayName = string.IsNullOrWhiteSpace(myProfile?.DisplayName)
-                    ? DEFAULT_DISPLAY_NAME
-                    : myProfile.DisplayName;
-
-                byte[] avatarBytes = TryGetProfileBytes(myProfile);
-
-                var avatarImageSource =
-                    UiImageHelper.TryCreateFromBytes(avatarBytes, DEFAULT_AVATAR_SIZE) ??
-                    UiImageHelper.DefaultAvatar(DEFAULT_AVATAR_SIZE);
-
-                if (imgAvatar != null)
-                {
-                    imgAvatar.Source = avatarImageSource;
-                }
-            }
-            catch (FaultException<LobbyService.ServiceFault> ex)
-            {
-                Logger.Warn("Lobby fault while refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar(imgAvatar);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Warn("Communication error while refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar(imgAvatar);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Unexpected error refreshing profile button avatar in lobby.", ex);
-                SetDefaultAvatar(imgAvatar);
-            }
+            friendsController.OpenAddFriendDialog();
         }
 
-        private async void BtnStartMatchClick(object sender, RoutedEventArgs e)
+        private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
         {
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            if (btnStart != null)
-            {
-                btnStart.IsEnabled = false;
-            }
-
-            try
-            {
-                var client = AppServices.Lobby.RawClient;
-
-                var request = new StartLobbyMatchRequest
-                {
-                    Token = token
-                };
-
-                await Task.Run(() => client.StartLobbyMatch(request));
-            }
-            catch (FaultException<LobbyService.ServiceFault> ex)
-            {
-                Logger.Warn("Fault al iniciar partida desde Lobby.", ex);
-
-                MessageBox.Show(
-                    ex.Detail.Code + ": " + ex.Detail.Message,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Error de comunicación al iniciar partida desde Lobby.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error inesperado al iniciar partida desde Lobby.", ex);
-
-                MessageBox.Show(
-                    ERROR_START_MATCH_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            finally
-            {
-                if (btnStart != null)
-                {
-                    btnStart.IsEnabled = true;
-                }
-            }
-        }
-
-        private static void UpdateLobbyHeader(
-            TextBlock lobbyHeaderText,
-            TextBlock accessCodeText,
-            string lobbyName,
-            string accessCode)
-        {
-            if (lobbyHeaderText != null)
-            {
-                lobbyHeaderText.Text = string.IsNullOrWhiteSpace(lobbyName)
-                    ? Lang.lobbyTitle
-                    : lobbyName;
-            }
-
-            if (accessCodeText != null)
-            {
-                accessCodeText.Text = string.IsNullOrWhiteSpace(accessCode)
-                    ? string.Empty
-                    : Lang.lobbyCodePrefix + accessCode;
-            }
-        }
-
-        private void AppendLine(string author, string text)
-        {
-            chatLines.Add(
-                new ChatLine
-                {
-                    Author = string.IsNullOrWhiteSpace(author) ? UNKNOWN_AUTHOR_DISPLAY_NAME : author,
-                    Text = text ?? string.Empty,
-                    Time = DateTime.Now.ToString(CHAT_TIME_FORMAT)
-                });
-
-            if (lstChatMessages != null && lstChatMessages.Items.Count > 0)
-            {
-                lstChatMessages.ScrollIntoView(
-                    lstChatMessages.Items[lstChatMessages.Items.Count - 1]);
-            }
-        }
-
-        private void AppendSystemLine(string text)
-        {
-            AppendLine(Lang.system, text);
-        }
-
-        private async void TxtChatInputKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter)
-            {
-                return;
-            }
-
-            e.Handled = true;
-
-            var messageText = (txtChatInput?.Text ?? string.Empty).Trim();
-            if (messageText.Length == 0)
-            {
-                return;
-            }
-
-            if (!currentLobbyId.HasValue)
-            {
-                MessageBox.Show(Lang.chatCreateOrJoinFirst);
-                return;
-            }
-
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            try
-            {
-                AppendLine(myDisplayName, messageText);
-
-                lastSentText = messageText;
-                lastSentUtc = DateTime.UtcNow;
-
-                await AppServices.Lobby.SendMessageAsync(token, currentLobbyId.Value, messageText);
-
-                if (txtChatInput != null)
-                {
-                    txtChatInput.Text = string.Empty;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error sending chat message in lobby.", ex);
-
-                EnqueuePendingMessage(token, currentLobbyId.Value, messageText);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.chatTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
-                if (txtChatInput != null)
-                {
-                    txtChatInput.Text = string.Empty;
-                }
-            }
-        }
-
-        private void EnqueuePendingMessage(string token, Guid lobbyId, string text)
-        {
-            try
-            {
-                var pm = new PendingMessage
-                {
-                    Token = token ?? string.Empty,
-                    LobbyId = lobbyId,
-                    Text = text ?? string.Empty,
-                    QueuedUtc = DateTime.UtcNow
-                };
-
-                pendingMessages.Add(pm);
-                AppendSystemLine(Lang.noConnection);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error enqueueing pending chat message.", ex);
-            }
-        }
-
-        private async Task RetryPendingMessagesAsync()
-        {
-            if (isRetryingPending)
-            {
-                return;
-            }
-
-            if (pendingMessages.Count == 0)
-            {
-                if (pendingRetryTimer.IsEnabled)
-                {
-                    pendingRetryTimer.Stop();
-                }
-
-                return;
-            }
-
-            isRetryingPending = true;
-
-            try
-            {
-                var copy = new PendingMessage[pendingMessages.Count];
-                pendingMessages.CopyTo(copy, 0);
-
-                foreach (var pm in copy)
-                {
-                    try
-                    {
-                        if (pm == null)
-                        {
-                            continue;
-                        }
-
-                        if (!currentLobbyId.HasValue || currentLobbyId.Value != pm.LobbyId)
-                        {
-                            pendingMessages.Remove(pm);
-                            continue;
-                        }
-
-                        await AppServices.Lobby.SendMessageAsync(pm.Token, pm.LobbyId, pm.Text);
-
-                        pendingMessages.Remove(pm);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn("Reintento de mensaje pendiente falló.", ex);
-                    }
-                }
-            }
-            finally
-            {
-                isRetryingPending = false;
-            }
-        }
-
-        private static LobbyPlayerItem MapPlayerToLobbyItem(LobbyContracts.AccountMini account)
-        {
-            var item = LobbyAvatarHelper.BuildFromAccountMini(account);
-            if (item == null)
-            {
-                return null;
-            }
-
-            var session = LoginWindow.AppSession.CurrentToken;
-            if (session != null && session.UserId == item.AccountId)
-            {
-                item.IsMe = true;
-            }
-
-            return item;
-        }
-
-        private void OnLobbyUpdatedFromHub(LobbyInfo info)
-        {
-            try
-            {
-                if (info == null)
-                {
-                    return;
-                }
-
-                currentLobbyId = info.LobbyId;
-
-                if (!string.IsNullOrWhiteSpace(info.AccessCode))
-                {
-                    currentAccessCode = info.AccessCode;
-                }
-
-                Ui(() =>
-                {
-                    UpdateLobbyHeader(txtLobbyHeader, txtAccessCode, info.LobbyName, currentAccessCode);
-
-                    LobbyAvatarHelper.RebuildLobbyPlayers(
-                        lobbyPlayers,
-                        info.Players,
-                        MapPlayerToLobbyItem);
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error handling lobby update from hub.", ex);
-            }
-        }
-
-        private void OnPlayerJoinedFromHub(LobbyContracts.PlayerSummary _)
-        {
-            try
-            {
-                Ui(() => AppendSystemLine(Lang.lobbyPlayerJoined));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error handling player-joined event from hub.", ex);
-            }
-        }
-
-        private void OnPlayerLeftFromHub(Guid _)
-        {
-            try
-            {
-                Ui(() => AppendSystemLine(Lang.lobbyPlayerLeft));
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error handling player-left event from hub.", ex);
-            }
-        }
-
-        private void OnChatMessageReceivedFromHub(ChatMessage chat)
-        {
-            try
-            {
-                if (chat == null)
-                {
-                    return;
-                }
-
-                Ui(() =>
-                {
-                    var author = string.IsNullOrWhiteSpace(chat.FromPlayerName)
-                        ? Lang.player
-                        : chat.FromPlayerName;
-
-                    var isMyRecentEcho =
-                        string.Equals(author, myDisplayName, StringComparison.OrdinalIgnoreCase) &&
-                        string.Equals(chat.Message ?? string.Empty, lastSentText, StringComparison.Ordinal) &&
-                        (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(RECENT_ECHO_WINDOW_SECONDS);
-
-                    if (!isMyRecentEcho)
-                    {
-                        AppendLine(author, chat.Message ?? string.Empty);
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error handling chat message received from hub.", ex);
-            }
-        }
-
-        private void OnFriendsUpdated(System.Collections.Generic.IReadOnlyList<FriendItem> list, int pending)
-        {
-            friendItems.Clear();
-
-            foreach (var friend in list)
-            {
-                friendItems.Add(friend);
-            }
-
-            pendingRequestsCount = pending;
-            UpdateFriendDrawerUi();
-        }
-
-        private void UpdateFriendDrawerUi()
-        {
-            if (friendsEmptyPanel != null)
-            {
-                friendsEmptyPanel.Visibility =
-                    friendItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-            }
-
-            if (lstFriends != null)
-            {
-                lstFriends.Visibility =
-                    friendItems.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-            }
-
-            if (txtRequestsCount != null)
-            {
-                txtRequestsCount.Text = pendingRequestsCount.ToString(CultureInfo.InvariantCulture);
-            }
-        }
-
-        private void OnWindowUnloaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                AppServices.Lobby.LobbyUpdated -= OnLobbyUpdatedFromHub;
-                AppServices.Lobby.PlayerJoined -= OnPlayerJoinedFromHub;
-                AppServices.Lobby.PlayerLeft -= OnPlayerLeftFromHub;
-                AppServices.Lobby.ChatMessageReceived -= OnChatMessageReceivedFromHub;
-                AppServices.Lobby.MatchStarted -= OnMatchStartedFromHub;
-                AppServices.Lobby.ForcedLogout -= OnForcedLogoutFromHub;
-                AppServices.Lobby.ChatSendFailed -= OnChatSendFailed;
-                AppServices.Lobby.ReconnectStarted -= OnReconnectStartedFromHub;
-                AppServices.Lobby.ReconnectAttempted -= OnReconnectAttemptedFromHub;
-                AppServices.Lobby.ReconnectStopped -= OnReconnectStoppedFromHub;
-                AppServices.Lobby.ReconnectExhausted -= OnReconnectExhaustedFromHub;
-                AppServices.Lobby.DatabaseErrorDetected -= OnDatabaseErrorDetectedFromHub;
-
-
-                if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
-                {
-                    reconnectCycleTimer.Stop();
-                }
-
-
-                AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
-
-                if (lstFriends != null)
-                {
-                    lstFriends.PreviewMouseRightButtonDown -= LstFriendsPreviewMouseRightButtonDown;
-                    lstFriends.ContextMenuOpening -= LstFriendsContextMenuOpening;
-                }
-
-                try
-                {
-                    if (pendingRetryTimer != null && pendingRetryTimer.IsEnabled)
-                    {
-                        pendingRetryTimer.Stop();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("Error stopping pendingRetryTimer on unload.", ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error detaching lobby and friends event handlers on window unload.", ex);
-            }
-        }
-
-        protected override async void OnClosed(EventArgs e)
-        {
-            try
-            {
-                var token = LoginWindow.AppSession.CurrentToken?.Token;
-
-                if (!string.IsNullOrWhiteSpace(token) && currentLobbyId.HasValue)
-                {
-                    await AppServices.Lobby.LeaveLobbyAsync(token);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error leaving lobby on window close.", ex);
-            }
-
-            base.OnClosed(e);
+            friendsController.OpenFriendRequestsDialog();
         }
 
         private void BtnCopyCodeClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(currentAccessCode))
-                {
-                    MessageBox.Show(
-                        ERROR_COPY_CODE_NO_CODE,
-                        Lang.lobbyTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-
-                    return;
-                }
-
-                Clipboard.SetText(currentAccessCode);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error copying lobby access code to clipboard.", ex);
-
-                MessageBox.Show(
-                    ERROR_COPY_CODE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            playersController.CopyCodeToClipboard();
         }
 
-        private void OnMatchStartedFromHub(LobbyService.MatchInfo match)
+        private void BtnSettingsClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (match == null)
-                {
-                    return;
-                }
-
-                Ui(() =>
-                {
-                    if (isOpeningMatchWindow)
-                    {
-                        Logger.Warn("OnMatchStartedFromHub ignored because match window is already opening.");
-                        return;
-                    }
-
-                    isOpeningMatchWindow = true;
-
-                    try
-                    {
-                        var token = LoginWindow.AppSession.CurrentToken?.Token ?? string.Empty;
-                        var session = LoginWindow.AppSession.CurrentToken;
-
-                        var myUserId = session != null ? session.UserId : 0;
-                        var isHost = false;
-
-                        var matchWindow = new MatchWindow(match, token, myUserId, isHost, this);
-
-                        matchWindow.Closed += (_, __) =>
-                        {
-                            Ui(() =>
-                            {
-                                try
-                                {
-                                    Show();
-                                    Activate();
-                                }
-                                catch (Exception ex)
-                                {
-                                    Logger.Warn("Error restoring lobby after match window closed.", ex);
-                                }
-                                finally
-                                {
-                                    isOpeningMatchWindow = false;
-                                }
-                            });
-                        };
-
-                        Hide();
-                        matchWindow.Show();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error("Error opening MatchWindow from lobby.", ex);
-
-                        try
-                        {
-                            Show();
-                            Activate();
-                        }
-                        catch (Exception showEx)
-                        {
-                            Logger.Warn("Error restoring lobby after MatchWindow open failure.", showEx);
-                        }
-                        finally
-                        {
-                            isOpeningMatchWindow = false;
-                        }
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error handling OnMatchStartedFromHub in LobbyWindow.", ex);
-            }
+            matchController.OpenSettings();
         }
 
-        private static void OnForcedLogoutFromHub(ForcedLogoutNotification notification)
+        private void BtnStartMatchClick(object sender, RoutedEventArgs e)
         {
-            Infraestructure.ForcedLogoutCoordinator.Handle(notification);
+            matchController.StartMatchAsync();
         }
 
-        private void LstFriendsPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void BtnModifyProfileClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (lstFriends == null)
-                {
-                    return;
-                }
-
-                var origin = e.OriginalSource as DependencyObject;
-                var container = FindAncestor<ListBoxItem>(origin);
-                if (container == null)
-                {
-                    return;
-                }
-
-                lstFriends.SelectedItem = container.DataContext;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error selecting friend item on right click.", ex);
-            }
+            matchController.OpenProfileDialog();
         }
 
-        private void LstFriendsContextMenuOpening(object sender, ContextMenuEventArgs e)
+        private void TxtChatInputKeyDown(object sender, KeyEventArgs e)
         {
-            try
-            {
-                if (lstFriends == null)
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                var friend = lstFriends.SelectedItem as FriendItem;
-                if (friend == null)
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                if (!currentLobbyId.HasValue || string.IsNullOrWhiteSpace(currentAccessCode))
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                var menu = new ContextMenu();
-
-                var inviteItem = new MenuItem
-                {
-                    Header = INVITE_MENU_HEADER,
-                    CommandParameter = friend
-                };
-
-                inviteItem.Click += MenuItemInviteToLobbyClick;
-
-                menu.Items.Add(inviteItem);
-
-                lstFriends.ContextMenu = menu;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error building friends context menu.", ex);
-                e.Handled = true;
-            }
+            chatController.HandleChatInputKeyDown(e);
         }
-
-        private async void MenuItemInviteToLobbyClick(object sender, RoutedEventArgs e)
-        {
-            var menuItem = sender as MenuItem;
-            var friend = menuItem?.CommandParameter as FriendItem;
-            if (friend == null)
-            {
-                return;
-            }
-
-            string token = GetSessionTokenOrShowMessage();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return;
-            }
-
-            if (!currentLobbyId.HasValue || string.IsNullOrWhiteSpace(currentAccessCode))
-            {
-                MessageBox.Show(
-                    ERROR_INVITE_NO_CODE,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
-                return;
-            }
-
-            var client = new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME);
-
-            try
-            {
-                var request = new SendLobbyInviteEmailRequest
-                {
-                    Token = token,
-                    TargetAccountId = friend.AccountId,
-                    LobbyCode = currentAccessCode
-                };
-
-                await Task.Run(() => client.SendLobbyInviteEmail(request));
-
-                MessageBox.Show(
-                    INFO_INVITE_SENT,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-            }
-            catch (FaultException<FriendService.ServiceFault> ex)
-            {
-                Logger.Warn("Friend fault while sending lobby invite email.", ex);
-
-                MessageBox.Show(
-                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : ERROR_INVITE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Error("Communication error while sending lobby invite email.", ex);
-
-                MessageBox.Show(
-                    Lang.noConnection,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Unexpected error while sending lobby invite email.", ex);
-
-                MessageBox.Show(
-                    ERROR_INVITE_GENERIC,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            finally
-            {
-                CloseClientSafely(client, "FriendServiceClient.SendLobbyInviteEmail");
-            }
-        }
-
 
         private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            try
-            {
-                var element = sender as FrameworkElement;
-                var item = element?.DataContext as LobbyPlayerItem;
-
-                if (item == null)
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                if (item.IsMe)
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                if (!currentLobbyId.HasValue || currentLobbyId.Value == Guid.Empty)
-                {
-                    e.Handled = true;
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("LobbyPlayerContextMenuOpening error.", ex);
-                e.Handled = true;
-            }
+            playersController.LobbyPlayerContextMenuOpening(sender, e);
         }
 
         private void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var menuItem = sender as MenuItem;
-                var target = menuItem?.CommandParameter as LobbyPlayerItem;
-
-                if (target == null || target.IsMe)
-                {
-                    return;
-                }
-
-
-                MessageBox.Show(
-                    Lang.UiGenericError,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("MenuItemReportPlayerClick error.", ex);
-
-                MessageBox.Show(
-                    Lang.UiGenericError,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            playersController.MenuItemReportPlayerClick(sender, e);
         }
-
-        private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
-        {
-            while (current != null)
-            {
-                if (current is T match)
-                {
-                    return match;
-                }
-
-                current = VisualTreeHelper.GetParent(current);
-            }
-
-            return null;
-        }
-
-        private static string GetSessionTokenOrShowMessage()
-        {
-            var token = LoginWindow.AppSession.CurrentToken?.Token;
-
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                MessageBox.Show(Lang.noValidSessionCode);
-                return string.Empty;
-            }
-
-            return token;
-        }
-
-        private static void CloseClientSafely(ICommunicationObject client, string context)
-        {
-            if (client == null)
-            {
-                return;
-            }
-
-            try
-            {
-                if (client.State == CommunicationState.Faulted)
-                {
-                    TryAbort(client, context);
-                    return;
-                }
-
-                client.Close();
-            }
-            catch (CommunicationException ex)
-            {
-                Logger.Warn(
-                    string.Format(CultureInfo.InvariantCulture, "CloseClientSafely communication error. Context={0}", context),
-                    ex);
-
-                TryAbort(client, context);
-            }
-            catch (TimeoutException ex)
-            {
-                Logger.Warn(
-                    string.Format(CultureInfo.InvariantCulture, "CloseClientSafely timeout. Context={0}", context),
-                    ex);
-
-                TryAbort(client, context);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(
-                    string.Format(CultureInfo.InvariantCulture, "CloseClientSafely unexpected error. Context={0}", context),
-                    ex);
-
-                TryAbort(client, context);
-            }
-        }
-
-        private static void TryAbort(ICommunicationObject client, string context)
-        {
-            try
-            {
-                client.Abort();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn(
-                    string.Format(CultureInfo.InvariantCulture, "Abort failed. Context={0}", context),
-                    ex);
-            }
-        }
-
-
-        private void OnReconnectStartedFromHub()
-        {
-            Ui(() => ShowReconnectOverlay(RECONNECT_STATUS_START));
-        }
-
-        private void OnReconnectAttemptedFromHub(int attempt)
-        {
-            Ui(() => ShowReconnectOverlay(string.Format(CultureInfo.InvariantCulture, RECONNECT_STATUS_ATTEMPT_FORMAT, attempt)));
-        }
-
-        private void OnReconnectStoppedFromHub()
-        {
-            Ui(() =>
-            {
-                isAutoWaitingForReconnect = false;
-
-                if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
-                {
-                    reconnectCycleTimer.Stop();
-                }
-
-                HideReconnectOverlay();
-            });
-        }
-
-
-        private void ShowReconnectOverlay(string status)
-        {
-            if (txtReconnectStatus != null)
-            {
-                txtReconnectStatus.Text = status ?? string.Empty;
-            }
-
-            if (grdReconnectOverlay != null)
-            {
-                grdReconnectOverlay.Visibility = Visibility.Visible;
-                grdReconnectOverlay.IsHitTestVisible = true;
-            }
-        }
-
-        private void HideReconnectOverlay()
-        {
-            if (grdReconnectOverlay != null)
-            {
-                grdReconnectOverlay.Visibility = Visibility.Collapsed;
-                grdReconnectOverlay.IsHitTestVisible = false;
-            }
-        }
-
-        private void NavigateToLogin()
-        {
-            Ui(() =>
-            {
-                if (isNavigatingToLogin)
-                {
-                    return;
-                }
-
-                isNavigatingToLogin = true;
-
-                Window previousMainWindow = Application.Current?.MainWindow;
-                Window ownerWindow = Owner;
-
-                try
-                {
-                    Application.Current.ShutdownMode = ShutdownMode.OnLastWindowClose;
-
-                    var loginWindow = new LoginWindow();
-
-                    Application.Current.MainWindow = loginWindow;
-
-                    loginWindow.Show();
-                    loginWindow.Activate();
-
-                    if (previousMainWindow != null &&
-                        !ReferenceEquals(previousMainWindow, loginWindow) &&
-                        !ReferenceEquals(previousMainWindow, this))
-                    {
-                        previousMainWindow.Hide();
-                        previousMainWindow.Close();
-                    }
-
-                    if (ownerWindow != null &&
-                        !ReferenceEquals(ownerWindow, loginWindow) &&
-                        !ReferenceEquals(ownerWindow, this) &&
-                        ownerWindow.IsVisible)
-                    {
-                        ownerWindow.Hide();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("Error navigating to LoginWindow.", ex);
-                }
-                finally
-                {
-                    try
-                    {
-                        Hide();
-                        Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Warn("Error closing LobbyWindow during navigation to login.", ex);
-                    }
-                }
-            });
-        }
-
-
-        private void OnReconnectExhaustedFromHub()
-        {
-            Ui(() =>
-            {
-                try
-                {
-                    if (isAutoWaitingForReconnect)
-                    {
-                        StartNextReconnectCycle();
-                        return;
-                    }
-
-                    MessageBoxResult result = MessageBox.Show(
-                        RECONNECT_EXHAUSTED_MESSAGE,
-                        Lang.lobbyTitle,
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Warning);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        isAutoWaitingForReconnect = true;
-                        AppendSystemLine(WAITING_LINE_MESSAGE);
-
-                        ShowReconnectOverlay(WAITING_LINE_MESSAGE); // si ya tienes overlay
-                        StartNextReconnectCycle();
-                        return;
-                    }
-
-                    NavigateToLogin();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("Error handling reconnect exhausted prompt.", ex);
-                }
-            });
-        }
-
-        private void StartNextReconnectCycle()
-        {
-            try
-            {
-                if (reconnectCycleTimer != null)
-                {
-                    if (reconnectCycleTimer.IsEnabled)
-                    {
-                        reconnectCycleTimer.Stop();
-                    }
-
-                    reconnectCycleTimer.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error scheduling next reconnect cycle.", ex);
-            }
-        }
-
-        private void OnReconnectCycleDelayElapsed()
-        {
-            try
-            {
-                if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
-                {
-                    reconnectCycleTimer.Stop();
-                }
-
-                AppServices.Lobby.ContinueReconnectCycle();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("Error continuing reconnect cycle.", ex);
-            }
-        }
-        private void OnDatabaseErrorDetectedFromHub(LobbyService.ServiceFault fault)
-        {
-            Ui(() =>
-            {
-                try
-                {
-                    isAutoWaitingForReconnect = false;
-
-                    if (reconnectCycleTimer != null && reconnectCycleTimer.IsEnabled)
-                    {
-                        reconnectCycleTimer.Stop();
-                    }
-
-                    HideReconnectOverlay();
-
-                    MessageBox.Show(
-                        "Error de base de datos.",
-                        Lang.lobbyTitle,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("Error showing database error message in lobby.", ex);
-                }
-            });
-        }
-
-
     }
 }

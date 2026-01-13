@@ -807,4 +807,13 @@
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>There is no account registered with that email.</value>
   </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>You have no friends yet</value>
+  </data>
+  <data name="commonAcept" xml:space="preserve">
+    <value>Acept</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
 </root>

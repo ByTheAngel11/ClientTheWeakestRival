@@ -15,7 +15,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         private const string LOG_UI_ERROR = "GameplayHub.Ui error.";
         private const string LOG_CHANNEL_FAULTED = "GameplayHub called with channel Faulted.";
 
-        private const int RECONNECT_INTERVAL_SECONDS = 2;
+        private const int RECONNECT_INTERVAL_SECONDS = 5;
         private const int RECONNECT_TEST_TIMEOUT_SECONDS = 3;
 
         private const string ENDPOINT_GAMEPLAY_NETTCP = "NetTcpBinding_IGameplayService";

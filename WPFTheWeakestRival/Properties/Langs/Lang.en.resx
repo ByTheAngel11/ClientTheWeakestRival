@@ -732,6 +732,9 @@
   <data name="Email.SendPasswordResetCode.Smtp.MailboxUnavailable" xml:space="preserve">
     <value>Mail error: Recipient is not available. The password reset code could not be sent.</value>
   </data>
+  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
+    <value>Mail error: Recipient address is invalid.</value>
+  </data>
   <data name="Email.SendPasswordResetCode.Configuration" xml:space="preserve">
     <value>Mail error: Invalid mail server configuration.</value>
   </data>
@@ -777,9 +780,6 @@
   <data name="Email.SendLobbyInvite.Unexpected" xml:space="preserve">
     <value>Mail error: An unexpected problem occurred. The invitation to the room could not be sent.</value>
   </data>
-  <data name="Email.SendPasswordResetCode.InvalidRecipient" xml:space="preserve">
-    <value>Mail error: Recipient address is invalid.</value>
-  </data>
   <data name="Auth.ResolveConnectionString.Configuration" xml:space="preserve">
     <value>Configuration error: Server connection string not found.</value>
   </data>
@@ -806,5 +806,24 @@
   </data>
   <data name="Auth.Email.NotRegistered" xml:space="preserve">
     <value>There is no account registered with that email.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="noFriends" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonAcept" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="commonReject" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="noFriends" xml:space="preserve">
+    <value>You have no friends yet</value>
+  </data>
+  <data name="commonAcept" xml:space="preserve">
+    <value>Acept</value>
+  </data>
+  <data name="commonReject" xml:space="preserve">
+    <value>Reject</value>
   </data>
 </root>
