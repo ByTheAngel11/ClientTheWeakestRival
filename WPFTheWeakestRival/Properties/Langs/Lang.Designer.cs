@@ -1619,6 +1619,69 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a {0} used the wildcard: {1}..
+        /// </summary>
+        public static string msgSpecialEventWildcardUsedDescFormat {
+            get {
+                return ResourceManager.GetString("msgSpecialEventWildcardUsedDescFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Wildcard used.
+        /// </summary>
+        public static string msgSpecialEventWildcardUsedTitle {
+            get {
+                return ResourceManager.GetString("msgSpecialEventWildcardUsedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Block wildcards.
+        /// </summary>
+        public static string msgWildcardNameBlock {
+            get {
+                return ResourceManager.GetString("msgWildcardNameBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Change question.
+        /// </summary>
+        public static string msgWildcardNameChangeQuestion {
+            get {
+                return ResourceManager.GetString("msgWildcardNameChangeQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Double.
+        /// </summary>
+        public static string msgWildcardNameDouble {
+            get {
+                return ResourceManager.GetString("msgWildcardNameDouble", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Forced bank.
+        /// </summary>
+        public static string msgWildcardNameForcedBank {
+            get {
+                return ResourceManager.GetString("msgWildcardNameForcedBank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Pass question.
+        /// </summary>
+        public static string msgWildcardNamePassQuestion {
+            get {
+                return ResourceManager.GetString("msgWildcardNamePassQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a There is no connection.
         /// </summary>
         public static string noConnection {

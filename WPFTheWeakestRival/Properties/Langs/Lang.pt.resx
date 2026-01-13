@@ -861,43 +861,6 @@
   <data name="btnGlobalClose" xml:space="preserve">
     <value>Fechar</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="msgSpecialEventBombQuestionTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventBombQuestionDesc" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventBombAppliedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventSurpriseExamTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventSurpriseExamDesc" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventSurpriseExamResolvedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventLightningWildcardTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventExtraWildcardTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventSabotageTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventSabotageDescFormat" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventDarknessTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventDarknessEndedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="msgSpecialEventBombQuestionTitle" xml:space="preserve">
     <value>Pergunta sobre bomba”</value>
   </data>
@@ -933,5 +896,48 @@
   </data>
   <data name="msgSpecialEventDarknessEndedTitle" xml:space="preserve">
     <value>A escuridão acabou</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="msgSpecialEventWildcardUsedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventWildcardUsedDescFormat" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgWildcardNameChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgWildcardNamePassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgWildcardNameForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgWildcardNameDouble" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgWildcardNameBlock" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgSpecialEventWildcardUsedTitle" xml:space="preserve">
+    <value>Curinga usado</value>
+  </data>
+  <data name="msgSpecialEventWildcardUsedDescFormat" xml:space="preserve">
+    <value>{0} usou o curinga: {1}.</value>
+  </data>
+  <data name="msgWildcardNameChangeQuestion" xml:space="preserve">
+    <value>Alterar pergunta</value>
+  </data>
+  <data name="msgWildcardNamePassQuestion" xml:space="preserve">
+    <value>Passar pergunta</value>
+  </data>
+  <data name="msgWildcardNameForcedBank" xml:space="preserve">
+    <value>Banco forçado</value>
+  </data>
+  <data name="msgWildcardNameDouble" xml:space="preserve">
+    <value>Dobro</value>
+  </data>
+  <data name="msgWildcardNameBlock" xml:space="preserve">
+    <value>Bloquear curingas</value>
   </data>
 </root>

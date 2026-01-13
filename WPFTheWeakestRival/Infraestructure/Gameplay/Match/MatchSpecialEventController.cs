@@ -1,11 +1,8 @@
 ﻿using log4net;
 using System;
 using System.Globalization;
-using System.ServiceModel;
 using System.Threading.Tasks;
-using System.Windows;
 using WPFTheWeakestRival.Globalization;
-using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Properties.Langs;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
@@ -23,6 +20,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string SABOTAGE_KEYWORD_ES = "sabotaje";
 
         private const int SABOTAGE_TIME_SECONDS = 15;
+
+        private const string WILDCARD_USED_PREFIX = "WILDCARD_USED_";
+        private const char WILDCARD_USED_PAYLOAD_SEPARATOR = '|';
+
+        private const string WILDCARD_CODE_CHANGE_Q = "CHANGE_Q";
+        private const string WILDCARD_CODE_PASS_Q = "PASS_Q";
+        private const string WILDCARD_CODE_FORCED_BANK = "FORCED_BANK";
+        private const string WILDCARD_CODE_DOUBLE = "DOUBLE";
+        private const string WILDCARD_CODE_BLOCK = "BLOCK";
 
         private readonly MatchSessionState state;
         private readonly OverlayController overlay;
@@ -149,6 +155,40 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return (Lang.msgSpecialEventExtraWildcardTitle, string.Empty);
             }
 
+            if (StartsWithCode(eventName, WILDCARD_USED_PREFIX))
+            {
+                string trimmedEventName = (eventName ?? string.Empty).Trim();
+
+                string wildcardFromEventName = trimmedEventName.Length > WILDCARD_USED_PREFIX.Length
+                    ? trimmedEventName.Substring(WILDCARD_USED_PREFIX.Length)
+                    : string.Empty;
+
+                string payload = description ?? string.Empty;
+
+                string[] parts = payload.Split(new[] { WILDCARD_USED_PAYLOAD_SEPARATOR }, 2, StringSplitOptions.None);
+
+                string actorName = parts.Length > 0 ? parts[0] : string.Empty;
+                string wildcardFromPayload = parts.Length > 1 ? parts[1] : string.Empty;
+
+                string wildcardCode = !string.IsNullOrWhiteSpace(wildcardFromPayload)
+                    ? wildcardFromPayload
+                    : wildcardFromEventName;
+
+                string resolvedActorName = string.IsNullOrWhiteSpace(actorName)
+                    ? MatchConstants.DEFAULT_PLAYER_NAME
+                    : actorName;
+
+                string wildcardName = LocalizeWildcardName(wildcardCode);
+
+                string message = string.Format(
+                    culture,
+                    Lang.msgSpecialEventWildcardUsedDescFormat,
+                    resolvedActorName,
+                    wildcardName);
+
+                return (Lang.msgSpecialEventWildcardUsedTitle, message);
+            }
+
             if (IsSabotageEvent(eventName, description))
             {
                 string sabotageDesc = string.Format(culture, Lang.msgSpecialEventSabotageDescFormat, SABOTAGE_TIME_SECONDS);
@@ -180,7 +220,31 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             return (title, desc);
         }
 
+        private static string LocalizeWildcardName(string wildcardCode)
+        {
+            string code = (wildcardCode ?? string.Empty).Trim().ToUpperInvariant();
 
+            switch (code)
+            {
+                case WILDCARD_CODE_CHANGE_Q:
+                    return Lang.msgWildcardNameChangeQuestion;
+
+                case WILDCARD_CODE_PASS_Q:
+                    return Lang.msgWildcardNamePassQuestion;
+
+                case WILDCARD_CODE_FORCED_BANK:
+                    return Lang.msgWildcardNameForcedBank;
+
+                case WILDCARD_CODE_DOUBLE:
+                    return Lang.msgWildcardNameDouble;
+
+                case WILDCARD_CODE_BLOCK:
+                    return Lang.msgWildcardNameBlock;
+
+                default:
+                    return code;
+            }
+        }
 
         private async Task<bool> TryHandleVoteRevealAsync(string eventName, string description)
         {

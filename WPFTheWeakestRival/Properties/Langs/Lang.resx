@@ -897,4 +897,25 @@
   <data name="msgSpecialEventDarknessEndedTitle" xml:space="preserve">
     <value>Darkness ended</value>
   </data>
+  <data name="msgSpecialEventWildcardUsedTitle" xml:space="preserve">
+    <value>Wildcard used</value>
+  </data>
+  <data name="msgSpecialEventWildcardUsedDescFormat" xml:space="preserve">
+    <value>{0} used the wildcard: {1}.</value>
+  </data>
+  <data name="msgWildcardNameChangeQuestion" xml:space="preserve">
+    <value>Change question</value>
+  </data>
+  <data name="msgWildcardNamePassQuestion" xml:space="preserve">
+    <value>Pass question</value>
+  </data>
+  <data name="msgWildcardNameForcedBank" xml:space="preserve">
+    <value>Forced bank</value>
+  </data>
+  <data name="msgWildcardNameDouble" xml:space="preserve">
+    <value>Double</value>
+  </data>
+  <data name="msgWildcardNameBlock" xml:space="preserve">
+    <value>Block wildcards</value>
+  </data>
 </root>
