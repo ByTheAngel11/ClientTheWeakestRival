@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.NetworkInformation;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,11 +13,11 @@ namespace WPFTheWeakestRival.Infrastructure
     [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public sealed class LobbyHub : ILobbyServiceCallback, IDisposable, IStoppable
     {
-        private const byte DEFAULT_MAX_PLAYERS = 8;
-        private const byte MIN_ALLOWED_MAX_PLAYERS = 1;
+        private const byte DefaultMaxPlayers = 8;
+        private const byte MinAllowedMaxPlayers = 1;
 
-        private const string ERROR_TOKEN_REQUIRED = "Token requerido.";
-        private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
+        private const string ErrorTokenRequired = "Token requerido.";
+        private const string ErrorEndpointRequired = "Endpoint name cannot be null or whitespace.";
 
         private const string LogUiError = "LobbyHub.Ui error.";
         private const string LogChannelFaultedCreate = "CreateLobbyAsync called with channel Faulted.";
@@ -34,10 +33,10 @@ namespace WPFTheWeakestRival.Infrastructure
         private const int ReconnectTestTimeoutSeconds = 3;
         private const int MaxReconnectAttempts = 3;
 
-        private const string ENDPOINT_LOBBY_NET_TCP = "NetTcpBinding_ILobbyService";
-        private const string ENDPOINT_LOBBY_WS_DUAL_LEGACY = "WSDualHttpBinding_ILobbyService";
+        private const string EndpointLobbyNetTcp = "NetTcpBinding_ILobbyService";
+        private const string EndpointLobbyWsDualLegacy = "WSDualHttpBinding_ILobbyService";
 
-        private const string LOG_ENDPOINT_REMAPPED = "LobbyHub endpoint remapped from {0} to {1}.";
+        private const string LogEndpointRemapped = "LobbyHub endpoint remapped from {0} to {1}.";
 
         private const string FaultCodeDatabase = "Error de base de datos";
         private const string FaultMessageDatabaseMarker = "base de datos";
@@ -45,10 +44,7 @@ namespace WPFTheWeakestRival.Infrastructure
         private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(ReconnectIntervalSeconds);
         private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(ReconnectTestTimeoutSeconds);
 
-        private static readonly TimeSpan RECONNECT_INTERVAL = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
-        private static readonly TimeSpan RECONNECT_TEST_TIMEOUT = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
-
-        private static readonly DispatcherPriority UI_DISPATCHER_PRIORITY = DispatcherPriority.Send;
+        private static readonly DispatcherPriority UiDispatcherPriority = DispatcherPriority.Send;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyHub));
 
         private readonly Dispatcher dispatcher;
@@ -88,7 +84,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(endpointName))
             {
-                throw new ArgumentException(ERROR_ENDPOINT_REQUIRED, nameof(endpointName));
+                throw new ArgumentException(ErrorEndpointRequired, nameof(endpointName));
             }
 
             dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
@@ -99,7 +95,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
         public LobbyServiceClient RawClient => client;
 
-        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token, string lobbyName, byte maxPlayers = DEFAULT_MAX_PLAYERS)
+        public async Task<CreateLobbyResponse> CreateLobbyAsync(string token, string lobbyName, byte maxPlayers = DefaultMaxPlayers)
         {
             EnsureToken(token);
 
@@ -110,7 +106,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 return new CreateLobbyResponse();
             }
 
-            if (IsClientFaulted(LOG_CHANNEL_FAULTED_CREATE))
+            if (IsClientFaulted(LogChannelFaultedCreate))
             {
                 StartReconnectLoop();
                 return new CreateLobbyResponse();
@@ -186,7 +182,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             lastAccessCode = normalizedCode;
 
-            if (IsClientFaulted(LOG_CHANNEL_FAULTED_JOIN))
+            if (IsClientFaulted(LogChannelFaultedJoin))
             {
                 StartReconnectLoop();
                 return new JoinByCodeResponse();
@@ -433,7 +429,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             if (client.State == CommunicationState.Faulted)
             {
-                Logger.Warn(LOG_CHANNEL_FAULTED_START);
+                Logger.Warn(LogChannelFaultedStart);
                 StartReconnectLoop();
                 return new StartLobbyMatchResponse();
             }
@@ -614,11 +610,11 @@ namespace WPFTheWeakestRival.Infrastructure
                     return;
                 }
 
-                dispatcher.BeginInvoke(action, UI_DISPATCHER_PRIORITY);
+                dispatcher.BeginInvoke(action, UiDispatcherPriority);
             }
             catch (Exception ex)
             {
-                Logger.Warn(LOG_UI_ERROR, ex);
+                Logger.Warn(LogUiError, ex);
             }
         }
 
@@ -701,7 +697,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             if (!dispatcher.CheckAccess())
             {
-                dispatcher.BeginInvoke(new Action(StartReconnectLoop), UI_DISPATCHER_PRIORITY);
+                dispatcher.BeginInvoke(new Action(StartReconnectLoop), UiDispatcherPriority);
                 return;
             }
 
@@ -709,9 +705,9 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 if (reconnectTimer == null)
                 {
-                    reconnectTimer = new DispatcherTimer(UI_DISPATCHER_PRIORITY, dispatcher)
+                    reconnectTimer = new DispatcherTimer(UiDispatcherPriority, dispatcher)
                     {
-                        Interval = RECONNECT_INTERVAL
+                        Interval = ReconnectInterval
                     };
 
                     reconnectTimer.Tick += ReconnectTimerTick;
@@ -736,7 +732,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
             if (!dispatcher.CheckAccess())
             {
-                dispatcher.BeginInvoke(new Action(StopReconnectLoop), UI_DISPATCHER_PRIORITY);
+                dispatcher.BeginInvoke(new Action(StopReconnectLoop), UiDispatcherPriority);
                 return;
             }
 
@@ -769,7 +765,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 reconnectAttemptCount++;
                 attempt = reconnectAttemptCount;
 
-                if (attempt > MAX_RECONNECT_ATTEMPTS)
+                if (attempt > MaxReconnectAttempts)
                 {
                     StopReconnectLoop();
                     RaiseReconnectExhausted();
@@ -825,7 +821,7 @@ namespace WPFTheWeakestRival.Infrastructure
 
                 try
                 {
-                    client.InnerChannel.OperationTimeout = RECONNECT_TEST_TIMEOUT;
+                    client.InnerChannel.OperationTimeout = ReconnectTestTimeout;
                 }
                 catch (Exception ex)
                 {
@@ -933,8 +929,8 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private static byte NormalizeMaxPlayers(byte requestedMaxPlayers)
         {
-            return requestedMaxPlayers < MIN_ALLOWED_MAX_PLAYERS
-                ? DEFAULT_MAX_PLAYERS
+            return requestedMaxPlayers < MinAllowedMaxPlayers
+                ? DefaultMaxPlayers
                 : requestedMaxPlayers;
         }
 
@@ -962,7 +958,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
+                throw new ArgumentException(ErrorTokenRequired, nameof(token));
             }
         }
 
@@ -970,10 +966,10 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             string safeName = (requestedEndpointName ?? string.Empty).Trim();
 
-            if (string.Equals(safeName, ENDPOINT_LOBBY_WS_DUAL_LEGACY, StringComparison.Ordinal))
+            if (string.Equals(safeName, EndpointLobbyWsDualLegacy, StringComparison.Ordinal))
             {
-                Logger.WarnFormat(LOG_ENDPOINT_REMAPPED, safeName, ENDPOINT_LOBBY_NET_TCP);
-                return ENDPOINT_LOBBY_NET_TCP;
+                Logger.WarnFormat(LogEndpointRemapped, safeName, EndpointLobbyNetTcp);
+                return EndpointLobbyNetTcp;
             }
 
             return safeName;
@@ -1045,24 +1041,6 @@ namespace WPFTheWeakestRival.Infrastructure
             }
 
             StartReconnectLoop();
-        }
-
-        private static bool IsDatabaseFault(ServiceFault fault)
-        {
-            if (fault == null)
-            {
-                return false;
-            }
-
-            string code = (fault.Code ?? string.Empty).Trim();
-            string message = (fault.Message ?? string.Empty).Trim();
-
-            if (string.Equals(code, FaultCodeDatabase, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            return message.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void RaiseDatabaseErrorDetected(ServiceFault fault)
