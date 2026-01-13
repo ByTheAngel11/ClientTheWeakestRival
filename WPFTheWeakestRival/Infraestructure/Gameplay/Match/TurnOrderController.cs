@@ -13,9 +13,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TurnOrderController));
 
-        private const string DarknessAliasFormat = "Concursante {0}";
-        private const string DarknessFallbackName = "???";
-        private const string FallbackPlayerNameFormat = "Jugador {0}";
+        private const string DARKNESS_ALIAS_FORMAT = "Concursante {0}";
+        private const string DARKNESS_FALLBACK_NAME = "???";
+        private const string FALLBACK_PLAYER_NAME_FORMAT = "Jugador {0}";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -62,7 +62,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         new PlayerSummary
                         {
                             UserId = p.UserId,
-                            DisplayName = string.Format(CultureInfo.CurrentCulture, DarknessAliasFormat, index),
+                            DisplayName = string.Format(CultureInfo.CurrentCulture, DARKNESS_ALIAS_FORMAT, index),
                             Avatar = null,
                             IsOnline = p.IsOnline
                         });
@@ -268,7 +268,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             return new PlayerSummary
             {
                 UserId = userId,
-                DisplayName = string.Format(CultureInfo.CurrentCulture, FallbackPlayerNameFormat, userId),
+                DisplayName = string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, userId),
                 Avatar = null
             };
         }
@@ -356,7 +356,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         new PlayerSummary
                         {
                             UserId = userId,
-                            DisplayName = DarknessFallbackName,
+                            DisplayName = DARKNESS_FALLBACK_NAME,
                             Avatar = null
                         });
                 }
@@ -411,7 +411,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     return p.DisplayName;
                 }
 
-                return DarknessFallbackName;
+                return DARKNESS_FALLBACK_NAME;
             }
 
             if (userId <= 0)
@@ -427,7 +427,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return real.DisplayName;
             }
 
-            return string.Format(CultureInfo.CurrentCulture, FallbackPlayerNameFormat, userId);
+            return string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, userId);
         }
 
         private static void Shuffle(List<PlayerSummary> list, int seed)

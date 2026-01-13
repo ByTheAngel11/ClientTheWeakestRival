@@ -13,14 +13,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchSpecialEventController));
 
-        private const string SpecialEventLogTemplate = "OnSpecialEvent. MatchId={0}, Name='{1}', Desc='{2}'";
+        private const string SPECIAL_EVENT_LOG_TEMPLATE = "OnSpecialEvent. MatchId={0}, Name='{1}', Desc='{2}'";
 
-        private const string SabotageCode = "SABOTAGE";
-        private const string SabotageUsedCode = "SABOTAGE_USED";
-        private const string SabotageAppliedCode = "SABOTAGE_APPLIED";
-        private const string SabotageKeywordEs = "sabotaje";
+        private const string SABOTAGE_CODE = "SABOTAGE";
+        private const string SABOTAGE_USED_CODE = "SABOTAGE_USED";
+        private const string SABOTAGE_APPLIED_CODE = "SABOTAGE_APPLIED";
+        private const string SABOTAGE_KEYWORD_ES = "sabotaje";
 
-        private const int SabotageTimeSeconds = 15;
+        private const int SABOTAGE_TIME_SECONDS = 15;
 
         private readonly MatchSessionState state;
         private readonly OverlayController overlay;
@@ -54,7 +54,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         internal async Task HandleSpecialEventAsync(Guid matchId, string eventName, string description)
         {
             Logger.InfoFormat(
-                SpecialEventLogTemplate,
+                SPECIAL_EVENT_LOG_TEMPLATE,
                 matchId,
                 eventName ?? string.Empty,
                 description ?? string.Empty);
@@ -259,7 +259,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 TryParseFirstInt(description);
 
             questions.ScheduleNextTurnTimeLimitOverride(
-                SabotageTimeSeconds,
+                SABOTAGE_TIME_SECONDS,
                 sourceTurnUserId > 0 ? (int?)sourceTurnUserId : null,
                 parsedTargetUserId);
         }
@@ -272,18 +272,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private static bool IsSabotageEvent(string eventName, string description)
         {
-            return IsCode(eventName, SabotageCode)
-                || IsCode(description, SabotageCode)
-                || IsCode(eventName, SabotageUsedCode)
-                || IsCode(description, SabotageUsedCode)
-                || IsCode(eventName, SabotageAppliedCode)
-                || IsCode(description, SabotageAppliedCode)
-                || StartsWithCode(eventName, SabotageCode)
-                || StartsWithCode(description, SabotageCode)
-                || ContainsKeyword(eventName, SabotageKeywordEs)
-                || ContainsKeyword(description, SabotageKeywordEs)
-                || ContainsKeyword(eventName, SabotageCode)
-                || ContainsKeyword(description, SabotageCode);
+            return IsCode(eventName, SABOTAGE_CODE)
+                || IsCode(description, SABOTAGE_CODE)
+                || IsCode(eventName, SABOTAGE_USED_CODE)
+                || IsCode(description, SABOTAGE_USED_CODE)
+                || IsCode(eventName, SABOTAGE_APPLIED_CODE)
+                || IsCode(description, SABOTAGE_APPLIED_CODE)
+                || StartsWithCode(eventName, SABOTAGE_CODE)
+                || StartsWithCode(description, SABOTAGE_CODE)
+                || ContainsKeyword(eventName, SABOTAGE_KEYWORD_ES)
+                || ContainsKeyword(description, SABOTAGE_KEYWORD_ES)
+                || ContainsKeyword(eventName, SABOTAGE_CODE)
+                || ContainsKeyword(description, SABOTAGE_CODE);
         }
 
         private static bool IsCode(string text, string code)

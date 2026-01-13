@@ -17,11 +17,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(QuestionController));
 
-        private const string DarknessUnknownName = "???";
-        private const string DarknessTurnLabel = "A oscuras";
-        private const string LightningInProgressText = "Reto relámpago en curso";
-        private const string SurpriseExamMyTurnText = "Examen sorpresa: responde";
-        private const string OtherAnswerRegisteredText = "Respuesta registrada.";
+        private const string DARKNESS_UNKNOWN_NAME = "???";
+        private const string DARKNESS_TURN_LABEL = "A oscuras";
+        private const string LIGHTNING_IN_PROGRESS_TEXT = "Reto relámpago en curso";
+        private const string SURPRISE_EXAM_MY_TURN_TEXT = "Examen sorpresa: responde";
+        private const string OTHER_ANSWER_REGISTERED_TEXT = "Respuesta registrada.";
 
         private const int MIN_SECONDS = 0;
 
@@ -175,12 +175,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (ui.TxtTurnPlayerName != null)
             {
-                ui.TxtTurnPlayerName.Text = DarknessUnknownName;
+                ui.TxtTurnPlayerName.Text = DARKNESS_UNKNOWN_NAME;
             }
 
             if (ui.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = DarknessTurnLabel;
+                ui.TxtTurnLabel.Text = DARKNESS_TURN_LABEL;
             }
 
             if (ui.TurnBannerBackground != null)
@@ -294,8 +294,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (state.IsDarknessActive)
             {
                 if (ui.TurnAvatar != null) ui.TurnAvatar.Visibility = Visibility.Collapsed;
-                if (ui.TxtTurnPlayerName != null) ui.TxtTurnPlayerName.Text = DarknessUnknownName;
-                if (ui.TxtTurnLabel != null) ui.TxtTurnLabel.Text = DarknessTurnLabel;
+                if (ui.TxtTurnPlayerName != null) ui.TxtTurnPlayerName.Text = DARKNESS_UNKNOWN_NAME;
+                if (ui.TxtTurnLabel != null) ui.TxtTurnLabel.Text = DARKNESS_TURN_LABEL;
                 return;
             }
 
@@ -354,7 +354,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (ui.TxtTurnLabel != null)
             {
                 ui.TxtTurnLabel.Text = state.IsSurpriseExamActive
-                    ? SurpriseExamMyTurnText
+                    ? SURPRISE_EXAM_MY_TURN_TEXT
                     : MatchConstants.TURN_MY_TURN_TEXT;
             }
 
@@ -465,7 +465,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 if (ui.TxtQuestion != null)
                 {
-                    ui.TxtQuestion.Text = LightningInProgressText;
+                    ui.TxtQuestion.Text = LIGHTNING_IN_PROGRESS_TEXT;
                 }
 
                 return;
@@ -559,7 +559,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void ShowOtherAnswerRegistered()
         {
-            ui.TxtAnswerFeedback.Text = OtherAnswerRegisteredText;
+            ui.TxtAnswerFeedback.Text = OTHER_ANSWER_REGISTERED_TEXT;
             ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
         }
 
@@ -817,7 +817,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             button.Background = Brushes.Transparent;
         }
 
-        
         private static void SetAnswerButtonContent(Button button, GameplayServiceProxy.AnswerDto[] answers, int index)
         {
             if (button == null)

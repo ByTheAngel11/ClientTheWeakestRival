@@ -12,14 +12,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LightningChallengeController));
 
-        private const string LightningMyTurnLabel = "Reto relámpago: tu turno";
-        private const string LightningInProgressLabel = "Reto relámpago en curso";
+        private const string LIGHTNING_MY_TURN_LABEL = "Reto relámpago: tu turno";
+        private const string LIGHTNING_IN_PROGRESS_LABEL = "Reto relámpago en curso";
 
-        private const string LightningSuccessTemplate = "¡Has completado el reto relámpago! Respuestas correctas: {0}.";
-        private const string LightningFailTemplate = "Reto relámpago finalizado. Respuestas correctas: {0}.";
+        private const string LIGHTNING_SUCCES_TEMPLATE = "¡Has completado el reto relámpago! Respuestas correctas: {0}.";
+        private const string LIGHTNING_FAIL_TEMPLATE = "Reto relámpago finalizado. Respuestas correctas: {0}.";
 
-        private const string BrushTurnMyTurn = "Brush.Turn.MyTurn";
-        private const string BrushTurnOtherTurn = "Brush.Turn.OtherTurn";
+        private const string BRUSH_MY_TURN = "Brush.Turn.MyTurn";
+        private const string BRUSH_TURN_OTHER_TURN = "Brush.Turn.OtherTurn";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -73,12 +73,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (ui.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = state.IsMyTurn ? LightningMyTurnLabel : LightningInProgressLabel;
+                ui.TxtTurnLabel.Text = state.IsMyTurn ? LIGHTNING_MY_TURN_LABEL : LIGHTNING_IN_PROGRESS_LABEL;
             }
 
             if (ui.TurnBannerBackground != null)
             {
-                string brushKey = state.IsMyTurn ? BrushTurnMyTurn : BrushTurnOtherTurn;
+                string brushKey = state.IsMyTurn ? BRUSH_MY_TURN : BRUSH_TURN_OTHER_TURN;
                 ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource(brushKey);
             }
 
@@ -107,8 +107,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.IsMyTurn = false;
 
             string message = isSuccess
-                ? string.Format(CultureInfo.CurrentCulture, LightningSuccessTemplate, correctAnswers)
-                : string.Format(CultureInfo.CurrentCulture, LightningFailTemplate, correctAnswers);
+                ? string.Format(CultureInfo.CurrentCulture, LIGHTNING_SUCCES_TEMPLATE, correctAnswers)
+                : string.Format(CultureInfo.CurrentCulture, LIGHTNING_FAIL_TEMPLATE, correctAnswers);
 
             MessageBox.Show(
                 message,

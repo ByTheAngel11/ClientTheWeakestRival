@@ -18,21 +18,21 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchSessionCoordinator));
 
-        private const string GameplayEndpointName = "WSDualHttpBinding_IGameplayService";
+        private const string GAMEPLAY_ENDPOINT_NAME = "WSDualHttpBinding_IGameplayService";
 
-        private const string ReconnectingTitle = "Reconectando…";
-        private const string ReconnectingDescription = "Intentando recuperar la conexión con el servidor.";
+        private const string RECONNECTING_TITLE = "Reconectando…";
+        private const string RECONNECTING_DESCRIPTION = "Intentando recuperar la conexión con el servidor.";
 
-        private const string VotePhaseLogTemplate = "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}";
+        private const string VOTE_PHASE_LOG_TEMPLATE = "OnServerVotePhaseStarted. MatchId={0}, TimeLimitSeconds={1}";
 
-        private const string ContextVotePhaseStarted = "MatchSessionCoordinator.VotePhaseStarted";
-        private const string ContextSpecialEvent = "MatchSessionCoordinator.SpecialEvent";
-        private const string ContextDuelCandidates = "MatchSessionCoordinator.DuelCandidates";
-        private const string ContextLightningFinished = "MatchSessionCoordinator.LightningFinished";
-        private const string ContextTurnOrderInitialized = "MatchSessionCoordinator.TurnOrderInitialized";
-        private const string ContextTurnOrderChanged = "MatchSessionCoordinator.TurnOrderChanged";
+        private const string CONTEXT_VOTE_PHASE_STARTED = "MatchSessionCoordinator.VotePhaseStarted";
+        private const string CONTEXT_SPECIAL_EVENT = "MatchSessionCoordinator.SpecialEvent";
+        private const string CONTEXT_DUEL_CANDIDATES = "MatchSessionCoordinator.DuelCandidates";
+        private const string CONTEXT_LIGHTNING_FINISHED = "MatchSessionCoordinator.LightningFinished";
+        private const string CONTEXT_TURN_ORDER_INITIALIZED = "MatchSessionCoordinator.TurnOrderInitialized";
+        private const string CONTEXT_TURN_ORDER_CHANGED = "MatchSessionCoordinator.TurnOrderChanged";
 
-        private const int FinalPlayersCount = 2;
+        private const int FINAL_PLAYERS_COUNT = 2;
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -106,7 +106,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void InitializeGameplayClient()
         {
-            hub = new GameplayHub(GameplayEndpointName);
+            hub = new GameplayHub(GAMEPLAY_ENDPOINT_NAME);
 
             hub.ConnectionLost += OnGameplayConnectionLost;
             hub.ConnectionRestored += OnGameplayConnectionRestored;
@@ -167,19 +167,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             };
 
             callbackBridge.VotePhaseStarted += (matchId, timeLimit) =>
-                RunAsync(() => HandleVotePhaseStartedAsync(matchId, timeLimit), ContextVotePhaseStarted);
+                RunAsync(() => HandleVotePhaseStartedAsync(matchId, timeLimit), CONTEXT_VOTE_PHASE_STARTED);
 
             callbackBridge.Elimination += (matchId, eliminated) =>
                 specialEventController.HandleElimination(eliminated);
 
             callbackBridge.SpecialEvent += (matchId, name, description) =>
-                RunAsync(() => specialEventController.HandleSpecialEventAsync(matchId, name, description), ContextSpecialEvent);
+                RunAsync(() => specialEventController.HandleSpecialEventAsync(matchId, name, description), CONTEXT_SPECIAL_EVENT);
 
             callbackBridge.CoinFlipResolved += (matchId, coinFlip) =>
                 HandleCoinFlip(coinFlip);
 
             callbackBridge.DuelCandidates += (matchId, duelCandidates) =>
-                RunAsync(() => HandleDuelCandidatesAsync(duelCandidates), ContextDuelCandidates);
+                RunAsync(() => HandleDuelCandidatesAsync(duelCandidates), CONTEXT_DUEL_CANDIDATES);
 
             callbackBridge.MatchFinished += (matchId, winner) =>
                 HandleMatchFinished(winner);
@@ -191,13 +191,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 lightningController.HandleQuestion(qq);
 
             callbackBridge.LightningChallengeFinished += (m, r, ca, ok) =>
-                RunAsync(() => lightningController.HandleFinishedAsync(ca, ok), ContextLightningFinished);
+                RunAsync(() => lightningController.HandleFinishedAsync(ca, ok), CONTEXT_LIGHTNING_FINISHED);
 
             callbackBridge.TurnOrderInitialized += (matchId, turnOrder) =>
-                RunAsync(() => HandleTurnOrderInitializedAsync(turnOrder), ContextTurnOrderInitialized);
+                RunAsync(() => HandleTurnOrderInitializedAsync(turnOrder), CONTEXT_TURN_ORDER_INITIALIZED);
 
             callbackBridge.TurnOrderChanged += (matchId, turnOrder, reason) =>
-                RunAsync(() => HandleTurnOrderChangedAsync(turnOrder, reason), ContextTurnOrderChanged);
+                RunAsync(() => HandleTurnOrderChangedAsync(turnOrder, reason), CONTEXT_TURN_ORDER_CHANGED);
         }
 
         private static void RunAsync(Func<Task> action, string context)
@@ -344,7 +344,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             try
             {
-                overlay.ShowSpecialEvent(ReconnectingTitle, ReconnectingDescription);
+                overlay.ShowSpecialEvent(RECONNECTING_TITLE, RECONNECTING_DESCRIPTION);
             }
             catch (Exception overlayEx)
             {
@@ -387,7 +387,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             decimal chain,
             decimal banked)
         {
-            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
             if (!state.IsInFinalPhase())
             {
@@ -410,7 +410,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleVotePhaseStartedAsync(Guid matchId, TimeSpan timeLimit)
         {
-            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
             if (state.IsInFinalPhase() || state.IsMatchFinished)
             {
@@ -418,7 +418,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             Logger.InfoFormat(
-                VotePhaseLogTemplate,
+                VOTE_PHASE_LOG_TEMPLATE,
                 matchId,
                 timeLimit.TotalSeconds);
 
@@ -449,7 +449,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.CurrentPhase = coinFlip.ShouldEnableDuel ? MatchPhase.Duel : MatchPhase.NormalRound;
 
-            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
             if (state.IsInFinalPhase())
             {
@@ -465,7 +465,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleDuelCandidatesAsync(GameplayServiceProxy.DuelCandidatesDto duelCandidates)
         {
-            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
             if (state.IsInFinalPhase() || state.IsMatchFinished)
             {
@@ -591,7 +591,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (!state.IsMatchFinished)
             {
-                phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+                phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
                 state.CurrentPhase = state.IsInFinalPhase()
                     ? MatchPhase.Final
@@ -651,7 +651,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             SyncMyTurnFromTurnOrder(turnOrder);
 
-            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
             RefreshWildcardUseState();
 
@@ -672,7 +672,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             SyncMyTurnFromTurnOrder(turnOrder);
 
-            phaseController.DetectAndApplyFinalPhaseIfApplicable(FinalPlayersCount);
+            phaseController.DetectAndApplyFinalPhaseIfApplicable(FINAL_PLAYERS_COUNT);
 
             RefreshWildcardUseState();
 

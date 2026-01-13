@@ -15,10 +15,11 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 {
     internal sealed class LobbyChatController : IDisposable
     {
-        private const int RecentEchoWindowSeconds = 2;
-        private const string UnknownAuthorDisplayName = "?";
-        private const string ChatTimeFormat = "HH:mm";
-        private const int PendingRetryIntervalSeconds = 5;
+        private const int RECENT_ECHO_WINDOW_SECONDS = 2;
+        private const string UNKWON_AUTHOR_DISPLAYNAME = "?";
+        private const string CHAT_TIME_FORMAT = "HH:mm";
+        private const int PENDING_RETRY_INTERVALS_SECONDS = 5;
+        private const int MAX_CHAT_MESSAGE_LENGTH = 100;
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
@@ -60,7 +61,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             pendingRetryTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(PendingRetryIntervalSeconds)
+                Interval = TimeSpan.FromSeconds(PENDING_RETRY_INTERVALS_SECONDS)
             };
             pendingRetryTimer.Tick += PendingRetryTimerTick;
 
@@ -93,6 +94,16 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             if (string.IsNullOrWhiteSpace(token))
             {
                 return;
+            }
+
+            if (messageText.Length > MAX_CHAT_MESSAGE_LENGTH)
+            {
+                messageText = messageText.Substring(0, MAX_CHAT_MESSAGE_LENGTH);
+                if (chatInput != null)
+                {
+                    chatInput.Text = messageText;
+                    chatInput.CaretIndex = messageText.Length;
+                }
             }
 
             _ = SendMessageAsync(token, state.CurrentLobbyId.Value, messageText);
@@ -143,9 +154,9 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             chatLines.Add(
                 new ChatLine
                 {
-                    Author = string.IsNullOrWhiteSpace(author) ? UnknownAuthorDisplayName : author,
+                    Author = string.IsNullOrWhiteSpace(author) ? UNKWON_AUTHOR_DISPLAYNAME : author,
                     Text = text ?? string.Empty,
-                    Time = DateTime.Now.ToString(ChatTimeFormat, CultureInfo.InvariantCulture)
+                    Time = DateTime.Now.ToString(CHAT_TIME_FORMAT, CultureInfo.InvariantCulture)
                 });
 
             if (chatList != null && chatList.Items.Count > 0)
@@ -256,7 +267,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                     var isMyRecentEcho =
                         string.Equals(author, state.MyDisplayName, StringComparison.OrdinalIgnoreCase) &&
                         string.Equals(chat.Message ?? string.Empty, lastSentText, StringComparison.Ordinal) &&
-                        (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(RecentEchoWindowSeconds);
+                        (DateTime.UtcNow - lastSentUtc) < TimeSpan.FromSeconds(RECENT_ECHO_WINDOW_SECONDS);
 
                     if (!isMyRecentEcho)
                     {

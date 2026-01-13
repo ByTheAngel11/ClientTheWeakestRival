@@ -21,24 +21,24 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 {
     internal sealed class LobbyFriendsController : IDisposable
     {
-        private const int DrawerAnimInMs = 180;
-        private const int DrawerAnimOutMs = 160;
+        private const int DRAWER_ANIM_IN_MS = 180;
+        private const int DRAWER_ANIM_OUT_MS = 160;
 
-        private const double OverlayBlurInitialRadius = 0.0;
-        private const double OverlayBlurTargetRadius = 3.0;
+        private const double OVERLAY_BLUR_INITIAL_RADIUS = 0.0;
+        private const double OVERLAY_BLUR_TARGET_RADIUS = 3.0;
 
-        private const int FriendsDrawerInitialTranslateX = 340;
+        private const int FRIENDS_DRAWER_INITIAL_TRANSLATE_X = 340;
 
-        private const double FriendDialogWindowWidth = 600;
-        private const double FriendDialogWindowHeight = 420;
+        private const double FRIEND_DIALOG_WINDOW_WIDTH = 600;
+        private const double FRIEND_DIALOG_WINDOW_HEIGHT = 420;
 
-        private const string FriendEndpointConfigurationName = "WSHttpBinding_IFriendService";
+        private const string FRIEND_ENDPOINT_CONFIGURATION_NAME = "WSHttpBinding_IFriendService";
 
-        private const string InviteMenuHeader = "Invitar al lobby";
+        private const string INVITE_MENU_HEADER = "Invitar al lobby";
 
-        private const string ErrorInviteNoCode = "No hay un código de lobby disponible para invitar.";
-        private const string ErrorInviteGeneric = "Ocurrió un error al enviar la invitación.";
-        private const string InfoInviteSent = "Invitación enviada.";
+        private const string ERROR_INVITE_NO_CODE = "No hay un código de lobby disponible para invitar.";
+        private const string ERROR_INVITE_GENERIC = "Ocurrió un error al enviar la invitación.";
+        private const string INFO_INVITE_SENT = "Invitación enviada.";
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
@@ -93,7 +93,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             overlayBlur = new BlurEffect
             {
-                Radius = OverlayBlurInitialRadius
+                Radius = OVERLAY_BLUR_INITIAL_RADIUS
             };
 
             friendItems = new ObservableCollection<FriendItem>();
@@ -133,13 +133,13 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             try
             {
-                var page = new AddFriendPage(new FriendServiceClient(FriendEndpointConfigurationName), token);
+                var page = new AddFriendPage(new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME), token);
 
                 var window = BuildPageDialog(
                     page,
                     Lang.btnSendRequests,
-                    FriendDialogWindowWidth,
-                    FriendDialogWindowHeight);
+                    FRIEND_DIALOG_WINDOW_WIDTH,
+                    FRIEND_DIALOG_WINDOW_HEIGHT);
 
                 window.ShowDialog();
             }
@@ -165,13 +165,13 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             try
             {
-                var page = new FriendRequestsPage(new FriendServiceClient(FriendEndpointConfigurationName), token);
+                var page = new FriendRequestsPage(new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME), token);
 
                 var window = BuildPageDialog(
                     page,
                     Lang.btnRequests,
-                    FriendDialogWindowWidth,
-                    FriendDialogWindowHeight);
+                    FRIEND_DIALOG_WINDOW_WIDTH,
+                    FRIEND_DIALOG_WINDOW_HEIGHT);
 
                 window.ShowDialog();
             }
@@ -220,8 +220,8 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             var blurAnimation = new DoubleAnimation(
                 overlayBlur.Radius,
-                OverlayBlurTargetRadius,
-                TimeSpan.FromMilliseconds(DrawerAnimInMs))
+                OVERLAY_BLUR_TARGET_RADIUS,
+                TimeSpan.FromMilliseconds(DRAWER_ANIM_IN_MS))
             {
                 EasingFunction = new QuadraticEase()
             };
@@ -232,7 +232,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             if (drawerTranslate != null)
             {
-                drawerTranslate.X = FriendsDrawerInitialTranslateX;
+                drawerTranslate.X = FRIENDS_DRAWER_INITIAL_TRANSLATE_X;
             }
 
             if (drawerHost != null)
@@ -255,8 +255,8 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             var blurAnimation = new DoubleAnimation(
                 overlayBlur.Radius,
-                OverlayBlurInitialRadius,
-                TimeSpan.FromMilliseconds(DrawerAnimOutMs))
+                OVERLAY_BLUR_INITIAL_RADIUS,
+                TimeSpan.FromMilliseconds(DRAWER_ANIM_OUT_MS))
             {
                 EasingFunction = new QuadraticEase()
             };
@@ -425,7 +425,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
                 var inviteItem = new MenuItem
                 {
-                    Header = InviteMenuHeader,
+                    Header = INVITE_MENU_HEADER,
                     CommandParameter = friend
                 };
 
@@ -460,7 +460,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             if (!state.CurrentLobbyId.HasValue || string.IsNullOrWhiteSpace(state.CurrentAccessCode))
             {
                 MessageBox.Show(
-                    ErrorInviteNoCode,
+                    ERROR_INVITE_NO_CODE,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -468,7 +468,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 return;
             }
 
-            var client = new FriendServiceClient(FriendEndpointConfigurationName);
+            var client = new FriendServiceClient(FRIEND_ENDPOINT_CONFIGURATION_NAME);
 
             try
             {
@@ -482,7 +482,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 await Task.Run(() => client.SendLobbyInviteEmail(request));
 
                 MessageBox.Show(
-                    InfoInviteSent,
+                    INFO_INVITE_SENT,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -492,7 +492,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 logger.Warn("Friend fault while sending lobby invite email.", ex);
 
                 MessageBox.Show(
-                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : ErrorInviteGeneric,
+                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : ERROR_INVITE_GENERIC,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -512,7 +512,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 logger.Error("Unexpected error while sending lobby invite email.", ex);
 
                 MessageBox.Show(
-                    ErrorInviteGeneric,
+                    ERROR_INVITE_GENERIC,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

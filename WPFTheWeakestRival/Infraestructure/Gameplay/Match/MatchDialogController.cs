@@ -17,8 +17,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchDialogController));
 
-        private const string DarknessAliasFormat = "Concursante {0}";
-        private const string DarknessFallbackName = "???";
+        private const string DARKNESS_ALIAS_FORMAT = "Concursante {0}";
+        private const string DARKNESS_FALLBACK_NAME = "???";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -175,7 +175,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             await SendVoteAsync(selectedTargetUserId);
         }
 
-
         private IEnumerable<PlayerVoteItem> BuildVotePlayers()
         {
             PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
@@ -224,7 +223,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (aliasByUserId == null || userId <= 0)
             {
-                return DarknessFallbackName;
+                return DARKNESS_FALLBACK_NAME;
             }
 
             string alias;
@@ -233,7 +232,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return alias;
             }
 
-            return DarknessFallbackName;
+            return DARKNESS_FALLBACK_NAME;
         }
 
         private Dictionary<int, string> BuildDarknessAliasMapIncludingMe()
@@ -262,7 +261,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 if (!map.ContainsKey(p.UserId))
                 {
-                    map[p.UserId] = string.Format(CultureInfo.CurrentCulture, DarknessAliasFormat, index);
+                    map[p.UserId] = string.Format(CultureInfo.CurrentCulture, DARKNESS_ALIAS_FORMAT, index);
                 }
 
                 index++;

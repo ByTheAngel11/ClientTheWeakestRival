@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.NetworkInformation;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,10 +24,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
         private const string LOG_ENDPOINT_REMAPPED = "GameplayHub endpoint remapped from {0} to {1}.";
 
-        private static readonly TimeSpan ReconnectInterval = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
-        private static readonly TimeSpan ReconnectTestTimeout = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
+        private const string FAULT_CODE_DATABASE = "Error de base de datos";
+        private const string FAULT_MESSAGE_DATABASE_MARKER = "base de datos";
 
-        private static readonly DispatcherPriority UiDispatcherPriority = DispatcherPriority.Send;
+        private static readonly TimeSpan RECONNECT_INTERVAL = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
+        private static readonly TimeSpan RECONNECT_TEST_TIMEOUT = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
+
+        private static readonly DispatcherPriority UI_DISPATCHER_PRIORITY = DispatcherPriority.Send;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GameplayHub));
 
         private readonly Dispatcher dispatcher;
@@ -45,6 +49,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
         public event Action<Exception> ConnectionLost;
         public event Action ConnectionRestored;
+
+        public event Action<string> DatabaseErrorDetected;
 
         public GameplayHub(string endpointName)
         {
@@ -93,6 +99,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             catch (FaultException ex)
             {
                 Logger.Warn("JoinMatchAsync fault.", ex);
+
+                if (IsDatabaseFault(ex.Message))
+                {
+                    RaiseDatabaseErrorDetected(ex.Message);
+                }
+
                 return new GameplayServiceProxy.GameplayJoinMatchResponse();
             }
             catch (CommunicationException ex)
@@ -133,6 +145,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 await Task.Run(() => client.StartMatch(request)).ConfigureAwait(false);
                 StopReconnectLoop();
             }
+            catch (FaultException ex)
+            {
+                Logger.Warn("StartMatchAsync fault.", ex);
+
+                if (IsDatabaseFault(ex.Message))
+                {
+                    StopReconnectLoop();
+                    RaiseDatabaseErrorDetected(ex.Message);
+                }
+
+                throw;
+            }
             catch (CommunicationException ex)
             {
                 OnChannelDead("StartMatchAsync communication error.", ex);
@@ -167,6 +191,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 StopReconnectLoop();
                 return response ?? new GameplayServiceProxy.SubmitAnswerResponse();
             }
+            catch (FaultException ex)
+            {
+                Logger.Warn("SubmitAnswerAsync fault.", ex);
+
+                if (IsDatabaseFault(ex.Message))
+                {
+                    StopReconnectLoop();
+                    RaiseDatabaseErrorDetected(ex.Message);
+                }
+
+                throw;
+            }
             catch (CommunicationException ex)
             {
                 OnChannelDead("SubmitAnswerAsync communication error.", ex);
@@ -200,6 +236,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 StopReconnectLoop();
                 return response ?? new GameplayServiceProxy.BankResponse();
             }
+            catch (FaultException ex)
+            {
+                Logger.Warn("BankAsync fault.", ex);
+
+                if (IsDatabaseFault(ex.Message))
+                {
+                    StopReconnectLoop();
+                    RaiseDatabaseErrorDetected(ex.Message);
+                }
+
+                throw;
+            }
             catch (CommunicationException ex)
             {
                 OnChannelDead("BankAsync communication error.", ex);
@@ -230,6 +278,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 await Task.Run(() => client.CastVote(request)).ConfigureAwait(false);
                 StopReconnectLoop();
             }
+            catch (FaultException ex)
+            {
+                Logger.Warn("CastVoteAsync fault.", ex);
+
+                if (IsDatabaseFault(ex.Message))
+                {
+                    StopReconnectLoop();
+                    RaiseDatabaseErrorDetected(ex.Message);
+                }
+
+                throw;
+            }
             catch (CommunicationException ex)
             {
                 OnChannelDead("CastVoteAsync communication error.", ex);
@@ -259,6 +319,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             {
                 await Task.Run(() => client.ChooseDuelOpponent(request)).ConfigureAwait(false);
                 StopReconnectLoop();
+            }
+            catch (FaultException ex)
+            {
+                Logger.Warn("ChooseDuelOpponentAsync fault.", ex);
+
+                if (IsDatabaseFault(ex.Message))
+                {
+                    StopReconnectLoop();
+                    RaiseDatabaseErrorDetected(ex.Message);
+                }
+
+                throw;
             }
             catch (CommunicationException ex)
             {
@@ -334,7 +406,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                     return;
                 }
 
-                dispatcher.BeginInvoke(action, UiDispatcherPriority);
+                dispatcher.BeginInvoke(action, UI_DISPATCHER_PRIORITY);
             }
             catch (Exception ex)
             {
@@ -407,7 +479,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
             if (!dispatcher.CheckAccess())
             {
-                dispatcher.BeginInvoke(new Action(StartReconnectLoop), UiDispatcherPriority);
+                dispatcher.BeginInvoke(new Action(StartReconnectLoop), UI_DISPATCHER_PRIORITY);
                 return;
             }
 
@@ -415,12 +487,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             {
                 if (reconnectTimer == null)
                 {
-                    reconnectTimer = new DispatcherTimer(UiDispatcherPriority, dispatcher)
+                    reconnectTimer = new DispatcherTimer(UI_DISPATCHER_PRIORITY, dispatcher)
                     {
-                        Interval = ReconnectInterval
+                        Interval = RECONNECT_INTERVAL
                     };
 
-                    reconnectTimer.Tick += ReconnectTimer_Tick;
+                    reconnectTimer.Tick += ReconnectTimerTick;
                 }
 
                 if (!reconnectTimer.IsEnabled)
@@ -439,7 +511,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
             if (!dispatcher.CheckAccess())
             {
-                dispatcher.BeginInvoke(new Action(StopReconnectLoop), UiDispatcherPriority);
+                dispatcher.BeginInvoke(new Action(StopReconnectLoop), UI_DISPATCHER_PRIORITY);
                 return;
             }
 
@@ -452,7 +524,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             }
         }
 
-        private async void ReconnectTimer_Tick(object sender, EventArgs e)
+        private async void ReconnectTimerTick(object sender, EventArgs e)
         {
             if (isStoppedOrDisposed)
             {
@@ -485,6 +557,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
         private async Task TryReconnectAsync()
         {
+            if (!NetworkInterface.GetIsNetworkAvailable())
+            {
+                return;
+            }
+
             if (isStoppedOrDisposed)
             {
                 StopReconnectLoop();
@@ -498,7 +575,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
             try
             {
-                bool mustRecreate = client == null || client.State == CommunicationState.Faulted;
+                bool mustRecreate =
+                    client == null ||
+                    client.State != CommunicationState.Opened;
+
                 if (mustRecreate)
                 {
                     RecreateClient();
@@ -506,24 +586,74 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
                 try
                 {
-                    client.InnerChannel.OperationTimeout = ReconnectTestTimeout;
+                    client.InnerChannel.OperationTimeout = RECONNECT_TEST_TIMEOUT;
                 }
                 catch (Exception ex)
                 {
                     Logger.Warn("Setting OperationTimeout failed.", ex);
                 }
 
-                _ = await Task.Run(() => client.JoinMatch(lastJoinRequest)).ConfigureAwait(false);
+                try
+                {
+                    _ = await Task.Run(() => client.JoinMatch(lastJoinRequest)).ConfigureAwait(false);
+                }
+                catch (FaultException ex)
+                {
+                    Logger.Warn("GameplayHub reconnect fault.", ex);
+
+                    StopReconnectLoop();
+
+                    if (IsDatabaseFault(ex.Message))
+                    {
+                        RaiseDatabaseErrorDetected(ex.Message);
+                    }
+
+                    return;
+                }
 
                 Logger.Info("GameplayHub reconnected successfully.");
                 StopReconnectLoop();
 
                 Ui(() => ConnectionRestored?.Invoke());
             }
+            catch (CommunicationException ex)
+            {
+                Logger.Warn("GameplayHub reconnect attempt communication error.", ex);
+                SafeAbort();
+            }
+            catch (TimeoutException ex)
+            {
+                Logger.Warn("GameplayHub reconnect attempt timeout.", ex);
+                SafeAbort();
+            }
             catch (Exception ex)
             {
                 Logger.Warn("GameplayHub reconnect attempt failed.", ex);
                 SafeAbort();
+            }
+        }
+
+        private static bool IsDatabaseFault(string faultMessage)
+        {
+            string message = faultMessage ?? string.Empty;
+
+            if (message.IndexOf(FAULT_CODE_DATABASE, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            return message.IndexOf(FAULT_MESSAGE_DATABASE_MARKER, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private void RaiseDatabaseErrorDetected(string message)
+        {
+            try
+            {
+                Ui(() => DatabaseErrorDetected?.Invoke(message ?? string.Empty));
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("GameplayHub.RaiseDatabaseErrorDetected failed.", ex);
             }
         }
 
