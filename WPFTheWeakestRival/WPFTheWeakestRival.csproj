@@ -781,5 +781,8 @@
   <ItemGroup>
     <None Include="Connected Services\LobbyService\item1.disco" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\reconnecting.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
