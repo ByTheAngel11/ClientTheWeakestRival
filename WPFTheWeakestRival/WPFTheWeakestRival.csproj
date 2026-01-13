@@ -345,7 +345,7 @@
     <EmbeddedResource Include="Properties\Langs\Lang.pt.resx" />
     <EmbeddedResource Include="Properties\Langs\Lang.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Lang3.Designer.cs</LastGenOutput>
+      <LastGenOutput>Lang.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.en.resx" />
     <EmbeddedResource Include="Properties\Resources.es.resx" />

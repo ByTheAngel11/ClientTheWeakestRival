@@ -861,4 +861,40 @@
   <data name="btnGlobalClose" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="msgSpecialEventBombQuestionTitle" xml:space="preserve">
+    <value>Bomb question”</value>
+  </data>
+  <data name="msgSpecialEventBombQuestionDesc" xml:space="preserve">
+    <value>Bomb question: correct +0.50 to bank, wrong -0.50</value>
+  </data>
+  <data name="msgSpecialEventBombAppliedTitle" xml:space="preserve">
+    <value>Question Bomb Applied</value>
+  </data>
+  <data name="msgSpecialEventSurpriseExamTitle" xml:space="preserve">
+    <value>Surprise exam</value>
+  </data>
+  <data name="msgSpecialEventSurpriseExamDesc" xml:space="preserve">
+    <value>Answer quickly.</value>
+  </data>
+  <data name="msgSpecialEventSurpriseExamResolvedTitle" xml:space="preserve">
+    <value>Surprise exam resolved”</value>
+  </data>
+  <data name="msgSpecialEventLightningWildcardTitle" xml:space="preserve">
+    <value>Lightning wildcard awarded</value>
+  </data>
+  <data name="msgSpecialEventExtraWildcardTitle" xml:space="preserve">
+    <value>Extra wildcard awarded</value>
+  </data>
+  <data name="msgSpecialEventSabotageTitle" xml:space="preserve">
+    <value>Sabotage</value>
+  </data>
+  <data name="msgSpecialEventSabotageDescFormat" xml:space="preserve">
+    <value>Turn time reduced to {0} seconds.</value>
+  </data>
+  <data name="msgSpecialEventDarknessTitle" xml:space="preserve">
+    <value>Darkness</value>
+  </data>
+  <data name="msgSpecialEventDarknessEndedTitle" xml:space="preserve">
+    <value>Darkness ended</value>
+  </data>
 </root>
