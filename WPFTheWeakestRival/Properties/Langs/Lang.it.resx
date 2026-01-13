@@ -940,4 +940,22 @@
   <data name="msgWildcardNameBlock" xml:space="preserve">
     <value>Blocca i caratteri jolly</value>
   </data>
+  <data name="wndMatchResultTitle" xml:space="preserve">
+    <value>Risultato del gioco</value>
+  </data>
+  <data name="lblMatchResultHeader" xml:space="preserve">
+    <value>RISULTATO</value>
+  </data>
+  <data name="lblMatchResultGradesList" xml:space="preserve">
+    <value>ELENCO DELLE QUALIFICHE</value>
+  </data>
+  <data name="lblMatchResultRatioLine1" xml:space="preserve">
+    <value>RAPPORTO DOMANDE BUONE PER</value>
+  </data>
+  <data name="lblMatchResultRatioLine2" xml:space="preserve">
+    <value>DOMANDE TOTALI</value>
+  </data>
+  <data name="btnMatchResultBackToLobby" xml:space="preserve">
+    <value>RITORNO ALLA LOBBY</value>
+  </data>
 </root>

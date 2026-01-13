@@ -313,6 +313,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a RETURN TO THE LOBBY.
+        /// </summary>
+        public static string btnMatchResultBackToLobby {
+            get {
+                return ResourceManager.GetString("btnMatchResultBackToLobby", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Personalization.
         /// </summary>
         public static string btnPersonalization {
@@ -1264,6 +1273,42 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string lblGameWaitingForMatchStart {
             get {
                 return ResourceManager.GetString("lblGameWaitingForMatchStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a LIST OF QUALIFICATIONS.
+        /// </summary>
+        public static string lblMatchResultGradesList {
+            get {
+                return ResourceManager.GetString("lblMatchResultGradesList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a RESULT.
+        /// </summary>
+        public static string lblMatchResultHeader {
+            get {
+                return ResourceManager.GetString("lblMatchResultHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a RATIO OF GOOD QUESTIONS PER.
+        /// </summary>
+        public static string lblMatchResultRatioLine1 {
+            get {
+                return ResourceManager.GetString("lblMatchResultRatioLine1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a TOTAL QUESTIONS.
+        /// </summary>
+        public static string lblMatchResultRatioLine2 {
+            get {
+                return ResourceManager.GetString("lblMatchResultRatioLine2", resourceCulture);
             }
         }
         
@@ -2452,6 +2497,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string UiTitleWarning {
             get {
                 return ResourceManager.GetString("UiTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Game result.
+        /// </summary>
+        public static string wndMatchResultTitle {
+            get {
+                return ResourceManager.GetString("wndMatchResultTitle", resourceCulture);
             }
         }
         

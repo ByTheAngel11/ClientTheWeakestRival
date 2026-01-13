@@ -918,4 +918,22 @@
   <data name="msgWildcardNameBlock" xml:space="preserve">
     <value>Block wildcards</value>
   </data>
+  <data name="wndMatchResultTitle" xml:space="preserve">
+    <value>Game result</value>
+  </data>
+  <data name="lblMatchResultHeader" xml:space="preserve">
+    <value>RESULT</value>
+  </data>
+  <data name="lblMatchResultGradesList" xml:space="preserve">
+    <value>LIST OF QUALIFICATIONS</value>
+  </data>
+  <data name="lblMatchResultRatioLine1" xml:space="preserve">
+    <value>RATIO OF GOOD QUESTIONS PER</value>
+  </data>
+  <data name="lblMatchResultRatioLine2" xml:space="preserve">
+    <value>TOTAL QUESTIONS</value>
+  </data>
+  <data name="btnMatchResultBackToLobby" xml:space="preserve">
+    <value>RETURN TO THE LOBBY</value>
+  </data>
 </root>
