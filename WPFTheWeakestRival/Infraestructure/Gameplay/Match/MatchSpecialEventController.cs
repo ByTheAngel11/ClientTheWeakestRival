@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using WPFTheWeakestRival.LobbyService;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
+using WPFTheWeakestRival.Globalization;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
@@ -70,7 +71,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            ShowGenericOverlay(name, desc);
+            // Localize event name/description into user-friendly text
+            var localized = LocalizeSpecialEvent(name, desc);
+            ShowGenericOverlay(localized.title, localized.description);
 
             SpecialEventKind kind = DetermineKind(name, desc);
             await ApplyAsync(kind, name, desc);
@@ -96,6 +99,89 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             questions.OnEliminated(isMe);
 
             refreshWildcardUseState();
+        }
+
+        private (string title, string description) LocalizeSpecialEvent(string eventName, string description)
+        {
+            string title = string.IsNullOrWhiteSpace(eventName) ? MatchConstants.PHASE_SPECIAL_EVENT_TEXT : eventName;
+            string desc = string.IsNullOrWhiteSpace(description) ? string.Empty : description;
+
+            string lang = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
+            bool isEs = string.Equals(lang, "es", StringComparison.OrdinalIgnoreCase);
+
+            if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE) || IsCode(description, MatchConstants.SPECIAL_EVENT_BOMB_QUESTION_CODE))
+            {
+                title = isEs ? "Pregunta bomba" : "Bomb question";
+                desc = isEs ? MatchConstants.BOMB_UI_MESSAGE : "Bomb question: correct +0.50 to bank, wrong -0.50.";
+                return (title, desc);
+            }
+
+            if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE) || IsCode(description, MatchConstants.SPECIAL_EVENT_BOMB_APPLIED_CODE))
+            {
+                title = isEs ? "Pregunta bomba aplicada" : "Bomb applied";
+                desc = string.Empty;
+                return (title, desc);
+            }
+
+            if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE) || IsCode(description, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE))
+            {
+                title = isEs ? "Examen sorpresa" : "Surprise exam";
+                desc = isEs ? "Responde rápidamente." : "Answer quickly.";
+                return (title, desc);
+            }
+
+            if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE) || IsCode(description, MatchConstants.SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE))
+            {
+                title = isEs ? "Examen sorpresa resuelto" : "Surprise exam resolved";
+                desc = string.Empty;
+                return (title, desc);
+            }
+
+            if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE) || IsCode(description, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE))
+            {
+                title = isEs ? "Comodín relámpago" : "Lightning wildcard awarded";
+                desc = string.Empty;
+                return (title, desc);
+            }
+
+            if (IsCode(eventName, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE) || IsCode(description, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE))
+            {
+                title = isEs ? "Comodín extra" : "Extra wildcard awarded";
+                desc = string.Empty;
+                return (title, desc);
+            }
+
+            if (IsSabotageEvent(eventName, description))
+            {
+                title = isEs ? "Sabotaje" : "Sabotage";
+                desc = isEs ? $"Turno reducido a {SABOTAGE_TIME_SECONDS} segundos." : $"Turn time reduced to {SABOTAGE_TIME_SECONDS} seconds.";
+                return (title, desc);
+            }
+
+            if (darknessController.IsDarkModeStartEvent(eventName, description))
+            {
+                title = isEs ? "A oscuras" : "Darkness";
+                desc = string.Empty;
+                return (title, desc);
+            }
+
+            if (darknessController.IsDarkModeEndEvent(eventName, description) || darknessController.IsLegacyDarknessEndEvent(eventName, description))
+            {
+                title = isEs ? "Fin de oscuras" : "Darkness ended";
+                desc = string.Empty;
+                return (title, desc);
+            }
+
+            if (!string.IsNullOrWhiteSpace(eventName) && eventName == eventName.ToUpperInvariant() && eventName.Contains("_"))
+            {
+                title = eventName.Replace('_', ' ').ToLowerInvariant();
+                if (title.Length > 1)
+                {
+                    title = char.ToUpperInvariant(title[0]) + title.Substring(1);
+                }
+            }
+
+            return (title, desc);
         }
 
         private async Task<bool> TryHandleVoteRevealAsync(string eventName, string description)
