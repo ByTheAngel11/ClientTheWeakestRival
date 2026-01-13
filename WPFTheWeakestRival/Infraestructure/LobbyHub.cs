@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
 using System.Net.NetworkInformation;
+using System.Globalization;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
@@ -22,6 +23,11 @@ namespace WPFTheWeakestRival.Infrastructure
         private const string LogChannelFaultedCreate = "CreateLobbyAsync called with channel Faulted.";
         private const string LogChannelFaultedJoin = "JoinByCodeAsync called with channel Faulted.";
         private const string LogChannelFaultedStart = "StartLobbyMatchAsync called with channel Faulted.";
+        private const string ReconnectFaultDialogTitle = "Lobby";
+        private const string ReconnectFaultDialogFormat = "{0}: {1}";
+        private const string ReconnectFaultDialogGeneric = "Ocurrió un error durante la reconexión.";
+
+        private bool hasShownReconnectFaultDialog;
 
         private const int ReconnectIntervalSeconds = 2;
         private const int ReconnectTestTimeoutSeconds = 3;
@@ -710,6 +716,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 if (!reconnectTimer.IsEnabled)
                 {
                     reconnectAttemptCount = 0;
+                    hasShownReconnectFaultDialog = false;
                     reconnectTimer.Start();
                     RaiseReconnectStarted();
                 }
@@ -839,6 +846,9 @@ namespace WPFTheWeakestRival.Infrastructure
                         UpdateLobbyContextFromJoinResponse(response, lastAccessCode);
                     }
                 }
+                // REEMPLAZA tu catch (FaultException<ServiceFault> ex) dentro de TryReconnectAsync()
+                // (el que está justo debajo del GetMyProfile / JoinByCode del reconnect)
+
                 catch (FaultException<ServiceFault> ex)
                 {
                     string faultCode = ex.Detail != null ? (ex.Detail.Code ?? string.Empty) : string.Empty;
@@ -853,16 +863,33 @@ namespace WPFTheWeakestRival.Infrastructure
                         string.Equals(faultCode.Trim(), FaultCodeDatabase, StringComparison.OrdinalIgnoreCase) ||
                         faultMessage.IndexOf(FaultMessageDatabaseMarker, StringComparison.OrdinalIgnoreCase) >= 0;
 
+                    StopReconnectLoop();
+
                     if (isDatabaseFault)
                     {
-                        StopReconnectLoop();
+                        RaiseReconnectStopped();
                         RaiseDatabaseErrorDetected(ex.Detail);
                         return;
                     }
 
-                    StopReconnectLoop();
+                    bool mustShow;
+
+                    lock (reconnectSyncRoot)
+                    {
+                        mustShow = !hasShownReconnectFaultDialog;
+                        hasShownReconnectFaultDialog = true;
+                    }
+
+                    RaiseReconnectStopped();
+
+                    if (mustShow)
+                    {
+                        ShowReconnectFaultDialog(faultCode, faultMessage);
+                    }
+
                     return;
                 }
+
 
                 Logger.Info("LobbyHub reconnected successfully.");
                 RaiseReconnectStopped(); 
@@ -1044,7 +1071,38 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 Logger.Warn("LobbyHub.RaiseDatabaseErrorDetected failed.", ex);
             }
+
         }
 
+        private void ShowReconnectFaultDialog(string faultCode, string faultMessage)
+        {
+            string safeCode = (faultCode ?? string.Empty).Trim();
+            string safeMessage = (faultMessage ?? string.Empty).Trim();
+
+            string text =
+                string.IsNullOrWhiteSpace(safeCode) && string.IsNullOrWhiteSpace(safeMessage)
+                    ? ReconnectFaultDialogGeneric
+                    : string.IsNullOrWhiteSpace(safeCode)
+                        ? safeMessage
+                        : string.IsNullOrWhiteSpace(safeMessage)
+                            ? safeCode
+                            : string.Format(CultureInfo.InvariantCulture, ReconnectFaultDialogFormat, safeCode, safeMessage);
+
+            Ui(() =>
+            {
+                try
+                {
+                    MessageBox.Show(
+                        text,
+                        ReconnectFaultDialogTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("ShowReconnectFaultDialog failed.", ex);
+                }
+            });
+        }
     }
 }
