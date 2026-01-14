@@ -1394,6 +1394,51 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Block wildcards.
+        /// </summary>
+        public static string lblWildcardBlockWildcards {
+            get {
+                return ResourceManager.GetString("lblWildcardBlockWildcards", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Change question.
+        /// </summary>
+        public static string lblWildcardChangeQuestion {
+            get {
+                return ResourceManager.GetString("lblWildcardChangeQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Duplicate score.
+        /// </summary>
+        public static string lblWildcardDuplicateScore {
+            get {
+                return ResourceManager.GetString("lblWildcardDuplicateScore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Forced bank.
+        /// </summary>
+        public static string lblWildcardForcedBank {
+            get {
+                return ResourceManager.GetString("lblWildcardForcedBank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Pass the question.
+        /// </summary>
+        public static string lblWildcardPassQuestion {
+            get {
+                return ResourceManager.GetString("lblWildcardPassQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Code:.
         /// </summary>
         public static string lobbyCodePrefix {
@@ -1682,7 +1727,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Surprise exam resolved”.
+        ///   Busca una cadena traducida similar a Surprise exam resolved.
         /// </summary>
         public static string msgSpecialEventSurpriseExamResolvedTitle {
             get {

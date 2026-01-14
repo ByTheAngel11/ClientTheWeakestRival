@@ -948,4 +948,19 @@
   <data name="btnReportSubmit" xml:space="preserve">
     <value>Send</value>
   </data>
+  <data name="lblWildcardChangeQuestion" xml:space="preserve">
+    <value>Change question</value>
+  </data>
+  <data name="lblWildcardPassQuestion" xml:space="preserve">
+    <value>Pass the question</value>
+  </data>
+  <data name="lblWildcardForcedBank" xml:space="preserve">
+    <value>Forced bank</value>
+  </data>
+  <data name="lblWildcardDuplicateScore" xml:space="preserve">
+    <value>Duplicate score</value>
+  </data>
+  <data name="lblWildcardBlockWildcards" xml:space="preserve">
+    <value>Block wildcards</value>
+  </data>
 </root>

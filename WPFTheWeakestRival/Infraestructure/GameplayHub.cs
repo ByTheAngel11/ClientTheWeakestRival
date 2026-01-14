@@ -666,10 +666,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                     if (IsDatabaseFault(ex.Message))
                     {
                         RaiseDatabaseErrorDetected(ex.Message);
+                        return;
                     }
 
+                    RaiseReturnToLobbyRequested();
                     return;
                 }
+
 
                 Logger.Info("GameplayHub reconnected successfully.");
 

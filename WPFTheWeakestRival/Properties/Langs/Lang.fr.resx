@@ -948,4 +948,35 @@
   <data name="btnReportSubmit" xml:space="preserve">
     <value>Envoyer</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="lblWildcardChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardPassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardDuplicateScore" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardBlockWildcards" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardChangeQuestion" xml:space="preserve">
+    <value>Changer de question</value>
+  </data>
+  <data name="lblWildcardPassQuestion" xml:space="preserve">
+    <value>Passez la question</value>
+  </data>
+  <data name="lblWildcardForcedBank" xml:space="preserve">
+    <value>Banque forcée</value>
+  </data>
+  <data name="lblWildcardDuplicateScore" xml:space="preserve">
+    <value>Partition en double</value>
+  </data>
+  <data name="lblWildcardBlockWildcards" xml:space="preserve">
+    <value>Bloquer les caractères génériques</value>
+  </data>
 </root>

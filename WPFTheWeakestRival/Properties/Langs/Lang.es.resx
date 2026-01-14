@@ -948,4 +948,35 @@
   <data name="btnReportSubmit" xml:space="preserve">
     <value>Enviar</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="lblWildcardChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardPassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardDuplicateScore" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardBlockWildcards" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="lblWildcardChangeQuestion" xml:space="preserve">
+    <value>Cambiar pregunta</value>
+  </data>
+  <data name="lblWildcardPassQuestion" xml:space="preserve">
+    <value>pasa la pregunta</value>
+  </data>
+  <data name="lblWildcardForcedBank" xml:space="preserve">
+    <value>banco forzado</value>
+  </data>
+  <data name="lblWildcardDuplicateScore" xml:space="preserve">
+    <value>Puntaje duplicado</value>
+  </data>
+  <data name="lblWildcardBlockWildcards" xml:space="preserve">
+    <value>Bloquear comodines</value>
+  </data>
 </root>
