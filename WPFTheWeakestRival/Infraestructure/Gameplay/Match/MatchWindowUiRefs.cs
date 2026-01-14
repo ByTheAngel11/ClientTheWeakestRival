@@ -59,6 +59,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             SpecialEventOverlay = args.SpecialEventOverlay ?? throw new ArgumentNullException(nameof(args.SpecialEventOverlay));
             SpecialEventTitleText = args.SpecialEventTitleText ?? throw new ArgumentNullException(nameof(args.SpecialEventTitleText));
             SpecialEventDescriptionText = args.SpecialEventDescriptionText ?? throw new ArgumentNullException(nameof(args.SpecialEventDescriptionText));
+
+            GrdReconnectOverlay = args.GrdReconnectOverlay ?? throw new ArgumentNullException(nameof(args.GrdReconnectOverlay));
+            TxtReconnectStatus = args.TxtReconnectStatus ?? throw new ArgumentNullException(nameof(args.TxtReconnectStatus));
         }
 
         public Window Window { get; }
@@ -106,6 +109,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public UIElement SpecialEventOverlay { get; }
         public TextBlock SpecialEventTitleText { get; }
         public TextBlock SpecialEventDescriptionText { get; }
+
+        public Grid GrdReconnectOverlay { get; set; }
+        public TextBlock TxtReconnectStatus { get; set; }
     }
 
     internal sealed class MatchWindowUiRefsArgs
@@ -155,5 +161,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public UIElement SpecialEventOverlay { get; set; }
         public TextBlock SpecialEventTitleText { get; set; }
         public TextBlock SpecialEventDescriptionText { get; set; }
+        public Grid GrdReconnectOverlay { get; set; }
+        public TextBlock TxtReconnectStatus { get; set; }
+
     }
 }
