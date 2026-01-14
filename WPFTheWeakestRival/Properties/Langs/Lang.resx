@@ -877,7 +877,7 @@
     <value>Answer quickly.</value>
   </data>
   <data name="msgSpecialEventSurpriseExamResolvedTitle" xml:space="preserve">
-    <value>Surprise exam resolved”</value>
+    <value>Surprise exam resolved</value>
   </data>
   <data name="msgSpecialEventLightningWildcardTitle" xml:space="preserve">
     <value>Lightning wildcard awarded</value>
