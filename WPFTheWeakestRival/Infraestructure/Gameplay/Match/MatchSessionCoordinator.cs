@@ -87,6 +87,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             await JoinMatchAsync();
             await EnsureMatchStartedAsync();
 
+            RefreshPlayersForUi();
+
             RefreshWildcardUseState();
         }
 
@@ -206,6 +208,32 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             callbackBridge.TurnOrderChanged += (matchId, turnOrder, reason) =>
                 RunAsync(() => HandleTurnOrderChangedAsync(turnOrder, reason), CONTEXT_TURN_ORDER_CHANGED);
+        }
+
+        private void RefreshPlayersForUi()
+        {
+            try
+            {
+                if (isDisposed)
+                {
+                    return;
+                }
+
+                if (Application.Current == null || Application.Current.Dispatcher == null)
+                {
+                    turns.RefreshPlayersFromMatchSnapshot();
+                    return;
+                }
+
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    turns.RefreshPlayersFromMatchSnapshot();
+                }));
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("MatchSessionCoordinator.RefreshPlayersForUi error.", ex);
+            }
         }
 
         private void HandleSpecialEvent(Guid matchId, string name, string description)
@@ -417,6 +445,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             RefreshWildcardUseState();
             inputController.RefreshGameplayInputs();
+
+            RefreshPlayersForUi();
         }
 
         private void HandleNextQuestion(
@@ -685,6 +715,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleTurnOrderInitializedAsync(object turnOrder)
         {
+            RefreshPlayersForUi();
+
             turns.ApplyTurnOrder(turnOrder);
 
             SyncMyTurnFromTurnOrder(turnOrder);
@@ -706,6 +738,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private async Task HandleTurnOrderChangedAsync(object turnOrder, string reasonCode)
         {
+            RefreshPlayersForUi();
+
             turns.ApplyTurnOrder(turnOrder);
 
             SyncMyTurnFromTurnOrder(turnOrder);
