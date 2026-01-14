@@ -47,7 +47,7 @@
                      AcceptsReturn="True"
                      TextWrapping="Wrap"
                      Height="90"
-                     MaxLength="500"/>
+                     MaxLength="200"/>
         </StackPanel>
 
         <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Right">
