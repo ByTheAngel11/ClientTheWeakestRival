@@ -32,7 +32,7 @@
 
         <StackPanel Grid.Row="4" Orientation="Horizontal">
             <TextBlock Text="{loc:Loc reportPlayer}" Visibility="Collapsed"/>
-            <TextBlock Text="Motivo:"
+            <TextBlock Text="{loc:Loc lblReportReason}"
                        VerticalAlignment="Center"
                        Margin="0,0,10,0"/>
             <ComboBox x:Name="cmbReasons"
@@ -42,7 +42,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="6">
-            <TextBlock Text="Comentario (opcional):" Margin="0,0,0,6"/>
+            <TextBlock Text="{loc:Loc lblReportCommentOptional}"
+                       Margin="0,0,0,6"/>
             <TextBox x:Name="txtComment"
                      AcceptsReturn="True"
                      TextWrapping="Wrap"
@@ -55,11 +56,11 @@
                     Width="90"
                     Margin="0,0,10,0"
                     Click="BtnCancelClick"
-                    Content="Cancelar"/>
+                    Content="{loc:Loc btnGlobalCancel}"/>
             <Button x:Name="btnSubmit"
                     Width="110"
                     Click="BtnSubmitClick"
-                    Content="Enviar"/>
+                    Content="{loc:Loc btnReportSubmit}"/>
         </StackPanel>
     </Grid>
 </Window>

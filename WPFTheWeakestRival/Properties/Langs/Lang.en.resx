@@ -958,4 +958,16 @@
   <data name="btnMatchResultBackToLobby" xml:space="preserve">
     <value>RETURN TO THE LOBBY</value>
   </data>
+  <data name="lblReportReason" xml:space="preserve">
+    <value>Reason:</value>
+  </data>
+  <data name="lblReportCommentOptional" xml:space="preserve">
+    <value>Comment (optional):</value>
+  </data>
+  <data name="btnGlobalCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="btnReportSubmit" xml:space="preserve">
+    <value>Send</value>
+  </data>
 </root>
