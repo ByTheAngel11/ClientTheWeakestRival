@@ -27,6 +27,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         private const string FAULT_CODE_DATABASE = "Error de base de datos";
         private const string FAULT_MESSAGE_DATABASE_MARKER = "base de datos";
 
+        private const int MAX_RECONNECT_ATTEMPTS = 3;
+
+        private const string RECONNECT_EXHAUSTED_DIALOG_TITLE = "Partida";
+        private const string RECONNECT_EXHAUSTED_DIALOG_MESSAGE =
+            "No se pudo restablecer la conexión.\n\n¿Deseas reintentar o regresar al lobby?";
+
         private static readonly TimeSpan RECONNECT_INTERVAL = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
         private static readonly TimeSpan RECONNECT_TEST_TIMEOUT = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
 
@@ -41,6 +47,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
         private bool isStoppedOrDisposed;
         private bool isReconnectInProgress;
+
+        private int reconnectAttemptCount;
+        private bool hasShownReconnectExhaustedDialog;
+
+        public event Action ReconnectStarted;
+        public event Action ReconnectStopped;
+        public event Action<int> ReconnectAttempted;
+        public event Action ReconnectExhausted;
+        public event Action ReturnToLobbyRequested;
 
         private readonly string endpointName;
         private readonly GameplayCallbackBridge callbackBridge;
@@ -418,10 +433,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         {
             try
             {
-                if (client != null)
+                GameplayServiceProxy.GameplayServiceClient localClient = client;
+                if (localClient == null)
                 {
-                    client.Abort();
+                    return;
                 }
+
+                localClient.Abort();
             }
             catch (Exception ex)
             {
@@ -497,7 +515,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
                 if (!reconnectTimer.IsEnabled)
                 {
+                    reconnectAttemptCount = 0;
+                    hasShownReconnectExhaustedDialog = false;
+
                     reconnectTimer.Start();
+                    RaiseReconnectStarted();
                 }
             }
         }
@@ -515,14 +537,23 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 return;
             }
 
+            bool wasRunning = false;
+
             lock (reconnectSyncRoot)
             {
                 if (reconnectTimer != null && reconnectTimer.IsEnabled)
                 {
                     reconnectTimer.Stop();
+                    wasRunning = true;
                 }
             }
+
+            if (wasRunning)
+            {
+                RaiseReconnectStopped();
+            }
         }
+
 
         private async void ReconnectTimerTick(object sender, EventArgs e)
         {
@@ -532,6 +563,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 return;
             }
 
+            int attempt;
+
             lock (reconnectSyncRoot)
             {
                 if (isReconnectInProgress)
@@ -539,8 +572,34 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                     return;
                 }
 
+                reconnectAttemptCount++;
+                attempt = reconnectAttemptCount;
+
+                if (attempt > MAX_RECONNECT_ATTEMPTS)
+                {
+                    StopReconnectLoop();
+                    RaiseReconnectExhausted();
+
+                    bool mustShow;
+
+                    lock (reconnectSyncRoot)
+                    {
+                        mustShow = !hasShownReconnectExhaustedDialog;
+                        hasShownReconnectExhaustedDialog = true;
+                    }
+
+                    if (mustShow)
+                    {
+                        ShowReconnectExhaustedDialog();
+                    }
+
+                    return;
+                }
+
                 isReconnectInProgress = true;
             }
+
+            RaiseReconnectAttempted(attempt);
 
             try
             {
@@ -602,6 +661,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                     Logger.Warn("GameplayHub reconnect fault.", ex);
 
                     StopReconnectLoop();
+                    RaiseReconnectStopped();
 
                     if (IsDatabaseFault(ex.Message))
                     {
@@ -612,7 +672,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 }
 
                 Logger.Info("GameplayHub reconnected successfully.");
+
                 StopReconnectLoop();
+
+                lock (reconnectSyncRoot)
+                {
+                    reconnectAttemptCount = 0;
+                    hasShownReconnectExhaustedDialog = false;
+                }
+
+                RaiseReconnectStopped();
 
                 Ui(() => ConnectionRestored?.Invoke());
             }
@@ -632,6 +701,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 SafeAbort();
             }
         }
+
+
 
         private static bool IsDatabaseFault(string faultMessage)
         {
@@ -688,6 +759,109 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         private bool CanUseDispatcher()
         {
             return dispatcher != null && !dispatcher.HasShutdownStarted && !dispatcher.HasShutdownFinished;
+        }
+
+        public void ContinueReconnectCycle()
+        {
+            if (isStoppedOrDisposed)
+            {
+                return;
+            }
+
+            lock (reconnectSyncRoot)
+            {
+                reconnectAttemptCount = 0;
+                hasShownReconnectExhaustedDialog = false;
+            }
+
+            StartReconnectLoop();
+        }
+
+        private void RaiseReconnectStarted()
+        {
+            try
+            {
+                Ui(() => ReconnectStarted?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("GameplayHub.RaiseReconnectStarted failed.", ex);
+            }
+        }
+
+        private void RaiseReconnectStopped()
+        {
+            try
+            {
+                Ui(() => ReconnectStopped?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("GameplayHub.RaiseReconnectStopped failed.", ex);
+            }
+        }
+
+        private void RaiseReconnectAttempted(int attempt)
+        {
+            try
+            {
+                Ui(() => ReconnectAttempted?.Invoke(attempt));
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("GameplayHub.RaiseReconnectAttempted failed.", ex);
+            }
+        }
+
+        private void RaiseReconnectExhausted()
+        {
+            try
+            {
+                Ui(() => ReconnectExhausted?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("GameplayHub.RaiseReconnectExhausted failed.", ex);
+            }
+        }
+
+        private void RaiseReturnToLobbyRequested()
+        {
+            try
+            {
+                Ui(() => ReturnToLobbyRequested?.Invoke());
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("GameplayHub.RaiseReturnToLobbyRequested failed.", ex);
+            }
+        }
+
+        private void ShowReconnectExhaustedDialog()
+        {
+            Ui(() =>
+            {
+                try
+                {
+                    MessageBoxResult result = MessageBox.Show(
+                        RECONNECT_EXHAUSTED_DIALOG_MESSAGE,
+                        RECONNECT_EXHAUSTED_DIALOG_TITLE,
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        ContinueReconnectCycle();
+                        return;
+                    }
+
+                    RaiseReturnToLobbyRequested();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("ShowReconnectExhaustedDialog failed.", ex);
+                }
+            });
         }
     }
 }

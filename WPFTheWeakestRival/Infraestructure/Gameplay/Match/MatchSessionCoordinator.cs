@@ -64,6 +64,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private LightningChallengeController lightningController;
 
         private bool isDisposed;
+        private MatchReconnectController reconnectController;
+
 
         public MatchSessionCoordinator(MatchWindowUiRefs ui, MatchSessionState state)
         {
@@ -120,6 +122,25 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             hub.ConnectionLost += OnGameplayConnectionLost;
             hub.ConnectionRestored += OnGameplayConnectionRestored;
+
+            reconnectController = new MatchReconnectController(
+                Application.Current.Dispatcher,
+                hub,
+                ui.GrdReconnectOverlay,
+                ui.TxtReconnectStatus,
+                returnToLobby: () =>
+                {
+                    try
+                    {
+                        ui.Window.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn("ReturnToLobby close window error.", ex);
+                    }
+                },
+                Logger);
+
 
             callbackBridge = hub.Callbacks;
 
@@ -809,6 +830,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 {
                     timer.Stop();
                 }
+
+                if (reconnectController != null)
+                {
+                    reconnectController.Dispose();
+                    reconnectController = null;
+                }
+
 
                 if (hub != null)
                 {

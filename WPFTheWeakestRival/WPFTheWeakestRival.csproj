@@ -139,6 +139,7 @@
     <Compile Include="Infraestructure\Gameplay\Match\MatchDialogController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchInputController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchPhaseLabelController.cs" />
+    <Compile Include="Infraestructure\Gameplay\Match\MatchReconnectController.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSessionCoordinator.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSessionState.cs" />
     <Compile Include="Infraestructure\Gameplay\Match\MatchSpecialEventController.cs" />

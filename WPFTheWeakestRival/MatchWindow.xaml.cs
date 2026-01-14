@@ -84,7 +84,10 @@ namespace WPFTheWeakestRival
 
                     SpecialEventOverlay = SpecialEventOverlay,
                     SpecialEventTitleText = SpecialEventTitleText,
-                    SpecialEventDescriptionText = SpecialEventDescriptionText
+                    SpecialEventDescriptionText = SpecialEventDescriptionText,
+
+                    GrdReconnectOverlay = grdReconnectOverlay,
+                    TxtReconnectStatus = txtReconnectStatus
                 });
 
 
