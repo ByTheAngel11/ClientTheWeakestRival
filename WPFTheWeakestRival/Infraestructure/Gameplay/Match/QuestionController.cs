@@ -1,7 +1,10 @@
 ﻿using log4net;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,6 +21,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(QuestionController));
 
+        private const string GENERIC_PLAYER_NAME_FORMAT = "Jugador {0}";
+
         private const string DARKNESS_UNKNOWN_NAME = "???";
         private const string DARKNESS_TURN_LABEL = "A oscuras";
         private const string LIGHTNING_IN_PROGRESS_TEXT = "Reto relámpago en curso";
@@ -26,12 +31,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private const string GENERIC_ACTION_FAILED_MESSAGE = "No se pudo realizar la acción. Intenta de nuevo.";
 
+        private const string TURN_MY_TURN_BRUSH_KEY = "Brush.Turn.MyTurn";
+        private const string TURN_OTHER_TURN_BRUSH_KEY = "Brush.Turn.OtherTurn";
+
         private const int MIN_SECONDS = 0;
+
+        private const string PROP_USER_ID = "UserId";
+        private const string PROP_DISPLAY_NAME = "DisplayName";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
         private readonly GameplayClientProxy gameplay;
         private readonly QuestionTimerController timer;
+
+        private readonly object lobbyCacheSyncRoot = new object();
+        private readonly Dictionary<int, PlayerSummary> lobbyPlayerCacheByUserId =
+            new Dictionary<int, PlayerSummary>();
 
         private int remainingSeconds;
         private int currentTurnTimeLimitSeconds;
@@ -171,7 +186,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            RestoreTurnIdentityFromLobby();
+            RestoreTurnIdentityFromLobbyOrUiList();
         }
 
         private void ApplyDarknessTurnIdentity()
@@ -192,23 +207,26 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
         }
 
-        private void RestoreTurnIdentityFromLobby()
+        private void RestoreTurnIdentityFromLobbyOrUiList()
         {
             int userId = state.CurrentTurnUserId;
 
-            PlayerSummary[] lobbyPlayers = state.Match.Players ?? Array.Empty<PlayerSummary>();
-            PlayerSummary p = lobbyPlayers.FirstOrDefault(x => x != null && x.UserId == userId);
+            string nameFromUi = TryResolveDisplayNameFromUiPlayersList(userId);
+            PlayerSummary lobbyPlayer = FindLobbyPlayer(userId);
 
             if (ui.TxtTurnPlayerName != null)
             {
-                ui.TxtTurnPlayerName.Text = p != null && !string.IsNullOrWhiteSpace(p.DisplayName)
-                    ? p.DisplayName
-                    : MatchConstants.DEFAULT_PLAYER_NAME;
+                ui.TxtTurnPlayerName.Text =
+                    !string.IsNullOrWhiteSpace(nameFromUi)
+                        ? nameFromUi
+                        : (lobbyPlayer != null && !string.IsNullOrWhiteSpace(lobbyPlayer.DisplayName)
+                            ? lobbyPlayer.DisplayName
+                            : BuildFallbackPlayerName(userId));
             }
 
             if (ui.TurnAvatar != null)
             {
-                AvatarAppearance appearance = AvatarMapper.FromLobbyDto(p != null ? p.Avatar : null);
+                AvatarAppearance appearance = AvatarMapper.FromLobbyDto(lobbyPlayer != null ? lobbyPlayer.Avatar : null);
                 ui.TurnAvatar.Appearance = appearance;
                 ui.TurnAvatar.Visibility = Visibility.Visible;
             }
@@ -250,7 +268,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             decimal banked,
             Action<int> highlightPlayer)
         {
-            SetBombQuestionUi(false);
+            CacheLobbyPlayersSnapshot();
 
             int targetUserId = targetPlayer != null ? targetPlayer.UserId : 0;
             bool isTargetEliminated = targetUserId > 0 && state.IsEliminated(targetUserId);
@@ -259,6 +277,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.IsMyTurn = isTargetMe && !isTargetEliminated;
             state.CurrentQuestion = question;
             state.CurrentTurnUserId = targetUserId;
+
+            SetBombQuestionUi(false);
 
             int? timeLimitOverrideSeconds = TryConsumeNextTurnTimeLimitOverride(targetUserId);
 
@@ -278,6 +298,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             StartOtherTurnUi();
             ShowWaitingTurnUi();
         }
+
 
         private void UpdateChainAndBankUi(decimal currentChain, decimal banked)
         {
@@ -307,21 +328,250 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void ApplyNormalTurnIdentity(GameplayServiceProxy.PlayerSummary targetPlayer)
         {
-            if (ui.TurnAvatar != null)
-            {
-                AvatarAppearance appearance = AvatarMapper.FromGameplayDto(targetPlayer != null ? targetPlayer.Avatar : null);
-                ui.TurnAvatar.Appearance = appearance;
-                ui.TurnAvatar.Visibility = Visibility.Visible;
-            }
+            CacheLobbyPlayersSnapshot();
+
+            int userId = targetPlayer != null && targetPlayer.UserId > 0
+                ? targetPlayer.UserId
+                : state.CurrentTurnUserId;
+
+            string nameFromUi = TryResolveDisplayNameFromUiPlayersList(userId);
+            PlayerSummary lobbyPlayer = FindLobbyPlayer(userId);
+
+            string displayName = ResolveBestDisplayName(nameFromUi, targetPlayer, lobbyPlayer, userId);
 
             if (ui.TxtTurnPlayerName != null)
             {
-                string displayName = targetPlayer != null ? targetPlayer.DisplayName : null;
-
-                ui.TxtTurnPlayerName.Text = !string.IsNullOrWhiteSpace(displayName)
-                    ? displayName
-                    : MatchConstants.DEFAULT_PLAYER_NAME;
+                ui.TxtTurnPlayerName.Text = displayName;
             }
+
+            if (ui.TurnAvatar != null)
+            {
+                AvatarAppearance appearance = null;
+
+                if (targetPlayer != null && targetPlayer.Avatar != null)
+                {
+                    appearance = AvatarMapper.FromGameplayDto(targetPlayer.Avatar);
+                }
+                else
+                {
+                    appearance = AvatarMapper.FromLobbyDto(lobbyPlayer != null ? lobbyPlayer.Avatar : null);
+                }
+
+                ui.TurnAvatar.Appearance = appearance;
+                ui.TurnAvatar.Visibility = Visibility.Visible;
+            }
+        }
+
+        private static string ResolveBestDisplayName(
+            string nameFromUi,
+            GameplayServiceProxy.PlayerSummary gameplayPlayer,
+            PlayerSummary lobbyPlayer,
+            int userId)
+        {
+            if (!string.IsNullOrWhiteSpace(nameFromUi))
+            {
+                return nameFromUi;
+            }
+
+            string name = gameplayPlayer != null ? gameplayPlayer.DisplayName : null;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+
+            name = lobbyPlayer != null ? lobbyPlayer.DisplayName : null;
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+
+            return BuildFallbackPlayerName(userId);
+        }
+
+        private static string BuildFallbackPlayerName(int userId)
+        {
+            if (userId > 0)
+            {
+                return string.Format(CultureInfo.CurrentCulture, GENERIC_PLAYER_NAME_FORMAT, userId);
+            }
+
+            return MatchConstants.DEFAULT_PLAYER_NAME;
+        }
+
+        private void CacheLobbyPlayersSnapshot()
+        {
+            try
+            {
+                PlayerSummary[] players = state.Match != null ? state.Match.Players : null;
+                if (players == null || players.Length == 0)
+                {
+                    return;
+                }
+
+                lock (lobbyCacheSyncRoot)
+                {
+                    foreach (PlayerSummary p in players)
+                    {
+                        if (p == null || p.UserId <= 0)
+                        {
+                            continue;
+                        }
+
+                        lobbyPlayerCacheByUserId[p.UserId] = p;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("CacheLobbyPlayersSnapshot failed.", ex);
+            }
+        }
+
+        private PlayerSummary FindLobbyPlayer(int userId)
+        {
+            if (userId <= 0)
+            {
+                return null;
+            }
+
+            lock (lobbyCacheSyncRoot)
+            {
+                if (lobbyPlayerCacheByUserId.TryGetValue(userId, out PlayerSummary cached))
+                {
+                    return cached;
+                }
+            }
+
+            PlayerSummary[] players = state.Match != null ? state.Match.Players : null;
+            if (players == null)
+            {
+                return null;
+            }
+
+            PlayerSummary found = players.FirstOrDefault(p => p != null && p.UserId == userId);
+            if (found != null)
+            {
+                lock (lobbyCacheSyncRoot)
+                {
+                    lobbyPlayerCacheByUserId[userId] = found;
+                }
+            }
+
+            return found;
+        }
+
+        private string TryResolveDisplayNameFromUiPlayersList(int userId)
+        {
+            try
+            {
+                if (userId <= 0 || ui.LstPlayers == null)
+                {
+                    return null;
+                }
+
+                IEnumerable source = ui.LstPlayers.ItemsSource as IEnumerable;
+                if (source == null)
+                {
+                    source = ui.LstPlayers.Items;
+                }
+
+                foreach (object item in source)
+                {
+                    if (item == null)
+                    {
+                        continue;
+                    }
+
+                    int? itemUserId = TryReadInt(item, PROP_USER_ID);
+                    if (!itemUserId.HasValue)
+                    {
+                        continue;
+                    }
+
+                    if (itemUserId.Value != userId)
+                    {
+                        continue;
+                    }
+
+                    string name = TryReadString(item, PROP_DISPLAY_NAME);
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        return name;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("TryResolveDisplayNameFromUiPlayersList failed.", ex);
+            }
+
+            return null;
+        }
+
+        private static int? TryReadInt(object target, string propertyName)
+        {
+            try
+            {
+                if (target == null || string.IsNullOrWhiteSpace(propertyName))
+                {
+                    return null;
+                }
+
+                PropertyInfo prop = target.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
+                if (prop == null || prop.PropertyType != typeof(int))
+                {
+                    return null;
+                }
+
+                object value = prop.GetValue(target, null);
+                if (value is int intValue)
+                {
+                    return intValue;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return null;
+        }
+
+        private void ApplyTurnBannerOnly()
+        {
+            if (ui.TurnBannerBackground == null)
+            {
+                return;
+            }
+
+            string key = state.IsMyTurn ? TURN_MY_TURN_BRUSH_KEY : TURN_OTHER_TURN_BRUSH_KEY;
+
+            ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource(key);
+        }
+
+
+        private static string TryReadString(object target, string propertyName)
+        {
+            try
+            {
+                if (target == null || string.IsNullOrWhiteSpace(propertyName))
+                {
+                    return null;
+                }
+
+                PropertyInfo prop = target.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
+                if (prop == null || prop.PropertyType != typeof(string))
+                {
+                    return null;
+                }
+
+                return prop.GetValue(target, null) as string;
+            }
+            catch (Exception)
+            {
+                // Ignorar: solo fallback.
+            }
+
+            return null;
         }
 
         private void ApplyBankButtonState()
@@ -336,7 +586,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void StartMyTurnTimer(int? timeLimitOverrideSeconds)
         {
-            if (!state.IsDarknessActive)
+            if (state.IsDarknessActive)
+            {
+                ApplyTurnBannerOnly();
+            }
+            else
             {
                 ApplyMyTurnLabelAndBanner();
             }
@@ -351,6 +605,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             timer.Stop();
             timer.Start(limitSeconds);
         }
+
 
         private void ApplyMyTurnLabelAndBanner()
         {
@@ -388,7 +643,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             currentTurnTimeLimitSeconds = 0;
 
-            if (!state.IsDarknessActive)
+            if (state.IsDarknessActive)
+            {
+                ApplyTurnBannerOnly();
+            }
+            else
             {
                 ApplyOtherTurnLabelAndBanner();
             }
@@ -396,6 +655,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             timer.Stop();
             SetTimerText(MatchConstants.DEFAULT_TIMER_TEXT);
         }
+
 
         private void ApplyOtherTurnLabelAndBanner()
         {
@@ -450,6 +710,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void OnLightningQuestion(GameplayServiceProxy.QuestionWithAnswersDto question, int timeLimitSeconds)
         {
+            CacheLobbyPlayersSnapshot();
+
             SetBombQuestionUi(false);
 
             state.CurrentQuestion = question;
@@ -578,13 +840,31 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
         }
 
-        private static string ResolveOtherPlayerName(GameplayServiceProxy.PlayerSummary player)
+        private string ResolveOtherPlayerName(GameplayServiceProxy.PlayerSummary player)
         {
             string displayName = player != null ? player.DisplayName : null;
+            if (!string.IsNullOrWhiteSpace(displayName))
+            {
+                return displayName;
+            }
 
-            return string.IsNullOrWhiteSpace(displayName)
-                ? MatchConstants.DEFAULT_OTHER_PLAYER_NAME
-                : displayName;
+            int userId = player != null ? player.UserId : 0;
+
+            string fromUi = TryResolveDisplayNameFromUiPlayersList(userId);
+            if (!string.IsNullOrWhiteSpace(fromUi))
+            {
+                return fromUi;
+            }
+
+            PlayerSummary lobby = FindLobbyPlayer(userId);
+
+            displayName = lobby != null ? lobby.DisplayName : null;
+            if (!string.IsNullOrWhiteSpace(displayName))
+            {
+                return displayName;
+            }
+
+            return MatchConstants.DEFAULT_OTHER_PLAYER_NAME;
         }
 
         public void OnBankUpdated(GameplayServiceProxy.BankState bank)

@@ -20,6 +20,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string DARKNESS_ALIAS_FORMAT = "Concursante {0}";
         private const string DARKNESS_FALLBACK_NAME = "???";
 
+        private const string PLAYER_FALLBACK_NAME_FORMAT = "Jugador {0}";
+        private const string PLAYER_FALLBACK_PREFIX = "Jugador";
+
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
         private readonly GameplayClientProxy gameplay;
@@ -39,15 +42,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             bool isMe = eliminatedPlayer.UserId == state.MyUserId;
-
-            string name = string.IsNullOrWhiteSpace(eliminatedPlayer.DisplayName)
-                ? MatchConstants.DEFAULT_PLAYER_NAME
-                : eliminatedPlayer.DisplayName;
-
             if (isMe)
             {
                 return;
             }
+
+            string name = ResolvePlayerNameForUi(eliminatedPlayer.UserId, eliminatedPlayer.DisplayName);
 
             MessageBox.Show(
                 string.Format(CultureInfo.CurrentCulture, "{0} ha sido eliminado de la ronda.", name),
@@ -58,9 +58,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void ShowMatchFinishedMessage(GameplayServiceProxy.PlayerSummary winner)
         {
-            string winnerName = winner != null && !string.IsNullOrWhiteSpace(winner.DisplayName)
-                ? winner.DisplayName
-                : MatchConstants.DEFAULT_PLAYER_NAME;
+            string winnerName = ResolvePlayerNameForUi(
+                winner != null ? winner.UserId : 0,
+                winner != null ? winner.DisplayName : null);
 
             string message = string.Format(
                 CultureInfo.CurrentCulture,
@@ -80,10 +80,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 PlayerSummary[] players = state.Match.Players ?? Array.Empty<PlayerSummary>();
 
-                string mainResultText;
                 bool iAmWinner = state.FinalWinner != null && state.FinalWinner.UserId == state.MyUserId;
 
-                mainResultText = iAmWinner
+                string mainResultText = iAmWinner
                     ? "¡GANASTE LA PARTIDA!"
                     : "Resultado de la partida";
 
@@ -173,6 +172,181 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             await SendVoteAsync(selectedTargetUserId);
+        }
+
+        public async Task ShowDuelSelectionAndSendAsync(
+            int weakestRivalUserId,
+            IReadOnlyCollection<DuelCandidateItem> candidates)
+        {
+            if (weakestRivalUserId != state.MyUserId)
+            {
+                return;
+            }
+
+            if (candidates == null || candidates.Count == 0)
+            {
+                return;
+            }
+
+            IReadOnlyCollection<DuelCandidateItem> normalizedCandidates = NormalizeDuelCandidatesForUi(candidates);
+
+            int? selectedUserId = null;
+
+            var duelPage = new DuelSelectionPage(
+                state.MatchDbId,
+                weakestRivalUserId,
+                normalizedCandidates);
+
+            var hostWindow = new Window
+            {
+                Title = "Selecciona a quién retar",
+                Content = duelPage,
+                Owner = ui.Window,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                SizeToContent = SizeToContent.WidthAndHeight,
+                ResizeMode = ResizeMode.NoResize,
+                WindowStyle = WindowStyle.ToolWindow,
+                ShowInTaskbar = false
+            };
+
+            duelPage.DuelSelectionCompleted += (s, e) =>
+            {
+                selectedUserId = e != null ? (int?)e.TargetUserId : null;
+                hostWindow.DialogResult = true;
+                hostWindow.Close();
+            };
+
+            hostWindow.ShowDialog();
+
+            if (!selectedUserId.HasValue)
+            {
+                Logger.Info("ShowDuelSelectionAndSendAsync: user closed without selection.");
+                return;
+            }
+
+            try
+            {
+                var request = new GameplayServiceProxy.ChooseDuelOpponentRequest
+                {
+                    Token = state.Token,
+                    TargetUserId = selectedUserId.Value
+                };
+
+                Logger.InfoFormat(
+                    "Enviando ChooseDuelOpponent. MatchDbId={0}, WeakestRivalUserId={1}, TargetUserId={2}",
+                    state.MatchDbId,
+                    weakestRivalUserId,
+                    selectedUserId.Value);
+
+                await gameplay.ChooseDuelOpponentAsync(request);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("ShowDuelSelectionAndSendAsync error.", ex);
+            }
+        }
+
+        private IReadOnlyCollection<DuelCandidateItem> NormalizeDuelCandidatesForUi(IReadOnlyCollection<DuelCandidateItem> candidates)
+        {
+            if (candidates == null || candidates.Count == 0)
+            {
+                return Array.Empty<DuelCandidateItem>();
+            }
+
+            Dictionary<int, string> aliasByUserId = state.IsDarknessActive
+                ? BuildDarknessAliasMapIncludingMe()
+                : null;
+
+            var list = new List<DuelCandidateItem>(candidates.Count);
+
+            foreach (DuelCandidateItem c in candidates)
+            {
+                if (c == null || c.UserId <= 0)
+                {
+                    continue;
+                }
+
+                string name = state.IsDarknessActive
+                    ? ResolveAlias(aliasByUserId, c.UserId)
+                    : ResolvePlayerDisplayName(c.UserId, c.DisplayName);
+
+                list.Add(new DuelCandidateItem
+                {
+                    UserId = c.UserId,
+                    DisplayName = name
+                });
+            }
+
+            return list;
+        }
+
+        private string ResolvePlayerNameForUi(int userId, string gameplayDisplayName)
+        {
+            if (state.IsDarknessActive)
+            {
+                Dictionary<int, string> aliasByUserId = BuildDarknessAliasMapIncludingMe();
+                return ResolveAlias(aliasByUserId, userId);
+            }
+
+            return ResolvePlayerDisplayName(userId, gameplayDisplayName);
+        }
+
+        private string ResolvePlayerDisplayName(int userId, string gameplayDisplayName)
+        {
+            if (!string.IsNullOrWhiteSpace(gameplayDisplayName) &&
+                !IsGeneratedPlayerName(gameplayDisplayName, userId))
+            {
+                return gameplayDisplayName;
+            }
+
+            try
+            {
+                PlayerSummary[] lobbyPlayers = state.Match?.Players ?? Array.Empty<PlayerSummary>();
+                PlayerSummary lobby = lobbyPlayers.FirstOrDefault(p => p != null && p.UserId == userId);
+
+                if (lobby != null && !string.IsNullOrWhiteSpace(lobby.DisplayName))
+                {
+                    return lobby.DisplayName;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("ResolvePlayerDisplayName: error reading lobby players.", ex);
+            }
+
+            if (userId > 0)
+            {
+                return string.Format(CultureInfo.CurrentCulture, PLAYER_FALLBACK_NAME_FORMAT, userId);
+            }
+
+            return MatchConstants.DEFAULT_PLAYER_NAME;
+        }
+
+        private static bool IsGeneratedPlayerName(string displayName, int userId)
+        {
+            if (string.IsNullOrWhiteSpace(displayName) || userId <= 0)
+            {
+                return false;
+            }
+
+            string trimmed = displayName.Trim();
+
+            string expectedCurrent = string.Format(CultureInfo.CurrentCulture, PLAYER_FALLBACK_NAME_FORMAT, userId);
+            if (string.Equals(trimmed, expectedCurrent, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            string expectedInvariant = string.Format(CultureInfo.InvariantCulture, PLAYER_FALLBACK_NAME_FORMAT, userId);
+            if (string.Equals(trimmed, expectedInvariant, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            string userIdText = userId.ToString(CultureInfo.InvariantCulture);
+
+            return trimmed.StartsWith(PLAYER_FALLBACK_PREFIX, StringComparison.OrdinalIgnoreCase)
+                && trimmed.EndsWith(userIdText, StringComparison.OrdinalIgnoreCase);
         }
 
         private IEnumerable<PlayerVoteItem> BuildVotePlayers()
@@ -311,76 +485,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             catch (Exception ex)
             {
                 Logger.Warn("SendVoteAsync error.", ex);
-            }
-        }
-
-        public async Task ShowDuelSelectionAndSendAsync(
-            int weakestRivalUserId,
-            IReadOnlyCollection<DuelCandidateItem> candidates)
-        {
-            if (weakestRivalUserId != state.MyUserId)
-            {
-                return;
-            }
-
-            if (candidates == null || candidates.Count == 0)
-            {
-                return;
-            }
-
-            int? selectedUserId = null;
-
-            var duelPage = new DuelSelectionPage(
-                state.MatchDbId,
-                weakestRivalUserId,
-                candidates);
-
-            var hostWindow = new Window
-            {
-                Title = "Selecciona a quién retar",
-                Content = duelPage,
-                Owner = ui.Window,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                SizeToContent = SizeToContent.WidthAndHeight,
-                ResizeMode = ResizeMode.NoResize,
-                WindowStyle = WindowStyle.ToolWindow,
-                ShowInTaskbar = false
-            };
-
-            duelPage.DuelSelectionCompleted += (s, e) =>
-            {
-                selectedUserId = e != null ? (int?)e.TargetUserId : null;
-                hostWindow.DialogResult = true;
-                hostWindow.Close();
-            };
-
-            hostWindow.ShowDialog();
-
-            if (!selectedUserId.HasValue)
-            {
-                Logger.Info("ShowDuelSelectionAndSendAsync: user closed without selection.");
-                return;
-            }
-
-            try
-            {
-                var request = new GameplayServiceProxy.ChooseDuelOpponentRequest
-                {
-                    Token = state.Token,
-                    TargetUserId = selectedUserId.Value
-                };
-
-                Logger.InfoFormat(
-                    "Enviando ChooseDuelOpponent. MatchDbId={0}, WeakestRivalUserId={1}, TargetUserId={2}",
-                    state.MatchDbId,
-                    weakestRivalUserId,
-                    selectedUserId.Value);
-
-                await gameplay.ChooseDuelOpponentAsync(request);
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("ShowDuelSelectionAndSendAsync error.", ex);
             }
         }
     }

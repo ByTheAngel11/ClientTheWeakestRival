@@ -57,7 +57,6 @@
                        Foreground="#222"
                        Text="{loc:Loc lblGamePhaseDefault}"/>
 
-            <!-- Timer -->
             <Border Grid.Column="2"
                     HorizontalAlignment="Right"
                     Width="200"
@@ -250,7 +249,6 @@
                     </Border>
                 </Grid>
 
-                <!-- NO internacionalizar pregunta -->
                 <Border Grid.Row="1"
                         Margin="0,0,0,8"
                         Background="#FFBFBFBF"

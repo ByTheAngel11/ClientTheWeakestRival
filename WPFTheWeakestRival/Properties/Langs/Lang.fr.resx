@@ -862,7 +862,7 @@
     <value>Fermer</value>
   </data>
   <data name="msgSpecialEventBombQuestionTitle" xml:space="preserve">
-    <value>Question bombe"</value>
+    <value>Question bombe</value>
   </data>
   <data name="msgSpecialEventBombQuestionDesc" xml:space="preserve">
     <value>Question bombe : correct +0,50 à la banque, faux -0,50</value>
@@ -877,7 +877,7 @@
     <value>Répondez rapidement.</value>
   </data>
   <data name="msgSpecialEventSurpriseExamResolvedTitle" xml:space="preserve">
-    <value>Examen surprise résolu »</value>
+    <value>Examen surprise résolu </value>
   </data>
   <data name="msgSpecialEventLightningWildcardTitle" xml:space="preserve">
     <value>Wildcard Lightning attribué</value>
@@ -896,28 +896,6 @@
   </data>
   <data name="msgSpecialEventDarknessEndedTitle" xml:space="preserve">
     <value>L'obscurité est terminée</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="msgSpecialEventWildcardUsedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventWildcardUsedDescFormat" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNamePassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameDouble" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameBlock" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
   <data name="msgSpecialEventWildcardUsedTitle" xml:space="preserve">
     <value>Caractère générique utilisé</value>

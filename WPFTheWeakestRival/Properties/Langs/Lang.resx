@@ -862,7 +862,7 @@
     <value>Close</value>
   </data>
   <data name="msgSpecialEventBombQuestionTitle" xml:space="preserve">
-    <value>Bomb question”</value>
+    <value>Bomb question</value>
   </data>
   <data name="msgSpecialEventBombQuestionDesc" xml:space="preserve">
     <value>Bomb question: correct +0.50 to bank, wrong -0.50</value>
