@@ -1610,7 +1610,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Bomb question”.
+        ///   Busca una cadena traducida similar a Bomb question.
         /// </summary>
         public static string msgSpecialEventBombQuestionTitle {
             get {

@@ -862,7 +862,7 @@
     <value>Fechar</value>
   </data>
   <data name="msgSpecialEventBombQuestionTitle" xml:space="preserve">
-    <value>Pergunta sobre bomba”</value>
+    <value>Pergunta sobre bomba</value>
   </data>
   <data name="msgSpecialEventBombQuestionDesc" xml:space="preserve">
     <value>Pergunta sobre bomba: correto +0,50 para banco, errado -0,50</value>
@@ -877,7 +877,7 @@
     <value>Responda rapidamente.</value>
   </data>
   <data name="msgSpecialEventSurpriseExamResolvedTitle" xml:space="preserve">
-    <value>Exame surpresa resolvido”</value>
+    <value>Exame surpresa resolvido</value>
   </data>
   <data name="msgSpecialEventLightningWildcardTitle" xml:space="preserve">
     <value>Curinga relâmpago concedido</value>
@@ -896,28 +896,6 @@
   </data>
   <data name="msgSpecialEventDarknessEndedTitle" xml:space="preserve">
     <value>A escuridão acabou</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="msgSpecialEventWildcardUsedTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgSpecialEventWildcardUsedDescFormat" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNamePassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameDouble" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="msgWildcardNameBlock" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
   <data name="msgSpecialEventWildcardUsedTitle" xml:space="preserve">
     <value>Curinga usado</value>
