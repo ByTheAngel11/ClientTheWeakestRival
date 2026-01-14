@@ -1682,7 +1682,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Surprise exam resolved”.
+        ///   Busca una cadena traducida similar a Surprise exam resolved.
         /// </summary>
         public static string msgSpecialEventSurpriseExamResolvedTitle {
             get {

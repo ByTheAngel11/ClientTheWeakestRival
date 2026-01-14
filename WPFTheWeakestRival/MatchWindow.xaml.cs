@@ -18,6 +18,11 @@ namespace WPFTheWeakestRival
         private readonly LobbyWindow lobbyWindow;
 
         private bool isCloseFlowInProgress;
+        private bool skipClosePrompt;
+        private bool skipCloseConfirmation;
+        private bool skipExitPrompt;
+        private bool skipReturnToLobbyOnClose;
+        private Action postCloseAction;
 
         public MatchWindow(
             MatchInfo match,
@@ -123,47 +128,27 @@ namespace WPFTheWeakestRival
                 return;
             }
 
+            if (skipClosePrompt)
+            {
+                return;
+            }
+
             e.Cancel = true;
-
-            try
-            {
-                RequestCloseFlow();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("MatchWindowClosing error.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+            RequestCloseFlow();
         }
+
 
         private void MatchWindowClosed(object sender, EventArgs e)
         {
-            try
+            coordinator.Dispose();
+
+            if (skipReturnToLobbyOnClose)
             {
-                coordinator.Dispose();
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("MatchWindow.Closed: coordinator.Dispose error.", ex);
+                return; 
             }
 
-            try
-            {
-                if (lobbyWindow != null)
-                {
-                    lobbyWindow.Show();
-                    lobbyWindow.Activate();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Warn("MatchWindow.Closed: lobbyWindow.Show/Activate error.", ex);
-            }
+            lobbyWindow?.Show();
+            lobbyWindow?.Activate();
         }
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)
@@ -321,5 +306,21 @@ namespace WPFTheWeakestRival
                 Logger.Error("SpecialEventCloseButtonClick error.", ex);
             }
         }
+
+        public void SetSkipReturnToLobbyOnClose()
+        {
+            skipExitPrompt = true;
+        }
+
+        public void CloseToLogin(Action showLogin)
+        {
+            skipClosePrompt = true;
+            skipReturnToLobbyOnClose = true;
+
+            showLogin?.Invoke();
+
+            ForceClose();
+        }
+
     }
 }
