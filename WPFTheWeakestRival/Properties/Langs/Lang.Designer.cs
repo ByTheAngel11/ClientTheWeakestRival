@@ -268,6 +268,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Cancel.
+        /// </summary>
+        public static string btnGlobalCancel {
+            get {
+                return ResourceManager.GetString("btnGlobalCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Close.
         /// </summary>
         public static string btnGlobalClose {
@@ -354,6 +363,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string btnProfileRemoveImage {
             get {
                 return ResourceManager.GetString("btnProfileRemoveImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Send.
+        /// </summary>
+        public static string btnReportSubmit {
+            get {
+                return ResourceManager.GetString("btnReportSubmit", resourceCulture);
             }
         }
         
@@ -1327,6 +1345,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string lblPassword {
             get {
                 return ResourceManager.GetString("lblPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Comment (optional):.
+        /// </summary>
+        public static string lblReportCommentOptional {
+            get {
+                return ResourceManager.GetString("lblReportCommentOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Reason:.
+        /// </summary>
+        public static string lblReportReason {
+            get {
+                return ResourceManager.GetString("lblReportReason", resourceCulture);
             }
         }
         
