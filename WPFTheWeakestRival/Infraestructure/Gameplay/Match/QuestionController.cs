@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +23,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string LIGHTNING_IN_PROGRESS_TEXT = "Reto relámpago en curso";
         private const string SURPRISE_EXAM_MY_TURN_TEXT = "Examen sorpresa: responde";
         private const string OTHER_ANSWER_REGISTERED_TEXT = "Respuesta registrada.";
+
+        private const string GENERIC_ACTION_FAILED_MESSAGE = "No se pudo realizar la acción. Intenta de nuevo.";
 
         private const int MIN_SECONDS = 0;
 
@@ -677,6 +680,23 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     OnBankUpdated(response.Bank);
                 }
             }
+            catch (FaultException ex)
+            {
+                Logger.Warn("BankAsync service fault.", ex);
+
+                string message = ResolveServiceFaultMessage(ex);
+
+                MessageBox.Show(
+                    message,
+                    MatchConstants.GAME_MESSAGE_TITLE,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                if (state.IsMyTurn && remainingSeconds > 0)
+                {
+                    timer.Start(remainingSeconds);
+                }
+            }
             catch (Exception ex)
             {
                 Logger.Warn("BankAsync error.", ex);
@@ -688,6 +708,46 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     ui.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
                 }
             }
+        }
+
+        private static string ResolveServiceFaultMessage(FaultException ex)
+        {
+            if (ex == null)
+            {
+                return GENERIC_ACTION_FAILED_MESSAGE;
+            }
+
+            try
+            {
+                var detailProperty = ex.GetType().GetProperty("Detail");
+                if (detailProperty != null)
+                {
+                    object detail = detailProperty.GetValue(ex, null);
+                    if (detail != null)
+                    {
+                        var messageProperty = detail.GetType().GetProperty("Message");
+                        if (messageProperty != null)
+                        {
+                            string detailMessage = messageProperty.GetValue(detail, null) as string;
+                            if (!string.IsNullOrWhiteSpace(detailMessage))
+                            {
+                                return detailMessage;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Fallback abajo.
+            }
+
+            if (!string.IsNullOrWhiteSpace(ex.Message))
+            {
+                return ex.Message;
+            }
+
+            return GENERIC_ACTION_FAILED_MESSAGE;
         }
 
         public void OnEliminated(bool isMe)

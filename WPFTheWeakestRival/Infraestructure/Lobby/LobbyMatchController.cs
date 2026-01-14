@@ -14,13 +14,28 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 {
     internal sealed class LobbyMatchController : IDisposable
     {
-        private const double SettingsWindowWidth = 480;
-        private const double SettingsWindowHeight = 420;
+        private const double SETTINGS_WINDOW_WIDTH = 480;
+        private const double SETTINGS_WINDOW_HEIGHT = 420;
 
-        private const double ProfileWindowWidth = 720;
-        private const double ProfileWindowHeight = 460;
+        private const double PROFILE_WINDOW_WIDTH = 720;
+        private const double PROFILE_WINDOW_HEIGHT = 460;
 
-        private const string ErrorStartMatchGeneric = "Ocurrió un error al iniciar la partida.";
+        private const int DEFAULT_MAX_PLAYERS = 4;
+
+        private const decimal DEFAULT_STARTING_SCORE = 0m;
+        private const decimal DEFAULT_MAX_SCORE = 100m;
+        private const decimal DEFAULT_POINTS_CORRECT = 10m;
+        private const decimal DEFAULT_POINTS_WRONG = -5m;
+        private const decimal DEFAULT_POINTS_ELIMINATION_GAIN = 5m;
+
+        private const bool DEFAULT_IS_PRIVATE = true;
+        private const bool DEFAULT_TIEBREAK_COINFLIP_ALLOWED = true;
+
+        private const string ERROR_START_MATCH_GENERIC = "Ocurrió un error al iniciar la partida.";
+
+        private const string AUTH_ENDPOINT_CONFIGURATION_NAME = "WSHttpBinding_IAuthService";
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyMatchController));
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
@@ -29,16 +44,16 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
         private readonly LobbyProfileController profileController;
         private readonly ILog logger;
 
-        private bool isPrivate = true;
-        private int maxPlayers = 4;
+        private bool isPrivate = DEFAULT_IS_PRIVATE;
+        private int maxPlayers = DEFAULT_MAX_PLAYERS;
 
-        private decimal startingScore = 0m;
-        private decimal maxScore = 100m;
-        private decimal pointsCorrect = 10m;
-        private decimal pointsWrong = -5m;
-        private decimal pointsEliminationGain = 5m;
+        private decimal startingScore = DEFAULT_STARTING_SCORE;
+        private decimal maxScore = DEFAULT_MAX_SCORE;
+        private decimal pointsCorrect = DEFAULT_POINTS_CORRECT;
+        private decimal pointsWrong = DEFAULT_POINTS_WRONG;
+        private decimal pointsEliminationGain = DEFAULT_POINTS_ELIMINATION_GAIN;
 
-        private bool isTiebreakCoinflipAllowed = true;
+        private bool isTiebreakCoinflipAllowed = DEFAULT_TIEBREAK_COINFLIP_ALLOWED;
 
         internal LobbyMatchController(
             LobbyUiDispatcher ui,
@@ -75,8 +90,8 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             var settingsWindow = BuildPageDialog(
                 page,
                 Lang.lblSettings,
-                SettingsWindowWidth,
-                SettingsWindowHeight,
+                SETTINGS_WINDOW_WIDTH,
+                SETTINGS_WINDOW_HEIGHT,
                 true);
 
             bool? dialogResult = settingsWindow.ShowDialog();
@@ -142,7 +157,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 logger.Error("Unexpected error starting match from lobby.", ex);
 
                 MessageBox.Show(
-                    ErrorStartMatchGeneric,
+                    ERROR_START_MATCH_GENERIC,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -168,7 +183,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             {
                 var page = new ModifyProfilePage(
                     AppServices.Lobby.RawClient,
-                    new AuthServiceClient("WSHttpBinding_IAuthService"),
+                    new AuthServiceClient(AUTH_ENDPOINT_CONFIGURATION_NAME),
                     token)
                 {
                     Title = Lang.profileTitle
@@ -177,8 +192,8 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 var profileWindow = BuildPageDialog(
                     page,
                     Lang.profileTitle,
-                    ProfileWindowWidth,
-                    ProfileWindowHeight,
+                    PROFILE_WINDOW_WIDTH,
+                    PROFILE_WINDOW_HEIGHT,
                     false);
 
                 profileWindow.ShowDialog();
@@ -237,13 +252,14 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
                     try
                     {
-                        var token = LoginWindow.AppSession.CurrentToken?.Token ?? string.Empty;
                         var session = LoginWindow.AppSession.CurrentToken;
 
-                        var myUserId = session != null ? session.UserId : 0;
-                        var isHost = false;
+                        string token = session != null ? (session.Token ?? string.Empty) : string.Empty;
+                        int myUserId = session != null ? session.UserId : 0;
 
-                        var matchWindow = new MatchWindow(match, token, myUserId, isHost, (LobbyWindow)lobbyWindow);
+                        const bool IS_HOST_DEFAULT = false;
+
+                        var matchWindow = new MatchWindow(match, token, myUserId, IS_HOST_DEFAULT, (LobbyWindow)lobbyWindow);
 
                         matchWindow.Closed += (_, __) =>
                         {

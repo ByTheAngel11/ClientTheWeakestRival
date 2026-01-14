@@ -6,7 +6,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
     internal sealed class MatchPhaseLabelController
     {
-        private const string FinalPhaseLabelText = "Final 1 vs 1";
+        private const string FINAL_PHASE_LABEL_TEXT = "Final 1 vs 1";
+
+        private const string PHASE_LABEL_FORMAT = "{0}: {1}";
+        private const string OVERLAY_EMPTY_DESCRIPTION = "";
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchPhaseLabelController));
 
@@ -50,7 +53,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             try
             {
-                overlay.ShowSpecialEvent(FinalPhaseLabelText, string.Empty);
+                overlay.ShowSpecialEvent(FINAL_PHASE_LABEL_TEXT, OVERLAY_EMPTY_DESCRIPTION);
             }
             catch (Exception ex)
             {
@@ -70,7 +73,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             switch (state.CurrentPhase)
             {
                 case MatchPhase.NormalRound:
-                    phaseDetail = string.Format(CultureInfo.CurrentCulture, MatchConstants.PHASE_ROUND_FORMAT, state.CurrentRoundNumber);
+                    phaseDetail = string.Format(
+                        CultureInfo.CurrentCulture,
+                        MatchConstants.PHASE_ROUND_FORMAT,
+                        state.CurrentRoundNumber);
                     break;
 
                 case MatchPhase.Duel:
@@ -82,7 +88,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     break;
 
                 case MatchPhase.Final:
-                    phaseDetail = FinalPhaseLabelText;
+                    phaseDetail = FINAL_PHASE_LABEL_TEXT;
                     break;
 
                 case MatchPhase.Finished:
@@ -96,7 +102,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             ui.TxtPhase.Text = string.Format(
                 CultureInfo.CurrentCulture,
-                "{0}: {1}",
+                PHASE_LABEL_FORMAT,
                 MatchConstants.PHASE_TITLE,
                 phaseDetail);
         }

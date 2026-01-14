@@ -12,22 +12,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchDarknessController));
 
-        private const string LegacyDarknessStartCode = "DARKNESS_STARTED";
-        private const string LegacyDarknessEndCode = "DARKNESS_ENDED";
+        private const string LEGACY_DARKNESS_START_CODE = "DARKNESS_STARTED";
+        private const string LEGACY_DARKNESS_END_CODE = "DARKNESS_ENDED";
 
-        private const string DarkModeStartCode = "DARK_MODE_STARTED";
-        private const string DarkModeEndCode = "DARK_MODE_ENDED";
-        private const string DarkModeVoteRevealCode = "DARK_MODE_VOTE_REVEAL";
+        private const string DARK_MODE_START_CODE = "DARK_MODE_STARTED";
+        private const string DARK_MODE_END_CODE = "DARK_MODE_ENDED";
+        private const string DARK_MODE_VOTE_REVEAL_CODE = "DARK_MODE_VOTE_REVEAL";
 
-        private const string DarknessKeywordEs = "oscuras";
-        private const string DarknessUnknownName = "???";
-        private const string DarknessTurnLabel = "A oscuras";
+        private const string DARKNESS_KEYWORD_ES = "oscuras";
+        private const string DARKNESS_UNKNOWN_NAME = "???";
+        private const string DARKNESS_TURN_LABEL = "A oscuras";
 
-        private const string DarkModeVoteRevealTitle = "A oscuras";
-        private const string DarkModeVoteRevealDescription = "Voto revelado.";
+        private const string DARK_MODE_VOTE_REVEAL_TITLE = "A oscuras";
+        private const string DARK_MODE_VOTE_REVEAL_DESCRIPTION = "Voto revelado.";
 
-        private const string GenericPlayerNameTemplate = "Jugador {0}";
-        private const string RevealVoteTemplate = "Votaste por: {0}";
+        private const string GENERIC_PLAYER_NAME_TEMPLATE = "Jugador {0}";
+        private const string REVEAL_VOTE_TEMPLATE = "Votaste por: {0}";
 
         private readonly MatchWindowUiRefs ui;
         private readonly MatchSessionState state;
@@ -48,30 +48,30 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         internal bool IsDarkModeStartEvent(string eventName, string description)
         {
-            return IsCode(eventName, DarkModeStartCode)
-                || IsCode(description, DarkModeStartCode)
-                || IsCode(eventName, LegacyDarknessStartCode)
-                || IsCode(description, LegacyDarknessStartCode)
-                || ContainsKeyword(eventName, DarknessKeywordEs)
-                || ContainsKeyword(description, DarknessKeywordEs);
+            return IsCode(eventName, DARK_MODE_START_CODE)
+                || IsCode(description, DARK_MODE_START_CODE)
+                || IsCode(eventName, LEGACY_DARKNESS_START_CODE)
+                || IsCode(description, LEGACY_DARKNESS_START_CODE)
+                || ContainsKeyword(eventName, DARKNESS_KEYWORD_ES)
+                || ContainsKeyword(description, DARKNESS_KEYWORD_ES);
         }
 
         internal bool IsDarkModeEndEvent(string eventName, string description)
         {
-            return IsCode(eventName, DarkModeEndCode)
-                || IsCode(description, DarkModeEndCode);
+            return IsCode(eventName, DARK_MODE_END_CODE)
+                || IsCode(description, DARK_MODE_END_CODE);
         }
 
         internal bool IsLegacyDarknessEndEvent(string eventName, string description)
         {
-            return IsCode(eventName, LegacyDarknessEndCode)
-                || IsCode(description, LegacyDarknessEndCode);
+            return IsCode(eventName, LEGACY_DARKNESS_END_CODE)
+                || IsCode(description, LEGACY_DARKNESS_END_CODE);
         }
 
         internal bool IsVoteRevealEvent(string eventName, string description)
         {
-            return StartsWithCode(eventName, DarkModeVoteRevealCode)
-                || StartsWithCode(description, DarkModeVoteRevealCode);
+            return StartsWithCode(eventName, DARK_MODE_VOTE_REVEAL_CODE)
+                || StartsWithCode(description, DARK_MODE_VOTE_REVEAL_CODE);
         }
 
         internal void ShowVoteRevealOverlay(OverlayController overlay)
@@ -81,7 +81,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            overlay.ShowSpecialEvent(DarkModeVoteRevealTitle, DarkModeVoteRevealDescription);
+            overlay.ShowSpecialEvent(DARK_MODE_VOTE_REVEAL_TITLE, DARK_MODE_VOTE_REVEAL_DESCRIPTION);
         }
 
         internal void SetPendingVoteRevealUserId(int? userId)
@@ -149,10 +149,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 string name = voted != null && !string.IsNullOrWhiteSpace(voted.DisplayName)
                     ? voted.DisplayName
-                    : string.Format(CultureInfo.CurrentCulture, GenericPlayerNameTemplate, votedUserId.Value);
+                    : string.Format(CultureInfo.CurrentCulture, GENERIC_PLAYER_NAME_TEMPLATE, votedUserId.Value);
 
                 MessageBox.Show(
-                    string.Format(CultureInfo.CurrentCulture, RevealVoteTemplate, name),
+                    string.Format(CultureInfo.CurrentCulture, REVEAL_VOTE_TEMPLATE, name),
                     MatchConstants.GAME_MESSAGE_TITLE,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -174,12 +174,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 if (ui.TxtTurnPlayerName != null)
                 {
-                    ui.TxtTurnPlayerName.Text = DarknessUnknownName;
+                    ui.TxtTurnPlayerName.Text = DARKNESS_UNKNOWN_NAME;
                 }
 
                 if (ui.TxtTurnLabel != null)
                 {
-                    ui.TxtTurnLabel.Text = DarknessTurnLabel;
+                    ui.TxtTurnLabel.Text = DARKNESS_TURN_LABEL;
                 }
 
                 if (ui.TurnBannerBackground != null)

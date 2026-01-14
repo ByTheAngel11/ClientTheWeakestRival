@@ -32,6 +32,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string CONTEXT_TURN_ORDER_INITIALIZED = "MatchSessionCoordinator.TurnOrderInitialized";
         private const string CONTEXT_TURN_ORDER_CHANGED = "MatchSessionCoordinator.TurnOrderChanged";
 
+        private const string SPECIAL_EVENT_RESULTS_PERSIST_FAILED_CODE = "RESULTS_PERSIST_FAILED";
+
+        private const string RESULTS_PERSIST_FAILED_TITLE = "Aviso";
+        private const string RESULTS_PERSIST_FAILED_FALLBACK_MESSAGE =
+            "No se pudieron guardar las calificaciones de la partida.";
+
+        private const string LOG_RESULTS_PERSIST_FAILED_UI = "MatchSessionCoordinator.ResultsPersistFailed UI notify error.";
+
         private const int FINAL_PLAYERS_COUNT = 2;
 
         private readonly MatchWindowUiRefs ui;
@@ -173,7 +181,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 specialEventController.HandleElimination(eliminated);
 
             callbackBridge.SpecialEvent += (matchId, name, description) =>
-                RunAsync(() => specialEventController.HandleSpecialEventAsync(matchId, name, description), CONTEXT_SPECIAL_EVENT);
+                HandleSpecialEvent(matchId, name, description);
 
             callbackBridge.CoinFlipResolved += (matchId, coinFlip) =>
                 HandleCoinFlip(coinFlip);
@@ -198,6 +206,36 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             callbackBridge.TurnOrderChanged += (matchId, turnOrder, reason) =>
                 RunAsync(() => HandleTurnOrderChangedAsync(turnOrder, reason), CONTEXT_TURN_ORDER_CHANGED);
+        }
+
+        private void HandleSpecialEvent(Guid matchId, string name, string description)
+        {
+            if (string.Equals(name, SPECIAL_EVENT_RESULTS_PERSIST_FAILED_CODE, StringComparison.OrdinalIgnoreCase))
+            {
+                string message = string.IsNullOrWhiteSpace(description)
+                    ? RESULTS_PERSIST_FAILED_FALLBACK_MESSAGE
+                    : description;
+
+                try
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        MessageBox.Show(
+                            message,
+                            RESULTS_PERSIST_FAILED_TITLE,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn(LOG_RESULTS_PERSIST_FAILED_UI, ex);
+                }
+
+                return;
+            }
+
+            RunAsync(() => specialEventController.HandleSpecialEventAsync(matchId, name, description), CONTEXT_SPECIAL_EVENT);
         }
 
         private static void RunAsync(Func<Task> action, string context)

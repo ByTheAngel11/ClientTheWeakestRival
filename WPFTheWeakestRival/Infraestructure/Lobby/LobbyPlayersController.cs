@@ -13,14 +13,16 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 {
     internal sealed class LobbyPlayersController : IDisposable
     {
-        private const string ErrorCopyCodeNoCode = "No hay un código de lobby para copiar.";
-        private const string ErrorCopyCodeGeneric = "Ocurrió un error al copiar el código al portapapeles.";
+        private const string ERROR_COPY_CODE_NO_CODE = "No hay un código de lobby para copiar.";
+        private const string ERROR_COPY_CODE_GENERIC = "Ocurrió un error al copiar el código al portapapeles.";
 
-        private const string LogPlayerDeltaIgnoredTemplate =
+        private const string LOG_PLAYER_DELTA_IGNORED_TEMPLATE =
             "Player delta ignored (UI updates via LobbyUpdated snapshot). Event={0}.";
 
-        private const string PlayerDeltaEventJoined = "PlayerJoined";
-        private const string PlayerDeltaEventLeft = "PlayerLeft";
+        private const string PLAYER_DELTA_EVENT_JOINED = "PlayerJoined";
+        private const string PLAYER_DELTA_EVENT_LEFT = "PlayerLeft";
+
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyPlayersController));
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
@@ -92,7 +94,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 if (string.IsNullOrWhiteSpace(state.CurrentAccessCode))
                 {
                     MessageBox.Show(
-                        ErrorCopyCodeNoCode,
+                        ERROR_COPY_CODE_NO_CODE,
                         Lang.lobbyTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
@@ -107,7 +109,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 logger.Error("CopyCodeToClipboard error.", ex);
 
                 MessageBox.Show(
-                    ErrorCopyCodeGeneric,
+                    ERROR_COPY_CODE_GENERIC,
                     Lang.lobbyTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -204,7 +206,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
         {
             try
             {
-                logger.DebugFormat(LogPlayerDeltaIgnoredTemplate, PlayerDeltaEventJoined);
+                logger.DebugFormat(LOG_PLAYER_DELTA_IGNORED_TEMPLATE, PLAYER_DELTA_EVENT_JOINED);
             }
             catch (Exception ex)
             {
@@ -216,7 +218,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
         {
             try
             {
-                logger.DebugFormat(LogPlayerDeltaIgnoredTemplate, PlayerDeltaEventLeft);
+                logger.DebugFormat(LOG_PLAYER_DELTA_IGNORED_TEMPLATE, PLAYER_DELTA_EVENT_LEFT);
             }
             catch (Exception ex)
             {

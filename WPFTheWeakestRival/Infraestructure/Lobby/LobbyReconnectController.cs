@@ -11,17 +11,17 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 {
     internal sealed class LobbyReconnectController : IDisposable
     {
-        private const string ReconnectStatusStart = "Reconectando...";
-        private const string ReconnectStatusAttemptFormat = "Reconectando... intento {0}";
+        private const string RECONNECT_STATUS_START = "Reconectando...";
+        private const string RECONNECT_STATUS_ATTEMPT_FORMAT = "Reconectando... intento {0}";
 
-        private const int ReconnectCycleDelaySeconds = 5;
+        private const int RECONNECT_CYCLE_DELAY_SECONDS = 5;
 
-        private const string ReconnectExhaustedMessage =
+        private const string RECONNECT_EXHAUSTED_MESSAGE =
             "No se pudo reconectar con el servidor.\n\n¿Quieres quedarte en espera?\n\n" +
             "Sí: me quedo y seguiré intentando.\n" +
             "No: regresar al inicio de sesión.";
 
-        private const string WaitingLineMessage = "Sin conexión. En espera...";
+        private const string WAITING_LINE_MESSAGE = "Sin conexión. En espera...";
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
@@ -52,7 +52,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
             reconnectCycleTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(ReconnectCycleDelaySeconds)
+                Interval = TimeSpan.FromSeconds(RECONNECT_CYCLE_DELAY_SECONDS)
             };
             reconnectCycleTimer.Tick += ReconnectCycleTimerTick;
 
@@ -64,13 +64,13 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
 
         private void OnReconnectStartedFromHub()
         {
-            ui.Ui(() => ShowOverlay(ReconnectStatusStart));
+            ui.Ui(() => ShowOverlay(RECONNECT_STATUS_START));
         }
 
         private void OnReconnectAttemptedFromHub(int attempt)
         {
             ui.Ui(() =>
-                ShowOverlay(string.Format(CultureInfo.InvariantCulture, ReconnectStatusAttemptFormat, attempt)));
+                ShowOverlay(string.Format(CultureInfo.InvariantCulture, RECONNECT_STATUS_ATTEMPT_FORMAT, attempt)));
         }
 
         private void OnReconnectStoppedFromHub()
@@ -101,7 +101,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                     }
 
                     MessageBoxResult result = MessageBox.Show(
-                        ReconnectExhaustedMessage,
+                        RECONNECT_EXHAUSTED_MESSAGE,
                         Lang.lobbyTitle,
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Warning);
@@ -110,8 +110,8 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                     {
                         state.IsAutoWaitingForReconnect = true;
 
-                        chatController.AppendSystemLine(WaitingLineMessage);
-                        ShowOverlay(WaitingLineMessage);
+                        chatController.AppendSystemLine(WAITING_LINE_MESSAGE);
+                        ShowOverlay(WAITING_LINE_MESSAGE);
 
                         StartNextReconnectCycle();
                         return;
