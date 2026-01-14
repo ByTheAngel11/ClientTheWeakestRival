@@ -60,6 +60,7 @@ namespace WPFTheWeakestRival
             playersController = new LobbyPlayersController(
                 ui,
                 runtimeState,
+                this,
                 txtLobbyHeader,
                 txtAccessCode,
                 lstLobbyPlayers,
@@ -234,12 +235,27 @@ namespace WPFTheWeakestRival
 
         private void LobbyPlayerContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
+            try
+            {
+                if (sender is Grid grid && grid.DataContext is WPFTheWeakestRival.Models.LobbyPlayerItem player)
+                {
+                    lstLobbyPlayers.SelectedItem = player;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("LobbyWindow context menu selection error.", ex);
+            }
+
             playersController.LobbyPlayerContextMenuOpening(sender, e);
         }
+
 
         private void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
         {
             playersController.MenuItemReportPlayerClick(sender, e);
         }
+
+
     }
 }

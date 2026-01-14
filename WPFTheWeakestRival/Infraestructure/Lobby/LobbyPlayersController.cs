@@ -1,6 +1,8 @@
 ﻿using log4net;
 using System;
 using System.Collections.ObjectModel;
+using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using WPFTheWeakestRival.Helpers;
@@ -8,6 +10,7 @@ using WPFTheWeakestRival.Infrastructure;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Properties.Langs;
+using WPFTheWeakestRival.Windows;
 
 namespace WPFTheWeakestRival.Infraestructure.Lobby
 {
@@ -22,11 +25,19 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
         private const string PLAYER_DELTA_EVENT_JOINED = "PlayerJoined";
         private const string PLAYER_DELTA_EVENT_LEFT = "PlayerLeft";
 
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(LobbyPlayersController));
+        private const string REPORT_ENDPOINT_NAME = "WSHttpBinding_IReportService";
+        private const string FAULT_REPORT_COOLDOWN = "REPORT_COOLDOWN";
+
+        private const byte ACCOUNT_STATUS_SUSPENDED = 3;
+        private const byte ACCOUNT_STATUS_BANNED = 4;
+
+        private const string SANCTION_END_TIME_FORMAT = "g";
 
         private readonly LobbyUiDispatcher ui;
         private readonly LobbyRuntimeState state;
         private readonly ILog logger;
+
+        private readonly Window ownerWindow;
 
         private readonly TextBlock lobbyHeaderText;
         private readonly TextBlock accessCodeText;
@@ -37,6 +48,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
         internal LobbyPlayersController(
             LobbyUiDispatcher ui,
             LobbyRuntimeState state,
+            Window ownerWindow,
             TextBlock lobbyHeaderText,
             TextBlock accessCodeText,
             ListBox playersList,
@@ -44,6 +56,7 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
         {
             this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
+            this.ownerWindow = ownerWindow ?? throw new ArgumentNullException(nameof(ownerWindow));
             this.lobbyHeaderText = lobbyHeaderText;
             this.accessCodeText = accessCodeText;
             this.playersList = playersList;
@@ -123,7 +136,10 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
                 var element = sender as FrameworkElement;
                 var item = element?.DataContext as LobbyPlayerItem;
 
-                if (item == null || item.IsMe || !state.CurrentLobbyId.HasValue || state.CurrentLobbyId.Value == Guid.Empty)
+                if (item == null ||
+                    item.IsMe ||
+                    !state.CurrentLobbyId.HasValue ||
+                    state.CurrentLobbyId.Value == Guid.Empty)
                 {
                     e.Handled = true;
                 }
@@ -135,26 +151,141 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             }
         }
 
-        internal void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
+        internal async void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                MessageBox.Show(
-                    Lang.UiGenericError,
-                    Lang.lobbyTitle,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                var menuItem = sender as MenuItem;
+                var targetPlayer = menuItem?.CommandParameter as LobbyPlayerItem;
+
+                if (targetPlayer == null || targetPlayer.IsMe)
+                {
+                    return;
+                }
+
+                var session = LoginWindow.AppSession.CurrentToken;
+                string token = session != null ? session.Token : null;
+
+                if (string.IsNullOrWhiteSpace(token))
+                {
+                    MessageBox.Show(Lang.noValidSessionCode);
+                    return;
+                }
+
+                var dialog = new ReportPlayerWindow(targetPlayer.DisplayName)
+                {
+                    Owner = ownerWindow
+                };
+
+                bool? dialogResult = dialog.ShowDialog();
+                if (dialogResult != true)
+                {
+                    return;
+                }
+
+                var client = new ReportService.ReportServiceClient(REPORT_ENDPOINT_NAME);
+
+                try
+                {
+                    var request = new ReportService.SubmitPlayerReportRequest
+                    {
+                        Token = token,
+                        ReportedAccountId = targetPlayer.AccountId,
+                        LobbyId = state.CurrentLobbyId,
+                        ReasonCode = (ReportService.ReportReasonCode)dialog.SelectedReasonCode,
+                        Comment = string.IsNullOrWhiteSpace(dialog.Comment) ? null : dialog.Comment
+                    };
+
+                    ReportService.SubmitPlayerReportResponse response =
+                        await Task.Run(() => client.SubmitPlayerReport(request)).ConfigureAwait(false);
+
+                    ui.Ui(() => ShowReportResult(response));
+                }
+                finally
+                {
+                    TryCloseClient(client);
+                }
             }
-            catch (Exception ex)
+            catch (FaultException<ReportService.ServiceFault> ex)
             {
-                logger.Error("MenuItemReportPlayerClick error.", ex);
+                if (ex.Detail != null &&
+                    string.Equals(ex.Detail.Code, FAULT_REPORT_COOLDOWN, StringComparison.Ordinal))
+                {
+                    MessageBox.Show(
+                        Lang.reportCooldown,
+                        Lang.reportPlayer,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    return;
+                }
+
+                logger.Warn("Report fault in lobby.", ex);
 
                 MessageBox.Show(
-                    Lang.UiGenericError,
-                    Lang.lobbyTitle,
+                    Lang.reportFailed,
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
+            catch (CommunicationException ex)
+            {
+                logger.Error("Communication error while submitting report.", ex);
+
+                MessageBox.Show(
+                    Lang.noConnection,
+                    Lang.reportPlayer,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+            catch (Exception ex)
+            {
+                logger.Error("Unexpected error while submitting report.", ex);
+
+                MessageBox.Show(
+                    Lang.reportUnexpectedError,
+                    Lang.reportPlayer,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void ShowReportResult(ReportService.SubmitPlayerReportResponse response)
+        {
+            if (response != null && response.SanctionApplied)
+            {
+                if (response.SanctionType == ACCOUNT_STATUS_SUSPENDED && response.SanctionEndAtUtc.HasValue)
+                {
+                    string localEnd = response.SanctionEndAtUtc.Value
+                        .ToLocalTime()
+                        .ToString(SANCTION_END_TIME_FORMAT);
+
+                    MessageBox.Show(
+                        string.Format(Lang.reportSanctionTemporary, localEnd),
+                        Lang.reportPlayer,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+
+                    return;
+                }
+
+                if (response.SanctionType == ACCOUNT_STATUS_BANNED)
+                {
+                    MessageBox.Show(
+                        Lang.reportSanctionPermanent,
+                        Lang.reportPlayer,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    return;
+                }
+            }
+
+            MessageBox.Show(
+                Lang.reportSent,
+                Lang.reportPlayer,
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
         private void UpdateLobbyHeader(string lobbyName, string accessCode)
@@ -241,6 +372,19 @@ namespace WPFTheWeakestRival.Infraestructure.Lobby
             }
 
             return item;
+        }
+
+        private void TryCloseClient(ICommunicationObject client)
+        {
+            try
+            {
+                client.Close();
+            }
+            catch (Exception ex)
+            {
+                logger.Warn("Error closing report client.", ex);
+                client.Abort();
+            }
         }
 
         public void Dispose()
