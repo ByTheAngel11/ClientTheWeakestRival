@@ -132,15 +132,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 {
                     try
                     {
-                        ui.Window.Close();
+                        OnReturnToLoginRequested();
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warn("ReturnToLobby close window error.", ex);
+                        Logger.Warn("ReturnToLoginRequested from reconnect controller error.", ex);
                     }
                 },
                 Logger);
 
+            hub.ReturnToLobbyRequested += OnReturnToLoginRequested;
 
             callbackBridge = hub.Callbacks;
 
@@ -857,5 +858,60 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 Logger.Warn("MatchSessionCoordinator.Dispose error.", ex);
             }
         }
+
+        private void OnReturnToLoginRequested()
+        {
+            if (isDisposed)
+            {
+                return;
+            }
+
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    if (reconnectController != null)
+                    {
+                        reconnectController.Dispose();
+                        reconnectController = null;
+                    }
+
+                    if (hub != null)
+                    {
+                        hub.ReturnToLobbyRequested -= OnReturnToLoginRequested;
+                        hub.Stop();
+                    }
+
+                    if (ui.Window is MatchWindow matchWindow)
+                    {
+                        matchWindow.CloseToLogin(() =>
+                        {
+                            try
+                            {
+                                var login = new LoginWindow();
+                                Application.Current.MainWindow = login;
+                                login.Show();
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Warn("Show Login error.", ex);
+                            }
+                        });
+
+                        return;
+                    }
+
+                    var fallbackLogin = new LoginWindow();
+                    Application.Current.MainWindow = fallbackLogin;
+                    fallbackLogin.Show();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("OnReturnToLoginRequested error.", ex);
+                }
+            }));
+        }
+
+
     }
 }

@@ -842,29 +842,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
         private void ShowReconnectExhaustedDialog()
         {
-            Ui(() =>
-            {
-                try
-                {
-                    MessageBoxResult result = MessageBox.Show(
-                        RECONNECT_EXHAUSTED_DIALOG_MESSAGE,
-                        RECONNECT_EXHAUSTED_DIALOG_TITLE,
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Warning);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        ContinueReconnectCycle();
-                        return;
-                    }
-
-                    RaiseReturnToLobbyRequested();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Warn("ShowReconnectExhaustedDialog failed.", ex);
-                }
-            });
+            RaiseReturnToLobbyRequested();
         }
+
+
     }
 }
