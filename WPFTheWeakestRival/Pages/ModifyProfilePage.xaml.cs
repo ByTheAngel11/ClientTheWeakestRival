@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WPFTheWeakestRival.AuthService;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Infrastructure.Faults;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Properties.Langs;
 
@@ -15,6 +16,10 @@ namespace WPFTheWeakestRival
 {
     public partial class ModifyProfilePage : Page
     {
+        private const string CTX_LOAD_PROFILE = "ModifyProfilePage.LoadProfile";
+        private const string CTX_UPDATE_PROFILE = "ModifyProfilePage.BtnSaveClick";
+        private const string CTX_LOGOUT = "ModifyProfilePage.LogoutClick";
+
         private const int PREVIEW_DECODE_WIDTH = 0;
 
         private const int MAX_PROFILE_IMAGE_BYTES = 524288;
@@ -85,6 +90,19 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_LOAD_PROFILE,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.Warn("Lobby fault while loading profile.", ex);
                 MessageBox.Show(Lang.profileLoadFailed, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -201,6 +219,19 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_UPDATE_PROFILE,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.Warn("Lobby fault while updating profile.", ex);
                 MessageBox.Show(
                     ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.profileUpdateFailed,
@@ -244,6 +275,19 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<AuthService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_LOGOUT,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.Warn("Auth fault while logging out.", ex);
                 MessageBox.Show(
                     ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.logoutFailed,

@@ -120,10 +120,12 @@
     <Compile Include="Globalization\LocExtension.cs" />
     <Compile Include="Helpers\AvatarMapper.cs" />
     <Compile Include="Helpers\LobbyAvatarHelper.cs" />
+    <Compile Include="Helpers\UiExceptionHelper.cs" />
     <!-- /AGREGADO -->
     <Compile Include="Helpers\UiImageHelper.cs" />
     <Compile Include="Helpers\UiValidationHelper.cs" />
     <Compile Include="Infraestructure\AppServices.cs" />
+    <Compile Include="Infraestructure\Faults\AuthTokenInvalidUiHandler.cs" />
     <Compile Include="Infraestructure\Faults\FaultKeyMessageResolver.cs" />
     <Compile Include="Infraestructure\ForcedLogoutCoordinator.cs" />
     <Compile Include="Infraestructure\FriendManager.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="Infraestructure\Lobby\LobbyUiDispatcher.cs" />
     <Compile Include="Infraestructure\Lobby\LoginNavigator.cs" />
     <Compile Include="Infraestructure\Lobby\SessionTokenProvider.cs" />
+    <Compile Include="Infraestructure\LoginRedirector.cs" />
     <Compile Include="Infraestructure\ProfileImageCache.cs" />
     <Compile Include="Infraestructure\SessionCleanup.cs" />
     <Compile Include="Infraestructure\SessionLogoutCoordinator.cs" />

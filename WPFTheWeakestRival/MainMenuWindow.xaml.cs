@@ -15,6 +15,7 @@ using WPFTheWeakestRival.Controls;
 using WPFTheWeakestRival.FriendService;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Infrastructure;
+using WPFTheWeakestRival.Infrastructure.Faults;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Properties.Langs;
@@ -37,6 +38,11 @@ namespace WPFTheWeakestRival
         private const int DEFAULT_AVATAR_SIZE = 28;
         private const string AVATAR_SIZE_RESOURCE_KEY = "AvatarSize";
         private const string ADD_FRIEND_BACKGROUND_RESOURCE_KEY = "AddFriendBackground";
+
+        private const string CTX_REFRESH_PROFILE_AVATAR = "MainMenuWindow.RefreshProfileButtonAvatar";
+        private const string CTX_CREATE_LOBBY = "MainMenuWindow.OnCreateLobbyRequestedAsync";
+        private const string CTX_JOIN_LOBBY = "MainMenuWindow.OnJoinLobbyRequestedAsync";
+        private const string CTX_SAVE_AVATAR = "MainMenuWindow.SaveAvatarToServerAsync";
 
         private const int DEFAULT_MAX_LOBBY_PLAYERS = 8;
 
@@ -189,11 +195,32 @@ namespace WPFTheWeakestRival
                 UserAvatarControl.ProfileImage = faceImage;
                 UserAvatarControl.Appearance = appearance;
             }
-            catch
+            catch (FaultException<LobbyService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_REFRESH_PROFILE_AVATAR,
+                        Logger,
+                        this))
+                {
+                    SetDefaultAvatar();
+                    return;
+                }
+
+                Logger.Warn("RefreshProfileButtonAvatar lobby fault.", ex);
+                SetDefaultAvatar();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("RefreshProfileButtonAvatar unexpected error.", ex);
                 SetDefaultAvatar();
             }
         }
+
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -349,7 +376,21 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_CREATE_LOBBY,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.Warn("Lobby service fault while creating lobby.", ex);
+
                 MessageBox.Show(
                     ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.lobbyCreateFailed,
                     Lang.lobbyTitle,
@@ -402,7 +443,21 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_JOIN_LOBBY,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.Warn("Lobby service fault while joining lobby by code.", ex);
+
                 MessageBox.Show(
                     ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.lobbyJoinFailed,
                     Lang.lobbyTitle,
@@ -545,10 +600,18 @@ namespace WPFTheWeakestRival
             }
 
             var page = new Pages.AddFriendPage(new FriendServiceClient("WSHttpBinding_IFriendService"), token);
+
             page.CloseRequested += (_, __) => { HideOverlay(); };
+
+            page.LoginRequested += (_, __) =>
+            {
+                HideOverlay();
+                OnLoggedOut(this, EventArgs.Empty);
+            };
 
             ShowOverlay(page);
         }
+
 
         private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
         {
@@ -688,6 +751,19 @@ namespace WPFTheWeakestRival
             }
             catch (FaultException<LobbyService.ServiceFault> ex)
             {
+                string faultCode = ex.Detail == null ? string.Empty : (ex.Detail.Code ?? string.Empty);
+                string faultMessage = ex.Detail == null ? (ex.Message ?? string.Empty) : (ex.Detail.Message ?? string.Empty);
+
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        faultCode,
+                        faultMessage,
+                        CTX_SAVE_AVATAR,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.Warn("Lobby service fault while updating avatar.", ex);
             }
             catch (CommunicationException ex)

@@ -132,6 +132,16 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        GetFaultCode(ex.Detail),
+                        GetFaultKey(ex.Detail),
+                        LOG_CTX_REFRESH,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.WarnFormat(
                     "{0}: service fault. Code={1}, Key={2}.",
                     LOG_CTX_REFRESH,
@@ -423,6 +433,16 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        GetFaultCode(ex.Detail),
+                        GetFaultKey(ex.Detail),
+                        LOG_CTX_ACCEPT,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.WarnFormat(
                     "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
                     LOG_CTX_ACCEPT,
@@ -502,6 +522,16 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        GetFaultCode(ex.Detail),
+                        GetFaultKey(ex.Detail),
+                        LOG_CTX_REJECT,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.WarnFormat(
                     "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
                     LOG_CTX_REJECT,
@@ -581,6 +611,16 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                        GetFaultCode(ex.Detail),
+                        GetFaultKey(ex.Detail),
+                        LOG_CTX_CANCEL,
+                        Logger,
+                        this))
+                {
+                    return;
+                }
+
                 Logger.WarnFormat(
                     "{0}: service fault. FriendRequestId={1}, Code={2}, Key={3}.",
                     LOG_CTX_CANCEL,

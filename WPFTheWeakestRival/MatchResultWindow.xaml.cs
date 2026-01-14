@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival
 {
     public partial class MatchResultWindow : Window
     {
+        private const string KEY_MATCH_RESULT_DEFAULT_TITLE = "matchResultDefaultTitle";
+        private const string KEY_PLAYER_FALLBACK_FORMAT = "playerFallbackFormat";
+        private const string KEY_POSITION_FORMAT = "matchResultPositionFormat"; 
+        private const string KEY_ANSWERS_FORMAT = "matchResultAnswersFormat";
+
         private sealed class PlayerResultItem
         {
             public int Position { get; set; }
@@ -28,7 +35,7 @@ namespace WPFTheWeakestRival
             InitializeComponent();
 
             txtMainResult.Text = string.IsNullOrWhiteSpace(mainResultText)
-                ? "RESULTADO"
+                ? Localize(KEY_MATCH_RESULT_DEFAULT_TITLE)
                 : mainResultText;
 
             if (localAvatar != null)
@@ -41,16 +48,18 @@ namespace WPFTheWeakestRival
 
             txtPlayerName.Text = !string.IsNullOrWhiteSpace(localPlayer?.DisplayName)
                 ? localPlayer.DisplayName
-                : $"Jugador {localUserId}";
+                : string.Format(CultureInfo.CurrentCulture, Localize(KEY_PLAYER_FALLBACK_FORMAT), localUserId);
 
-            int localPosition;
             List<PlayerResultItem> rankingItems = BuildRanking(
                 allPlayers,
                 winnerUserId,
                 localUserId,
-                out localPosition);
+                out int localPosition);
 
-            txtPosition.Text = $"Tu posición: {localPosition}°";
+            txtPosition.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                Localize(KEY_POSITION_FORMAT),
+                localPosition);
 
             double ratio = 0d;
             if (myTotalAnswers > 0)
@@ -58,8 +67,13 @@ namespace WPFTheWeakestRival
                 ratio = (double)myCorrectAnswers / myTotalAnswers;
             }
 
-            txtPercentage.Text = $"{ratio:P0}";
-            txtAnswers.Text = $"{myCorrectAnswers} de {myTotalAnswers} preguntas correctas";
+            txtPercentage.Text = ratio.ToString("P0", CultureInfo.CurrentCulture);
+
+            txtAnswers.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                Localize(KEY_ANSWERS_FORMAT),
+                myCorrectAnswers,
+                myTotalAnswers);
 
             lstResults.ItemsSource = rankingItems;
         }
@@ -104,7 +118,7 @@ namespace WPFTheWeakestRival
                 PlayerSummary player = ordered[index];
 
                 string displayName = string.IsNullOrWhiteSpace(player.DisplayName)
-                    ? $"Jugador {player.UserId}"
+                    ? string.Format(CultureInfo.CurrentCulture, Localize(KEY_PLAYER_FALLBACK_FORMAT), player.UserId)
                     : player.DisplayName;
 
                 int position = index + 1;
@@ -123,6 +137,18 @@ namespace WPFTheWeakestRival
             }
 
             return items;
+        }
+
+        private static string Localize(string key)
+        {
+            string safeKey = (key ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(safeKey))
+            {
+                return string.Empty;
+            }
+
+            string value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            return string.IsNullOrWhiteSpace(value) ? safeKey : value;
         }
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)

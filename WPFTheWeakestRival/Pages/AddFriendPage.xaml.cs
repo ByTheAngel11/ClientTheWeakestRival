@@ -24,9 +24,15 @@ namespace WPFTheWeakestRival.Pages
         private const int MAX_SEARCH_RESULTS = 20;
         private const int AVATAR_DECODE_WIDTH = 36;
 
+        private const string CTX_SEARCH_ASYNC = "AddFriendPage.SearchAsync";
+        private const string CTX_SEND_FRIEND_REQUEST = "AddFriendPage.SendFriendRequest";
+        private const string CTX_ACCEPT_FRIEND_REQUEST = "AddFriendPage.AcceptFriendRequest";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(AddFriendPage));
 
         private readonly FriendServiceClient friendServiceClient;
+        public event EventHandler LoginRequested;
+
         private readonly string authToken;
 
         private readonly ObservableCollection<FriendSearchResultVm> results =
@@ -181,6 +187,12 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (TryHandleInvalidToken(ex.Detail, CTX_SEARCH_ASYNC))
+                {
+                    lblStatus.Text = Lang.authTokenInvalidMessage;
+                    return;
+                }
+
                 HandleSearchFault(ex);
             }
             catch (TimeoutException ex)
@@ -408,6 +420,11 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (TryHandleInvalidToken(ex.Detail, CTX_SEND_FRIEND_REQUEST))
+                {
+                    return;
+                }
+
                 Logger.WarnFormat(
                     "AddFriendPage.SendFriendRequest: service fault. Code={0}, Key={1}",
                     ex.Detail == null ? string.Empty : ex.Detail.Code,
@@ -485,6 +502,11 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (FaultException<FriendService.ServiceFault> ex)
             {
+                if (TryHandleInvalidToken(ex.Detail, CTX_ACCEPT_FRIEND_REQUEST))
+                {
+                    return;
+                }
+
                 Logger.WarnFormat(
                     "AddFriendPage.AcceptFriendRequest: service fault. Code={0}, Key={1}",
                     ex.Detail == null ? string.Empty : ex.Detail.Code,
@@ -530,6 +552,25 @@ namespace WPFTheWeakestRival.Pages
             {
                 Mouse.OverrideCursor = null;
             }
+        }
+
+        private bool TryHandleInvalidToken(FriendService.ServiceFault fault, string context)
+        {
+            string faultCode = fault == null ? string.Empty : (fault.Code ?? string.Empty);
+            string faultMessage = fault == null ? string.Empty : (fault.Message ?? string.Empty);
+
+            if (!AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                    faultCode,
+                    faultMessage,
+                    context,
+                    Logger,
+                    this))
+            {
+                return false;
+            }
+
+            LoginRequested?.Invoke(this, EventArgs.Empty);
+            return true;
         }
 
         private void BtnCloseClick(object sender, RoutedEventArgs e)

@@ -534,12 +534,6 @@
   <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
     <value>Il n'était pas possible d'ouvrir une connexion à la base de données lors de l'envoi d'une demande d'ami.</value>
   </data>
-  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
-    <value>Une erreur de base de données inattendue s'est produite lors de l'envoi d'une demande d'ami.</value>
-  </data>
-  <data name="UiGenericError" xml:space="preserve">
-    <value>Une erreur inattendue s'est produite. Veuillez réessayer.</value>
-  </data>
   <data name="UiTitleWarning" xml:space="preserve">
     <value>Avertissement</value>
   </data>
@@ -789,9 +783,6 @@
   <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
     <value>Il existe déjà une session active pour cet utilisateur.</value>
   </data>
-  <data name="Auth.Unexpected" xml:space="preserve">
-    <value>Une erreur inattendue s'est produite. Essayez plus tard.</value>
-  </data>
   <data name="Auth.Account.NotActive" xml:space="preserve">
     <value>Votre compte n'est pas actif.</value>
   </data>
@@ -948,22 +939,6 @@
   <data name="btnReportSubmit" xml:space="preserve">
     <value>Envoyer</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lblWildcardChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardPassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardDuplicateScore" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardBlockWildcards" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="lblWildcardChangeQuestion" xml:space="preserve">
     <value>Changer de question</value>
   </data>
@@ -978,5 +953,33 @@
   </data>
   <data name="lblWildcardBlockWildcards" xml:space="preserve">
     <value>Bloquer les caractères génériques</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="authTokenInvalidTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="authTokenInvalidMessage" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="authTokenInvalidQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="authTokenInvalidTitle" xml:space="preserve">
+    <value>Session expirée</value>
+  </data>
+  <data name="authTokenInvalidMessage" xml:space="preserve">
+    <value>Votre session n'est plus valable. Vous devez vous reconnecter.</value>
+  </data>
+  <data name="authTokenInvalidQuestion" xml:space="preserve">
+    <value>Voulez-vous accéder à l'écran de connexion ?</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>Erreur de jeton invalide</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>Erreur de jeton invalide</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Erreur de jeton invalide</value>
   </data>
 </root>

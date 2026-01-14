@@ -1,11 +1,12 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Globalization;
 using System.Net.NetworkInformation;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using log4net;
+using WPFTheWeakestRival.Infrastructure.Faults;
 using WPFTheWeakestRival.LobbyService;
 
 namespace WPFTheWeakestRival.Infrastructure
@@ -795,6 +796,50 @@ namespace WPFTheWeakestRival.Infrastructure
 
         private async Task TryReconnectAsync()
         {
+            const string CTX_TRY_RECONNECT = "LobbyHub.TryReconnectAsync";
+
+            bool TryHandleInvalidToken(string faultCode, string faultMessage)
+            {
+                try
+                {
+                    if (isStoppedOrDisposed)
+                    {
+                        return true;
+                    }
+
+                    bool handled = false;
+
+                    void Handle()
+                    {
+                        handled = AuthTokenInvalidUiHandler.TryHandleInvalidToken(
+                            faultCode ?? string.Empty,
+                            faultMessage ?? string.Empty,
+                            CTX_TRY_RECONNECT,
+                            Logger,
+                            Application.Current?.MainWindow);
+                    }
+
+                    if (!CanUseDispatcher())
+                    {
+                        return false;
+                    }
+
+                    if (dispatcher.CheckAccess())
+                    {
+                        Handle();
+                        return handled;
+                    }
+
+                    dispatcher.Invoke((Action)Handle, UiDispatcherPriority);
+                    return handled;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("LobbyHub.TryReconnectAsync: invalid-token handling failed.", ex);
+                    return false;
+                }
+            }
+
             if (!NetworkInterface.GetIsNetworkAvailable())
             {
                 return;
@@ -854,6 +899,13 @@ namespace WPFTheWeakestRival.Infrastructure
                     string faultCode = ex.Detail != null ? (ex.Detail.Code ?? string.Empty) : string.Empty;
                     string faultMessage = ex.Detail != null ? (ex.Detail.Message ?? string.Empty) : (ex.Message ?? string.Empty);
 
+                    if (TryHandleInvalidToken(faultCode, faultMessage))
+                    {
+                        StopReconnectLoop();
+                        RaiseReconnectStopped();
+                        return;
+                    }
+
                     Logger.WarnFormat(
                         "LobbyHub reconnect fault. Code={0}, Message={1}",
                         faultCode,
@@ -883,6 +935,37 @@ namespace WPFTheWeakestRival.Infrastructure
                     if (mustShow)
                     {
                         ShowReconnectFaultDialog(faultCode, faultMessage);
+                    }
+
+                    return;
+                }
+                catch (FaultException ex)
+                {
+                    string faultMessage = ex.Message ?? string.Empty;
+
+                    if (TryHandleInvalidToken(string.Empty, faultMessage))
+                    {
+                        StopReconnectLoop();
+                        RaiseReconnectStopped();
+                        return;
+                    }
+
+                    Logger.Warn("LobbyHub reconnect non-typed fault.", ex);
+
+                    StopReconnectLoop();
+                    RaiseReconnectStopped();
+
+                    bool mustShow;
+
+                    lock (reconnectSyncRoot)
+                    {
+                        mustShow = !hasShownReconnectFaultDialog;
+                        hasShownReconnectFaultDialog = true;
+                    }
+
+                    if (mustShow)
+                    {
+                        ShowReconnectFaultDialog(string.Empty, faultMessage);
                     }
 
                     return;

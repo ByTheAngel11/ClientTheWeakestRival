@@ -250,12 +250,9 @@ namespace WPFTheWeakestRival
             playersController.LobbyPlayerContextMenuOpening(sender, e);
         }
 
-
         private void MenuItemReportPlayerClick(object sender, RoutedEventArgs e)
         {
             playersController.MenuItemReportPlayerClick(sender, e);
         }
-
-
     }
 }

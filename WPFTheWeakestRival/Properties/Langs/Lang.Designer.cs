@@ -169,11 +169,38 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a An unexpected error occurred. Try later..
+        ///   Busca una cadena traducida similar a Invalid Token Error.
         /// </summary>
         public static string Auth_Unexpected {
             get {
                 return ResourceManager.GetString("Auth.Unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your session is no longer valid. You need to log in again..
+        /// </summary>
+        public static string authTokenInvalidMessage {
+            get {
+                return ResourceManager.GetString("authTokenInvalidMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Do you want to go to the login screen?.
+        /// </summary>
+        public static string authTokenInvalidQuestion {
+            get {
+                return ResourceManager.GetString("authTokenInvalidQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Session expired.
+        /// </summary>
+        public static string authTokenInvalidTitle {
+            get {
+                return ResourceManager.GetString("authTokenInvalidTitle", resourceCulture);
             }
         }
         
@@ -1133,7 +1160,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a An unexpected database error occurred while sending a friend request..
+        ///   Busca una cadena traducida similar a Invalid Token error.
         /// </summary>
         public static string Friends_SendFriendRequest_Sql_Unknown {
             get {
@@ -2564,7 +2591,7 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a An unexpected error occurred. Please try again..
+        ///   Busca una cadena traducida similar a Invalid Token Error.
         /// </summary>
         public static string UiGenericError {
             get {

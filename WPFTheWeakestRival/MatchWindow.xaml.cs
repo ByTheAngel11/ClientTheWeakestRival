@@ -1,11 +1,11 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using log4net;
+using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.Infrastructure.Gameplay.Match;
 using WPFTheWeakestRival.LobbyService;
-using WPFTheWeakestRival.Models;
 
 namespace WPFTheWeakestRival
 {
@@ -19,10 +19,7 @@ namespace WPFTheWeakestRival
 
         private bool isCloseFlowInProgress;
         private bool skipClosePrompt;
-        private bool skipCloseConfirmation;
-        private bool skipExitPrompt;
         private bool skipReturnToLobbyOnClose;
-        private Action postCloseAction;
 
         public MatchWindow(
             MatchInfo match,
@@ -95,7 +92,6 @@ namespace WPFTheWeakestRival
                     TxtReconnectStatus = txtReconnectStatus
                 });
 
-
             coordinator = new MatchSessionCoordinator(ui, state);
 
             Loaded += MatchWindowLoaded;
@@ -111,24 +107,13 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("MatchWindowLoaded error.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                UiExceptionHelper.ShowError(ex, "MatchWindow.Loaded", Logger);
             }
         }
 
         private void MatchWindowClosing(object sender, CancelEventArgs e)
         {
-            if (isCloseFlowInProgress)
-            {
-                return;
-            }
-
-            if (skipClosePrompt)
+            if (isCloseFlowInProgress || skipClosePrompt)
             {
                 return;
             }
@@ -137,14 +122,13 @@ namespace WPFTheWeakestRival
             RequestCloseFlow();
         }
 
-
         private void MatchWindowClosed(object sender, EventArgs e)
         {
             coordinator.Dispose();
 
             if (skipReturnToLobbyOnClose)
             {
-                return; 
+                return;
             }
 
             lobbyWindow?.Show();
@@ -159,13 +143,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("BtnCloseClick error.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                UiExceptionHelper.ShowError(ex, "MatchWindow.BtnCloseClick", Logger);
             }
         }
 
@@ -201,13 +179,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("AnswerButtonClick error.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                UiExceptionHelper.ShowError(ex, "MatchWindow.AnswerButtonClick", Logger);
             }
         }
 
@@ -219,13 +191,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("BtnBankClick error.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                UiExceptionHelper.ShowError(ex, "MatchWindow.BtnBankClick", Logger);
             }
         }
 
@@ -237,13 +203,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("BtnUseWildcardClick error.", ex);
-
-                MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.WILDCARDS_MESSAGE_TITLE,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                UiExceptionHelper.ShowError(ex, "MatchWindow.BtnUseWildcardClick", Logger);
             }
         }
 
@@ -255,7 +215,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("BtnWildcardPrevClick error.", ex);
+                Logger.Error("MatchWindow.BtnWildcardPrevClick error.", ex);
             }
         }
 
@@ -267,7 +227,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("BtnWildcardNextClick error.", ex);
+                Logger.Error("MatchWindow.BtnWildcardNextClick error.", ex);
             }
         }
 
@@ -279,7 +239,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("IntroVideo_MediaEnded error.", ex);
+                Logger.Error("MatchWindow.IntroVideo_MediaEnded error.", ex);
             }
         }
 
@@ -291,7 +251,7 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("BtnSkipIntroClick error.", ex);
+                Logger.Error("MatchWindow.BtnSkipIntroClick error.", ex);
             }
         }
 
@@ -303,13 +263,14 @@ namespace WPFTheWeakestRival
             }
             catch (Exception ex)
             {
-                Logger.Error("SpecialEventCloseButtonClick error.", ex);
+                Logger.Error("MatchWindow.SpecialEventCloseButtonClick error.", ex);
             }
         }
 
         public void SetSkipReturnToLobbyOnClose()
         {
-            skipExitPrompt = true;
+            skipReturnToLobbyOnClose = true;
+            skipClosePrompt = true;
         }
 
         public void CloseToLogin(Action showLogin)
@@ -318,9 +279,7 @@ namespace WPFTheWeakestRival
             skipReturnToLobbyOnClose = true;
 
             showLogin?.Invoke();
-
             ForceClose();
         }
-
     }
 }

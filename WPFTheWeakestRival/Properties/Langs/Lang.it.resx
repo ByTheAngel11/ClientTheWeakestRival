@@ -534,12 +534,6 @@
   <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
     <value>Non è stato possibile aprire una connessione al database durante l'invio di una richiesta di amicizia.</value>
   </data>
-  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
-    <value>Si è verificato un errore imprevisto del database durante l'invio di una richiesta di amicizia.</value>
-  </data>
-  <data name="UiGenericError" xml:space="preserve">
-    <value>Si è verificato un errore imprevisto. Per favore riprova.</value>
-  </data>
   <data name="UiTitleWarning" xml:space="preserve">
     <value>Avvertimento</value>
   </data>
@@ -789,9 +783,6 @@
   <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
     <value>Esiste già una sessione attiva per questo utente.</value>
   </data>
-  <data name="Auth.Unexpected" xml:space="preserve">
-    <value>Si è verificato un errore imprevisto. Riprova più tardi.</value>
-  </data>
   <data name="Auth.Account.NotActive" xml:space="preserve">
     <value>Il tuo account non è attivo.</value>
   </data>
@@ -948,22 +939,6 @@
   <data name="btnReportSubmit" xml:space="preserve">
     <value>Inviare</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lblWildcardChangeQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardPassQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardForcedBank" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardDuplicateScore" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="lblWildcardBlockWildcards" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="lblWildcardChangeQuestion" xml:space="preserve">
     <value>Cambia domanda</value>
   </data>
@@ -978,5 +953,33 @@
   </data>
   <data name="lblWildcardBlockWildcards" xml:space="preserve">
     <value>Blocca i caratteri jolly</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="authTokenInvalidTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="authTokenInvalidMessage" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="authTokenInvalidQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="authTokenInvalidTitle" xml:space="preserve">
+    <value>Sessione scaduta</value>
+  </data>
+  <data name="authTokenInvalidMessage" xml:space="preserve">
+    <value>La tua sessione non è più valida. È necessario effettuare nuovamente l'accesso.</value>
+  </data>
+  <data name="authTokenInvalidQuestion" xml:space="preserve">
+    <value>Vuoi andare alla schermata di accesso?</value>
+  </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>Errore token non valido</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>Errore token non valido</value>
+  </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Errore token non valido</value>
   </data>
 </root>
