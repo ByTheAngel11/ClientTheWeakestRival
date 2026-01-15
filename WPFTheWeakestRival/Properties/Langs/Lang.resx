@@ -972,4 +972,301 @@
   <data name="authTokenInvalidQuestion" xml:space="preserve">
     <value>Do you want to go to the login screen?</value>
   </data>
+  <data name="lightningMyTurnLabel" xml:space="preserve">
+    <value>Lightning challenge: Your turn</value>
+  </data>
+  <data name="lightningInProgressLabel" xml:space="preserve">
+    <value>Lightning challenge: Lightning challenge on course</value>
+  </data>
+  <data name="lightningSuccessTemplate" xml:space="preserve">
+    <value>You have completed the lightning challenge! Correct answers {0}</value>
+  </data>
+  <data name="lightningFailTemplate" xml:space="preserve">
+    <value>Lightning challenge ended. Correct answers {0}</value>
+  </data>
+  <data name="matchFinishedLabelText" xml:space="preserve">
+    <value>Match finished</value>
+  </data>
+  <data name="exitToLobbyPrompt" xml:space="preserve">
+    <value>The match is not finished yet. Do you want to exit to the lobby?</value>
+  </data>
+  <data name="gameMessageTitle" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="wildcardsMessageTitle" xml:space="preserve">
+    <value>Wildcards</value>
+  </data>
+  <data name="matchCodeNone" xml:space="preserve">
+    <value>No code</value>
+  </data>
+  <data name="matchCodePrefix" xml:space="preserve">
+    <value>Code:</value>
+  </data>
+  <data name="otherPlayer" xml:space="preserve">
+    <value>Other player</value>
+  </data>
+  <data name="matchWaitingForQuestion" xml:space="preserve">
+    <value>(waiting for question...)</value>
+  </data>
+  <data name="matchWaitingForYourTurn" xml:space="preserve">
+    <value>Waiting for your turn...</value>
+  </data>
+  <data name="matchMyTurn" xml:space="preserve">
+    <value>Your turn</value>
+  </data>
+  <data name="matchOtherTurn" xml:space="preserve">
+    <value>Other player's turn</value>
+  </data>
+  <data name="wildcardNone" xml:space="preserve">
+    <value>No wildcard</value>
+  </data>
+  <data name="wildcardGeneric" xml:space="preserve">
+    <value>Wildcard</value>
+  </data>
+  <data name="matchTimeout" xml:space="preserve">
+    <value>Time's up.</value>
+  </data>
+  <data name="matchSelectAnswer" xml:space="preserve">
+    <value>Select an answer.</value>
+  </data>
+  <data name="matchCorrect" xml:space="preserve">
+    <value>Correct!</value>
+  </data>
+  <data name="matchIncorrect" xml:space="preserve">
+    <value>Incorrect answer.</value>
+  </data>
+  <data name="wildcardsLoadFailed" xml:space="preserve">
+    <value>Wildcards could not be loaded.</value>
+  </data>
+  <data name="wildcardsLoadUnexpected" xml:space="preserve">
+    <value>An error occurred while loading wildcards.</value>
+  </data>
+  <data name="coinFlipTitle" xml:space="preserve">
+    <value>Coin flip</value>
+  </data>
+  <data name="coinFlipHeadsMessage" xml:space="preserve">
+    <value>Heads! There will be a duel.</value>
+  </data>
+  <data name="coinFlipTailsMessage" xml:space="preserve">
+    <value>Tails. There will be no duel.</value>
+  </data>
+  <data name="matchWinnerMessageFormat" xml:space="preserve">
+    <value>The game has ended. The winner is: {0}.</value>
+  </data>
+  <data name="phaseTitle" xml:space="preserve">
+    <value>Phase</value>
+  </data>
+  <data name="String1phaseRoundFormat" xml:space="preserve">
+    <value>Round {0}</value>
+  </data>
+  <data name="phaseDuel" xml:space="preserve">
+    <value>Duel</value>
+  </data>
+  <data name="phaseSpecialEvent" xml:space="preserve">
+    <value>Special event</value>
+  </data>
+  <data name="phaseFinished" xml:space="preserve">
+    <value>Finished</value>
+  </data>
+  <data name="surpriseExamBankBlockedMessage" xml:space="preserve">
+    <value>Surprise exam in progress. You can't bank right now.</value>
+  </data>
+  <data name="turnIntroTitle" xml:space="preserve">
+    <value>Turns</value>
+  </data>
+  <data name="turnIntroDescriptionTemplate" xml:space="preserve">
+    <value>Order: {0}\nStarts: {1}</value>
+  </data>
+  <data name="turnOrderChangedTitle" xml:space="preserve">
+    <value>Updated turns</value>
+  </data>
+  <data name="phaseRoundFormat" xml:space="preserve">
+    <value>Round {0}</value>
+  </data>
+  <data name="msgSpecialEventDarknessDesc" xml:space="preserve">
+    <value>The lights went out. You can't see who is who until after the vote.</value>
+  </data>
+  <data name="msgSpecialEventDarknessEndedDesc" xml:space="preserve">
+    <value>Identities are revealed again.</value>
+  </data>
+  <data name="darknessUnknownPlayerName" xml:space="preserve">
+    <value>???</value>
+  </data>
+  <data name="darknessMyTurnText" xml:space="preserve">
+    <value>In the dark: your turn</value>
+  </data>
+  <data name="darknessOtherTurnText" xml:space="preserve">
+    <value>In the dark: waiting for turn</value>
+  </data>
+  <data name="darknessVoteWindowTitle" xml:space="preserve">
+    <value>Voting (in the dark)</value>
+  </data>
+  <data name="darknessSlotFormat" xml:space="preserve">
+    <value>Shadow {0}</value>
+  </data>
+  <data name="darknessSomeoneAnsweredCorrect" xml:space="preserve">
+    <value>Someone answered correctly.</value>
+  </data>
+  <data name="darknessSomeoneAnsweredIncorrect" xml:space="preserve">
+    <value>Someone answered incorrectly.</value>
+  </data>
+  <data name="darknessRevealVoteFormat" xml:space="preserve">
+    <value>You voted for: {0}</value>
+  </data>
+  <data name="darknessVoteRevealDescription" xml:space="preserve">
+    <value>Vote revealed.</value>
+  </data>
+  <data name="playerWithIdFormat" xml:space="preserve">
+    <value>Player {0}</value>
+  </data>
+  <data name="matchPlayerEliminatedFormat" xml:space="preserve">
+    <value>{0} has been eliminated from the round.</value>
+  </data>
+  <data name="matchResultCloseHint" xml:space="preserve">
+    <value>You can close the window whenever you want to see your result.</value>
+  </data>
+  <data name="matchResultWinTitle" xml:space="preserve">
+    <value>YOU WON THE MATCH!</value>
+  </data>
+  <data name="voteWindowTitle" xml:space="preserve">
+    <value>Voting</value>
+  </data>
+  <data name="duelSelectionTitle" xml:space="preserve">
+    <value>Select who to challenge</value>
+  </data>
+  <data name="matchFinalPhaseTitle" xml:space="preserve">
+    <value>Final 1 vs 1</value>
+  </data>
+  <data name="reconnectStatusStart" xml:space="preserve">
+    <value>Reconnecting...</value>
+  </data>
+  <data name="reconnectStatusAttemptFormat" xml:space="preserve">
+    <value>Reconnecting... attempt {0}</value>
+  </data>
+  <data name="reconnectExhaustedMessage" xml:space="preserve">
+    <value>Could not reconnect to the server.\n\nDo you want to wait?\n\nYes: stay and keep trying.\nNo: return to the lobby.</value>
+  </data>
+  <data name="reconnectWaitingLineMessage" xml:space="preserve">
+    <value>No connection. Waiting...</value>
+  </data>
+  <data name="matchResultsPersistFailedTitle" xml:space="preserve">
+    <value>Notice</value>
+  </data>
+  <data name="matchResultsPersistFailedMessage" xml:space="preserve">
+    <value>Could not save the match results.</value>
+  </data>
+  <data name="matchJoinFailedMessage" xml:space="preserve">
+    <value>Could not join the match. Please try again.</value>
+  </data>
+  <data name="matchStartFailedMessage" xml:space="preserve">
+    <value>Could not start the match. Please try again.</value>
+  </data>
+  <data name="reconnectingOverlayTitle" xml:space="preserve">
+    <value>Reconnecting…</value>
+  </data>
+  <data name="reconnectingOverlayDescription" xml:space="preserve">
+    <value>Trying to restore the connection with the server.</value>
+  </data>
+  <data name="surpriseExamMyTurnText" xml:space="preserve">
+    <value>Surprise exam: answer now</value>
+  </data>
+  <data name="otherAnswerRegisteredText" xml:space="preserve">
+    <value>Answer recorded.</value>
+  </data>
+  <data name="otherPlayerAnsweredCorrectFormat" xml:space="preserve">
+    <value>{0} answered correctly.</value>
+  </data>
+  <data name="otherPlayerAnsweredIncorrectFormat" xml:space="preserve">
+    <value>{0} answered incorrectly.</value>
+  </data>
+  <data name="genericActionFailedMessage" xml:space="preserve">
+    <value>Could not complete the action. Please try again.</value>
+  </data>
+  <data name="eliminatedSpectatorMessage" xml:space="preserve">
+    <value>You have been eliminated from the round.\nYou will continue watching the match as a spectator.</value>
+  </data>
+  <data name="eliminatedSpectatorLabel" xml:space="preserve">
+    <value>Eliminated (spectator)</value>
+  </data>
+  <data name="darknessAliasFormat" xml:space="preserve">
+    <value>Contestant {0}</value>
+  </data>
+  <data name="darknessFallbackName" xml:space="preserve">
+    <value>???</value>
+  </data>
+  <data name="fallbackPlayerNameFormat" xml:space="preserve">
+    <value>Player {0}</value>
+  </data>
+  <data name="playersSummaryFormat" xml:space="preserve">
+    <value>({0})</value>
+  </data>
+  <data name="turnOrderSeparator" xml:space="preserve">
+    <value>→</value>
+  </data>
+  <data name="errGameplayEndpointRequired" xml:space="preserve">
+    <value>Endpoint name is required.</value>
+  </data>
+  <data name="errGameplayChannelFaulted" xml:space="preserve">
+    <value>Gameplay channel is faulted.</value>
+  </data>
+  <data name="errLobbyEndpointRequired" xml:space="preserve">
+    <value>Endpoint name is required.</value>
+  </data>
+  <data name="errLobbyTokenRequired" xml:space="preserve">
+    <value>Token is required.</value>
+  </data>
+  <data name="errLobbyClientFaulted" xml:space="preserve">
+    <value>The lobby client is in 'Faulted' state.</value>
+  </data>
+  <data name="msgLobbyReconnectErrorGeneric" xml:space="preserve">
+    <value>An error occurred during reconnection.</value>
+  </data>
+  <data name="fmtLobbyReconnectFaultDetail" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="leaderboardTitle" xml:space="preserve">
+    <value>Leaderboards</value>
+  </data>
+  <data name="leaderboardServerUnavailable" xml:space="preserve">
+    <value>The server is unreachable or there is no connection.</value>
+  </data>
+  <data name="leaderboardDatabaseError" xml:space="preserve">
+    <value>The server could not access the database.</value>
+  </data>
+  <data name="leaderboardLoadFailed" xml:space="preserve">
+    <value>Could not load the leaderboard due to a database error.</value>
+  </data>
+  <data name="leaderboardGenericError" xml:space="preserve">
+    <value>An error occurred while loading the leaderboard.</value>
+  </data>
+  <data name="matchSettingsTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="matchSettingsInvalidMaxPlayers" xml:space="preserve">
+    <value>Max players must be a number between 1 and 16.</value>
+  </data>
+  <data name="matchSettingsInvalidStartingScore" xml:space="preserve">
+    <value>Starting score is not valid.</value>
+  </data>
+  <data name="matchSettingsInvalidMaxScore" xml:space="preserve">
+    <value>Maximum score is not valid.</value>
+  </data>
+  <data name="matchSettingsInvalidPointsCorrect" xml:space="preserve">
+    <value>Points per correct answer are not valid.</value>
+  </data>
+  <data name="matchSettingsInvalidPointsWrong" xml:space="preserve">
+    <value>Points per wrong answer are not valid.</value>
+  </data>
+  <data name="matchSettingsInvalidPointsElimination" xml:space="preserve">
+    <value>Elimination points are not valid.</value>
+  </data>
+  <data name="profileSelectAvatarFilter" xml:space="preserve">
+    <value>Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All files (*.*)|*.*</value>
+  </data>
+  <data name="profileInvalidImage" xml:space="preserve">
+    <value>Select a PNG or JPG image (max 512 KB).</value>
+  </data>
+  <data name="errorDisplayNameRequired" xml:space="preserve">
+    <value>Name cannot be empty.</value>
+  </data>
 </root>

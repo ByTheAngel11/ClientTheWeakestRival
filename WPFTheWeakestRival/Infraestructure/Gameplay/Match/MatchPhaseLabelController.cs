@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Globalization;
 using log4net;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
     internal sealed class MatchPhaseLabelController
     {
-        private const string FINAL_PHASE_LABEL_TEXT = "Final 1 vs 1";
-
         private const string PHASE_LABEL_FORMAT = "{0}: {1}";
         private const string OVERLAY_EMPTY_DESCRIPTION = "";
 
+        private const string LOG_SHOW_SPECIAL_EVENT_ERROR = "MatchPhaseLabelController.ShowSpecialEvent error.";
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchPhaseLabelController));
 
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
         private readonly OverlayController overlay;
 
         internal MatchPhaseLabelController(MatchWindowUiRefs ui, MatchSessionState state, OverlayController overlay)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
             this.overlay = overlay ?? throw new ArgumentNullException(nameof(overlay));
         }
@@ -53,20 +54,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             try
             {
-                overlay.ShowSpecialEvent(FINAL_PHASE_LABEL_TEXT, OVERLAY_EMPTY_DESCRIPTION);
+                overlay.ShowSpecialEvent(Lang.matchFinalPhaseTitle, OVERLAY_EMPTY_DESCRIPTION);
             }
             catch (Exception ex)
             {
-                Logger.Warn("MatchPhaseLabelController.ShowSpecialEvent error.", ex);
+                Logger.Warn(LOG_SHOW_SPECIAL_EVENT_ERROR, ex);
             }
         }
 
         internal void UpdatePhaseLabel()
         {
-            if (ui.TxtPhase == null)
+            if (uiMatchWindow.TxtPhase == null)
             {
                 return;
             }
+
+            string phaseTitle = Lang.phaseTitle;
 
             string phaseDetail;
 
@@ -75,24 +78,24 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 case MatchPhase.NormalRound:
                     phaseDetail = string.Format(
                         CultureInfo.CurrentCulture,
-                        MatchConstants.PHASE_ROUND_FORMAT,
+                        Lang.phaseRoundFormat,
                         state.CurrentRoundNumber);
                     break;
 
                 case MatchPhase.Duel:
-                    phaseDetail = MatchConstants.PHASE_DUEL_TEXT;
+                    phaseDetail = Lang.phaseDuel;
                     break;
 
                 case MatchPhase.SpecialEvent:
-                    phaseDetail = MatchConstants.PHASE_SPECIAL_EVENT_TEXT;
+                    phaseDetail = Lang.phaseSpecialEvent;
                     break;
 
                 case MatchPhase.Final:
-                    phaseDetail = FINAL_PHASE_LABEL_TEXT;
+                    phaseDetail = Lang.matchFinalPhaseTitle;
                     break;
 
                 case MatchPhase.Finished:
-                    phaseDetail = MatchConstants.PHASE_FINISHED_TEXT;
+                    phaseDetail = Lang.phaseFinished;
                     break;
 
                 default:
@@ -100,10 +103,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     break;
             }
 
-            ui.TxtPhase.Text = string.Format(
+            uiMatchWindow.TxtPhase.Text = string.Format(
                 CultureInfo.CurrentCulture,
                 PHASE_LABEL_FORMAT,
-                MatchConstants.PHASE_TITLE,
+                phaseTitle,
                 phaseDetail);
         }
     }

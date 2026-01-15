@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
@@ -20,16 +21,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string DARK_MODE_VOTE_REVEAL_CODE = "DARK_MODE_VOTE_REVEAL";
 
         private const string DARKNESS_KEYWORD_ES = "oscuras";
-        private const string DARKNESS_UNKNOWN_NAME = "???";
-        private const string DARKNESS_TURN_LABEL = "A oscuras";
+        private const string DARKNESS_KEYWORD_EN = "dark";
 
-        private const string DARK_MODE_VOTE_REVEAL_TITLE = "A oscuras";
-        private const string DARK_MODE_VOTE_REVEAL_DESCRIPTION = "Voto revelado.";
+        private const string BRUSH_TURN_OTHER_TURN = "Brush.Turn.OtherTurn";
 
-        private const string GENERIC_PLAYER_NAME_TEMPLATE = "Jugador {0}";
-        private const string REVEAL_VOTE_TEMPLATE = "Votaste por: {0}";
+        private const string LOG_REVEAL_VOTE_ERROR = "RevealPendingVoteIfAny error.";
+        private const string LOG_APPLY_DARKNESS_UI_ERROR = "ApplyDarknessUiImmediate error.";
 
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
         private readonly TurnOrderController turns;
         private readonly QuestionController questions;
@@ -40,7 +39,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             TurnOrderController turns,
             QuestionController questions)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
             this.turns = turns ?? throw new ArgumentNullException(nameof(turns));
             this.questions = questions ?? throw new ArgumentNullException(nameof(questions));
@@ -53,7 +52,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 || IsCode(eventName, LEGACY_DARKNESS_START_CODE)
                 || IsCode(description, LEGACY_DARKNESS_START_CODE)
                 || ContainsKeyword(eventName, DARKNESS_KEYWORD_ES)
-                || ContainsKeyword(description, DARKNESS_KEYWORD_ES);
+                || ContainsKeyword(description, DARKNESS_KEYWORD_ES)
+                || ContainsKeyword(eventName, DARKNESS_KEYWORD_EN)
+                || ContainsKeyword(description, DARKNESS_KEYWORD_EN);
         }
 
         internal bool IsDarkModeEndEvent(string eventName, string description)
@@ -81,7 +82,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            overlay.ShowSpecialEvent(DARK_MODE_VOTE_REVEAL_TITLE, DARK_MODE_VOTE_REVEAL_DESCRIPTION);
+            overlay.ShowSpecialEvent(
+                Lang.msgSpecialEventDarknessTitle,
+                Lang.darknessVoteRevealDescription);
         }
 
         internal void SetPendingVoteRevealUserId(int? userId)
@@ -149,17 +152,17 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 string name = voted != null && !string.IsNullOrWhiteSpace(voted.DisplayName)
                     ? voted.DisplayName
-                    : string.Format(CultureInfo.CurrentCulture, GENERIC_PLAYER_NAME_TEMPLATE, votedUserId.Value);
+                    : string.Format(CultureInfo.CurrentCulture, Lang.playerWithIdFormat, votedUserId.Value);
 
                 MessageBox.Show(
-                    string.Format(CultureInfo.CurrentCulture, REVEAL_VOTE_TEMPLATE, name),
+                    string.Format(CultureInfo.CurrentCulture, Lang.darknessRevealVoteFormat, name),
                     MatchConstants.GAME_MESSAGE_TITLE,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                Logger.Warn("RevealPendingVoteIfAny error.", ex);
+                Logger.Warn(LOG_REVEAL_VOTE_ERROR, ex);
             }
         }
 
@@ -167,29 +170,29 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             try
             {
-                if (ui.TurnAvatar != null)
+                if (uiMatchWindow.TurnAvatar != null)
                 {
-                    ui.TurnAvatar.Visibility = Visibility.Collapsed;
+                    uiMatchWindow.TurnAvatar.Visibility = Visibility.Collapsed;
                 }
 
-                if (ui.TxtTurnPlayerName != null)
+                if (uiMatchWindow.TxtTurnPlayerName != null)
                 {
-                    ui.TxtTurnPlayerName.Text = DARKNESS_UNKNOWN_NAME;
+                    uiMatchWindow.TxtTurnPlayerName.Text = Lang.darknessUnknownPlayerName;
                 }
 
-                if (ui.TxtTurnLabel != null)
+                if (uiMatchWindow.TxtTurnLabel != null)
                 {
-                    ui.TxtTurnLabel.Text = DARKNESS_TURN_LABEL;
+                    uiMatchWindow.TxtTurnLabel.Text = Lang.msgSpecialEventDarknessTitle;
                 }
 
-                if (ui.TurnBannerBackground != null)
+                if (uiMatchWindow.TurnBannerBackground != null)
                 {
-                    ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
+                    uiMatchWindow.TurnBannerBackground.Background = (Brush)uiMatchWindow.Window.FindResource(BRUSH_TURN_OTHER_TURN);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Warn("ApplyDarknessUiImmediate error.", ex);
+                Logger.Warn(LOG_APPLY_DARKNESS_UI_ERROR, ex);
             }
         }
 

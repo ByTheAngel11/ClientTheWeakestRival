@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Microsoft.Win32;
 using System;
+using System.Globalization;
 using System.IO;
 using System.ServiceModel;
 using System.Windows;
@@ -32,9 +33,6 @@ namespace WPFTheWeakestRival
 
         private const string CONTENT_TYPE_PNG = "image/png";
         private const string CONTENT_TYPE_JPEG = "image/jpeg";
-
-        private const string IMG_FILTER = "Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All files (*.*)|*.*";
-        private const string MSG_INVALID_IMAGE = "Selecciona una imagen PNG o JPG (máximo 512 KB).";
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(ModifyProfilePage));
 
@@ -135,19 +133,19 @@ namespace WPFTheWeakestRival
                 var dialog = new OpenFileDialog
                 {
                     Title = Lang.profileSelectAvatarTitle,
-                    Filter = IMG_FILTER,
+                    Filter = Lang.profileSelectAvatarFilter,
                     Multiselect = false
                 };
 
-                var result = dialog.ShowDialog();
+                bool? result = dialog.ShowDialog();
                 if (result != true)
                 {
                     return;
                 }
 
-                if (!TryLoadProfileImage(dialog.FileName, out var bytes, out var contentType))
+                if (!TryLoadProfileImage(dialog.FileName, out byte[] bytes, out string contentType))
                 {
-                    MessageBox.Show(MSG_INVALID_IMAGE, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(Lang.profileInvalidImage, Lang.modifyProfileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -176,11 +174,11 @@ namespace WPFTheWeakestRival
         {
             try
             {
-                var email = (txtEmail.Text ?? string.Empty).Trim();
-                var displayName = (txtDisplayName.Text ?? string.Empty).Trim();
+                string email = (txtEmail.Text ?? string.Empty).Trim();
+                string displayName = (txtDisplayName.Text ?? string.Empty).Trim();
 
-                var hasEmailChange = email.Length > 0 && !string.Equals(email, originalEmail, StringComparison.Ordinal);
-                var hasDisplayNameChange = displayName.Length > 0 && !string.Equals(displayName, originalDisplayName, StringComparison.Ordinal);
+                bool hasEmailChange = email.Length > 0 && !string.Equals(email, originalEmail, StringComparison.Ordinal);
+                bool hasDisplayNameChange = displayName.Length > 0 && !string.Equals(displayName, originalDisplayName, StringComparison.Ordinal);
 
                 var request = new UpdateAccountRequest
                 {
@@ -233,8 +231,13 @@ namespace WPFTheWeakestRival
                 }
 
                 Logger.Warn("Lobby fault while updating profile.", ex);
+
+                string serverText = ex.Detail != null
+                    ? string.Format(CultureInfo.CurrentCulture, "{0}: {1}", ex.Detail.Code ?? string.Empty, ex.Detail.Message ?? string.Empty)
+                    : Lang.profileUpdateFailed;
+
                 MessageBox.Show(
-                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.profileUpdateFailed,
+                    serverText,
                     Lang.modifyProfileTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -258,7 +261,7 @@ namespace WPFTheWeakestRival
 
         private void LogoutClick(object sender, RoutedEventArgs e)
         {
-            var confirm = MessageBox.Show(
+            MessageBoxResult confirm = MessageBox.Show(
                 Lang.logoutConfirmMessage,
                 Lang.logoutTitle,
                 MessageBoxButton.YesNo,
@@ -289,8 +292,13 @@ namespace WPFTheWeakestRival
                 }
 
                 Logger.Warn("Auth fault while logging out.", ex);
+
+                string serverText = ex.Detail != null
+                    ? string.Format(CultureInfo.CurrentCulture, "{0}: {1}", ex.Detail.Code ?? string.Empty, ex.Detail.Message ?? string.Empty)
+                    : Lang.logoutFailed;
+
                 MessageBox.Show(
-                    ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.logoutFailed,
+                    serverText,
                     Lang.logoutTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -335,16 +343,16 @@ namespace WPFTheWeakestRival
                 return false;
             }
 
-            var ext = Path.GetExtension(filePath) ?? string.Empty;
-            var isPng = ext.Equals(".png", StringComparison.OrdinalIgnoreCase);
-            var isJpg = ext.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || ext.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
+            string ext = Path.GetExtension(filePath) ?? string.Empty;
+            bool isPng = ext.Equals(".png", StringComparison.OrdinalIgnoreCase);
+            bool isJpg = ext.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || ext.Equals(".jpeg", StringComparison.OrdinalIgnoreCase);
 
             if (!isPng && !isJpg)
             {
                 return false;
             }
 
-            var originalBytes = File.ReadAllBytes(filePath);
+            byte[] originalBytes = File.ReadAllBytes(filePath);
             if (originalBytes.Length <= MAX_PROFILE_IMAGE_BYTES)
             {
                 bytes = originalBytes;
@@ -398,7 +406,7 @@ namespace WPFTheWeakestRival
                 using (var ms = new MemoryStream())
                 {
                     encoder.Save(ms);
-                    var result = ms.ToArray();
+                    byte[] result = ms.ToArray();
 
                     if (result.Length <= MAX_PROFILE_IMAGE_BYTES && result.Length > 0)
                     {

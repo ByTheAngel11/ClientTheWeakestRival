@@ -6,7 +6,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
-using WPFTheWeakestRival.Infrastructure.Gameplay;
+using WPFTheWeakestRival.Properties.Langs;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
@@ -42,7 +42,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private const int FINAL_PLAYERS_COUNT = 2;
 
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
 
         private readonly OverlayController overlay;
@@ -69,12 +69,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public MatchSessionCoordinator(MatchWindowUiRefs ui, MatchSessionState state)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
 
-            overlay = new OverlayController(this.ui);
-            wildcards = new WildcardController(this.ui, this.state);
-            turns = new TurnOrderController(this.ui, this.state);
+            overlay = new OverlayController(this.uiMatchWindow);
+            wildcards = new WildcardController(this.uiMatchWindow, this.state);
+            turns = new TurnOrderController(this.uiMatchWindow, this.state);
             timer = new QuestionTimerController(TimeSpan.FromSeconds(MatchConstants.TIMER_INTERVAL_SECONDS));
         }
 
@@ -96,22 +96,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void InitializeUi()
         {
-            if (ui.TxtMatchCodeSmall != null)
+            if (uiMatchWindow.TxtMatchCodeSmall != null)
             {
                 string code = string.IsNullOrWhiteSpace(state.Match.MatchCode)
                     ? MatchConstants.DEFAULT_MATCH_CODE_TEXT
                     : state.Match.MatchCode;
 
-                ui.TxtMatchCodeSmall.Text = MatchConstants.DEFAULT_MATCH_CODE_PREFIX + code;
+                uiMatchWindow.TxtMatchCodeSmall.Text = MatchConstants.DEFAULT_MATCH_CODE_PREFIX + code;
             }
 
             turns.InitializePlayers();
 
-            if (ui.TxtChain != null) ui.TxtChain.Text = MatchConstants.DEFAULT_CHAIN_INITIAL_VALUE;
-            if (ui.TxtBanked != null) ui.TxtBanked.Text = MatchConstants.DEFAULT_BANKED_INITIAL_VALUE;
-            if (ui.TxtTurnPlayerName != null) ui.TxtTurnPlayerName.Text = MatchConstants.DEFAULT_PLAYER_NAME;
-            if (ui.TxtTurnLabel != null) ui.TxtTurnLabel.Text = MatchConstants.DEFAULT_WAITING_MATCH_TEXT;
-            if (ui.TxtTimer != null) ui.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
+            if (uiMatchWindow.TxtChain != null) uiMatchWindow.TxtChain.Text = MatchConstants.DEFAULT_CHAIN_INITIAL_VALUE;
+            if (uiMatchWindow.TxtBanked != null) uiMatchWindow.TxtBanked.Text = MatchConstants.DEFAULT_BANKED_INITIAL_VALUE;
+            if (uiMatchWindow.TxtTurnPlayerName != null) uiMatchWindow.TxtTurnPlayerName.Text = MatchConstants.DEFAULT_PLAYER_NAME;
+            if (uiMatchWindow.TxtTurnLabel != null) uiMatchWindow.TxtTurnLabel.Text = MatchConstants.DEFAULT_WAITING_MATCH_TEXT;
+            if (uiMatchWindow.TxtTimer != null) uiMatchWindow.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
 
             wildcards.InitializeEmpty();
         }
@@ -126,8 +126,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             reconnectController = new MatchReconnectController(
                 Application.Current.Dispatcher,
                 hub,
-                ui.GrdReconnectOverlay,
-                ui.TxtReconnectStatus,
+                uiMatchWindow.GrdReconnectOverlay,
+                uiMatchWindow.TxtReconnectStatus,
                 returnToLobby: () =>
                 {
                     try
@@ -147,15 +147,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             gameplay = new GameplayClientProxy(hub);
 
-            questions = new QuestionController(ui, state, gameplay, timer);
+            questions = new QuestionController(uiMatchWindow, state, gameplay, timer);
             questions.InitializeEmptyUi();
 
-            dialogs = new MatchDialogController(ui, state, gameplay);
+            dialogs = new MatchDialogController(uiMatchWindow, state, gameplay);
 
-            phaseController = new MatchPhaseLabelController(ui, state, overlay);
-            darknessController = new MatchDarknessController(ui, state, turns, questions);
+            phaseController = new MatchPhaseLabelController(uiMatchWindow, state, overlay);
+            darknessController = new MatchDarknessController(uiMatchWindow, state, turns, questions);
 
-            inputController = new MatchInputController(ui, state, wildcards, CanUseWildcardNow);
+            inputController = new MatchInputController(uiMatchWindow, state, wildcards, CanUseWildcardNow);
 
             specialEventController = new MatchSpecialEventController(
                 state,
@@ -168,7 +168,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 RefreshWildcardUseState);
 
             lightningController = new LightningChallengeController(
-                ui,
+                uiMatchWindow,
                 state,
                 wildcards,
                 questions,
@@ -263,7 +263,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (string.Equals(name, SPECIAL_EVENT_RESULTS_PERSIST_FAILED_CODE, StringComparison.OrdinalIgnoreCase))
             {
                 string message = string.IsNullOrWhiteSpace(description)
-                    ? RESULTS_PERSIST_FAILED_FALLBACK_MESSAGE
+                    ? Lang.matchResultsPersistFailedMessage
                     : description;
 
                 try
@@ -272,7 +272,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     {
                         MessageBox.Show(
                             message,
-                            RESULTS_PERSIST_FAILED_TITLE,
+                            Lang.matchResultsPersistFailedTitle,
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
                     }));
@@ -340,12 +340,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 Logger.Warn("JoinMatchAsync error.", ex);
 
                 MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
+                    Lang.matchJoinFailedMessage,
+                    Lang.gameMessageTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
         }
+
 
         private async Task EnsureMatchStartedAsync()
         {
@@ -375,8 +376,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 Logger.Warn("EnsureMatchStartedAsync Fault.", ex);
 
                 MessageBox.Show(
-                    ex.Detail != null ? ex.Detail.Message : ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
+                    Lang.matchStartFailedMessage,
+                    Lang.gameMessageTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
@@ -385,8 +386,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 Logger.Warn("EnsureMatchStartedAsync error.", ex);
 
                 MessageBox.Show(
-                    ex.Message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
+                    Lang.matchStartFailedMessage,
+                    Lang.gameMessageTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
@@ -432,13 +433,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             try
             {
-                overlay.ShowSpecialEvent(RECONNECTING_TITLE, RECONNECTING_DESCRIPTION);
+                overlay.ShowSpecialEvent(
+                    Lang.reconnectingOverlayTitle,
+                    Lang.reconnectingOverlayDescription);
             }
             catch (Exception overlayEx)
             {
                 Logger.Warn("Overlay reconnect show failed.", overlayEx);
             }
         }
+
 
         private void OnGameplayConnectionRestored()
         {
@@ -626,9 +630,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             dialogs.ShowMatchFinishedMessage(winner);
 
-            if (ui.TxtTurnLabel != null)
+            if (uiMatchWindow.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = MatchConstants.MATCH_FINISHED_LABEL_TEXT;
+                uiMatchWindow.TxtTurnLabel.Text = MatchConstants.MATCH_FINISHED_LABEL_TEXT;
             }
 
             state.CurrentPhase = MatchPhase.Finished;
@@ -882,7 +886,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         hub.Stop();
                     }
 
-                    if (ui.Window is MatchWindow matchWindow)
+                    if (uiMatchWindow.Window is MatchWindow matchWindow)
                     {
                         matchWindow.CloseToLogin(() =>
                         {

@@ -1,6 +1,7 @@
 ﻿using log4net;
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,19 +17,7 @@ namespace WPFTheWeakestRival.Pages
     {
         private const int DEFAULT_TOP = 10;
 
-        private const string DIALOG_TITLE = "Marcadores";
-
-        private const string MSG_SERVER_UNAVAILABLE =
-            "No se encuentra el servidor o no hay conexión.";
-
-        private const string MSG_DATABASE_ERROR =
-            "El servidor no pudo acceder a la base de datos.";
-
-        private const string MSG_LOAD_FAILED =
-            "No se pudo cargar el marcador por error en base de datos.";
-
-        private const string MSG_GENERIC_ERROR =
-            "Ocurrió un error al cargar el marcador.";
+        private const string STATS_ENDPOINT_NAME = "WSHttpBinding_IStatsService";
 
         private const string DB_FAULT_TOKEN = "DB";
 
@@ -47,7 +36,7 @@ namespace WPFTheWeakestRival.Pages
 
             DataContext = this;
 
-            statsClient = new StatsServiceClient("WSHttpBinding_IStatsService");
+            statsClient = new StatsServiceClient(STATS_ENDPOINT_NAME);
 
             Loaded += OnLoaded;
             Unloaded += OnUnloaded;
@@ -116,8 +105,8 @@ namespace WPFTheWeakestRival.Pages
                 if (IsDatabaseFault(ex.Detail))
                 {
                     MessageBox.Show(
-                        MSG_DATABASE_ERROR,
-                        DIALOG_TITLE,
+                        Lang.leaderboardDatabaseError,
+                        Lang.leaderboardTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
 
@@ -125,8 +114,8 @@ namespace WPFTheWeakestRival.Pages
                 }
 
                 MessageBox.Show(
-                    MSG_LOAD_FAILED,
-                    DIALOG_TITLE,
+                    Lang.leaderboardLoadFailed,
+                    Lang.leaderboardTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
             }
@@ -135,8 +124,8 @@ namespace WPFTheWeakestRival.Pages
                 Logger.Error("LeaderboardPage.LoadLeaderboardAsync: communication error.", ex);
 
                 MessageBox.Show(
-                    MSG_SERVER_UNAVAILABLE,
-                    DIALOG_TITLE,
+                    Lang.leaderboardServerUnavailable,
+                    Lang.leaderboardTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -145,8 +134,8 @@ namespace WPFTheWeakestRival.Pages
                 Logger.Error("LeaderboardPage.LoadLeaderboardAsync: timeout.", ex);
 
                 MessageBox.Show(
-                    MSG_SERVER_UNAVAILABLE,
-                    DIALOG_TITLE,
+                    Lang.leaderboardServerUnavailable,
+                    Lang.leaderboardTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -155,8 +144,8 @@ namespace WPFTheWeakestRival.Pages
                 Logger.Error("LeaderboardPage.LoadLeaderboardAsync: unexpected error.", ex);
 
                 MessageBox.Show(
-                    MSG_GENERIC_ERROR,
-                    DIALOG_TITLE,
+                    Lang.leaderboardGenericError,
+                    Lang.leaderboardTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
@@ -198,7 +187,9 @@ namespace WPFTheWeakestRival.Pages
             }
             catch (Exception ex)
             {
-                Logger.Warn(string.Concat(context, ": WCF client close failed. Aborting."), ex);
+                Logger.Warn(
+                    string.Format(CultureInfo.InvariantCulture, "{0}: WCF client close failed. Aborting.", context),
+                    ex);
 
                 try
                 {
@@ -206,7 +197,9 @@ namespace WPFTheWeakestRival.Pages
                 }
                 catch (Exception abortEx)
                 {
-                    Logger.Warn(string.Concat(context, ": WCF client abort failed."), abortEx);
+                    Logger.Warn(
+                        string.Format(CultureInfo.InvariantCulture, "{0}: WCF client abort failed.", context),
+                        abortEx);
                 }
             }
         }

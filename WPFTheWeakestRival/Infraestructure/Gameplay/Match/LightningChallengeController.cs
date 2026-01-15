@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using WPFTheWeakestRival.Properties.Langs;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
@@ -12,16 +13,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(LightningChallengeController));
 
-        private const string LIGHTNING_MY_TURN_LABEL = "Reto relámpago: tu turno";
-        private const string LIGHTNING_IN_PROGRESS_LABEL = "Reto relámpago en curso";
-
-        private const string LIGHTNING_SUCCES_TEMPLATE = "¡Has completado el reto relámpago! Respuestas correctas: {0}.";
-        private const string LIGHTNING_FAIL_TEMPLATE = "Reto relámpago finalizado. Respuestas correctas: {0}.";
-
         private const string BRUSH_MY_TURN = "Brush.Turn.MyTurn";
         private const string BRUSH_TURN_OTHER_TURN = "Brush.Turn.OtherTurn";
 
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
         private readonly WildcardController wildcards;
         private readonly QuestionController questions;
@@ -42,7 +37,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             MatchInputController inputController,
             Action refreshWildcardUseState)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
             this.wildcards = wildcards ?? throw new ArgumentNullException(nameof(wildcards));
             this.questions = questions ?? throw new ArgumentNullException(nameof(questions));
@@ -66,20 +61,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ? totalTimeSeconds
                 : MatchConstants.QUESTION_TIME_SECONDS;
 
-            if (ui.BtnBank != null)
+            if (uiMatchWindow.BtnBank != null)
             {
-                ui.BtnBank.IsEnabled = false;
+                uiMatchWindow.BtnBank.IsEnabled = false;
             }
 
-            if (ui.TxtTurnLabel != null)
+            if (uiMatchWindow.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = state.IsMyTurn ? LIGHTNING_MY_TURN_LABEL : LIGHTNING_IN_PROGRESS_LABEL;
+                uiMatchWindow.TxtTurnLabel.Text = state.IsMyTurn
+                    ? Lang.lightningMyTurnLabel
+                    : Lang.lightningInProgressLabel;
             }
 
-            if (ui.TurnBannerBackground != null)
+            if (uiMatchWindow.TurnBannerBackground != null)
             {
                 string brushKey = state.IsMyTurn ? BRUSH_MY_TURN : BRUSH_TURN_OTHER_TURN;
-                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource(brushKey);
+                uiMatchWindow.TurnBannerBackground.Background = (Brush)uiMatchWindow.Window.FindResource(brushKey);
             }
 
             wildcards.RefreshUseState(false);
@@ -107,8 +104,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             state.IsMyTurn = false;
 
             string message = isSuccess
-                ? string.Format(CultureInfo.CurrentCulture, LIGHTNING_SUCCES_TEMPLATE, correctAnswers)
-                : string.Format(CultureInfo.CurrentCulture, LIGHTNING_FAIL_TEMPLATE, correctAnswers);
+                ? string.Format(CultureInfo.CurrentCulture, Lang.lightningSuccessTemplate, correctAnswers)
+                : string.Format(CultureInfo.CurrentCulture, Lang.lightningFailTemplate, correctAnswers);
 
             MessageBox.Show(
                 message,

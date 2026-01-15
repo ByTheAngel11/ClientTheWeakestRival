@@ -18,11 +18,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string SABOTAGE_USED_CODE = "SABOTAGE_USED";
         private const string SABOTAGE_APPLIED_CODE = "SABOTAGE_APPLIED";
         private const string SABOTAGE_KEYWORD_ES = "sabotaje";
+        private const string SABOTAGE_KEYWORD_EN = "sabotage";
 
         private const int SABOTAGE_TIME_SECONDS = 15;
 
         private const string WILDCARD_USED_PREFIX = "WILDCARD_USED_";
         private const char WILDCARD_USED_PAYLOAD_SEPARATOR = '|';
+        private const int WILDCARD_USED_PAYLOAD_MAX_PARTS = 2;
 
         private const string WILDCARD_CODE_CHANGE_Q = "CHANGE_Q";
         private const string WILDCARD_CODE_PASS_Q = "PASS_Q";
@@ -165,7 +167,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 string payload = description ?? string.Empty;
 
-                string[] parts = payload.Split(new[] { WILDCARD_USED_PAYLOAD_SEPARATOR }, 2, StringSplitOptions.None);
+                string[] parts = payload.Split(
+                    new[] { WILDCARD_USED_PAYLOAD_SEPARATOR },
+                    WILDCARD_USED_PAYLOAD_MAX_PARTS,
+                    StringSplitOptions.None);
 
                 string actorName = parts.Length > 0 ? parts[0] : string.Empty;
                 string wildcardFromPayload = parts.Length > 1 ? parts[1] : string.Empty;
@@ -430,6 +435,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 || StartsWithCode(description, SABOTAGE_CODE)
                 || ContainsKeyword(eventName, SABOTAGE_KEYWORD_ES)
                 || ContainsKeyword(description, SABOTAGE_KEYWORD_ES)
+                || ContainsKeyword(eventName, SABOTAGE_KEYWORD_EN)
+                || ContainsKeyword(description, SABOTAGE_KEYWORD_EN)
                 || ContainsKeyword(eventName, SABOTAGE_CODE)
                 || ContainsKeyword(description, SABOTAGE_CODE);
         }

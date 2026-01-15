@@ -1,14 +1,15 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using log4net;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
 using WPFTheWeakestRival.Pages;
+using WPFTheWeakestRival.Properties.Langs;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
@@ -17,19 +18,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(MatchDialogController));
 
-        private const string DARKNESS_ALIAS_FORMAT = "Concursante {0}";
-        private const string DARKNESS_FALLBACK_NAME = "???";
+        private const string LOG_SHOW_MATCH_RESULT_WINDOW_ERROR = "ShowMatchResultAndClose: MatchResultWindow error.";
+        private const string LOG_RESOLVE_PLAYER_DISPLAY_NAME_ERROR = "ResolvePlayerDisplayName: error reading lobby players.";
+        private const string LOG_DUEL_SELECTION_ERROR = "ShowDuelSelectionAndSendAsync error.";
+        private const string LOG_SEND_VOTE_ERROR = "SendVoteAsync error.";
 
-        private const string PLAYER_FALLBACK_NAME_FORMAT = "Jugador {0}";
-        private const string PLAYER_FALLBACK_PREFIX = "Jugador";
-
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
         private readonly GameplayClientProxy gameplay;
 
         public MatchDialogController(MatchWindowUiRefs ui, MatchSessionState state, GameplayClientProxy gameplay)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
             this.gameplay = gameplay ?? throw new ArgumentNullException(nameof(gameplay));
         }
@@ -50,7 +50,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             string name = ResolvePlayerNameForUi(eliminatedPlayer.UserId, eliminatedPlayer.DisplayName);
 
             MessageBox.Show(
-                string.Format(CultureInfo.CurrentCulture, "{0} ha sido eliminado de la ronda.", name),
+                string.Format(CultureInfo.CurrentCulture, Lang.matchPlayerEliminatedFormat, name),
                 MatchConstants.GAME_MESSAGE_TITLE,
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -68,7 +68,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 winnerName);
 
             MessageBox.Show(
-                message + "\nPuedes cerrar la ventana cuando quieras para ver tu resultado.",
+                message + Environment.NewLine + Lang.matchResultCloseHint,
                 MatchConstants.GAME_MESSAGE_TITLE,
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -83,8 +83,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 bool iAmWinner = state.FinalWinner != null && state.FinalWinner.UserId == state.MyUserId;
 
                 string mainResultText = iAmWinner
-                    ? "¡GANASTE LA PARTIDA!"
-                    : "Resultado de la partida";
+                    ? Lang.matchResultWinTitle
+                    : Lang.wndMatchResultTitle;
 
                 AvatarAppearance localAvatar = null;
 
@@ -106,13 +106,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     players.ToList(),
                     winnerUserId);
 
-                resultWindow.Owner = ui.Window;
+                resultWindow.Owner = uiMatchWindow.Window;
                 resultWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 resultWindow.ShowDialog();
             }
             catch (Exception ex)
             {
-                Logger.Warn("Error al mostrar MatchResultWindow.", ex);
+                Logger.Warn(LOG_SHOW_MATCH_RESULT_WINDOW_ERROR, ex);
             }
             finally
             {
@@ -141,9 +141,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             var hostWindow = new Window
             {
-                Title = "Votación",
+                Title = state.IsDarknessActive ? Lang.darknessVoteWindowTitle : Lang.voteWindowTitle,
                 Content = votePage,
-                Owner = ui.Window,
+                Owner = uiMatchWindow.Window,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 SizeToContent = SizeToContent.WidthAndHeight,
                 ResizeMode = ResizeMode.NoResize,
@@ -199,9 +199,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             var hostWindow = new Window
             {
-                Title = "Selecciona a quién retar",
+                Title = Lang.duelSelectionTitle,
                 Content = duelPage,
-                Owner = ui.Window,
+                Owner = uiMatchWindow.Window,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 SizeToContent = SizeToContent.WidthAndHeight,
                 ResizeMode = ResizeMode.NoResize,
@@ -242,7 +242,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("ShowDuelSelectionAndSendAsync error.", ex);
+                Logger.Warn(LOG_DUEL_SELECTION_ERROR, ex);
             }
         }
 
@@ -311,12 +311,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("ResolvePlayerDisplayName: error reading lobby players.", ex);
+                Logger.Warn(LOG_RESOLVE_PLAYER_DISPLAY_NAME_ERROR, ex);
             }
 
             if (userId > 0)
             {
-                return string.Format(CultureInfo.CurrentCulture, PLAYER_FALLBACK_NAME_FORMAT, userId);
+                return string.Format(CultureInfo.CurrentCulture, Lang.playerWithIdFormat, userId);
             }
 
             return MatchConstants.DEFAULT_PLAYER_NAME;
@@ -331,13 +331,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             string trimmed = displayName.Trim();
 
-            string expectedCurrent = string.Format(CultureInfo.CurrentCulture, PLAYER_FALLBACK_NAME_FORMAT, userId);
+            string expectedCurrent = string.Format(CultureInfo.CurrentCulture, Lang.playerWithIdFormat, userId);
             if (string.Equals(trimmed, expectedCurrent, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            string expectedInvariant = string.Format(CultureInfo.InvariantCulture, PLAYER_FALLBACK_NAME_FORMAT, userId);
+            string expectedInvariant = string.Format(CultureInfo.InvariantCulture, Lang.playerWithIdFormat, userId);
             if (string.Equals(trimmed, expectedInvariant, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
@@ -345,7 +345,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             string userIdText = userId.ToString(CultureInfo.InvariantCulture);
 
-            return trimmed.StartsWith(PLAYER_FALLBACK_PREFIX, StringComparison.OrdinalIgnoreCase)
+            return trimmed.StartsWith(Lang.player, StringComparison.OrdinalIgnoreCase)
                 && trimmed.EndsWith(userIdText, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -378,7 +378,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 else
                 {
                     displayName = string.IsNullOrWhiteSpace(p.DisplayName)
-                        ? MatchConstants.DEFAULT_PLAYER_NAME
+                        ? string.Format(CultureInfo.CurrentCulture, Lang.playerWithIdFormat, p.UserId)
                         : p.DisplayName;
                 }
 
@@ -397,7 +397,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (aliasByUserId == null || userId <= 0)
             {
-                return DARKNESS_FALLBACK_NAME;
+                return Lang.darknessUnknownPlayerName;
             }
 
             string alias;
@@ -406,7 +406,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return alias;
             }
 
-            return DARKNESS_FALLBACK_NAME;
+            return Lang.darknessUnknownPlayerName;
         }
 
         private Dictionary<int, string> BuildDarknessAliasMapIncludingMe()
@@ -435,7 +435,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 if (!map.ContainsKey(p.UserId))
                 {
-                    map[p.UserId] = string.Format(CultureInfo.CurrentCulture, DARKNESS_ALIAS_FORMAT, index);
+                    map[p.UserId] = string.Format(CultureInfo.CurrentCulture, Lang.darknessSlotFormat, index);
                 }
 
                 index++;
@@ -484,7 +484,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("SendVoteAsync error.", ex);
+                Logger.Warn(LOG_SEND_VOTE_ERROR, ex);
             }
         }
     }

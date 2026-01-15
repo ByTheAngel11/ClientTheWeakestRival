@@ -18,7 +18,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private const int MIN_ROUND_NUMBER = 1;
 
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
 
         private List<PlayerWildcardDto> myWildcards = new List<PlayerWildcardDto>();
@@ -29,7 +29,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public WildcardController(MatchWindowUiRefs ui, MatchSessionState state)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
         }
 
@@ -156,9 +156,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            if (ui.BtnUseWildcard != null)
+            if (uiMatchWindow.BtnUseWildcard != null)
             {
-                ui.BtnUseWildcard.IsEnabled = false;
+                uiMatchWindow.BtnUseWildcard.IsEnabled = false;
             }
 
             int playerWildcardId = selectedWildcard.PlayerWildcardId;
@@ -288,44 +288,44 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void InitializeEmpty()
         {
-            if (ui.TxtWildcardName != null)
+            if (uiMatchWindow.TxtWildcardName != null)
             {
-                ui.TxtWildcardName.Text = MatchConstants.DEFAULT_NO_WILDCARD_NAME;
+                uiMatchWindow.TxtWildcardName.Text = MatchConstants.DEFAULT_NO_WILDCARD_NAME;
             }
 
-            if (ui.TxtWildcardDescription != null)
+            if (uiMatchWindow.TxtWildcardDescription != null)
             {
-                ui.TxtWildcardDescription.Text = string.Empty;
+                uiMatchWindow.TxtWildcardDescription.Text = string.Empty;
             }
 
-            if (ui.ImgWildcardIcon != null)
+            if (uiMatchWindow.ImgWildcardIcon != null)
             {
-                ui.ImgWildcardIcon.Visibility = Visibility.Collapsed;
-                ui.ImgWildcardIcon.Source = null;
+                uiMatchWindow.ImgWildcardIcon.Visibility = Visibility.Collapsed;
+                uiMatchWindow.ImgWildcardIcon.Source = null;
             }
 
-            if (ui.BtnWildcardPrev != null)
+            if (uiMatchWindow.BtnWildcardPrev != null)
             {
-                ui.BtnWildcardPrev.Visibility = Visibility.Collapsed;
-                ui.BtnWildcardPrev.IsEnabled = false;
+                uiMatchWindow.BtnWildcardPrev.Visibility = Visibility.Collapsed;
+                uiMatchWindow.BtnWildcardPrev.IsEnabled = false;
             }
 
-            if (ui.BtnWildcardNext != null)
+            if (uiMatchWindow.BtnWildcardNext != null)
             {
-                ui.BtnWildcardNext.Visibility = Visibility.Collapsed;
-                ui.BtnWildcardNext.IsEnabled = false;
+                uiMatchWindow.BtnWildcardNext.Visibility = Visibility.Collapsed;
+                uiMatchWindow.BtnWildcardNext.IsEnabled = false;
             }
 
-            if (ui.BtnUseWildcard != null)
+            if (uiMatchWindow.BtnUseWildcard != null)
             {
-                ui.BtnUseWildcard.Visibility = Visibility.Collapsed;
-                ui.BtnUseWildcard.IsEnabled = false;
+                uiMatchWindow.BtnUseWildcard.Visibility = Visibility.Collapsed;
+                uiMatchWindow.BtnUseWildcard.IsEnabled = false;
             }
         }
 
         private void UpdateUi()
         {
-            if (ui.TxtWildcardName == null || ui.TxtWildcardDescription == null)
+            if (uiMatchWindow.TxtWildcardName == null || uiMatchWindow.TxtWildcardDescription == null)
             {
                 return;
             }
@@ -354,13 +354,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     sameCodeCount);
             }
 
-            ui.TxtWildcardName.Text = displayName;
+            uiMatchWindow.TxtWildcardName.Text = displayName;
 
             string baseDescription = string.IsNullOrWhiteSpace(selectedWildcard.Description)
                 ? selectedWildcard.Code
                 : selectedWildcard.Description;
 
-            ui.TxtWildcardDescription.Text = sameCodeCount > 1
+            uiMatchWindow.TxtWildcardDescription.Text = sameCodeCount > 1
                 ? baseDescription + Environment.NewLine + string.Format(
                     CultureInfo.CurrentCulture,
                     "Tienes {0} comodines de este tipo en esta partida.",
@@ -369,16 +369,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             bool hasMultiple = myWildcards.Count > 1;
 
-            if (ui.BtnWildcardPrev != null)
+            if (uiMatchWindow.BtnWildcardPrev != null)
             {
-                ui.BtnWildcardPrev.Visibility = hasMultiple ? Visibility.Visible : Visibility.Collapsed;
-                ui.BtnWildcardPrev.IsEnabled = hasMultiple;
+                uiMatchWindow.BtnWildcardPrev.Visibility = hasMultiple ? Visibility.Visible : Visibility.Collapsed;
+                uiMatchWindow.BtnWildcardPrev.IsEnabled = hasMultiple;
             }
 
-            if (ui.BtnWildcardNext != null)
+            if (uiMatchWindow.BtnWildcardNext != null)
             {
-                ui.BtnWildcardNext.Visibility = hasMultiple ? Visibility.Visible : Visibility.Collapsed;
-                ui.BtnWildcardNext.IsEnabled = hasMultiple;
+                uiMatchWindow.BtnWildcardNext.Visibility = hasMultiple ? Visibility.Visible : Visibility.Collapsed;
+                uiMatchWindow.BtnWildcardNext.IsEnabled = hasMultiple;
             }
 
             UpdateIcon();
@@ -387,7 +387,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void ApplyUseButtonState()
         {
-            if (ui.BtnUseWildcard == null)
+            if (uiMatchWindow.BtnUseWildcard == null)
             {
                 return;
             }
@@ -400,26 +400,26 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             if (!hasWildcard)
             {
-                ui.BtnUseWildcard.Visibility = Visibility.Collapsed;
-                ui.BtnUseWildcard.IsEnabled = false;
+                uiMatchWindow.BtnUseWildcard.Visibility = Visibility.Collapsed;
+                uiMatchWindow.BtnUseWildcard.IsEnabled = false;
                 return;
             }
 
-            ui.BtnUseWildcard.Visibility = Visibility.Visible;
-            ui.BtnUseWildcard.IsEnabled = canUseNow;
+            uiMatchWindow.BtnUseWildcard.Visibility = Visibility.Visible;
+            uiMatchWindow.BtnUseWildcard.IsEnabled = canUseNow;
         }
 
         private void UpdateIcon()
         {
-            if (ui.ImgWildcardIcon == null)
+            if (uiMatchWindow.ImgWildcardIcon == null)
             {
                 return;
             }
 
             if (selectedWildcard == null || string.IsNullOrWhiteSpace(selectedWildcard.Code))
             {
-                ui.ImgWildcardIcon.Visibility = Visibility.Collapsed;
-                ui.ImgWildcardIcon.Source = null;
+                uiMatchWindow.ImgWildcardIcon.Visibility = Visibility.Collapsed;
+                uiMatchWindow.ImgWildcardIcon.Source = null;
                 return;
             }
 
@@ -439,16 +439,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 bitmap.EndInit();
                 bitmap.Freeze();
 
-                ui.ImgWildcardIcon.Source = bitmap;
-                ui.ImgWildcardIcon.Visibility = Visibility.Visible;
+                uiMatchWindow.ImgWildcardIcon.Source = bitmap;
+                uiMatchWindow.ImgWildcardIcon.Visibility = Visibility.Visible;
             }
             catch (Exception ex)
             {
                 Logger.WarnFormat("No se pudo cargar la imagen del comodín '{0}'.", code);
                 Logger.Warn("WildcardController.UpdateIcon", ex);
 
-                ui.ImgWildcardIcon.Visibility = Visibility.Collapsed;
-                ui.ImgWildcardIcon.Source = null;
+                uiMatchWindow.ImgWildcardIcon.Visibility = Visibility.Collapsed;
+                uiMatchWindow.ImgWildcardIcon.Source = null;
             }
         }
     }

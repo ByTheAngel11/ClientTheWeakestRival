@@ -13,6 +13,7 @@ using System.Windows.Media;
 using WPFTheWeakestRival.Helpers;
 using WPFTheWeakestRival.LobbyService;
 using WPFTheWeakestRival.Models;
+using WPFTheWeakestRival.Properties.Langs;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
@@ -21,15 +22,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(QuestionController));
 
-        private const string GENERIC_PLAYER_NAME_FORMAT = "Jugador {0}";
-
-        private const string DARKNESS_UNKNOWN_NAME = "???";
-        private const string DARKNESS_TURN_LABEL = "A oscuras";
-        private const string LIGHTNING_IN_PROGRESS_TEXT = "Reto relámpago en curso";
-        private const string SURPRISE_EXAM_MY_TURN_TEXT = "Examen sorpresa: responde";
-        private const string OTHER_ANSWER_REGISTERED_TEXT = "Respuesta registrada.";
-
-        private const string GENERIC_ACTION_FAILED_MESSAGE = "No se pudo realizar la acción. Intenta de nuevo.";
+        private const string LOG_CACHE_LOBBY_SNAPSHOT_FAILED = "CacheLobbyPlayersSnapshot failed.";
+        private const string LOG_TRY_RESOLVE_UI_NAME_FAILED = "TryResolveDisplayNameFromUiPlayersList failed.";
+        private const string LOG_TRY_READ_INT_FAILED = "TryReadInt failed.";
+        private const string LOG_TRY_READ_STRING_FAILED = "TryReadString failed.";
+        private const string LOG_ON_NEXT_QUESTION_NULL_FOR_MY_TURN = "OnNextQuestion: question is null for my turn.";
+        private const string LOG_SUBMIT_ANSWER_FAILED = "SubmitAnswerFromButtonAsync error.";
+        private const string LOG_BANK_SERVICE_FAULT = "BankAsync service fault.";
+        private const string LOG_BANK_FAILED = "BankAsync error.";
+        private const string LOG_RESOLVE_SERVICE_FAULT_FAILED = "ResolveServiceFaultMessage failed.";
+        private const string LOG_SEND_TIMEOUT_FAILED = "SendTimeoutAnswerAsync error.";
 
         private const string TURN_MY_TURN_BRUSH_KEY = "Brush.Turn.MyTurn";
         private const string TURN_OTHER_TURN_BRUSH_KEY = "Brush.Turn.OtherTurn";
@@ -39,7 +41,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         private const string PROP_USER_ID = "UserId";
         private const string PROP_DISPLAY_NAME = "DisplayName";
 
-        private readonly MatchWindowUiRefs ui;
+        private const int ANSWER_INDEX_FIRST = 0;
+        private const int ANSWER_INDEX_SECOND = 1;
+        private const int ANSWER_INDEX_THIRD = 2;
+        private const int ANSWER_INDEX_FOURTH = 3;
+
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
         private readonly GameplayClientProxy gameplay;
         private readonly QuestionTimerController timer;
@@ -61,7 +68,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             GameplayClientProxy gameplay,
             QuestionTimerController timer)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
             this.gameplay = gameplay ?? throw new ArgumentNullException(nameof(gameplay));
             this.timer = timer ?? throw new ArgumentNullException(nameof(timer));
@@ -79,22 +86,22 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             currentTurnTimeLimitSeconds = 0;
 
-            if (ui.TxtQuestion != null)
+            if (uiMatchWindow.TxtQuestion != null)
             {
-                ui.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_QUESTION_TEXT;
+                uiMatchWindow.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_QUESTION_TEXT;
             }
 
-            if (ui.TxtAnswerFeedback != null)
+            if (uiMatchWindow.TxtAnswerFeedback != null)
             {
-                ui.TxtAnswerFeedback.Text = string.Empty;
+                uiMatchWindow.TxtAnswerFeedback.Text = string.Empty;
             }
 
             ResetAnswerButtons();
             SetTimerText(MatchConstants.DEFAULT_TIMER_TEXT);
 
-            if (ui.BtnBank != null)
+            if (uiMatchWindow.BtnBank != null)
             {
-                ui.BtnBank.IsEnabled = false;
+                uiMatchWindow.BtnBank.IsEnabled = false;
             }
         }
 
@@ -175,9 +182,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             state.IsDarknessActive = isActive;
 
-            if (ui.TurnAvatar != null)
+            if (uiMatchWindow.TurnAvatar != null)
             {
-                ui.TurnAvatar.Visibility = isActive ? Visibility.Collapsed : Visibility.Visible;
+                uiMatchWindow.TurnAvatar.Visibility = isActive ? Visibility.Collapsed : Visibility.Visible;
             }
 
             if (isActive)
@@ -191,19 +198,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void ApplyDarknessTurnIdentity()
         {
-            if (ui.TxtTurnPlayerName != null)
+            if (uiMatchWindow.TxtTurnPlayerName != null)
             {
-                ui.TxtTurnPlayerName.Text = DARKNESS_UNKNOWN_NAME;
+                uiMatchWindow.TxtTurnPlayerName.Text = Lang.darknessUnknownPlayerName;
             }
 
-            if (ui.TxtTurnLabel != null)
+            if (uiMatchWindow.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = DARKNESS_TURN_LABEL;
+                uiMatchWindow.TxtTurnLabel.Text = Lang.msgSpecialEventDarknessTitle;
             }
 
-            if (ui.TurnBannerBackground != null)
+            if (uiMatchWindow.TurnBannerBackground != null)
             {
-                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
+                uiMatchWindow.TurnBannerBackground.Background = (Brush)uiMatchWindow.Window.FindResource(TURN_OTHER_TURN_BRUSH_KEY);
             }
         }
 
@@ -214,9 +221,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             string nameFromUi = TryResolveDisplayNameFromUiPlayersList(userId);
             PlayerSummary lobbyPlayer = FindLobbyPlayer(userId);
 
-            if (ui.TxtTurnPlayerName != null)
+            if (uiMatchWindow.TxtTurnPlayerName != null)
             {
-                ui.TxtTurnPlayerName.Text =
+                uiMatchWindow.TxtTurnPlayerName.Text =
                     !string.IsNullOrWhiteSpace(nameFromUi)
                         ? nameFromUi
                         : (lobbyPlayer != null && !string.IsNullOrWhiteSpace(lobbyPlayer.DisplayName)
@@ -224,11 +231,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                             : BuildFallbackPlayerName(userId));
             }
 
-            if (ui.TurnAvatar != null)
+            if (uiMatchWindow.TurnAvatar != null)
             {
                 AvatarAppearance appearance = AvatarMapper.FromLobbyDto(lobbyPlayer != null ? lobbyPlayer.Avatar : null);
-                ui.TurnAvatar.Appearance = appearance;
-                ui.TurnAvatar.Visibility = Visibility.Visible;
+                uiMatchWindow.TurnAvatar.Appearance = appearance;
+                uiMatchWindow.TurnAvatar.Visibility = Visibility.Visible;
             }
         }
 
@@ -236,28 +243,28 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             state.IsBombQuestionActive = isActive;
 
-            if (ui.TxtAnswerFeedback != null)
+            if (uiMatchWindow.TxtAnswerFeedback != null)
             {
                 if (isActive)
                 {
-                    ui.TxtAnswerFeedback.Text = MatchConstants.BOMB_UI_MESSAGE;
-                    ui.TxtAnswerFeedback.Foreground = Brushes.Gold;
+                    uiMatchWindow.TxtAnswerFeedback.Text = MatchConstants.BOMB_UI_MESSAGE;
+                    uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.Gold;
                 }
                 else
                 {
-                    if (string.Equals(ui.TxtAnswerFeedback.Text, MatchConstants.BOMB_UI_MESSAGE, StringComparison.Ordinal))
+                    if (string.Equals(uiMatchWindow.TxtAnswerFeedback.Text, MatchConstants.BOMB_UI_MESSAGE, StringComparison.Ordinal))
                     {
-                        ui.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
-                        ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+                        uiMatchWindow.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
+                        uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.LightGray;
                     }
                 }
             }
 
-            if (ui.TurnBannerBackground != null && state.IsMyTurn)
+            if (uiMatchWindow.TurnBannerBackground != null && state.IsMyTurn)
             {
-                ui.TurnBannerBackground.Background = isActive
+                uiMatchWindow.TurnBannerBackground.Background = isActive
                     ? MatchConstants.BombTurnBrush
-                    : (Brush)ui.Window.FindResource("Brush.Turn.MyTurn");
+                    : (Brush)uiMatchWindow.Window.FindResource(TURN_MY_TURN_BRUSH_KEY);
             }
         }
 
@@ -299,17 +306,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ShowWaitingTurnUi();
         }
 
-
         private void UpdateChainAndBankUi(decimal currentChain, decimal banked)
         {
-            if (ui.TxtChain != null)
+            if (uiMatchWindow.TxtChain != null)
             {
-                ui.TxtChain.Text = currentChain.ToString(MatchConstants.POINTS_FORMAT);
+                uiMatchWindow.TxtChain.Text = currentChain.ToString(MatchConstants.POINTS_FORMAT);
             }
 
-            if (ui.TxtBanked != null)
+            if (uiMatchWindow.TxtBanked != null)
             {
-                ui.TxtBanked.Text = banked.ToString(MatchConstants.POINTS_FORMAT);
+                uiMatchWindow.TxtBanked.Text = banked.ToString(MatchConstants.POINTS_FORMAT);
             }
         }
 
@@ -317,9 +323,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (state.IsDarknessActive)
             {
-                if (ui.TurnAvatar != null) ui.TurnAvatar.Visibility = Visibility.Collapsed;
-                if (ui.TxtTurnPlayerName != null) ui.TxtTurnPlayerName.Text = DARKNESS_UNKNOWN_NAME;
-                if (ui.TxtTurnLabel != null) ui.TxtTurnLabel.Text = DARKNESS_TURN_LABEL;
+                if (uiMatchWindow.TurnAvatar != null) uiMatchWindow.TurnAvatar.Visibility = Visibility.Collapsed;
+                if (uiMatchWindow.TxtTurnPlayerName != null) uiMatchWindow.TxtTurnPlayerName.Text = Lang.darknessUnknownPlayerName;
+                if (uiMatchWindow.TxtTurnLabel != null) uiMatchWindow.TxtTurnLabel.Text = Lang.msgSpecialEventDarknessTitle;
                 return;
             }
 
@@ -339,12 +345,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             string displayName = ResolveBestDisplayName(nameFromUi, targetPlayer, lobbyPlayer, userId);
 
-            if (ui.TxtTurnPlayerName != null)
+            if (uiMatchWindow.TxtTurnPlayerName != null)
             {
-                ui.TxtTurnPlayerName.Text = displayName;
+                uiMatchWindow.TxtTurnPlayerName.Text = displayName;
             }
 
-            if (ui.TurnAvatar != null)
+            if (uiMatchWindow.TurnAvatar != null)
             {
                 AvatarAppearance appearance = null;
 
@@ -357,8 +363,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     appearance = AvatarMapper.FromLobbyDto(lobbyPlayer != null ? lobbyPlayer.Avatar : null);
                 }
 
-                ui.TurnAvatar.Appearance = appearance;
-                ui.TurnAvatar.Visibility = Visibility.Visible;
+                uiMatchWindow.TurnAvatar.Appearance = appearance;
+                uiMatchWindow.TurnAvatar.Visibility = Visibility.Visible;
             }
         }
 
@@ -392,7 +398,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (userId > 0)
             {
-                return string.Format(CultureInfo.CurrentCulture, GENERIC_PLAYER_NAME_FORMAT, userId);
+                return string.Format(CultureInfo.CurrentCulture, Lang.playerWithIdFormat, userId);
             }
 
             return MatchConstants.DEFAULT_PLAYER_NAME;
@@ -423,7 +429,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("CacheLobbyPlayersSnapshot failed.", ex);
+                Logger.Warn(LOG_CACHE_LOBBY_SNAPSHOT_FAILED, ex);
             }
         }
 
@@ -464,15 +470,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             try
             {
-                if (userId <= 0 || ui.LstPlayers == null)
+                if (userId <= 0 || uiMatchWindow.LstPlayers == null)
                 {
                     return null;
                 }
 
-                IEnumerable source = ui.LstPlayers.ItemsSource as IEnumerable;
+                IEnumerable source = uiMatchWindow.LstPlayers.ItemsSource as IEnumerable;
                 if (source == null)
                 {
-                    source = ui.LstPlayers.Items;
+                    source = uiMatchWindow.LstPlayers.Items;
                 }
 
                 foreach (object item in source)
@@ -502,7 +508,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("TryResolveDisplayNameFromUiPlayersList failed.", ex);
+                Logger.Warn(LOG_TRY_RESOLVE_UI_NAME_FAILED, ex);
             }
 
             return null;
@@ -529,8 +535,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     return intValue;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Warn(LOG_TRY_READ_INT_FAILED, ex);
             }
 
             return null;
@@ -538,16 +545,15 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void ApplyTurnBannerOnly()
         {
-            if (ui.TurnBannerBackground == null)
+            if (uiMatchWindow.TurnBannerBackground == null)
             {
                 return;
             }
 
             string key = state.IsMyTurn ? TURN_MY_TURN_BRUSH_KEY : TURN_OTHER_TURN_BRUSH_KEY;
 
-            ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource(key);
+            uiMatchWindow.TurnBannerBackground.Background = (Brush)uiMatchWindow.Window.FindResource(key);
         }
-
 
         private static string TryReadString(object target, string propertyName)
         {
@@ -566,9 +572,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 return prop.GetValue(target, null) as string;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Ignorar: solo fallback.
+                Logger.Warn(LOG_TRY_READ_STRING_FAILED, ex);
             }
 
             return null;
@@ -576,12 +582,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void ApplyBankButtonState()
         {
-            if (ui.BtnBank == null)
+            if (uiMatchWindow.BtnBank == null)
             {
                 return;
             }
 
-            ui.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
+            uiMatchWindow.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
         }
 
         private void StartMyTurnTimer(int? timeLimitOverrideSeconds)
@@ -606,19 +612,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             timer.Start(limitSeconds);
         }
 
-
         private void ApplyMyTurnLabelAndBanner()
         {
-            if (ui.TxtTurnLabel != null)
+            if (uiMatchWindow.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = state.IsSurpriseExamActive
-                    ? SURPRISE_EXAM_MY_TURN_TEXT
+                uiMatchWindow.TxtTurnLabel.Text = state.IsSurpriseExamActive
+                    ? Lang.surpriseExamMyTurnText
                     : MatchConstants.TURN_MY_TURN_TEXT;
             }
 
-            if (ui.TurnBannerBackground != null)
+            if (uiMatchWindow.TurnBannerBackground != null)
             {
-                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.MyTurn");
+                uiMatchWindow.TurnBannerBackground.Background = (Brush)uiMatchWindow.Window.FindResource(TURN_MY_TURN_BRUSH_KEY);
             }
         }
 
@@ -656,17 +661,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             SetTimerText(MatchConstants.DEFAULT_TIMER_TEXT);
         }
 
-
         private void ApplyOtherTurnLabelAndBanner()
         {
-            if (ui.TxtTurnLabel != null)
+            if (uiMatchWindow.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = MatchConstants.TURN_OTHER_PLAYER_TEXT;
+                uiMatchWindow.TxtTurnLabel.Text = MatchConstants.TURN_OTHER_PLAYER_TEXT;
             }
 
-            if (ui.TurnBannerBackground != null)
+            if (uiMatchWindow.TurnBannerBackground != null)
             {
-                ui.TurnBannerBackground.Background = (Brush)ui.Window.FindResource("Brush.Turn.OtherTurn");
+                uiMatchWindow.TurnBannerBackground.Background = (Brush)uiMatchWindow.Window.FindResource(TURN_OTHER_TURN_BRUSH_KEY);
             }
         }
 
@@ -674,9 +678,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             InitializeEmptyUi();
 
-            if (ui.TxtQuestion != null)
+            if (uiMatchWindow.TxtQuestion != null)
             {
-                ui.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_TURN_TEXT;
+                uiMatchWindow.TxtQuestion.Text = MatchConstants.DEFAULT_WAITING_TURN_TEXT;
             }
         }
 
@@ -684,25 +688,25 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (question == null)
             {
-                Logger.Warn("OnNextQuestion: question is null for my turn.");
+                Logger.Warn(LOG_ON_NEXT_QUESTION_NULL_FOR_MY_TURN);
                 InitializeEmptyUi();
                 return;
             }
 
-            if (ui.TxtQuestion != null)
+            if (uiMatchWindow.TxtQuestion != null)
             {
-                ui.TxtQuestion.Text = question.Body;
+                uiMatchWindow.TxtQuestion.Text = question.Body;
             }
 
-            SetAnswerButtonContent(ui.BtnAnswer1, question.Answers, 0);
-            SetAnswerButtonContent(ui.BtnAnswer2, question.Answers, 1);
-            SetAnswerButtonContent(ui.BtnAnswer3, question.Answers, 2);
-            SetAnswerButtonContent(ui.BtnAnswer4, question.Answers, 3);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer1, question.Answers, ANSWER_INDEX_FIRST);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer2, question.Answers, ANSWER_INDEX_SECOND);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer3, question.Answers, ANSWER_INDEX_THIRD);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer4, question.Answers, ANSWER_INDEX_FOURTH);
 
-            if (ui.TxtAnswerFeedback != null)
+            if (uiMatchWindow.TxtAnswerFeedback != null)
             {
-                ui.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
-                ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+                uiMatchWindow.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
+                uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.LightGray;
             }
 
             EnableAnswerButtons(true);
@@ -716,9 +720,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             state.CurrentQuestion = question;
 
-            if (ui.BtnBank != null)
+            if (uiMatchWindow.BtnBank != null)
             {
-                ui.BtnBank.IsEnabled = false;
+                uiMatchWindow.BtnBank.IsEnabled = false;
             }
 
             if (!state.IsMyTurn)
@@ -728,9 +732,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 InitializeEmptyUi();
 
-                if (ui.TxtQuestion != null)
+                if (uiMatchWindow.TxtQuestion != null)
                 {
-                    ui.TxtQuestion.Text = LIGHTNING_IN_PROGRESS_TEXT;
+                    uiMatchWindow.TxtQuestion.Text = Lang.lightningInProgressLabel;
                 }
 
                 return;
@@ -742,20 +746,20 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            if (ui.TxtQuestion != null)
+            if (uiMatchWindow.TxtQuestion != null)
             {
-                ui.TxtQuestion.Text = question.Body;
+                uiMatchWindow.TxtQuestion.Text = question.Body;
             }
 
-            SetAnswerButtonContent(ui.BtnAnswer1, question.Answers, 0);
-            SetAnswerButtonContent(ui.BtnAnswer2, question.Answers, 1);
-            SetAnswerButtonContent(ui.BtnAnswer3, question.Answers, 2);
-            SetAnswerButtonContent(ui.BtnAnswer4, question.Answers, 3);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer1, question.Answers, ANSWER_INDEX_FIRST);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer2, question.Answers, ANSWER_INDEX_SECOND);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer3, question.Answers, ANSWER_INDEX_THIRD);
+            SetAnswerButtonContent(uiMatchWindow.BtnAnswer4, question.Answers, ANSWER_INDEX_FOURTH);
 
-            if (ui.TxtAnswerFeedback != null)
+            if (uiMatchWindow.TxtAnswerFeedback != null)
             {
-                ui.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
-                ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+                uiMatchWindow.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_SELECT_ANSWER_TEXT;
+                uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.LightGray;
             }
 
             EnableAnswerButtons(true);
@@ -773,7 +777,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void OnAnswerEvaluated(GameplayServiceProxy.PlayerSummary player, GameplayServiceProxy.AnswerResult result)
         {
-            if (ui.TxtAnswerFeedback == null)
+            if (uiMatchWindow.TxtAnswerFeedback == null)
             {
                 return;
             }
@@ -813,19 +817,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             bool isCorrect = result != null && result.IsCorrect;
 
-            ui.TxtAnswerFeedback.Text = isCorrect
+            uiMatchWindow.TxtAnswerFeedback.Text = isCorrect
                 ? MatchConstants.DEFAULT_CORRECT_TEXT
                 : MatchConstants.DEFAULT_INCORRECT_TEXT;
 
-            ui.TxtAnswerFeedback.Foreground = isCorrect
+            uiMatchWindow.TxtAnswerFeedback.Foreground = isCorrect
                 ? Brushes.LawnGreen
                 : Brushes.OrangeRed;
         }
 
         private void ShowOtherAnswerRegistered()
         {
-            ui.TxtAnswerFeedback.Text = OTHER_ANSWER_REGISTERED_TEXT;
-            ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+            uiMatchWindow.TxtAnswerFeedback.Text = Lang.otherAnswerRegisteredText;
+            uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.LightGray;
         }
 
         private void ShowOtherPlayerAnswerFeedback(GameplayServiceProxy.PlayerSummary player, GameplayServiceProxy.AnswerResult result)
@@ -833,11 +837,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             string name = ResolveOtherPlayerName(player);
             bool otherIsCorrect = result != null && result.IsCorrect;
 
-            ui.TxtAnswerFeedback.Text = otherIsCorrect
-                ? string.Format(CultureInfo.CurrentCulture, "{0} respondió correcto.", name)
-                : string.Format(CultureInfo.CurrentCulture, "{0} respondió incorrecto.", name);
+            uiMatchWindow.TxtAnswerFeedback.Text = otherIsCorrect
+                ? string.Format(CultureInfo.CurrentCulture, Lang.otherPlayerAnsweredCorrectFormat, name)
+                : string.Format(CultureInfo.CurrentCulture, Lang.otherPlayerAnsweredIncorrectFormat, name);
 
-            ui.TxtAnswerFeedback.Foreground = Brushes.LightGray;
+            uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.LightGray;
         }
 
         private string ResolveOtherPlayerName(GameplayServiceProxy.PlayerSummary player)
@@ -874,14 +878,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return;
             }
 
-            if (ui.TxtChain != null)
+            if (uiMatchWindow.TxtChain != null)
             {
-                ui.TxtChain.Text = bank.CurrentChain.ToString(MatchConstants.POINTS_FORMAT);
+                uiMatchWindow.TxtChain.Text = bank.CurrentChain.ToString(MatchConstants.POINTS_FORMAT);
             }
 
-            if (ui.TxtBanked != null)
+            if (uiMatchWindow.TxtBanked != null)
             {
-                ui.TxtBanked.Text = bank.BankedPoints.ToString(MatchConstants.POINTS_FORMAT);
+                uiMatchWindow.TxtBanked.Text = bank.BankedPoints.ToString(MatchConstants.POINTS_FORMAT);
             }
         }
 
@@ -917,7 +921,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("SubmitAnswerFromButtonAsync error.", ex);
+                Logger.Warn(LOG_SUBMIT_ANSWER_FAILED, ex);
             }
         }
 
@@ -931,17 +935,17 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             if (state.IsSurpriseExamActive)
             {
                 MessageBox.Show(
-                    MatchConstants.SURPRISE_EXAM_BANK_BLOCKED_MESSAGE,
-                    MatchConstants.GAME_MESSAGE_TITLE,
+                    Lang.surpriseExamBankBlockedMessage,
+                    Lang.gameMessageTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
                 return;
             }
 
-            if (ui.BtnBank != null)
+            if (uiMatchWindow.BtnBank != null)
             {
-                ui.BtnBank.IsEnabled = false;
+                uiMatchWindow.BtnBank.IsEnabled = false;
             }
 
             timer.Stop();
@@ -962,13 +966,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (FaultException ex)
             {
-                Logger.Warn("BankAsync service fault.", ex);
+                Logger.Warn(LOG_BANK_SERVICE_FAULT, ex);
 
                 string message = ResolveServiceFaultMessage(ex);
 
                 MessageBox.Show(
                     message,
-                    MatchConstants.GAME_MESSAGE_TITLE,
+                    Lang.gameMessageTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
@@ -979,13 +983,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("BankAsync error.", ex);
+                Logger.Warn(LOG_BANK_FAILED, ex);
             }
             finally
             {
-                if (ui.BtnBank != null)
+                if (uiMatchWindow.BtnBank != null)
                 {
-                    ui.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
+                    uiMatchWindow.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
                 }
             }
         }
@@ -994,7 +998,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             if (ex == null)
             {
-                return GENERIC_ACTION_FAILED_MESSAGE;
+                return Lang.genericActionFailedMessage;
             }
 
             try
@@ -1017,17 +1021,12 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception innerEx)
             {
-                // Fallback abajo.
+                Logger.Warn(LOG_RESOLVE_SERVICE_FAULT_FAILED, innerEx);
             }
 
-            if (!string.IsNullOrWhiteSpace(ex.Message))
-            {
-                return ex.Message;
-            }
-
-            return GENERIC_ACTION_FAILED_MESSAGE;
+            return Lang.genericActionFailedMessage;
         }
 
         public void OnEliminated(bool isMe)
@@ -1038,8 +1037,8 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
 
             MessageBox.Show(
-                "Has sido eliminado de la ronda.\nSeguirás viendo la partida como espectador.",
-                MatchConstants.GAME_MESSAGE_TITLE,
+                Lang.eliminatedSpectatorMessage,
+                Lang.gameMessageTitle,
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
 
@@ -1047,9 +1046,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             timer.Stop();
             DisableInteractionsForTurn();
 
-            if (ui.TxtTurnLabel != null)
+            if (uiMatchWindow.TxtTurnLabel != null)
             {
-                ui.TxtTurnLabel.Text = "Eliminado (espectador)";
+                uiMatchWindow.TxtTurnLabel.Text = Lang.eliminatedSpectatorLabel;
             }
         }
 
@@ -1057,9 +1056,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             state.IsSurpriseExamActive = isActive;
 
-            if (ui.BtnBank != null)
+            if (uiMatchWindow.BtnBank != null)
             {
-                ui.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
+                uiMatchWindow.BtnBank.IsEnabled = state.IsMyTurn && !state.IsSurpriseExamActive;
             }
         }
 
@@ -1072,10 +1071,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
             DisableInteractionsForTurn();
 
-            if (ui.TxtAnswerFeedback != null)
+            if (uiMatchWindow.TxtAnswerFeedback != null)
             {
-                ui.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_TIMEOUT_TEXT;
-                ui.TxtAnswerFeedback.Foreground = Brushes.OrangeRed;
+                uiMatchWindow.TxtAnswerFeedback.Text = MatchConstants.DEFAULT_TIMEOUT_TEXT;
+                uiMatchWindow.TxtAnswerFeedback.Foreground = Brushes.OrangeRed;
             }
 
             await SendTimeoutAnswerAsync();
@@ -1111,7 +1110,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("SendTimeoutAnswerAsync error.", ex);
+                Logger.Warn(LOG_SEND_TIMEOUT_FAILED, ex);
             }
         }
 
@@ -1119,9 +1118,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             EnableAnswerButtons(false);
 
-            if (ui.BtnBank != null)
+            if (uiMatchWindow.BtnBank != null)
             {
-                ui.BtnBank.IsEnabled = false;
+                uiMatchWindow.BtnBank.IsEnabled = false;
             }
 
             timer.Stop();
@@ -1129,18 +1128,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void EnableAnswerButtons(bool isEnabled)
         {
-            if (ui.BtnAnswer1 != null) ui.BtnAnswer1.IsEnabled = isEnabled;
-            if (ui.BtnAnswer2 != null) ui.BtnAnswer2.IsEnabled = isEnabled;
-            if (ui.BtnAnswer3 != null) ui.BtnAnswer3.IsEnabled = isEnabled;
-            if (ui.BtnAnswer4 != null) ui.BtnAnswer4.IsEnabled = isEnabled;
+            if (uiMatchWindow.BtnAnswer1 != null) uiMatchWindow.BtnAnswer1.IsEnabled = isEnabled;
+            if (uiMatchWindow.BtnAnswer2 != null) uiMatchWindow.BtnAnswer2.IsEnabled = isEnabled;
+            if (uiMatchWindow.BtnAnswer3 != null) uiMatchWindow.BtnAnswer3.IsEnabled = isEnabled;
+            if (uiMatchWindow.BtnAnswer4 != null) uiMatchWindow.BtnAnswer4.IsEnabled = isEnabled;
         }
 
         private void ResetAnswerButtons()
         {
-            ResetAnswerButton(ui.BtnAnswer1);
-            ResetAnswerButton(ui.BtnAnswer2);
-            ResetAnswerButton(ui.BtnAnswer3);
-            ResetAnswerButton(ui.BtnAnswer4);
+            ResetAnswerButton(uiMatchWindow.BtnAnswer1);
+            ResetAnswerButton(uiMatchWindow.BtnAnswer2);
+            ResetAnswerButton(uiMatchWindow.BtnAnswer3);
+            ResetAnswerButton(uiMatchWindow.BtnAnswer4);
         }
 
         private static void ResetAnswerButton(Button button)
@@ -1183,25 +1182,25 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void UpdateTimerText()
         {
-            if (ui.TxtTimer == null)
+            if (uiMatchWindow.TxtTimer == null)
             {
                 return;
             }
 
             if (remainingSeconds < 0)
             {
-                ui.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
+                uiMatchWindow.TxtTimer.Text = MatchConstants.DEFAULT_TIMER_TEXT;
                 return;
             }
 
-            ui.TxtTimer.Text = TimeSpan.FromSeconds(remainingSeconds).ToString(MatchConstants.TIMER_FORMAT);
+            uiMatchWindow.TxtTimer.Text = TimeSpan.FromSeconds(remainingSeconds).ToString(MatchConstants.TIMER_FORMAT);
         }
 
         private void SetTimerText(string text)
         {
-            if (ui.TxtTimer != null)
+            if (uiMatchWindow.TxtTimer != null)
             {
-                ui.TxtTimer.Text = text;
+                uiMatchWindow.TxtTimer.Text = text;
             }
         }
     }

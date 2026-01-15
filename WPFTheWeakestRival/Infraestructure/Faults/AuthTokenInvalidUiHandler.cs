@@ -151,7 +151,6 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
                 return true;
             }
 
-            // ✅ fallback: cuando viene como texto en ex.Message
             if (ContainsInvalidTokenMarkers(message))
             {
                 return true;

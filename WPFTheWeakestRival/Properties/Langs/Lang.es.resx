@@ -534,6 +534,12 @@
   <data name="Friends.SendFriendRequest.Sql.40" xml:space="preserve">
     <value>No fue posible abrir conexión con la base de datos al enviar una solicitud de amistad.</value>
   </data>
+  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
+    <value>Error de token no válido</value>
+  </data>
+  <data name="UiGenericError" xml:space="preserve">
+    <value>Error de token no válido</value>
+  </data>
   <data name="UiTitleWarning" xml:space="preserve">
     <value>Advertencia</value>
   </data>
@@ -783,6 +789,9 @@
   <data name="Auth.IssueToken.AlreadyLoggedIn" xml:space="preserve">
     <value>Ya hay una sesión activa para este usuario.</value>
   </data>
+  <data name="Auth.Unexpected" xml:space="preserve">
+    <value>Error de token no válido</value>
+  </data>
   <data name="Auth.Account.NotActive" xml:space="preserve">
     <value>Tu cuenta no está activa.</value>
   </data>
@@ -954,16 +963,6 @@
   <data name="lblWildcardBlockWildcards" xml:space="preserve">
     <value>Bloquear comodines</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="authTokenInvalidTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="authTokenInvalidMessage" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
-  <data name="authTokenInvalidQuestion" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="authTokenInvalidTitle" xml:space="preserve">
     <value>La sesión expiró</value>
   </data>
@@ -973,13 +972,368 @@
   <data name="authTokenInvalidQuestion" xml:space="preserve">
     <value>¿Quieres ir a la pantalla de inicio de sesión?</value>
   </data>
-  <data name="Friends.SendFriendRequest.Sql.Unknown" xml:space="preserve">
-    <value>Error de token no válido</value>
+  <data name="lightningMyTurnLabel" xml:space="preserve">
+    <value>Desafío relámpago: tu turno</value>
   </data>
-  <data name="UiGenericError" xml:space="preserve">
-    <value>Error de token no válido</value>
+  <data name="lightningInProgressLabel" xml:space="preserve">
+    <value>Desafío relámpago: Desafío relámpago en curso</value>
   </data>
-  <data name="Auth.Unexpected" xml:space="preserve">
-    <value>Error de token no válido</value>
+  <data name="lightningSuccessTemplate" xml:space="preserve">
+    <value>¡Has completado el desafío del rayo! Respuestas correctas {0}</value>
+  </data>
+  <data name="lightningFailTemplate" xml:space="preserve">
+    <value>El desafío del rayo terminó. Respuestas correctas {0}</value>
+  </data>
+  <data name="matchFinishedLabelText" xml:space="preserve">
+    <value>Partido terminado</value>
+  </data>
+  <data name="exitToLobbyPrompt" xml:space="preserve">
+    <value>El partido aún no ha terminado. ¿Quieres salir al lobby?</value>
+  </data>
+  <data name="gameMessageTitle" xml:space="preserve">
+    <value>Juego</value>
+  </data>
+  <data name="wildcardsMessageTitle" xml:space="preserve">
+    <value>comodines</value>
+  </data>
+  <data name="matchCodeNone" xml:space="preserve">
+    <value>Sin código</value>
+  </data>
+  <data name="matchCodePrefix" xml:space="preserve">
+    <value>Código:</value>
+  </data>
+  <data name="otherPlayer" xml:space="preserve">
+    <value>Otro jugador</value>
+  </data>
+  <data name="matchWaitingForQuestion" xml:space="preserve">
+    <value>(esperando pregunta...)</value>
+  </data>
+  <data name="matchWaitingForYourTurn" xml:space="preserve">
+    <value>Esperando tu turno...</value>
+  </data>
+  <data name="matchMyTurn" xml:space="preserve">
+    <value>tu turno</value>
+  </data>
+  <data name="matchOtherTurn" xml:space="preserve">
+    <value>El turno de otro jugador</value>
+  </data>
+  <data name="wildcardNone" xml:space="preserve">
+    <value>Sin comodín</value>
+  </data>
+  <data name="wildcardGeneric" xml:space="preserve">
+    <value>Comodín</value>
+  </data>
+  <data name="matchTimeout" xml:space="preserve">
+    <value>Se acabó el tiempo.</value>
+  </data>
+  <data name="matchSelectAnswer" xml:space="preserve">
+    <value>Seleccione una respuesta.</value>
+  </data>
+  <data name="matchCorrect" xml:space="preserve">
+    <value>¡Correcto!</value>
+  </data>
+  <data name="matchIncorrect" xml:space="preserve">
+    <value>Respuesta incorrecta.</value>
+  </data>
+  <data name="wildcardsLoadFailed" xml:space="preserve">
+    <value>No se pudieron cargar los comodines.</value>
+  </data>
+  <data name="wildcardsLoadUnexpected" xml:space="preserve">
+    <value>Se produjo un error al cargar comodines.</value>
+  </data>
+  <data name="coinFlipTitle" xml:space="preserve">
+    <value>Lanzamiento de moneda</value>
+  </data>
+  <data name="coinFlipHeadsMessage" xml:space="preserve">
+    <value>¡Cabezas! Habrá duelo.</value>
+  </data>
+  <data name="coinFlipTailsMessage" xml:space="preserve">
+    <value>Cruz. No habrá duelo.</value>
+  </data>
+  <data name="matchWinnerMessageFormat" xml:space="preserve">
+    <value>El juego ha terminado. El ganador es: {0}.</value>
+  </data>
+  <data name="phaseTitle" xml:space="preserve">
+    <value>Fase</value>
+  </data>
+  <data name="String1phaseRoundFormat" xml:space="preserve">
+    <value>Ronda {0}</value>
+  </data>
+  <data name="phaseDuel" xml:space="preserve">
+    <value>Duelo</value>
+  </data>
+  <data name="phaseSpecialEvent" xml:space="preserve">
+    <value>Evento especial</value>
+  </data>
+  <data name="phaseFinished" xml:space="preserve">
+    <value>Finalizado</value>
+  </data>
+  <data name="surpriseExamBankBlockedMessage" xml:space="preserve">
+    <value>Examen sorpresa en curso. No puedes realizar operaciones bancarias ahora mismo.</value>
+  </data>
+  <data name="turnIntroTitle" xml:space="preserve">
+    <value>vueltas</value>
+  </data>
+  <data name="turnIntroDescriptionTemplate" xml:space="preserve">
+    <value>Orden: {0}\nInicio: {1}</value>
+  </data>
+  <data name="turnOrderChangedTitle" xml:space="preserve">
+    <value>Turnos actualizados</value>
+  </data>
+  <data name="phaseRoundFormat" xml:space="preserve">
+    <value>Ronda {0}</value>
+  </data>
+  <data name="msgSpecialEventDarknessDesc" xml:space="preserve">
+    <value>Las luces se apagaron. No puedes ver quién es quién hasta después de la votación.</value>
+  </data>
+  <data name="msgSpecialEventDarknessEndedDesc" xml:space="preserve">
+    <value>Las identidades se revelan nuevamente.</value>
+  </data>
+  <data name="darknessUnknownPlayerName" xml:space="preserve">
+    <value>???</value>
+  </data>
+  <data name="darknessMyTurnText" xml:space="preserve">
+    <value>En la oscuridad: tu turno</value>
+  </data>
+  <data name="darknessOtherTurnText" xml:space="preserve">
+    <value>En la oscuridad: esperando turno</value>
+  </data>
+  <data name="darknessVoteWindowTitle" xml:space="preserve">
+    <value>Votar (en la oscuridad)</value>
+  </data>
+  <data name="darknessSlotFormat" xml:space="preserve">
+    <value>Sombra {0}</value>
+  </data>
+  <data name="darknessSomeoneAnsweredCorrect" xml:space="preserve">
+    <value>Alguien respondió correctamente.</value>
+  </data>
+  <data name="darknessSomeoneAnsweredIncorrect" xml:space="preserve">
+    <value>Alguien respondió incorrectamente.</value>
+  </data>
+  <data name="darknessRevealVoteFormat" xml:space="preserve">
+    <value>Votaste por: {0}</value>
+  </data>
+  <data name="darknessVoteRevealDescription" xml:space="preserve">
+    <value>Voto revelado.</value>
+  </data>
+  <data name="playerWithIdFormat" xml:space="preserve">
+    <value>Jugador {0}</value>
+  </data>
+  <data name="matchPlayerEliminatedFormat" xml:space="preserve">
+    <value>{0} ha sido eliminado de la ronda.</value>
+  </data>
+  <data name="matchResultCloseHint" xml:space="preserve">
+    <value>Puedes cerrar la ventana cuando quieras ver el resultado.</value>
+  </data>
+  <data name="matchResultWinTitle" xml:space="preserve">
+    <value>¡GANASTE EL PARTIDO!</value>
+  </data>
+  <data name="voteWindowTitle" xml:space="preserve">
+    <value>Votación</value>
+  </data>
+  <data name="duelSelectionTitle" xml:space="preserve">
+    <value>Selecciona a quién desafiar</value>
+  </data>
+  <data name="matchFinalPhaseTitle" xml:space="preserve">
+    <value>Final 1 contra 1</value>
+  </data>
+  <data name="reconnectStatusStart" xml:space="preserve">
+    <value>Reconectando...</value>
+  </data>
+  <data name="reconnectStatusAttemptFormat" xml:space="preserve">
+    <value>Reconectando... intenta {0}</value>
+  </data>
+  <data name="reconnectExhaustedMessage" xml:space="preserve">
+    <value>No se pudo volver a conectar con el servidor.\n\n¿Quieres esperar?\n\nSí: quédate y sigue intentándolo.\nNo: regresa al lobby.</value>
+  </data>
+  <data name="reconnectWaitingLineMessage" xml:space="preserve">
+    <value>Sin conexión. Espera...</value>
+  </data>
+  <data name="matchResultsPersistFailedTitle" xml:space="preserve">
+    <value>Aviso</value>
+  </data>
+  <data name="matchResultsPersistFailedMessage" xml:space="preserve">
+    <value>No se pudieron guardar los resultados del partido.</value>
+  </data>
+  <data name="matchJoinFailedMessage" xml:space="preserve">
+    <value>No se pudo unir al partido. Por favor inténtalo de nuevo.</value>
+  </data>
+  <data name="matchStartFailedMessage" xml:space="preserve">
+    <value>No se pudo iniciar el partido. Por favor inténtalo de nuevo.</value>
+  </data>
+  <data name="reconnectingOverlayTitle" xml:space="preserve">
+    <value>Reconectando…</value>
+  </data>
+  <data name="reconnectingOverlayDescription" xml:space="preserve">
+    <value>Intentando restablecer la conexión con el servidor.</value>
+  </data>
+  <data name="surpriseExamMyTurnText" xml:space="preserve">
+    <value>Examen sorpresa: responde ahora</value>
+  </data>
+  <data name="otherAnswerRegisteredText" xml:space="preserve">
+    <value>Respuesta grabada.</value>
+  </data>
+  <data name="otherPlayerAnsweredCorrectFormat" xml:space="preserve">
+    <value>{0} respondió correctamente.</value>
+  </data>
+  <data name="otherPlayerAnsweredIncorrectFormat" xml:space="preserve">
+    <value>{0} respondió incorrectamente.</value>
+  </data>
+  <data name="genericActionFailedMessage" xml:space="preserve">
+    <value>No se pudo completar la acción. Por favor inténtalo de nuevo.</value>
+  </data>
+  <data name="eliminatedSpectatorMessage" xml:space="preserve">
+    <value>Has sido eliminado de la ronda.\nContinuarás viendo el partido como espectador.</value>
+  </data>
+  <data name="eliminatedSpectatorLabel" xml:space="preserve">
+    <value>Eliminado (espectador)</value>
+  </data>
+  <data name="darknessAliasFormat" xml:space="preserve">
+    <value>Concursante {0}</value>
+  </data>
+  <data name="darknessFallbackName" xml:space="preserve">
+    <value>???</value>
+  </data>
+  <data name="fallbackPlayerNameFormat" xml:space="preserve">
+    <value>Jugador {0}</value>
+  </data>
+  <data name="playersSummaryFormat" xml:space="preserve">
+    <value>({0})</value>
+  </data>
+  <data name="turnOrderSeparator" xml:space="preserve">
+    <value>→</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="errGameplayEndpointRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="errGameplayChannelFaulted" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="errLobbyEndpointRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="errLobbyTokenRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="errLobbyClientFaulted" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="msgLobbyReconnectErrorGeneric" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="fmtLobbyReconnectFaultDetail" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="leaderboardTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="leaderboardServerUnavailable" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="leaderboardDatabaseError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="leaderboardLoadFailed" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="leaderboardGenericError" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsTitle" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsInvalidMaxPlayers" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsInvalidStartingScore" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsInvalidMaxScore" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsInvalidPointsCorrect" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsInvalidPointsWrong" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="matchSettingsInvalidPointsElimination" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="profileSelectAvatarFilter" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="profileInvalidImage" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="errorDisplayNameRequired" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="errGameplayEndpointRequired" xml:space="preserve">
+    <value>Se requiere el nombre del punto final.</value>
+  </data>
+  <data name="errGameplayChannelFaulted" xml:space="preserve">
+    <value>El canal de juego tiene fallas.</value>
+  </data>
+  <data name="errLobbyEndpointRequired" xml:space="preserve">
+    <value>Se requiere el nombre del punto final.</value>
+  </data>
+  <data name="errLobbyTokenRequired" xml:space="preserve">
+    <value>Se requiere token.</value>
+  </data>
+  <data name="errLobbyClientFaulted" xml:space="preserve">
+    <value>El cliente del lobby está en estado "Error".</value>
+  </data>
+  <data name="msgLobbyReconnectErrorGeneric" xml:space="preserve">
+    <value>Se produjo un error durante la reconexión.</value>
+  </data>
+  <data name="fmtLobbyReconnectFaultDetail" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="leaderboardTitle" xml:space="preserve">
+    <value>Tablas de clasificación</value>
+  </data>
+  <data name="leaderboardServerUnavailable" xml:space="preserve">
+    <value>El servidor es inaccesible o no hay conexión.</value>
+  </data>
+  <data name="leaderboardDatabaseError" xml:space="preserve">
+    <value>El servidor no pudo acceder a la base de datos.</value>
+  </data>
+  <data name="leaderboardLoadFailed" xml:space="preserve">
+    <value>No se pudo cargar la tabla de clasificación debido a un error de la base de datos.</value>
+  </data>
+  <data name="leaderboardGenericError" xml:space="preserve">
+    <value>Se produjo un error al cargar la tabla de clasificación.</value>
+  </data>
+  <data name="matchSettingsTitle" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+  <data name="matchSettingsInvalidMaxPlayers" xml:space="preserve">
+    <value>El máximo de jugadores debe ser un número entre 1 y 16.</value>
+  </data>
+  <data name="matchSettingsInvalidStartingScore" xml:space="preserve">
+    <value>La puntuación inicial no es válida.</value>
+  </data>
+  <data name="matchSettingsInvalidMaxScore" xml:space="preserve">
+    <value>La puntuación máxima no es válida.</value>
+  </data>
+  <data name="matchSettingsInvalidPointsCorrect" xml:space="preserve">
+    <value>Los puntos por respuesta correcta no son válidos.</value>
+  </data>
+  <data name="matchSettingsInvalidPointsWrong" xml:space="preserve">
+    <value>Los puntos por respuesta incorrecta no son válidos.</value>
+  </data>
+  <data name="matchSettingsInvalidPointsElimination" xml:space="preserve">
+    <value>Los puntos de eliminación no son válidos.</value>
+  </data>
+  <data name="profileSelectAvatarFilter" xml:space="preserve">
+    <value>Archivos de imagen (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|Todos los archivos (*.*)|*.*</value>
+  </data>
+  <data name="profileInvalidImage" xml:space="preserve">
+    <value>Seleccione una imagen PNG o JPG (máximo 512 KB).</value>
+  </data>
+  <data name="errorDisplayNameRequired" xml:space="preserve">
+    <value>El nombre no puede estar vacío.</value>
   </data>
 </root>

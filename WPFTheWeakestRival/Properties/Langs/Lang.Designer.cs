@@ -475,6 +475,33 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Heads! There will be a duel..
+        /// </summary>
+        public static string coinFlipHeadsMessage {
+            get {
+                return ResourceManager.GetString("coinFlipHeadsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Tails. There will be no duel..
+        /// </summary>
+        public static string coinFlipTailsMessage {
+            get {
+                return ResourceManager.GetString("coinFlipTailsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Coin flip.
+        /// </summary>
+        public static string coinFlipTitle {
+            get {
+                return ResourceManager.GetString("coinFlipTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a #cb102c.
         /// </summary>
         public static string colorLogin {
@@ -525,6 +552,132 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string commonSucces {
             get {
                 return ResourceManager.GetString("commonSucces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Contestant {0}.
+        /// </summary>
+        public static string darknessAliasFormat {
+            get {
+                return ResourceManager.GetString("darknessAliasFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ???.
+        /// </summary>
+        public static string darknessFallbackName {
+            get {
+                return ResourceManager.GetString("darknessFallbackName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a In the dark: your turn.
+        /// </summary>
+        public static string darknessMyTurnText {
+            get {
+                return ResourceManager.GetString("darknessMyTurnText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a In the dark: waiting for turn.
+        /// </summary>
+        public static string darknessOtherTurnText {
+            get {
+                return ResourceManager.GetString("darknessOtherTurnText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You voted for: {0}.
+        /// </summary>
+        public static string darknessRevealVoteFormat {
+            get {
+                return ResourceManager.GetString("darknessRevealVoteFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Shadow {0}.
+        /// </summary>
+        public static string darknessSlotFormat {
+            get {
+                return ResourceManager.GetString("darknessSlotFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Someone answered correctly..
+        /// </summary>
+        public static string darknessSomeoneAnsweredCorrect {
+            get {
+                return ResourceManager.GetString("darknessSomeoneAnsweredCorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Someone answered incorrectly..
+        /// </summary>
+        public static string darknessSomeoneAnsweredIncorrect {
+            get {
+                return ResourceManager.GetString("darknessSomeoneAnsweredIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a ???.
+        /// </summary>
+        public static string darknessUnknownPlayerName {
+            get {
+                return ResourceManager.GetString("darknessUnknownPlayerName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Vote revealed..
+        /// </summary>
+        public static string darknessVoteRevealDescription {
+            get {
+                return ResourceManager.GetString("darknessVoteRevealDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Voting (in the dark).
+        /// </summary>
+        public static string darknessVoteWindowTitle {
+            get {
+                return ResourceManager.GetString("darknessVoteWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Select who to challenge.
+        /// </summary>
+        public static string duelSelectionTitle {
+            get {
+                return ResourceManager.GetString("duelSelectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Eliminated (spectator).
+        /// </summary>
+        public static string eliminatedSpectatorLabel {
+            get {
+                return ResourceManager.GetString("eliminatedSpectatorLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You have been eliminated from the round.\nYou will continue watching the match as a spectator..
+        /// </summary>
+        public static string eliminatedSpectatorMessage {
+            get {
+                return ResourceManager.GetString("eliminatedSpectatorMessage", resourceCulture);
             }
         }
         
@@ -871,6 +1024,51 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Gameplay channel is faulted..
+        /// </summary>
+        public static string errGameplayChannelFaulted {
+            get {
+                return ResourceManager.GetString("errGameplayChannelFaulted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Endpoint name is required..
+        /// </summary>
+        public static string errGameplayEndpointRequired {
+            get {
+                return ResourceManager.GetString("errGameplayEndpointRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The lobby client is in &apos;Faulted&apos; state..
+        /// </summary>
+        public static string errLobbyClientFaulted {
+            get {
+                return ResourceManager.GetString("errLobbyClientFaulted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Endpoint name is required..
+        /// </summary>
+        public static string errLobbyEndpointRequired {
+            get {
+                return ResourceManager.GetString("errLobbyEndpointRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Token is required..
+        /// </summary>
+        public static string errLobbyTokenRequired {
+            get {
+                return ResourceManager.GetString("errLobbyTokenRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Mail error: Invalid mail server configuration..
         /// </summary>
         public static string Error_de_correo__la_dirección_del_destinatario_no_es_válida_ {
@@ -886,6 +1084,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
             get {
                 return ResourceManager.GetString("Error de correo: ocurrió un problema inesperado. No se pudo enviar el código para" +
                         " restablecer la contraseña.", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Name cannot be empty..
+        /// </summary>
+        public static string errorDisplayNameRequired {
+            get {
+                return ResourceManager.GetString("errorDisplayNameRequired", resourceCulture);
             }
         }
         
@@ -980,11 +1187,38 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a The match is not finished yet. Do you want to exit to the lobby?.
+        /// </summary>
+        public static string exitToLobbyPrompt {
+            get {
+                return ResourceManager.GetString("exitToLobbyPrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Player {0}.
+        /// </summary>
+        public static string fallbackPlayerNameFormat {
+            get {
+                return ResourceManager.GetString("fallbackPlayerNameFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Feature not implemented.
         /// </summary>
         public static string featureNotImplemented {
             get {
                 return ResourceManager.GetString("featureNotImplemented", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a {0}: {1}.
+        /// </summary>
+        public static string fmtLobbyReconnectFaultDetail {
+            get {
+                return ResourceManager.GetString("fmtLobbyReconnectFaultDetail", resourceCulture);
             }
         }
         
@@ -1169,11 +1403,29 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Game.
+        /// </summary>
+        public static string gameMessageTitle {
+            get {
+                return ResourceManager.GetString("gameMessageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Error on the registration.
         /// </summary>
         public static string generalRegistError {
             get {
                 return ResourceManager.GetString("generalRegistError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not complete the action. Please try again..
+        /// </summary>
+        public static string genericActionFailedMessage {
+            get {
+                return ResourceManager.GetString("genericActionFailedMessage", resourceCulture);
             }
         }
         
@@ -1466,6 +1718,87 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a The server could not access the database..
+        /// </summary>
+        public static string leaderboardDatabaseError {
+            get {
+                return ResourceManager.GetString("leaderboardDatabaseError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while loading the leaderboard..
+        /// </summary>
+        public static string leaderboardGenericError {
+            get {
+                return ResourceManager.GetString("leaderboardGenericError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not load the leaderboard due to a database error..
+        /// </summary>
+        public static string leaderboardLoadFailed {
+            get {
+                return ResourceManager.GetString("leaderboardLoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The server is unreachable or there is no connection..
+        /// </summary>
+        public static string leaderboardServerUnavailable {
+            get {
+                return ResourceManager.GetString("leaderboardServerUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Leaderboards.
+        /// </summary>
+        public static string leaderboardTitle {
+            get {
+                return ResourceManager.GetString("leaderboardTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Lightning challenge ended. Correct answers {0}.
+        /// </summary>
+        public static string lightningFailTemplate {
+            get {
+                return ResourceManager.GetString("lightningFailTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Lightning challenge: Lightning challenge on course.
+        /// </summary>
+        public static string lightningInProgressLabel {
+            get {
+                return ResourceManager.GetString("lightningInProgressLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Lightning challenge: Your turn.
+        /// </summary>
+        public static string lightningMyTurnLabel {
+            get {
+                return ResourceManager.GetString("lightningMyTurnLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You have completed the lightning challenge! Correct answers {0}.
+        /// </summary>
+        public static string lightningSuccessTemplate {
+            get {
+                return ResourceManager.GetString("lightningSuccessTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Code:.
         /// </summary>
         public static string lobbyCodePrefix {
@@ -1619,6 +1952,213 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a No code.
+        /// </summary>
+        public static string matchCodeNone {
+            get {
+                return ResourceManager.GetString("matchCodeNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Code:.
+        /// </summary>
+        public static string matchCodePrefix {
+            get {
+                return ResourceManager.GetString("matchCodePrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Correct!.
+        /// </summary>
+        public static string matchCorrect {
+            get {
+                return ResourceManager.GetString("matchCorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Final 1 vs 1.
+        /// </summary>
+        public static string matchFinalPhaseTitle {
+            get {
+                return ResourceManager.GetString("matchFinalPhaseTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Match finished.
+        /// </summary>
+        public static string matchFinishedLabelText {
+            get {
+                return ResourceManager.GetString("matchFinishedLabelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Incorrect answer..
+        /// </summary>
+        public static string matchIncorrect {
+            get {
+                return ResourceManager.GetString("matchIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not join the match. Please try again..
+        /// </summary>
+        public static string matchJoinFailedMessage {
+            get {
+                return ResourceManager.GetString("matchJoinFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Your turn.
+        /// </summary>
+        public static string matchMyTurn {
+            get {
+                return ResourceManager.GetString("matchMyTurn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Other player&apos;s turn.
+        /// </summary>
+        public static string matchOtherTurn {
+            get {
+                return ResourceManager.GetString("matchOtherTurn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a {0} has been eliminated from the round..
+        /// </summary>
+        public static string matchPlayerEliminatedFormat {
+            get {
+                return ResourceManager.GetString("matchPlayerEliminatedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a You can close the window whenever you want to see your result..
+        /// </summary>
+        public static string matchResultCloseHint {
+            get {
+                return ResourceManager.GetString("matchResultCloseHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not save the match results..
+        /// </summary>
+        public static string matchResultsPersistFailedMessage {
+            get {
+                return ResourceManager.GetString("matchResultsPersistFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Notice.
+        /// </summary>
+        public static string matchResultsPersistFailedTitle {
+            get {
+                return ResourceManager.GetString("matchResultsPersistFailedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a YOU WON THE MATCH!.
+        /// </summary>
+        public static string matchResultWinTitle {
+            get {
+                return ResourceManager.GetString("matchResultWinTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Select an answer..
+        /// </summary>
+        public static string matchSelectAnswer {
+            get {
+                return ResourceManager.GetString("matchSelectAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Max players must be a number between 1 and 16..
+        /// </summary>
+        public static string matchSettingsInvalidMaxPlayers {
+            get {
+                return ResourceManager.GetString("matchSettingsInvalidMaxPlayers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Maximum score is not valid..
+        /// </summary>
+        public static string matchSettingsInvalidMaxScore {
+            get {
+                return ResourceManager.GetString("matchSettingsInvalidMaxScore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Points per correct answer are not valid..
+        /// </summary>
+        public static string matchSettingsInvalidPointsCorrect {
+            get {
+                return ResourceManager.GetString("matchSettingsInvalidPointsCorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Elimination points are not valid..
+        /// </summary>
+        public static string matchSettingsInvalidPointsElimination {
+            get {
+                return ResourceManager.GetString("matchSettingsInvalidPointsElimination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Points per wrong answer are not valid..
+        /// </summary>
+        public static string matchSettingsInvalidPointsWrong {
+            get {
+                return ResourceManager.GetString("matchSettingsInvalidPointsWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Starting score is not valid..
+        /// </summary>
+        public static string matchSettingsInvalidStartingScore {
+            get {
+                return ResourceManager.GetString("matchSettingsInvalidStartingScore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Settings.
+        /// </summary>
+        public static string matchSettingsTitle {
+            get {
+                return ResourceManager.GetString("matchSettingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not start the match. Please try again..
+        /// </summary>
+        public static string matchStartFailedMessage {
+            get {
+                return ResourceManager.GetString("matchStartFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Match Starting soon....
         /// </summary>
         public static string matchStartingSoon {
@@ -1628,11 +2168,47 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Time&apos;s up..
+        /// </summary>
+        public static string matchTimeout {
+            get {
+                return ResourceManager.GetString("matchTimeout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Match.
         /// </summary>
         public static string matchTitle {
             get {
                 return ResourceManager.GetString("matchTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a (waiting for question...).
+        /// </summary>
+        public static string matchWaitingForQuestion {
+            get {
+                return ResourceManager.GetString("matchWaitingForQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Waiting for your turn....
+        /// </summary>
+        public static string matchWaitingForYourTurn {
+            get {
+                return ResourceManager.GetString("matchWaitingForYourTurn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The game has ended. The winner is: {0}..
+        /// </summary>
+        public static string matchWinnerMessageFormat {
+            get {
+                return ResourceManager.GetString("matchWinnerMessageFormat", resourceCulture);
             }
         }
         
@@ -1664,6 +2240,15 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred during reconnection..
+        /// </summary>
+        public static string msgLobbyReconnectErrorGeneric {
+            get {
+                return ResourceManager.GetString("msgLobbyReconnectErrorGeneric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Question Bomb Applied.
         /// </summary>
         public static string msgSpecialEventBombAppliedTitle {
@@ -1687,6 +2272,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string msgSpecialEventBombQuestionTitle {
             get {
                 return ResourceManager.GetString("msgSpecialEventBombQuestionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a The lights went out. You can&apos;t see who is who until after the vote..
+        /// </summary>
+        public static string msgSpecialEventDarknessDesc {
+            get {
+                return ResourceManager.GetString("msgSpecialEventDarknessDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Identities are revealed again..
+        /// </summary>
+        public static string msgSpecialEventDarknessEndedDesc {
+            get {
+                return ResourceManager.GetString("msgSpecialEventDarknessEndedDesc", resourceCulture);
             }
         }
         
@@ -1898,11 +2501,92 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Answer recorded..
+        /// </summary>
+        public static string otherAnswerRegisteredText {
+            get {
+                return ResourceManager.GetString("otherAnswerRegisteredText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Other player.
+        /// </summary>
+        public static string otherPlayer {
+            get {
+                return ResourceManager.GetString("otherPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a {0} answered correctly..
+        /// </summary>
+        public static string otherPlayerAnsweredCorrectFormat {
+            get {
+                return ResourceManager.GetString("otherPlayerAnsweredCorrectFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a {0} answered incorrectly..
+        /// </summary>
+        public static string otherPlayerAnsweredIncorrectFormat {
+            get {
+                return ResourceManager.GetString("otherPlayerAnsweredIncorrectFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Enter your password.
         /// </summary>
         public static string passwordPlaceHolder {
             get {
                 return ResourceManager.GetString("passwordPlaceHolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Duel.
+        /// </summary>
+        public static string phaseDuel {
+            get {
+                return ResourceManager.GetString("phaseDuel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Finished.
+        /// </summary>
+        public static string phaseFinished {
+            get {
+                return ResourceManager.GetString("phaseFinished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Round {0}.
+        /// </summary>
+        public static string phaseRoundFormat {
+            get {
+                return ResourceManager.GetString("phaseRoundFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Special event.
+        /// </summary>
+        public static string phaseSpecialEvent {
+            get {
+                return ResourceManager.GetString("phaseSpecialEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Phase.
+        /// </summary>
+        public static string phaseTitle {
+            get {
+                return ResourceManager.GetString("phaseTitle", resourceCulture);
             }
         }
         
@@ -1943,6 +2627,24 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a ({0}).
+        /// </summary>
+        public static string playersSummaryFormat {
+            get {
+                return ResourceManager.GetString("playersSummaryFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Player {0}.
+        /// </summary>
+        public static string playerWithIdFormat {
+            get {
+                return ResourceManager.GetString("playerWithIdFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Play Options.
         /// </summary>
         public static string playOptionsTitle {
@@ -1970,11 +2672,29 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Select a PNG or JPG image (max 512 KB)..
+        /// </summary>
+        public static string profileInvalidImage {
+            get {
+                return ResourceManager.GetString("profileInvalidImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Profile load failed.
         /// </summary>
         public static string profileLoadFailed {
             get {
                 return ResourceManager.GetString("profileLoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Image files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All files (*.*)|*.*.
+        /// </summary>
+        public static string profileSelectAvatarFilter {
+            get {
+                return ResourceManager.GetString("profileSelectAvatarFilter", resourceCulture);
             }
         }
         
@@ -2020,6 +2740,60 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string pt {
             get {
                 return ResourceManager.GetString("pt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Could not reconnect to the server.\n\nDo you want to wait?\n\nYes: stay and keep trying.\nNo: return to the lobby..
+        /// </summary>
+        public static string reconnectExhaustedMessage {
+            get {
+                return ResourceManager.GetString("reconnectExhaustedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Trying to restore the connection with the server..
+        /// </summary>
+        public static string reconnectingOverlayDescription {
+            get {
+                return ResourceManager.GetString("reconnectingOverlayDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Reconnecting….
+        /// </summary>
+        public static string reconnectingOverlayTitle {
+            get {
+                return ResourceManager.GetString("reconnectingOverlayTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Reconnecting... attempt {0}.
+        /// </summary>
+        public static string reconnectStatusAttemptFormat {
+            get {
+                return ResourceManager.GetString("reconnectStatusAttemptFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Reconnecting....
+        /// </summary>
+        public static string reconnectStatusStart {
+            get {
+                return ResourceManager.GetString("reconnectStatusStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No connection. Waiting....
+        /// </summary>
+        public static string reconnectWaitingLineMessage {
+            get {
+                return ResourceManager.GetString("reconnectWaitingLineMessage", resourceCulture);
             }
         }
         
@@ -2546,11 +3320,38 @@ namespace WPFTheWeakestRival.Properties.Langs {
         }
         
         /// <summary>
+        ///   Busca una cadena traducida similar a Round {0}.
+        /// </summary>
+        public static string String1phaseRoundFormat {
+            get {
+                return ResourceManager.GetString("String1phaseRoundFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Busca una cadena traducida similar a Welcome to The weakest rival.
         /// </summary>
         public static string succesLoginMessage {
             get {
                 return ResourceManager.GetString("succesLoginMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Surprise exam in progress. You can&apos;t bank right now..
+        /// </summary>
+        public static string surpriseExamBankBlockedMessage {
+            get {
+                return ResourceManager.GetString("surpriseExamBankBlockedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Surprise exam: answer now.
+        /// </summary>
+        public static string surpriseExamMyTurnText {
+            get {
+                return ResourceManager.GetString("surpriseExamMyTurnText", resourceCulture);
             }
         }
         
@@ -2569,6 +3370,42 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string tittleImageSelector {
             get {
                 return ResourceManager.GetString("tittleImageSelector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Order: {0}\nStarts: {1}.
+        /// </summary>
+        public static string turnIntroDescriptionTemplate {
+            get {
+                return ResourceManager.GetString("turnIntroDescriptionTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Turns.
+        /// </summary>
+        public static string turnIntroTitle {
+            get {
+                return ResourceManager.GetString("turnIntroTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Updated turns.
+        /// </summary>
+        public static string turnOrderChangedTitle {
+            get {
+                return ResourceManager.GetString("turnOrderChangedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a →.
+        /// </summary>
+        public static string turnOrderSeparator {
+            get {
+                return ResourceManager.GetString("turnOrderSeparator", resourceCulture);
             }
         }
         
@@ -2605,6 +3442,60 @@ namespace WPFTheWeakestRival.Properties.Langs {
         public static string UiTitleWarning {
             get {
                 return ResourceManager.GetString("UiTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Voting.
+        /// </summary>
+        public static string voteWindowTitle {
+            get {
+                return ResourceManager.GetString("voteWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Wildcard.
+        /// </summary>
+        public static string wildcardGeneric {
+            get {
+                return ResourceManager.GetString("wildcardGeneric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a No wildcard.
+        /// </summary>
+        public static string wildcardNone {
+            get {
+                return ResourceManager.GetString("wildcardNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Wildcards could not be loaded..
+        /// </summary>
+        public static string wildcardsLoadFailed {
+            get {
+                return ResourceManager.GetString("wildcardsLoadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a An error occurred while loading wildcards..
+        /// </summary>
+        public static string wildcardsLoadUnexpected {
+            get {
+                return ResourceManager.GetString("wildcardsLoadUnexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a Wildcards.
+        /// </summary>
+        public static string wildcardsMessageTitle {
+            get {
+                return ResourceManager.GetString("wildcardsMessageTitle", resourceCulture);
             }
         }
         

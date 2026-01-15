@@ -3,24 +3,16 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using WPFTheWeakestRival.Helpers;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Pages
 {
     public partial class MatchSettingsPage : Page
     {
-        private const string DIALOG_TITLE_SETTINGS = "Configuración";
-
         private const int MAX_PLAYERS_MIN = 1;
         private const int MAX_PLAYERS_MAX = 16;
 
         private const string DECIMAL_FORMAT = "0.##";
-
-        private const string MESSAGE_INVALID_MAX_PLAYERS = "Máx. jugadores debe ser un número entre 1 y 16.";
-        private const string MESSAGE_INVALID_STARTING_SCORE = "Puntaje inicial no es válido.";
-        private const string MESSAGE_INVALID_MAX_SCORE = "Puntaje máximo no es válido.";
-        private const string MESSAGE_INVALID_POINTS_CORRECT = "Puntos por acierto no son válidos.";
-        private const string MESSAGE_INVALID_POINTS_WRONG = "Puntos por fallo no son válidos.";
-        private const string MESSAGE_INVALID_POINTS_ELIMINATION = "Puntos por eliminación no son válidos.";
 
         public bool IsPrivate { get; private set; }
         public int MaxPlayers { get; private set; }
@@ -42,7 +34,6 @@ namespace WPFTheWeakestRival.Pages
             InitializeComponent();
 
             ApplyTextLimits(this);
-
             LoadDefaults(this, defaults);
         }
 
@@ -82,7 +73,8 @@ namespace WPFTheWeakestRival.Pages
 
             page.txtPointsCorrect.Text = defaults.PointsPerCorrect.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
             page.txtPointsWrong.Text = defaults.PointsPerWrong.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
-            page.txtPointsElimination.Text = defaults.PointsPerEliminationGain.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
+            page.txtPointsElimination.Text =
+                defaults.PointsPerEliminationGain.ToString(DECIMAL_FORMAT, CultureInfo.InvariantCulture);
 
             page.chkCoinflip.IsChecked = defaults.AllowTiebreakCoinflip;
         }
@@ -91,37 +83,37 @@ namespace WPFTheWeakestRival.Pages
         {
             if (!TryReadMaxPlayers(this, out int maxPlayers))
             {
-                ShowValidationErrorAndFocus(txtMaxPlayers, MESSAGE_INVALID_MAX_PLAYERS);
+                ShowValidationErrorAndFocus(txtMaxPlayers, Lang.matchSettingsInvalidMaxPlayers);
                 return;
             }
 
             if (!TryReadDecimal(txtStartingScore, out decimal startingScore))
             {
-                ShowValidationErrorAndFocus(txtStartingScore, MESSAGE_INVALID_STARTING_SCORE);
+                ShowValidationErrorAndFocus(txtStartingScore, Lang.matchSettingsInvalidStartingScore);
                 return;
             }
 
             if (!TryReadDecimal(txtMaxScore, out decimal maxScore))
             {
-                ShowValidationErrorAndFocus(txtMaxScore, MESSAGE_INVALID_MAX_SCORE);
+                ShowValidationErrorAndFocus(txtMaxScore, Lang.matchSettingsInvalidMaxScore);
                 return;
             }
 
             if (!TryReadDecimal(txtPointsCorrect, out decimal pointsCorrect))
             {
-                ShowValidationErrorAndFocus(txtPointsCorrect, MESSAGE_INVALID_POINTS_CORRECT);
+                ShowValidationErrorAndFocus(txtPointsCorrect, Lang.matchSettingsInvalidPointsCorrect);
                 return;
             }
 
             if (!TryReadDecimal(txtPointsWrong, out decimal pointsWrong))
             {
-                ShowValidationErrorAndFocus(txtPointsWrong, MESSAGE_INVALID_POINTS_WRONG);
+                ShowValidationErrorAndFocus(txtPointsWrong, Lang.matchSettingsInvalidPointsWrong);
                 return;
             }
 
             if (!TryReadDecimal(txtPointsElimination, out decimal pointsElimination))
             {
-                ShowValidationErrorAndFocus(txtPointsElimination, MESSAGE_INVALID_POINTS_ELIMINATION);
+                ShowValidationErrorAndFocus(txtPointsElimination, Lang.matchSettingsInvalidPointsElimination);
                 return;
             }
 
@@ -188,7 +180,7 @@ namespace WPFTheWeakestRival.Pages
 
         private static void ShowValidationErrorAndFocus(TextBox textBox, string message)
         {
-            MessageBox.Show(message, DIALOG_TITLE_SETTINGS, MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(message, Lang.matchSettingsTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
 
             if (textBox != null)
             {

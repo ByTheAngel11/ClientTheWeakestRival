@@ -22,9 +22,17 @@ namespace WPFTheWeakestRival
         private const int PROFILE_IMAGE_MAX_KB = 512;
         private const int PROFILE_IMAGE_MAX_BYTES = PROFILE_IMAGE_MAX_KB * ONE_KILOBYTE_BYTES;
 
+        private const int MIN_PASSWORD_LENGTH = 8;
+
         private const string CONTENT_TYPE_PNG = "image/png";
         private const string CONTENT_TYPE_JPEG = "image/jpeg";
-        private const string REGISTER_ERROR = "registerError";
+
+        private const string DEFAULT_LANG_ES = "es";
+        private const string LANG_ES = "es";
+        private const string LANG_EN = "en";
+        private const string LANG_PT = "pt";
+        private const string LANG_IT = "it";
+        private const string LANG_FR = "fr";
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(RegistrationWindow));
 
@@ -40,24 +48,30 @@ namespace WPFTheWeakestRival
             UiValidationHelper.ApplyMaxLength(pstPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
             UiValidationHelper.ApplyMaxLength(pstConfirmPassword, UiValidationHelper.PASSWORD_MAX_LENGTH);
 
-            var current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
+            string current = LocalizationManager.Current.Culture.TwoLetterISOLanguageName;
+
             switch (current)
             {
-                case "es":
+                case LANG_ES:
                     cmbLanguage.SelectedIndex = 0;
                     break;
-                case "en":
+
+                case LANG_EN:
                     cmbLanguage.SelectedIndex = 1;
                     break;
-                case "pt":
+
+                case LANG_PT:
                     cmbLanguage.SelectedIndex = 2;
                     break;
-                case "it":
+
+                case LANG_IT:
                     cmbLanguage.SelectedIndex = 3;
                     break;
-                case "fr":
+
+                case LANG_FR:
                     cmbLanguage.SelectedIndex = 4;
                     break;
+
                 default:
                     cmbLanguage.SelectedIndex = 0;
                     break;
@@ -68,7 +82,7 @@ namespace WPFTheWeakestRival
         {
             if (cmbLanguage.SelectedItem is ComboBoxItem item)
             {
-                var code = (item.Tag as string) ?? "es";
+                string code = (item.Tag as string) ?? DEFAULT_LANG_ES;
                 LocalizationManager.Current.SetCulture(code);
             }
         }
@@ -78,7 +92,7 @@ namespace WPFTheWeakestRival
             var dialog = new OpenFileDialog
             {
                 Title = Lang.btnChooseImage,
-                Filter = "Images|*.png;*.jpg;*.jpeg",
+                Filter = Lang.profileSelectAvatarFilter,
                 Multiselect = false,
                 CheckFileExists = true
             };
@@ -113,7 +127,7 @@ namespace WPFTheWeakestRival
                 txtImgName.Text = string.Empty;
 
                 MessageBox.Show(
-                    "Only PNG/JPG images up to 512 KB are allowed.",
+                    Lang.profileInvalidImage,
                     Lang.registerTitle,
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -123,6 +137,7 @@ namespace WPFTheWeakestRival
         private static BitmapImage CreateBitmapFromBytes(byte[] bytes)
         {
             var bitmap = new BitmapImage();
+
             using (var ms = new MemoryStream(bytes))
             {
                 bitmap.BeginInit();
@@ -192,6 +207,7 @@ namespace WPFTheWeakestRival
         private static string DetectContentTypeOrEmpty(string filePath, byte[] bytes)
         {
             string ext = (Path.GetExtension(filePath) ?? string.Empty).ToLowerInvariant();
+
             if (ext == ".png")
             {
                 return CONTENT_TYPE_PNG;
@@ -240,7 +256,7 @@ namespace WPFTheWeakestRival
                 return false;
             }
 
-            if (password.Length < 8)
+            if (password.Length < MIN_PASSWORD_LENGTH)
             {
                 return false;
             }
@@ -275,7 +291,7 @@ namespace WPFTheWeakestRival
 
                 if (displayName.Length == 0)
                 {
-                    MessageBox.Show("El nombre no puede estar vacío.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(Lang.errorDisplayNameRequired, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -307,7 +323,8 @@ namespace WPFTheWeakestRival
 
                 try
                 {
-                    var beginResponse = await authClient.BeginRegisterAsync(new BeginRegisterRequest { Email = email });
+                    BeginRegisterResponse beginResponse =
+                        await authClient.BeginRegisterAsync(new BeginRegisterRequest { Email = email });
 
                     SafeClose(authClient);
 
@@ -328,39 +345,40 @@ namespace WPFTheWeakestRival
                 catch (FaultException<ServiceFault> fx)
                 {
                     authClient.Abort();
+
                     MessageBox.Show(
-                    ResolveFaultMessage(fx.Detail),
-                    Localize(REGISTER_ERROR),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                        ResolveFaultMessage(fx.Detail),
+                        Lang.registerTitle,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
                 }
                 catch (EndpointNotFoundException ex)
                 {
                     authClient.Abort();
                     Logger.Error("RegistrationWindow.RegisterClick: endpoint not found.", ex);
 
-                    MessageBox.Show("Service is unavailable. Please try again later.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Lang.noConnection, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 catch (CommunicationException ex)
                 {
                     authClient.Abort();
                     Logger.Error("RegistrationWindow.RegisterClick: communication error.", ex);
 
-                    MessageBox.Show("Network error. Please try again later.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Lang.noConnection, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 catch (TimeoutException ex)
                 {
                     authClient.Abort();
                     Logger.Error("RegistrationWindow.RegisterClick: timeout.", ex);
 
-                    MessageBox.Show("Request timed out. Please try again.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Lang.noConnection, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 catch (Exception ex)
                 {
                     authClient.Abort();
                     Logger.Error("RegistrationWindow.RegisterClick: unexpected error.", ex);
 
-                    MessageBox.Show("Unexpected error. Please try again later.", Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(Lang.UiGenericError, Lang.registerTitle, MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             finally
@@ -401,19 +419,19 @@ namespace WPFTheWeakestRival
 
         private static string Localize(string key)
         {
-            var safeKey = (key ?? string.Empty).Trim();
+            string safeKey = (key ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(safeKey))
             {
                 return string.Empty;
             }
 
-            var value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
+            string value = Lang.ResourceManager.GetString(safeKey, Lang.Culture);
             return string.IsNullOrWhiteSpace(value) ? safeKey : value;
         }
 
         private static string ResolveFaultMessage(AuthService.ServiceFault fault)
         {
-            var key = fault == null ? string.Empty : (fault.Message ?? string.Empty);
+            string key = fault == null ? string.Empty : (fault.Message ?? string.Empty);
             return FaultKeyMessageResolver.Resolve(key, Localize);
         }
     }

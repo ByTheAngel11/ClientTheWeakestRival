@@ -53,6 +53,7 @@ namespace WPFTheWeakestRival
 
         private readonly BlurEffect overlayBlur = new BlurEffect { Radius = 0 };
         private readonly ObservableCollection<FriendItem> friendItems = new ObservableCollection<FriendItem>();
+
         private int pendingRequests;
 
         public MainMenuWindow()
@@ -71,9 +72,16 @@ namespace WPFTheWeakestRival
                 RenderOptions.SetBitmapScalingMode(UserAvatarControl, BitmapScalingMode.HighQuality);
             }
 
-            lstFriends.ItemsSource = friendItems;
-            UpdateFriendDrawerUi();
+            if (lstFriends != null)
+            {
+                lstFriends.ItemsSource = friendItems;
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow: lstFriends is null. Friends list binding skipped.");
+            }
 
+            UpdateFriendDrawerUi();
             RefreshProfileButtonAvatar();
 
             AppServices.Friends.FriendsUpdated += OnFriendsUpdated;
@@ -86,13 +94,11 @@ namespace WPFTheWeakestRival
         {
             try
             {
-                if (friendItems != null)
-                {
-                }
+                AppServices.Friends.FriendsUpdated -= OnFriendsUpdated;
             }
             catch (Exception ex)
             {
-                Logger.Warn("MainMenuWindow.OnUnloaded: detach failed.", ex);
+                Logger.Warn("MainMenuWindow.OnUnloaded: detach FriendsUpdated failed.", ex);
             }
 
             try
@@ -105,7 +111,6 @@ namespace WPFTheWeakestRival
             }
         }
 
-
         private int GetAvatarSize()
         {
             try
@@ -115,10 +120,19 @@ namespace WPFTheWeakestRival
                 {
                     return (int)doubleValue;
                 }
+
+                if (resource is int intValue)
+                {
+                    return intValue;
+                }
+
+                Logger.WarnFormat(
+                    "MainMenuWindow.GetAvatarSize: resource '{0}' is not a number. Using default.",
+                    AVATAR_SIZE_RESOURCE_KEY);
             }
             catch (Exception ex)
             {
-                Logger.Warn("Error retrieving avatar size resource. Using default avatar size.", ex);
+                Logger.Warn("MainMenuWindow.GetAvatarSize: resource lookup failed. Using default avatar size.", ex);
             }
 
             return DEFAULT_AVATAR_SIZE;
@@ -128,6 +142,7 @@ namespace WPFTheWeakestRival
         {
             if (imgAvatar == null)
             {
+                Logger.Warn("MainMenuWindow.SetAvatarImage: imgAvatar is null.");
                 return;
             }
 
@@ -140,13 +155,16 @@ namespace WPFTheWeakestRival
 
             SetAvatarImage(UiImageHelper.DefaultAvatar(avatarSize));
 
-            if (UserAvatarControl != null)
+            if (UserAvatarControl == null)
             {
-                UserAvatarControl.ProfileImage = null;
-                UserAvatarControl.FacePhoto = null;
-                UserAvatarControl.Appearance = null;
-                UserAvatarControl.UseProfilePhotoAsFace = false;
+                Logger.Warn("MainMenuWindow.SetDefaultAvatar: UserAvatarControl is null.");
+                return;
             }
+
+            UserAvatarControl.ProfileImage = null;
+            UserAvatarControl.FacePhoto = null;
+            UserAvatarControl.Appearance = null;
+            UserAvatarControl.UseProfilePhotoAsFace = false;
         }
 
         private static string GetCurrentToken()
@@ -161,6 +179,7 @@ namespace WPFTheWeakestRival
                 var token = GetCurrentToken();
                 if (string.IsNullOrWhiteSpace(token))
                 {
+                    Logger.Info("MainMenuWindow.RefreshProfileButtonAvatar: no token. Using default avatar.");
                     SetDefaultAvatar();
                     return;
                 }
@@ -175,6 +194,7 @@ namespace WPFTheWeakestRival
 
                 if (UserAvatarControl == null)
                 {
+                    Logger.Warn("MainMenuWindow.RefreshProfileButtonAvatar: UserAvatarControl is null.");
                     return;
                 }
 
@@ -211,16 +231,15 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Logger.Warn("RefreshProfileButtonAvatar lobby fault.", ex);
+                Logger.Warn("MainMenuWindow.RefreshProfileButtonAvatar: lobby fault.", ex);
                 SetDefaultAvatar();
             }
             catch (Exception ex)
             {
-                Logger.Warn("RefreshProfileButtonAvatar unexpected error.", ex);
+                Logger.Warn("MainMenuWindow.RefreshProfileButtonAvatar: unexpected error.", ex);
                 SetDefaultAvatar();
             }
         }
-
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -229,13 +248,13 @@ namespace WPFTheWeakestRival
                 return;
             }
 
-            if (friendsDrawerHost.Visibility == Visibility.Visible)
+            if (friendsDrawerHost != null && friendsDrawerHost.Visibility == Visibility.Visible)
             {
                 CloseFriendsDrawer();
                 return;
             }
 
-            if (pnlOverlayHost.Visibility == Visibility.Visible)
+            if (pnlOverlayHost != null && pnlOverlayHost.Visibility == Visibility.Visible)
             {
                 HideOverlay();
             }
@@ -267,10 +286,14 @@ namespace WPFTheWeakestRival
                             AlignmentY = AlignmentY.Center
                         };
                     }
+
+                    Logger.WarnFormat(
+                        "MainMenuWindow.GetOverlayBackgroundForPage: resource '{0}' is not an ImageSource.",
+                        ADD_FRIEND_BACKGROUND_RESOURCE_KEY);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn("Error loading overlay background. Falling back to transparent background.", ex);
+                    Logger.Warn("MainMenuWindow.GetOverlayBackgroundForPage: background resource failed.", ex);
                 }
             }
 
@@ -279,6 +302,18 @@ namespace WPFTheWeakestRival
 
         private void ShowOverlay(Page page)
         {
+            if (page == null)
+            {
+                Logger.Warn("MainMenuWindow.ShowOverlay: page is null.");
+                return;
+            }
+
+            if (frmOverlayFrame == null || pnlOverlayHost == null || grdMainArea == null)
+            {
+                Logger.Warn("MainMenuWindow.ShowOverlay: overlay UI refs missing.");
+                return;
+            }
+
             if (overlayContentGrid != null)
             {
                 overlayContentGrid.Background = GetOverlayBackgroundForPage(page);
@@ -305,6 +340,12 @@ namespace WPFTheWeakestRival
 
         private void HideOverlay()
         {
+            if (pnlOverlayHost == null || frmOverlayFrame == null)
+            {
+                Logger.Warn("MainMenuWindow.HideOverlay: overlay UI refs missing.");
+                return;
+            }
+
             var anim = new DoubleAnimation(pnlOverlayHost.Opacity, 0, TimeSpan.FromMilliseconds(OVERLAY_FADE_OUT_DURATION_MS))
             {
                 EasingFunction = new QuadraticEase()
@@ -320,15 +361,18 @@ namespace WPFTheWeakestRival
                     overlayContentGrid.Background = Brushes.Transparent;
                 }
 
-                if (friendsDrawerHost.Visibility != Visibility.Visible)
+                if (friendsDrawerHost == null || friendsDrawerHost.Visibility != Visibility.Visible)
                 {
-                    grdMainArea.Effect = null;
+                    if (grdMainArea != null)
+                    {
+                        grdMainArea.Effect = null;
+                    }
                 }
             };
 
             pnlOverlayHost.BeginAnimation(OpacityProperty, anim);
 
-            if (grdMainArea.Effect is BlurEffect be)
+            if (grdMainArea != null && grdMainArea.Effect is BlurEffect be)
             {
                 be.BeginAnimation(
                     BlurEffect.RadiusProperty,
@@ -359,6 +403,7 @@ namespace WPFTheWeakestRival
             var token = GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
+                Logger.Warn("MainMenuWindow.OnCreateLobbyRequestedAsync: token missing.");
                 MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
@@ -368,6 +413,7 @@ namespace WPFTheWeakestRival
                 var result = await AppServices.Lobby.CreateLobbyAsync(token, Lang.lobbyTitle, DEFAULT_MAX_LOBBY_PLAYERS);
                 if (result?.Lobby == null)
                 {
+                    Logger.Warn("MainMenuWindow.OnCreateLobbyRequestedAsync: CreateLobby returned null Lobby.");
                     MessageBox.Show(Lang.lobbyCreateFailed);
                     return;
                 }
@@ -389,7 +435,7 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Logger.Warn("Lobby service fault while creating lobby.", ex);
+                Logger.Warn("MainMenuWindow.OnCreateLobbyRequestedAsync: lobby fault while creating lobby.", ex);
 
                 MessageBox.Show(
                     ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.lobbyCreateFailed,
@@ -399,17 +445,17 @@ namespace WPFTheWeakestRival
             }
             catch (CommunicationException ex)
             {
-                Logger.Error("Communication error while creating lobby.", ex);
+                Logger.Error("MainMenuWindow.OnCreateLobbyRequestedAsync: communication error.", ex);
                 MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (TimeoutException ex)
             {
-                Logger.Error("Timeout while creating lobby.", ex);
+                Logger.Error("MainMenuWindow.OnCreateLobbyRequestedAsync: timeout.", ex);
                 MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                Logger.Error("Unexpected error while creating lobby.", ex);
+                Logger.Error("MainMenuWindow.OnCreateLobbyRequestedAsync: unexpected error.", ex);
                 MessageBox.Show(Lang.lobbyCreateFailed, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -421,7 +467,15 @@ namespace WPFTheWeakestRival
             var token = GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
+                Logger.Warn("MainMenuWindow.OnJoinLobbyRequestedAsync: token missing.");
                 MessageBox.Show(Lang.noValidSessionCode);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                Logger.Warn("MainMenuWindow.OnJoinLobbyRequestedAsync: access code empty.");
+                MessageBox.Show(Lang.lobbyEnterAccessCode);
                 return;
             }
 
@@ -430,6 +484,7 @@ namespace WPFTheWeakestRival
                 var result = await AppServices.Lobby.JoinByCodeAsync(token, code);
                 if (result?.Lobby == null)
                 {
+                    Logger.Warn("MainMenuWindow.OnJoinLobbyRequestedAsync: JoinByCode returned null Lobby.");
                     MessageBox.Show(Lang.lobbyJoinFailed);
                     return;
                 }
@@ -456,7 +511,7 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Logger.Warn("Lobby service fault while joining lobby by code.", ex);
+                Logger.Warn("MainMenuWindow.OnJoinLobbyRequestedAsync: lobby fault while joining lobby by code.", ex);
 
                 MessageBox.Show(
                     ex.Detail != null ? (ex.Detail.Code + ": " + ex.Detail.Message) : Lang.lobbyJoinFailed,
@@ -466,23 +521,30 @@ namespace WPFTheWeakestRival
             }
             catch (CommunicationException ex)
             {
-                Logger.Error("Communication error while joining lobby by code.", ex);
+                Logger.Error("MainMenuWindow.OnJoinLobbyRequestedAsync: communication error.", ex);
                 MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (TimeoutException ex)
             {
-                Logger.Error("Timeout while joining lobby by code.", ex);
+                Logger.Error("MainMenuWindow.OnJoinLobbyRequestedAsync: timeout.", ex);
                 MessageBox.Show(Lang.noConnection, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                Logger.Error("Unexpected error while joining lobby by code.", ex);
+                Logger.Error("MainMenuWindow.OnJoinLobbyRequestedAsync: unexpected error.", ex);
                 MessageBox.Show(Lang.lobbyJoinFailed, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void OpenLobbyWindow(LobbyContracts.LobbyInfo lobby)
         {
+            if (lobby == null)
+            {
+                Logger.Warn("MainMenuWindow.OpenLobbyWindow: lobby is null.");
+                MessageBox.Show(Lang.lobbyJoinFailed, Lang.lobbyTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var window = new LobbyWindow { Owner = this };
             window.InitializeExistingLobby(lobby);
             window.Show();
@@ -490,16 +552,37 @@ namespace WPFTheWeakestRival
 
             window.Closed += (_, __) =>
             {
-                try { Show(); }
-                catch (Exception ex) { Logger.Warn("Error showing MainMenuWindow after LobbyWindow was closed.", ex); }
+                try
+                {
+                    Show();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Warn("MainMenuWindow.OpenLobbyWindow: error showing MainMenuWindow after LobbyWindow closed.", ex);
+                }
             };
         }
 
         private void OnFriendsUpdated(System.Collections.Generic.IReadOnlyList<FriendItem> list, int pending)
         {
+            if (list == null)
+            {
+                Logger.Warn("MainMenuWindow.OnFriendsUpdated: list is null.");
+                friendItems.Clear();
+                pendingRequests = pending;
+                UpdateFriendDrawerUi();
+                return;
+            }
+
             friendItems.Clear();
+
             foreach (var item in list)
             {
+                if (item == null)
+                {
+                    continue;
+                }
+
                 friendItems.Add(item);
             }
 
@@ -511,20 +594,56 @@ namespace WPFTheWeakestRival
         {
             var isEmpty = friendItems.Count == 0;
 
-            friendsEmptyPanel.Visibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
-            lstFriends.Visibility = isEmpty ? Visibility.Collapsed : Visibility.Visible;
+            if (friendsEmptyPanel != null)
+            {
+                friendsEmptyPanel.Visibility = isEmpty ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow.UpdateFriendDrawerUi: friendsEmptyPanel is null.");
+            }
 
-            txtRequestsCount.Text = pendingRequests.ToString();
+            if (lstFriends != null)
+            {
+                lstFriends.Visibility = isEmpty ? Visibility.Collapsed : Visibility.Visible;
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow.UpdateFriendDrawerUi: lstFriends is null.");
+            }
+
+            if (txtRequestsCount != null)
+            {
+                txtRequestsCount.Text = pendingRequests.ToString();
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow.UpdateFriendDrawerUi: txtRequestsCount is null.");
+            }
         }
 
         private async Task OpenFriendsDrawer()
         {
-            if (friendsDrawerHost.Visibility == Visibility.Visible)
+            if (friendsDrawerHost == null)
             {
+                Logger.Warn("MainMenuWindow.OpenFriendsDrawer: friendsDrawerHost is null.");
                 return;
             }
 
-            grdMainArea.Effect = overlayBlur;
+            if (friendsDrawerHost.Visibility == Visibility.Visible)
+            {
+                Logger.Info("MainMenuWindow.OpenFriendsDrawer: drawer already visible.");
+                return;
+            }
+
+            if (grdMainArea != null)
+            {
+                grdMainArea.Effect = overlayBlur;
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow.OpenFriendsDrawer: grdMainArea is null.");
+            }
 
             overlayBlur.BeginAnimation(
                 BlurEffect.RadiusProperty,
@@ -533,38 +652,90 @@ namespace WPFTheWeakestRival
                     EasingFunction = new QuadraticEase()
                 });
 
-            await AppServices.Friends.ManualRefreshAsync();
+            try
+            {
+                await AppServices.Friends.ManualRefreshAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("MainMenuWindow.OpenFriendsDrawer: ManualRefreshAsync failed.", ex);
+            }
 
-            friendsDrawerTT.X = FRIENDS_DRAWER_INITIAL_TRANSLATION_X;
+            if (friendsDrawerTT != null)
+            {
+                friendsDrawerTT.X = FRIENDS_DRAWER_INITIAL_TRANSLATION_X;
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow.OpenFriendsDrawer: friendsDrawerTT is null.");
+            }
+
             friendsDrawerHost.Opacity = 0;
             friendsDrawerHost.Visibility = Visibility.Visible;
 
             if (FindResource("sbOpenFriendsDrawer") is Storyboard openStoryboard)
             {
                 openStoryboard.Begin(this, true);
+                return;
             }
+
+            Logger.Warn("MainMenuWindow.OpenFriendsDrawer: storyboard 'sbOpenFriendsDrawer' not found.");
         }
 
         private void CloseFriendsDrawer()
         {
+            if (friendsDrawerHost == null)
+            {
+                Logger.Warn("MainMenuWindow.CloseFriendsDrawer: friendsDrawerHost is null.");
+                return;
+            }
+
             if (friendsDrawerHost.Visibility != Visibility.Visible)
             {
+                Logger.Info("MainMenuWindow.CloseFriendsDrawer: drawer already hidden.");
                 return;
             }
 
             if (FindResource("sbCloseFriendsDrawer") is Storyboard closeStoryboard)
             {
-                closeStoryboard.Completed += (_, __) =>
+                EventHandler handler = null;
+                handler = (_, __) =>
                 {
-                    friendsDrawerHost.Visibility = Visibility.Collapsed;
-
-                    if (pnlOverlayHost.Visibility != Visibility.Visible)
+                    try
                     {
-                        grdMainArea.Effect = null;
+                        closeStoryboard.Completed -= handler;
+
+                        friendsDrawerHost.Visibility = Visibility.Collapsed;
+
+                        if (pnlOverlayHost == null || pnlOverlayHost.Visibility != Visibility.Visible)
+                        {
+                            if (grdMainArea != null)
+                            {
+                                grdMainArea.Effect = null;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn("MainMenuWindow.CloseFriendsDrawer: close storyboard completion failed.", ex);
                     }
                 };
 
+                closeStoryboard.Completed += handler;
                 closeStoryboard.Begin(this, true);
+            }
+            else
+            {
+                Logger.Warn("MainMenuWindow.CloseFriendsDrawer: storyboard 'sbCloseFriendsDrawer' not found.");
+                friendsDrawerHost.Visibility = Visibility.Collapsed;
+
+                if (pnlOverlayHost == null || pnlOverlayHost.Visibility != Visibility.Visible)
+                {
+                    if (grdMainArea != null)
+                    {
+                        grdMainArea.Effect = null;
+                    }
+                }
             }
 
             overlayBlur.BeginAnimation(
@@ -595,6 +766,7 @@ namespace WPFTheWeakestRival
             var token = GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
+                Logger.Warn("MainMenuWindow.BtnSendFriendRequestClick: token missing.");
                 MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
@@ -612,12 +784,12 @@ namespace WPFTheWeakestRival
             ShowOverlay(page);
         }
 
-
         private void BtnViewRequestsClick(object sender, RoutedEventArgs e)
         {
             var token = GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
+                Logger.Warn("MainMenuWindow.BtnViewRequestsClick: token missing.");
                 MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
@@ -633,6 +805,7 @@ namespace WPFTheWeakestRival
             var token = GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
+                Logger.Warn("MainMenuWindow.BtnModifyProfileClick: token missing.");
                 MessageBox.Show(Lang.noValidSessionCode);
                 return;
             }
@@ -668,20 +841,35 @@ namespace WPFTheWeakestRival
         {
             HideOverlay();
 
-            SessionCleanup.Shutdown("MainMenuWindow.OnLoggedOut");
+            try
+            {
+                SessionCleanup.Shutdown("MainMenuWindow.OnLoggedOut");
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn("MainMenuWindow.OnLoggedOut: SessionCleanup failed.", ex);
+            }
 
-            var loginWindow = new LoginWindow();
-            Application.Current.MainWindow = loginWindow;
-            loginWindow.Show();
+            try
+            {
+                var loginWindow = new LoginWindow();
+                Application.Current.MainWindow = loginWindow;
+                loginWindow.Show();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("MainMenuWindow.OnLoggedOut: failed to show LoginWindow.", ex);
+            }
 
             Close();
         }
-
 
         private async void BtnPersonalizationClick(object sender, RoutedEventArgs e)
         {
             if (UserAvatarControl == null)
             {
+                Logger.Warn("MainMenuWindow.BtnPersonalizationClick: UserAvatarControl is null.");
+                MessageBox.Show(Lang.profileLoadFailed, Lang.profileTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -700,6 +888,7 @@ namespace WPFTheWeakestRival
             var result = dialog.ShowDialog();
             if (result != true)
             {
+                Logger.Info("MainMenuWindow.BtnPersonalizationClick: dialog cancelled.");
                 return;
             }
 
@@ -725,8 +914,15 @@ namespace WPFTheWeakestRival
             try
             {
                 var token = GetCurrentToken();
-                if (string.IsNullOrWhiteSpace(token) || UserAvatarControl == null)
+                if (string.IsNullOrWhiteSpace(token))
                 {
+                    Logger.Warn("MainMenuWindow.SaveAvatarToServerAsync: token missing.");
+                    return;
+                }
+
+                if (UserAvatarControl == null)
+                {
+                    Logger.Warn("MainMenuWindow.SaveAvatarToServerAsync: UserAvatarControl is null.");
                     return;
                 }
 
@@ -764,19 +960,19 @@ namespace WPFTheWeakestRival
                     return;
                 }
 
-                Logger.Warn("Lobby service fault while updating avatar.", ex);
+                Logger.Warn("MainMenuWindow.SaveAvatarToServerAsync: lobby fault while updating avatar.", ex);
             }
             catch (CommunicationException ex)
             {
-                Logger.Error("Communication error while updating avatar.", ex);
+                Logger.Error("MainMenuWindow.SaveAvatarToServerAsync: communication error.", ex);
             }
             catch (TimeoutException ex)
             {
-                Logger.Error("Timeout while updating avatar.", ex);
+                Logger.Error("MainMenuWindow.SaveAvatarToServerAsync: timeout.", ex);
             }
             catch (Exception ex)
             {
-                Logger.Error("Unexpected error while updating avatar.", ex);
+                Logger.Error("MainMenuWindow.SaveAvatarToServerAsync: unexpected error.", ex);
             }
         }
     }

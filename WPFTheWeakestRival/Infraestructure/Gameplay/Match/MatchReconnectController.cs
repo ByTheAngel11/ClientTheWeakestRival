@@ -4,27 +4,22 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
     internal sealed class MatchReconnectController : IDisposable
     {
-        private const string RECONNECT_STATUS_START = "Reconectando...";
-        private const string RECONNECT_STATUS_ATTEMPT_FORMAT = "Reconectando... intento {0}";
-
         private const int RECONNECT_CYCLE_DELAY_SECONDS = 5;
 
-        private const string RECONNECT_EXHAUSTED_MESSAGE =
-            "No se pudo reconectar con el servidor.\n\n¿Quieres quedarte en espera?\n\n" +
-            "Sí: me quedo y seguiré intentando.\n" +
-            "No: regresar al lobby.";
-
-        private const string WAITING_LINE_MESSAGE = "Sin conexión. En espera...";
+        private const string LOG_EXHAUSTED_HANDLER_ERROR = "MatchReconnect exhausted handler error.";
+        private const string LOG_CONTINUE_RECONNECT_CYCLE_ERROR = "MatchReconnect ContinueReconnectCycle error.";
+        private const string LOG_UI_ERROR = "MatchReconnect Ui error.";
 
         private readonly Grid overlayGrid;
         private readonly TextBlock statusText;
         private readonly Dispatcher dispatcher;
-        private readonly GameplayHub hub;
+        private readonly GameplayHub hubGameplay;
         private readonly Action returnToLobby;
         private readonly ILog logger;
 
@@ -39,7 +34,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             ILog logger)
         {
             this.dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            this.hub = hub ?? throw new ArgumentNullException(nameof(hub));
+            this.hubGameplay = hub ?? throw new ArgumentNullException(nameof(hub));
             this.overlayGrid = overlayGrid;
             this.statusText = statusText;
             this.returnToLobby = returnToLobby ?? throw new ArgumentNullException(nameof(returnToLobby));
@@ -59,13 +54,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void OnReconnectStartedFromHub()
         {
-            Ui(() => ShowOverlay(RECONNECT_STATUS_START));
+            Ui(() => ShowOverlay(Lang.reconnectStatusStart));
         }
 
         private void OnReconnectAttemptedFromHub(int attempt)
         {
             Ui(() =>
-                ShowOverlay(string.Format(CultureInfo.InvariantCulture, RECONNECT_STATUS_ATTEMPT_FORMAT, attempt)));
+                ShowOverlay(string.Format(
+                    CultureInfo.CurrentCulture,
+                    Lang.reconnectStatusAttemptFormat,
+                    attempt)));
         }
 
         private void OnReconnectStoppedFromHub()
@@ -88,14 +86,14 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 try
                 {
                     MessageBoxResult result = MessageBox.Show(
-                        RECONNECT_EXHAUSTED_MESSAGE,
-                        MatchConstants.GAME_MESSAGE_TITLE,
+                        Lang.reconnectExhaustedMessage,
+                        Lang.gameMessageTitle,
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Warning);
 
                     if (result == MessageBoxResult.Yes)
                     {
-                        ShowOverlay(WAITING_LINE_MESSAGE);
+                        ShowOverlay(Lang.reconnectWaitingLineMessage);
                         StartNextReconnectCycle();
                         return;
                     }
@@ -104,7 +102,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 }
                 catch (Exception ex)
                 {
-                    logger.Error("MatchReconnect exhausted handler error.", ex);
+                    logger.Error(LOG_EXHAUSTED_HANDLER_ERROR, ex);
                 }
             });
         }
@@ -128,11 +126,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     reconnectCycleTimer.Stop();
                 }
 
-                hub.ContinueReconnectCycle();
+                hubGameplay.ContinueReconnectCycle();
             }
             catch (Exception ex)
             {
-                logger.Warn("MatchReconnect ContinueReconnectCycle error.", ex);
+                logger.Warn(LOG_CONTINUE_RECONNECT_CYCLE_ERROR, ex);
             }
         }
 
@@ -178,16 +176,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                logger.Warn("MatchReconnect Ui error.", ex);
+                logger.Warn(LOG_UI_ERROR, ex);
             }
         }
 
         public void Dispose()
         {
-            hub.ReconnectStarted -= OnReconnectStartedFromHub;
-            hub.ReconnectAttempted -= OnReconnectAttemptedFromHub;
-            hub.ReconnectStopped -= OnReconnectStoppedFromHub;
-            hub.ReconnectExhausted -= OnReconnectExhaustedFromHub;
+            hubGameplay.ReconnectStarted -= OnReconnectStartedFromHub;
+            hubGameplay.ReconnectAttempted -= OnReconnectAttemptedFromHub;
+            hubGameplay.ReconnectStopped -= OnReconnectStoppedFromHub;
+            hubGameplay.ReconnectExhausted -= OnReconnectExhaustedFromHub;
 
             reconnectCycleTimer.Tick -= ReconnectCycleTimerTick;
 

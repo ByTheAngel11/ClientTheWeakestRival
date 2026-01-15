@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using log4net;
+using WPFTheWeakestRival.Properties.Langs;
 using GameplayServiceProxy = WPFTheWeakestRival.GameplayService;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay
 {
     public sealed class GameplayHub : IDisposable, IStoppable
     {
-        private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
-
         private const string LOG_UI_ERROR = "GameplayHub.Ui error.";
         private const string LOG_CHANNEL_FAULTED = "GameplayHub called with channel Faulted.";
 
@@ -24,14 +23,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
 
         private const string LOG_ENDPOINT_REMAPPED = "GameplayHub endpoint remapped from {0} to {1}.";
 
-        private const string FAULT_CODE_DATABASE = "Error de base de datos";
-        private const string FAULT_MESSAGE_DATABASE_MARKER = "base de datos";
-
         private const int MAX_RECONNECT_ATTEMPTS = 3;
 
-        private const string RECONNECT_EXHAUSTED_DIALOG_TITLE = "Partida";
-        private const string RECONNECT_EXHAUSTED_DIALOG_MESSAGE =
-            "No se pudo restablecer la conexión.\n\n¿Deseas reintentar o regresar al lobby?";
+        private const string DATABASE_FAULT_CODE_ES = "Error de base de datos";
+        private const string DATABASE_FAULT_MARKER_ES = "base de datos";
+        private const string DATABASE_FAULT_MARKER_EN = "database";
 
         private static readonly TimeSpan RECONNECT_INTERVAL = TimeSpan.FromSeconds(RECONNECT_INTERVAL_SECONDS);
         private static readonly TimeSpan RECONNECT_TEST_TIMEOUT = TimeSpan.FromSeconds(RECONNECT_TEST_TIMEOUT_SECONDS);
@@ -49,7 +45,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         private bool isReconnectInProgress;
 
         private int reconnectAttemptCount;
-        private bool hasShownReconnectExhaustedDialog;
+        private bool hasRaisedReconnectExhausted;
 
         public event Action ReconnectStarted;
         public event Action ReconnectStopped;
@@ -71,7 +67,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
         {
             if (string.IsNullOrWhiteSpace(endpointName))
             {
-                throw new ArgumentException(ERROR_ENDPOINT_REQUIRED, nameof(endpointName));
+                throw new ArgumentException(Lang.errGameplayEndpointRequired, nameof(endpointName));
             }
 
             dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
@@ -152,7 +148,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             if (IsClientFaulted(LOG_CHANNEL_FAULTED))
             {
                 StartReconnectLoop();
-                throw new CommunicationException("Gameplay channel faulted.");
+                throw new CommunicationException(Lang.errGameplayChannelFaulted);
             }
 
             try
@@ -195,7 +191,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             if (IsClientFaulted(LOG_CHANNEL_FAULTED))
             {
                 StartReconnectLoop();
-                throw new CommunicationException("Gameplay channel faulted.");
+                throw new CommunicationException(Lang.errGameplayChannelFaulted);
             }
 
             try
@@ -240,7 +236,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             if (IsClientFaulted(LOG_CHANNEL_FAULTED))
             {
                 StartReconnectLoop();
-                throw new CommunicationException("Gameplay channel faulted.");
+                throw new CommunicationException(Lang.errGameplayChannelFaulted);
             }
 
             try
@@ -285,7 +281,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             if (IsClientFaulted(LOG_CHANNEL_FAULTED))
             {
                 StartReconnectLoop();
-                throw new CommunicationException("Gameplay channel faulted.");
+                throw new CommunicationException(Lang.errGameplayChannelFaulted);
             }
 
             try
@@ -327,7 +323,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             if (IsClientFaulted(LOG_CHANNEL_FAULTED))
             {
                 StartReconnectLoop();
-                throw new CommunicationException("Gameplay channel faulted.");
+                throw new CommunicationException(Lang.errGameplayChannelFaulted);
             }
 
             try
@@ -516,7 +512,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 if (!reconnectTimer.IsEnabled)
                 {
                     reconnectAttemptCount = 0;
-                    hasShownReconnectExhaustedDialog = false;
+                    hasRaisedReconnectExhausted = false;
 
                     reconnectTimer.Start();
                     RaiseReconnectStarted();
@@ -554,7 +550,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             }
         }
 
-
         private async void ReconnectTimerTick(object sender, EventArgs e)
         {
             if (isStoppedOrDisposed)
@@ -578,19 +573,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 if (attempt > MAX_RECONNECT_ATTEMPTS)
                 {
                     StopReconnectLoop();
-                    RaiseReconnectExhausted();
 
-                    bool mustShow;
+                    bool mustRaise = !hasRaisedReconnectExhausted;
+                    hasRaisedReconnectExhausted = true;
 
-                    lock (reconnectSyncRoot)
+                    if (mustRaise)
                     {
-                        mustShow = !hasShownReconnectExhaustedDialog;
-                        hasShownReconnectExhaustedDialog = true;
-                    }
-
-                    if (mustShow)
-                    {
-                        ShowReconnectExhaustedDialog();
+                        RaiseReconnectExhausted();
                     }
 
                     return;
@@ -673,7 +662,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                     return;
                 }
 
-
                 Logger.Info("GameplayHub reconnected successfully.");
 
                 StopReconnectLoop();
@@ -681,7 +669,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 lock (reconnectSyncRoot)
                 {
                     reconnectAttemptCount = 0;
-                    hasShownReconnectExhaustedDialog = false;
+                    hasRaisedReconnectExhausted = false;
                 }
 
                 RaiseReconnectStopped();
@@ -705,18 +693,21 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             }
         }
 
-
-
         private static bool IsDatabaseFault(string faultMessage)
         {
             string message = faultMessage ?? string.Empty;
 
-            if (message.IndexOf(FAULT_CODE_DATABASE, StringComparison.OrdinalIgnoreCase) >= 0)
+            if (message.IndexOf(DATABASE_FAULT_CODE_ES, StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return true;
             }
 
-            return message.IndexOf(FAULT_MESSAGE_DATABASE_MARKER, StringComparison.OrdinalIgnoreCase) >= 0;
+            if (message.IndexOf(DATABASE_FAULT_MARKER_ES, StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            return message.IndexOf(DATABASE_FAULT_MARKER_EN, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void RaiseDatabaseErrorDetected(string message)
@@ -774,7 +765,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
             lock (reconnectSyncRoot)
             {
                 reconnectAttemptCount = 0;
-                hasShownReconnectExhaustedDialog = false;
+                hasRaisedReconnectExhausted = false;
             }
 
             StartReconnectLoop();
@@ -839,12 +830,5 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay
                 Logger.Warn("GameplayHub.RaiseReturnToLobbyRequested failed.", ex);
             }
         }
-
-        private void ShowReconnectExhaustedDialog()
-        {
-            RaiseReturnToLobbyRequested();
-        }
-
-
     }
 }

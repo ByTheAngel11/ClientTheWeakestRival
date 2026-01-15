@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using log4net;
 using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
@@ -13,16 +14,16 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(TurnOrderController));
 
-        private const string DARKNESS_ALIAS_FORMAT = "Concursante {0}";
-        private const string DARKNESS_FALLBACK_NAME = "???";
-        private const string FALLBACK_PLAYER_NAME_FORMAT = "Jugador {0}";
-
-        private const string PLAYERS_SUMMARY_FORMAT = "({0})";
-        private const string TURN_ORDER_SEPARATOR = " → ";
-
         private const int POSITION_BASE = 1;
 
-        private readonly MatchWindowUiRefs ui;
+        private const string LOG_ENABLE_DARKNESS_ERROR = "TurnOrderController.EnableDarknessMode error.";
+        private const string LOG_PLAY_TURN_INTRO_CANCELLED = "TurnOrderController.PlayTurnIntroAsync cancelled.";
+        private const string LOG_PLAY_TURN_INTRO_ERROR = "TurnOrderController.PlayTurnIntroAsync error.";
+        private const string LOG_PLAY_TURN_INTRO_HIDE_ERROR = "TurnOrderController.PlayTurnIntroAsync: error hiding overlay.";
+        private const string LOG_CANCEL_INTRO_ERROR = "TurnOrderController.CancelIntro error.";
+        private const string LOG_HIGHLIGHT_ERROR = "TurnOrderController.TryHighlightPlayerInList error.";
+
+        private readonly MatchWindowUiRefs uiMatchWindow;
         private readonly MatchSessionState state;
 
         private readonly Dictionary<int, string> knownDisplayNamesByUserId = new Dictionary<int, string>();
@@ -32,7 +33,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public TurnOrderController(MatchWindowUiRefs ui, MatchSessionState state)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
             this.state = state ?? throw new ArgumentNullException(nameof(state));
         }
 
@@ -81,7 +82,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         new PlayerSummary
                         {
                             UserId = p.UserId,
-                            DisplayName = string.Format(CultureInfo.CurrentCulture, DARKNESS_ALIAS_FORMAT, index),
+                            DisplayName = string.Format(CultureInfo.CurrentCulture, Lang.darknessAliasFormat, index),
                             Avatar = null,
                             IsOnline = p.IsOnline
                         });
@@ -97,7 +98,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("TurnOrderController.EnableDarknessMode error.", ex);
+                Logger.Warn(LOG_ENABLE_DARKNESS_ERROR, ex);
             }
         }
 
@@ -130,7 +131,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public async Task PlayTurnIntroAsync(object turnOrderDto, Action<string, string> showOverlay, Action hideOverlay)
         {
-            if (turnOrderDto == null || ui.LstPlayers == null)
+            if (turnOrderDto == null || uiMatchWindow.LstPlayers == null)
             {
                 return;
             }
@@ -151,7 +152,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             int starterUserId = snapshot.CurrentTurnUserId;
 
             string orderText = string.Join(
-                TURN_ORDER_SEPARATOR,
+                Lang.turnOrderSeparator,
                 orderedAliveUserIds
                     .Where(id => id > 0)
                     .Select(GetDisplayNameByUserIdSafe)
@@ -182,11 +183,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (OperationCanceledException ex)
             {
-                Logger.Info("TurnOrderController.PlayTurnIntroAsync cancelled.", ex);
+                Logger.Info(LOG_PLAY_TURN_INTRO_CANCELLED, ex);
             }
             catch (Exception ex)
             {
-                Logger.Warn("TurnOrderController.PlayTurnIntroAsync error.", ex);
+                Logger.Warn(LOG_PLAY_TURN_INTRO_ERROR, ex);
             }
             finally
             {
@@ -196,7 +197,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn("TurnOrderController.PlayTurnIntroAsync: error hiding overlay.", ex);
+                    Logger.Warn(LOG_PLAY_TURN_INTRO_HIDE_ERROR, ex);
                 }
             }
         }
@@ -214,13 +215,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             }
             catch (Exception ex)
             {
-                Logger.Warn("TurnOrderController.CancelIntro error.", ex);
+                Logger.Warn(LOG_CANCEL_INTRO_ERROR, ex);
             }
         }
 
         private void RebuildPlayersForUi(int[] orderedAliveUserIds)
         {
-            if (ui.LstPlayers == null)
+            if (uiMatchWindow.LstPlayers == null)
             {
                 return;
             }
@@ -291,7 +292,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             return new PlayerSummary
             {
                 UserId = userId,
-                DisplayName = string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, userId),
+                DisplayName = string.Format(CultureInfo.CurrentCulture, Lang.fallbackPlayerNameFormat, userId),
                 Avatar = null
             };
         }
@@ -318,18 +319,18 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         private void UpdatePlayersSummaryText()
         {
-            if (ui.TxtPlayersSummary != null)
+            if (uiMatchWindow.TxtPlayersSummary != null)
             {
-                ui.TxtPlayersSummary.Text = string.Format(
+                uiMatchWindow.TxtPlayersSummary.Text = string.Format(
                     CultureInfo.CurrentCulture,
-                    PLAYERS_SUMMARY_FORMAT,
+                    Lang.playersSummaryFormat,
                     playersForUi != null ? playersForUi.Length : 0);
             }
         }
 
         private void RebuildPlayersForUiDarkness(int[] orderedAliveUserIds)
         {
-            if (ui.LstPlayers == null)
+            if (uiMatchWindow.LstPlayers == null)
             {
                 return;
             }
@@ -367,7 +368,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         new PlayerSummary
                         {
                             UserId = userId,
-                            DisplayName = DARKNESS_FALLBACK_NAME,
+                            DisplayName = Lang.darknessFallbackName,
                             Avatar = null
                         });
                 }
@@ -381,7 +382,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void TryHighlightPlayerInList(int userId)
         {
-            if (ui.LstPlayers == null || userId <= 0)
+            if (uiMatchWindow.LstPlayers == null || userId <= 0)
             {
                 return;
             }
@@ -390,7 +391,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             {
                 object item = null;
 
-                foreach (object it in ui.LstPlayers.Items)
+                foreach (object it in uiMatchWindow.LstPlayers.Items)
                 {
                     PlayerSummary p = it as PlayerSummary;
                     if (p != null && p.UserId == userId)
@@ -402,13 +403,13 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
                 if (item != null)
                 {
-                    ui.LstPlayers.SelectedItem = item;
-                    ui.LstPlayers.ScrollIntoView(item);
+                    uiMatchWindow.LstPlayers.SelectedItem = item;
+                    uiMatchWindow.LstPlayers.ScrollIntoView(item);
                 }
             }
             catch (Exception ex)
             {
-                Logger.Warn("TurnOrderController.TryHighlightPlayerInList error.", ex);
+                Logger.Warn(LOG_HIGHLIGHT_ERROR, ex);
             }
         }
 
@@ -422,7 +423,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     return p.DisplayName;
                 }
 
-                return DARKNESS_FALLBACK_NAME;
+                return Lang.darknessFallbackName;
             }
 
             if (userId <= 0)
@@ -450,19 +451,19 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return real.DisplayName;
             }
 
-            return string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, userId);
+            return string.Format(CultureInfo.CurrentCulture, Lang.fallbackPlayerNameFormat, userId);
         }
 
         private void RebindPlayersList()
         {
-            if (ui.LstPlayers == null)
+            if (uiMatchWindow.LstPlayers == null)
             {
                 return;
             }
 
-            ui.LstPlayers.DisplayMemberPath = nameof(PlayerSummary.DisplayName);
-            ui.LstPlayers.ItemsSource = null;
-            ui.LstPlayers.ItemsSource = playersForUi;
+            uiMatchWindow.LstPlayers.DisplayMemberPath = nameof(PlayerSummary.DisplayName);
+            uiMatchWindow.LstPlayers.ItemsSource = null;
+            uiMatchWindow.LstPlayers.ItemsSource = playersForUi;
         }
 
         private PlayerSummary[] ClonePlayersForUi(PlayerSummary[] source, bool preferPositionFallback)
@@ -498,7 +499,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                         ? (i + POSITION_BASE)
                         : (userId > 0 ? userId : (i + POSITION_BASE));
 
-                    displayName = string.Format(CultureInfo.CurrentCulture, FALLBACK_PLAYER_NAME_FORMAT, fallbackNumber);
+                    displayName = string.Format(CultureInfo.CurrentCulture, Lang.fallbackPlayerNameFormat, fallbackNumber);
                 }
 
                 cloned[i] = new PlayerSummary

@@ -12,20 +12,20 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof(OverlayController));
 
-        private readonly MatchWindowUiRefs ui;
+        private readonly MatchWindowUiRefs uiMatchWindow;
 
         private GameplayServiceProxy.CoinFlipResolvedDto lastCoinFlip;
 
         public OverlayController(MatchWindowUiRefs ui)
         {
-            this.ui = ui ?? throw new ArgumentNullException(nameof(ui));
+            this.uiMatchWindow = ui ?? throw new ArgumentNullException(nameof(ui));
         }
 
         public void HideIntro()
         {
-            if (ui.IntroOverlay != null)
+            if (uiMatchWindow.IntroOverlay != null)
             {
-                ui.IntroOverlay.Visibility = Visibility.Collapsed;
+                uiMatchWindow.IntroOverlay.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -33,9 +33,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             try
             {
-                if (ui.IntroVideo != null)
+                if (uiMatchWindow.IntroVideo != null)
                 {
-                    ui.IntroVideo.Stop();
+                    uiMatchWindow.IntroVideo.Stop();
                 }
             }
             catch (Exception ex)
@@ -46,27 +46,27 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 
         public void ShowSpecialEvent(string title, string description)
         {
-            if (ui.SpecialEventTitleText != null)
+            if (uiMatchWindow.SpecialEventTitleText != null)
             {
-                ui.SpecialEventTitleText.Text = string.IsNullOrWhiteSpace(title) ? string.Empty : title;
+                uiMatchWindow.SpecialEventTitleText.Text = string.IsNullOrWhiteSpace(title) ? string.Empty : title;
             }
 
-            if (ui.SpecialEventDescriptionText != null)
+            if (uiMatchWindow.SpecialEventDescriptionText != null)
             {
-                ui.SpecialEventDescriptionText.Text = string.IsNullOrWhiteSpace(description) ? string.Empty : description;
+                uiMatchWindow.SpecialEventDescriptionText.Text = string.IsNullOrWhiteSpace(description) ? string.Empty : description;
             }
 
-            if (ui.SpecialEventOverlay != null)
+            if (uiMatchWindow.SpecialEventOverlay != null)
             {
-                ui.SpecialEventOverlay.Visibility = Visibility.Visible;
+                uiMatchWindow.SpecialEventOverlay.Visibility = Visibility.Visible;
             }
         }
 
         public void HideSpecialEvent()
         {
-            if (ui.SpecialEventOverlay != null)
+            if (uiMatchWindow.SpecialEventOverlay != null)
             {
-                ui.SpecialEventOverlay.Visibility = Visibility.Collapsed;
+                uiMatchWindow.SpecialEventOverlay.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -74,7 +74,7 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             lastCoinFlip = coinFlip;
 
-            if (ui.CoinFlipOverlay == null || ui.CoinFlipResultText == null)
+            if (uiMatchWindow.CoinFlipOverlay == null || uiMatchWindow.CoinFlipResultText == null)
             {
                 string fallback = coinFlip != null && coinFlip.Result == GameplayServiceProxy.CoinFlipResultType.Heads
                     ? MatchConstants.COIN_FLIP_HEADS_MESSAGE
@@ -93,10 +93,10 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 ? MatchConstants.COIN_FLIP_HEADS_MESSAGE
                 : MatchConstants.COIN_FLIP_TAILS_MESSAGE;
 
-            ui.CoinFlipResultText.Text = message;
-            ui.CoinFlipOverlay.Visibility = Visibility.Visible;
+            uiMatchWindow.CoinFlipResultText.Text = message;
+            uiMatchWindow.CoinFlipOverlay.Visibility = Visibility.Visible;
 
-            Storyboard storyboard = ui.Window.TryFindResource("CoinFlipStoryboard") as Storyboard;
+            Storyboard storyboard = uiMatchWindow.Window.TryFindResource("CoinFlipStoryboard") as Storyboard;
             if (storyboard != null)
             {
                 storyboard.Completed -= CoinFlipStoryboardCompleted;
@@ -109,9 +109,9 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         {
             try
             {
-                if (ui.CoinFlipOverlay != null)
+                if (uiMatchWindow.CoinFlipOverlay != null)
                 {
-                    ui.CoinFlipOverlay.Visibility = Visibility.Collapsed;
+                    uiMatchWindow.CoinFlipOverlay.Visibility = Visibility.Collapsed;
                 }
 
                 if (lastCoinFlip != null && lastCoinFlip.ShouldEnableDuel)

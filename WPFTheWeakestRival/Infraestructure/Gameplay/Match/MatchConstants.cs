@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
 {
@@ -12,66 +13,66 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public const int QUESTION_TIME_SECONDS = 30;
         public const int TIMER_INTERVAL_SECONDS = 1;
 
-        internal const string MATCH_FINISHED_LABEL_TEXT = "Partida finalizada";
-        internal const string EXIT_TO_LOBBY_PROMPT = "La partida aún no ha terminado. ¿Deseas salir al lobby?";
+        internal static string MATCH_FINISHED_LABEL_TEXT => Lang.matchFinishedLabelText;
+        internal static string EXIT_TO_LOBBY_PROMPT => Lang.exitToLobbyPrompt;
 
         public const string TIMER_FORMAT = @"mm\:ss";
         public const string POINTS_FORMAT = "0.00";
 
-        public const string GAME_MESSAGE_TITLE = "Juego";
-        public const string WILDCARDS_MESSAGE_TITLE = "Wildcards";
+        public static string GAME_MESSAGE_TITLE => Lang.gameMessageTitle;
+        public static string WILDCARDS_MESSAGE_TITLE => Lang.wildcardsMessageTitle;
 
-        public const string DEFAULT_MATCH_CODE_TEXT = "Sin código";
-        public const string DEFAULT_MATCH_CODE_PREFIX = "Código: ";
+        public static string DEFAULT_MATCH_CODE_TEXT => Lang.matchCodeNone;
+        public static string DEFAULT_MATCH_CODE_PREFIX => Lang.matchCodePrefix;
 
         public const string DEFAULT_CHAIN_INITIAL_VALUE = "0.00";
         public const string DEFAULT_BANKED_INITIAL_VALUE = "0.00";
 
-        public const string DEFAULT_PLAYER_NAME = "Jugador";
-        public const string DEFAULT_OTHER_PLAYER_NAME = "Otro jugador";
+        public static string DEFAULT_PLAYER_NAME => Lang.player;
+        public static string DEFAULT_OTHER_PLAYER_NAME => Lang.otherPlayer;
 
-        public const string DEFAULT_WAITING_MATCH_TEXT = "Esperando inicio de partida...";
-        public const string DEFAULT_WAITING_QUESTION_TEXT = "(esperando pregunta...)";
-        public const string DEFAULT_WAITING_TURN_TEXT = "Esperando tu turno...";
+        public static string DEFAULT_WAITING_MATCH_TEXT => Lang.lblGameWaitingForMatchStart;
+        public static string DEFAULT_WAITING_QUESTION_TEXT => Lang.matchWaitingForQuestion;
+        public static string DEFAULT_WAITING_TURN_TEXT => Lang.matchWaitingForYourTurn;
 
-        public const string TURN_MY_TURN_TEXT = "Tu turno";
-        public const string TURN_OTHER_PLAYER_TEXT = "Turno de otro jugador";
+        public static string TURN_MY_TURN_TEXT => Lang.matchMyTurn;
+        public static string TURN_OTHER_PLAYER_TEXT => Lang.matchOtherTurn;
 
         public const string DEFAULT_TIMER_TEXT = "--:--";
 
-        public const string DEFAULT_NO_WILDCARD_NAME = "Sin comodín";
-        public const string DEFAULT_WILDCARD_NAME = "Comodín";
+        public static string DEFAULT_NO_WILDCARD_NAME => Lang.wildcardNone;
+        public static string DEFAULT_WILDCARD_NAME => Lang.wildcardGeneric;
 
-        public const string DEFAULT_TIMEOUT_TEXT = "Tiempo agotado.";
-        public const string DEFAULT_SELECT_ANSWER_TEXT = "Selecciona una respuesta.";
-        public const string DEFAULT_CORRECT_TEXT = "¡Correcto!";
-        public const string DEFAULT_INCORRECT_TEXT = "Respuesta incorrecta.";
+        public static string DEFAULT_TIMEOUT_TEXT => Lang.matchTimeout;
+        public static string DEFAULT_SELECT_ANSWER_TEXT => Lang.matchSelectAnswer;
+        public static string DEFAULT_CORRECT_TEXT => Lang.matchCorrect;
+        public static string DEFAULT_INCORRECT_TEXT => Lang.matchIncorrect;
 
-        public const string DEFAULT_BANK_ERROR_MESSAGE = "No se pudieron cargar los comodines.";
-        public const string DEFAULT_BANK_UNEXPECTED_ERROR_MESSAGE = "Ocurrió un error al cargar los comodines.";
+        public static string DEFAULT_BANK_ERROR_MESSAGE => Lang.wildcardsLoadFailed;
+        public static string DEFAULT_BANK_UNEXPECTED_ERROR_MESSAGE => Lang.wildcardsLoadUnexpected;
 
-        public const string COIN_FLIP_TITLE = "Volado";
-        public const string COIN_FLIP_HEADS_MESSAGE = "¡Cara! Habrá duelo.";
-        public const string COIN_FLIP_TAILS_MESSAGE = "Cruz. No habrá duelo.";
+        public static string COIN_FLIP_TITLE => Lang.coinFlipTitle;
+        public static string COIN_FLIP_HEADS_MESSAGE => Lang.coinFlipHeadsMessage;
+        public static string COIN_FLIP_TAILS_MESSAGE => Lang.coinFlipTailsMessage;
 
         public const byte DIFFICULTY_EASY = 1;
         public const byte DIFFICULTY_MEDIUM = 2;
         public const byte DIFFICULTY_HARD = 3;
 
-        public const string MATCH_WINNER_MESSAGE_FORMAT = "El juego ha terminado. El ganador es: {0}.";
+        public static string MATCH_WINNER_MESSAGE_FORMAT => Lang.matchWinnerMessageFormat;
 
-        public const string PHASE_TITLE = "Fase";
-        public const string PHASE_ROUND_FORMAT = "Ronda {0}";
-        public const string PHASE_DUEL_TEXT = "Duelo";
-        public const string PHASE_SPECIAL_EVENT_TEXT = "Evento especial";
-        public const string PHASE_FINISHED_TEXT = "Finalizada";
+        public static string PHASE_TITLE => Lang.phaseTitle;
+        public static string PHASE_ROUND_FORMAT => Lang.phaseRoundFormat;
+        public static string PHASE_DUEL_TEXT => Lang.phaseDuel;
+        public static string PHASE_SPECIAL_EVENT_TEXT => Lang.phaseSpecialEvent;
+        public static string PHASE_FINISHED_TEXT => Lang.phaseFinished;
 
         public const string SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE = "LIGHTNING_WILDCARD_AWARDED";
         public const string SPECIAL_EVENT_EXTRA_WILDCARD_CODE = "EXTRA_WILDCARD_AWARDED";
 
         public const string SPECIAL_EVENT_BOMB_QUESTION_CODE = "BOMB_QUESTION";
         public const string SPECIAL_EVENT_BOMB_APPLIED_CODE = "BOMB_QUESTION_APPLIED";
-        public const string BOMB_UI_MESSAGE = "PREGUNTA BOMBA: Acierto +0.50 a banca, fallo -0.50.";
+        public static string BOMB_UI_MESSAGE => Lang.msgSpecialEventBombQuestionDesc;
 
         public const string SPECIAL_EVENT_SURPRISE_EXAM_STARTED_CODE = "SURPRISE_EXAM_STARTED";
         public const string SPECIAL_EVENT_SURPRISE_EXAM_RESOLVED_CODE = "SURPRISE_EXAM_RESOLVED";
@@ -79,12 +80,11 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
         public const int SURPRISE_EXAM_TIME_SECONDS = 20;
         public const int SURPRISE_EXAM_OVERLAY_AUTOHIDE_MS = 1200;
 
-        public const string SURPRISE_EXAM_BANK_BLOCKED_MESSAGE =
-            "Examen sorpresa en curso. No se puede bancar.";
+        public static string SURPRISE_EXAM_BANK_BLOCKED_MESSAGE => Lang.surpriseExamBankBlockedMessage;
 
-        public const string TURN_INTRO_TITLE = "Turnos";
-        public const string TURN_INTRO_DESCRIPTION_TEMPLATE = "Orden: {0}\nInicia: {1}";
-        public const string TURN_ORDER_CHANGED_TITLE = "Turnos actualizados";
+        public static string TURN_INTRO_TITLE => Lang.turnIntroTitle;
+        public static string TURN_INTRO_DESCRIPTION_TEMPLATE => Lang.turnIntroDescriptionTemplate;
+        public static string TURN_ORDER_CHANGED_TITLE => Lang.turnOrderChangedTitle;
         public const int TURN_INTRO_STEP_DELAY_MS = 350;
         public const int TURN_INTRO_FINAL_DELAY_MS = 700;
 

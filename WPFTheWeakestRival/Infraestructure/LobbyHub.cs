@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Threading;
 using WPFTheWeakestRival.Infrastructure.Faults;
 using WPFTheWeakestRival.LobbyService;
+using WPFTheWeakestRival.Properties.Langs;
 
 namespace WPFTheWeakestRival.Infrastructure
 {
@@ -17,17 +18,10 @@ namespace WPFTheWeakestRival.Infrastructure
         private const byte DEFAULT_MAX_PLAYERS = 8;
         private const byte MIN_ALLOWED_MAX_PLAYERS = 1;
 
-        private const string ERROR_TOKEN_REQUIRED = "Token requerido.";
-        private const string ERROR_ENDPOINT_REQUIRED = "Endpoint name cannot be null or whitespace.";
-
         private const string LOG_UI_ERROR = "LobbyHub.Ui error.";
         private const string LOG_CHANNEL_FAULTED_CREATE = "CreateLobbyAsync called with channel Faulted.";
         private const string LOG_CHANNEL_FAULTED_JOIN = "JoinByCodeAsync called with channel Faulted.";
         private const string LOG_CHANNEL_FAULTED_START = "StartLobbyMatchAsync called with channel Faulted.";
-
-        private const string RECONNECT_FAULT_DIALOG_TITLE = "Lobby";
-        private const string RECONNECT_FAULT_DIALOG_FORMAT = "{0}: {1}";
-        private const string RECONNECT_FAULT_DIALOG_GENERIC = "Ocurrió un error durante la reconexión.";
 
         private const int RECONNECT_INTERVAL_SECONDS = 2;
         private const int RECONNECT_TEST_TIMEOUT_SECONDS = 3;
@@ -87,7 +81,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(endpointName))
             {
-                throw new ArgumentException(ERROR_ENDPOINT_REQUIRED, nameof(endpointName));
+                throw new ArgumentException(Lang.errLobbyEndpointRequired, nameof(endpointName));
             }
 
             dispatcher = Application.Current?.Dispatcher ?? Dispatcher.CurrentDispatcher;
@@ -339,7 +333,7 @@ namespace WPFTheWeakestRival.Infrastructure
             {
                 if (client.State == CommunicationState.Faulted)
                 {
-                    var ex = new CommunicationException("El cliente de lobby está en estado 'Faulted'.");
+                    var ex = new CommunicationException(Lang.errLobbyClientFaulted);
                     Logger.Warn("SendMessageAsync: channel faulted.", ex);
                     RaiseChatSendFailed(ex);
                     StartReconnectLoop();
@@ -1038,7 +1032,7 @@ namespace WPFTheWeakestRival.Infrastructure
         {
             if (string.IsNullOrWhiteSpace(token))
             {
-                throw new ArgumentException(ERROR_TOKEN_REQUIRED, nameof(token));
+                throw new ArgumentException(Lang.errLobbyTokenRequired, nameof(token));
             }
         }
 
@@ -1142,12 +1136,12 @@ namespace WPFTheWeakestRival.Infrastructure
 
             string text =
                 string.IsNullOrWhiteSpace(safeCode) && string.IsNullOrWhiteSpace(safeMessage)
-                    ? RECONNECT_FAULT_DIALOG_GENERIC
+                    ? Lang.msgLobbyReconnectErrorGeneric
                     : string.IsNullOrWhiteSpace(safeCode)
                         ? safeMessage
                         : string.IsNullOrWhiteSpace(safeMessage)
                             ? safeCode
-                            : string.Format(CultureInfo.InvariantCulture, RECONNECT_FAULT_DIALOG_FORMAT, safeCode, safeMessage);
+                            : string.Format(CultureInfo.CurrentCulture, Lang.fmtLobbyReconnectFaultDetail, safeCode, safeMessage);
 
             Ui(() =>
             {
@@ -1155,7 +1149,7 @@ namespace WPFTheWeakestRival.Infrastructure
                 {
                     MessageBox.Show(
                         text,
-                        RECONNECT_FAULT_DIALOG_TITLE,
+                        Lang.lobbyTitle,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
                 }

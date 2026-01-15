@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows.Media;
 using WPFTheWeakestRival.Models;
+using WPFTheWeakestRival.Properties.Langs;
 using LobbyAccountMini = WPFTheWeakestRival.LobbyService.AccountMini;
 using LobbyAvatarDto = WPFTheWeakestRival.LobbyService.AvatarAppearanceDto;
 
@@ -11,7 +13,52 @@ namespace WPFTheWeakestRival.Helpers
     public static class LobbyAvatarHelper
     {
         private const int DEFAULT_AVATAR_SIZE = 40;
-        private const string DEFAULT_PLAYER_NAME_FORMAT = "Jugador {0}";
+
+        private const string PLAYER_NAME_FORMAT = "{0} {1}";
+
+        public static void RebuildLobbyPlayers(
+            ObservableCollection<LobbyPlayerItem> targetPlayers,
+            LobbyAccountMini[] sourcePlayers,
+            Func<LobbyAccountMini, LobbyPlayerItem> mapper)
+        {
+            if (targetPlayers == null)
+            {
+                return;
+            }
+
+            targetPlayers.Clear();
+
+            if (sourcePlayers == null || sourcePlayers.Length == 0)
+            {
+                return;
+            }
+
+            var seen = new HashSet<int>();
+
+            foreach (LobbyAccountMini account in sourcePlayers)
+            {
+                if (account == null || account.AccountId <= 0)
+                {
+                    continue;
+                }
+
+                if (!seen.Add(account.AccountId))
+                {
+                    continue;
+                }
+
+                LobbyPlayerItem item = mapper != null
+                    ? mapper(account)
+                    : BuildFromAccountMini(account);
+
+                if (item == null)
+                {
+                    continue;
+                }
+
+                targetPlayers.Add(item);
+            }
+        }
 
         public static LobbyPlayerItem BuildFromAccountMini(LobbyAccountMini account)
         {
@@ -24,7 +71,7 @@ namespace WPFTheWeakestRival.Helpers
             {
                 AccountId = account.AccountId,
                 DisplayName = string.IsNullOrWhiteSpace(account.DisplayName)
-                    ? string.Format(CultureInfo.CurrentCulture, DEFAULT_PLAYER_NAME_FORMAT, account.AccountId)
+                    ? BuildDefaultPlayerName(account.AccountId)
                     : account.DisplayName.Trim(),
                 IsMe = false
             };
@@ -45,36 +92,13 @@ namespace WPFTheWeakestRival.Helpers
             return playerItem;
         }
 
-        public static void RebuildLobbyPlayers(
-            ObservableCollection<LobbyPlayerItem> collection,
-            LobbyAccountMini[] players,
-            Func<LobbyAccountMini, LobbyPlayerItem> mapper)
+        private static string BuildDefaultPlayerName(int accountId)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
-
-            if (mapper == null)
-            {
-                throw new ArgumentNullException(nameof(mapper));
-            }
-
-            collection.Clear();
-
-            if (players == null || players.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var player in players)
-            {
-                var item = mapper(player);
-                if (item != null)
-                {
-                    collection.Add(item);
-                }
-            }
+            return string.Format(
+                CultureInfo.CurrentCulture,
+                PLAYER_NAME_FORMAT,
+                Lang.player,
+                accountId);
         }
 
         private static ImageSource TryReadProfileImage(LobbyAccountMini account)
