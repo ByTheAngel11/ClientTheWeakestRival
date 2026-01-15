@@ -7,18 +7,18 @@ namespace WPFTheWeakestRival.Globalization
 {
     public sealed class LocalizationManager : INotifyPropertyChanged
     {
-        private static readonly LocalizationManager _current = new LocalizationManager();
-        public static LocalizationManager Current => _current;
+        private static readonly LocalizationManager current = new LocalizationManager();
+        public static LocalizationManager Current => current;
 
-        private CultureInfo _culture = new CultureInfo("es");
-        public CultureInfo Culture => _culture;
+        private CultureInfo culture = new CultureInfo("es");
+        public CultureInfo Culture => culture;
 
         public string this[string key]
         {
             get
             {
                 if (string.IsNullOrWhiteSpace(key)) return string.Empty;
-                var s = Properties.Langs.Lang.ResourceManager.GetString(key, _culture);
+                var s = Properties.Langs.Lang.ResourceManager.GetString(key, culture);
                 return string.IsNullOrEmpty(s)
                     ? Properties.Langs.Lang.ResourceManager.GetString(key, new CultureInfo("es")) ?? key
                     : s;
@@ -29,10 +29,10 @@ namespace WPFTheWeakestRival.Globalization
         {
             var ci = new CultureInfo(cultureName);
 
-            if (string.Equals(_culture.Name, ci.Name, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(culture.Name, ci.Name, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            _culture = ci;
+            culture = ci;
 
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;

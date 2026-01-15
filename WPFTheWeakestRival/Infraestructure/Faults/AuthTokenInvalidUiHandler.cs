@@ -21,6 +21,25 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
         private const string MARKER_EN_INVALID = "invalid token";
         private const string MARKER_EN_EXPIRED = "expired";
 
+        private const string TOKEN_WORD_MARKER = "token";
+
+        private const string CTX_FALLBACK = "AuthTokenInvalidUiHandler";
+
+        private const string LOG_INVALID_TOKEN_TEMPLATE =
+            "Invalid token detected. Ctx={0}, Code={1}, Message={2}";
+
+        private const string LOG_CLEAR_TOKEN_FAILED =
+            "AuthTokenInvalidUiHandler: failed to clear token.";
+
+        private const string LOG_SESSION_CLEANUP_FAILED =
+            "AuthTokenInvalidUiHandler: SessionCleanup failed.";
+
+        private const string LOG_MESSAGEBOX_FAILED =
+            "AuthTokenInvalidUiHandler: MessageBox failed.";
+
+        private const string LOG_REDIRECT_FAILED =
+            "AuthTokenInvalidUiHandler: redirect to Login failed.";
+
         public static bool TryHandleInvalidToken(
             string faultCode,
             string faultMessage,
@@ -37,7 +56,7 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
             {
                 logger.WarnFormat(
                     CultureInfo.InvariantCulture,
-                    "Invalid token detected. Ctx={0}, Code={1}, Message={2}",
+                    LOG_INVALID_TOKEN_TEMPLATE,
                     context ?? string.Empty,
                     faultCode ?? string.Empty,
                     faultMessage ?? string.Empty);
@@ -51,19 +70,19 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
             {
                 if (logger != null)
                 {
-                    logger.Warn("AuthTokenInvalidUiHandler: failed to clear token.", ex);
+                    logger.Warn(LOG_CLEAR_TOKEN_FAILED, ex);
                 }
             }
 
             try
             {
-                SessionCleanup.Shutdown(context ?? "AuthTokenInvalidUiHandler");
+                SessionCleanup.Shutdown(string.IsNullOrWhiteSpace(context) ? CTX_FALLBACK : context);
             }
             catch (Exception ex)
             {
                 if (logger != null)
                 {
-                    logger.Warn("AuthTokenInvalidUiHandler: SessionCleanup failed.", ex);
+                    logger.Warn(LOG_SESSION_CLEANUP_FAILED, ex);
                 }
             }
 
@@ -93,7 +112,7 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
             {
                 if (logger != null)
                 {
-                    logger.Warn("AuthTokenInvalidUiHandler: MessageBox failed.", ex);
+                    logger.Warn(LOG_MESSAGEBOX_FAILED, ex);
                 }
             }
 
@@ -119,7 +138,7 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
             {
                 if (logger != null)
                 {
-                    logger.Error("AuthTokenInvalidUiHandler: redirect to Login failed.", ex);
+                    logger.Error(LOG_REDIRECT_FAILED, ex);
                 }
             }
 
@@ -183,8 +202,7 @@ namespace WPFTheWeakestRival.Infrastructure.Faults
 
             string lower = message.ToLowerInvariant();
 
-            bool hasToken =
-                lower.Contains("token");
+            bool hasToken = lower.Contains(TOKEN_WORD_MARKER);
 
             bool hasInvalid =
                 lower.Contains(MARKER_ES_TOKEN_INVALID) ||

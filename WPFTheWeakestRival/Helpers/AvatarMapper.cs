@@ -9,39 +9,39 @@ namespace WPFTheWeakestRival.Helpers
 {
     public static class AvatarMapper
     {
-        public static AvatarAppearance FromLobbyDto(LobbyAvatarDto dto)
+        public static AvatarAppearance FromLobbyDto(LobbyAvatarDto dtoAvatarLobby)
         {
-            if (dto == null)
+            if (dtoAvatarLobby == null)
             {
                 return null;
             }
 
             return new AvatarAppearance
             {
-                BodyColor = (int)dto.BodyColor,
-                PantsColor = (int)dto.PantsColor,
-                HatType = (int)dto.HatType,
-                HatColor = (int)dto.HatColor,
-                FaceType = (int)dto.FaceType,
-                UseProfilePhotoAsFace = dto.UseProfilePhotoAsFace
+                BodyColor = (int)dtoAvatarLobby.BodyColor,
+                PantsColor = (int)dtoAvatarLobby.PantsColor,
+                HatType = (int)dtoAvatarLobby.HatType,
+                HatColor = (int)dtoAvatarLobby.HatColor,
+                FaceType = (int)dtoAvatarLobby.FaceType,
+                UseProfilePhotoAsFace = dtoAvatarLobby.UseProfilePhotoAsFace
             };
         }
 
-        public static AvatarAppearance FromGameplayDto(GameplayAvatarDto dto)
+        public static AvatarAppearance FromGameplayDto(GameplayAvatarDto dtoAvatarGameplay)
         {
-            if (dto == null)
+            if (dtoAvatarGameplay == null)
             {
                 return null;
             }
 
             return new AvatarAppearance
             {
-                BodyColor = (int)dto.BodyColor,
-                PantsColor = (int)dto.PantsColor,
-                HatType = (int)dto.HatType,
-                HatColor = (int)dto.HatColor,
-                FaceType = (int)dto.FaceType,
-                UseProfilePhotoAsFace = dto.UseProfilePhotoAsFace
+                BodyColor = (int)dtoAvatarGameplay.BodyColor,
+                PantsColor = (int)dtoAvatarGameplay.PantsColor,
+                HatType = (int)dtoAvatarGameplay.HatType,
+                HatColor = (int)dtoAvatarGameplay.HatColor,
+                FaceType = (int)dtoAvatarGameplay.FaceType,
+                UseProfilePhotoAsFace = dtoAvatarGameplay.UseProfilePhotoAsFace
             };
         }
 
