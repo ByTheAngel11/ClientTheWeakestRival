@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using WPFTheWeakestRival.Properties.Langs;
+using System.Diagnostics;
 
 namespace WPFTheWeakestRival.Helpers
 {
@@ -27,8 +28,23 @@ namespace WPFTheWeakestRival.Helpers
                     logger.Error(safeContext, ex);
                 }
             }
-            catch
+            catch (Exception logEx)
             {
+                try
+                {
+                    if (logger != null)
+                    {
+                        logger.Warn("UiExceptionHelper.ShowError failed while logging.", logEx);
+                    }
+                    else
+                    {
+                        Trace.TraceWarning("UiExceptionHelper.ShowError failed while logging: " + logEx);
+                    }
+                }
+                catch (Exception traceEx)
+                {
+                    Trace.TraceWarning("UiExceptionHelper.ShowError nested logging failure: " + traceEx);
+                }
             }
 
             string message = Lang.UiGenericError;
