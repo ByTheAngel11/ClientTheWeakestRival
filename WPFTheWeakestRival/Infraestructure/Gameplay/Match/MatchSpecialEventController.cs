@@ -331,11 +331,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                 return SpecialEventKind.BombApplied;
             }
 
-            if (IsSabotageEvent(eventName, description))
-            {
-                return SpecialEventKind.Sabotage;
-            }
-
             if (string.Equals(eventName, MatchConstants.SPECIAL_EVENT_LIGHTNING_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(eventName, MatchConstants.SPECIAL_EVENT_EXTRA_WILDCARD_CODE, StringComparison.OrdinalIgnoreCase))
             {
@@ -386,11 +381,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
                     questions.SetBombQuestionUi(false);
                     state.IsBombQuestionActive = false;
                     refreshWildcardUseState();
-                    return;
-
-                case SpecialEventKind.Sabotage:
-                    ApplySabotageTimeOverride(eventName, description);
-                    await AutoHideAndRefreshWildcardsAsync();
                     return;
 
                 case SpecialEventKind.WildcardGranted:
@@ -514,7 +504,6 @@ namespace WPFTheWeakestRival.Infrastructure.Gameplay.Match
             SurpriseExamResolved = 5,
             BombQuestion = 6,
             BombApplied = 7,
-            Sabotage = 8,
             WildcardGranted = 9
         }
     }
